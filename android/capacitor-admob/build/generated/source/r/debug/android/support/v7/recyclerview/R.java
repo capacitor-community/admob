@@ -8,33 +8,33 @@ package android.support.v7.recyclerview;
 
 public final class R {
     public static final class attr {
-        public static int coordinatorLayoutStyle = 0x7f04006d;
-        public static int fastScrollEnabled = 0x7f040090;
-        public static int fastScrollHorizontalThumbDrawable = 0x7f040091;
-        public static int fastScrollHorizontalTrackDrawable = 0x7f040092;
-        public static int fastScrollVerticalThumbDrawable = 0x7f040093;
-        public static int fastScrollVerticalTrackDrawable = 0x7f040094;
-        public static int font = 0x7f040095;
-        public static int fontProviderAuthority = 0x7f040097;
-        public static int fontProviderCerts = 0x7f040098;
-        public static int fontProviderFetchStrategy = 0x7f040099;
-        public static int fontProviderFetchTimeout = 0x7f04009a;
-        public static int fontProviderPackage = 0x7f04009b;
-        public static int fontProviderQuery = 0x7f04009c;
-        public static int fontStyle = 0x7f04009d;
-        public static int fontWeight = 0x7f04009e;
-        public static int keylines = 0x7f0400ba;
-        public static int layoutManager = 0x7f0400bc;
-        public static int layout_anchor = 0x7f0400bd;
-        public static int layout_anchorGravity = 0x7f0400be;
-        public static int layout_behavior = 0x7f0400bf;
-        public static int layout_dodgeInsetEdges = 0x7f0400c2;
-        public static int layout_insetEdge = 0x7f0400c3;
-        public static int layout_keyline = 0x7f0400c4;
-        public static int reverseLayout = 0x7f0400f7;
-        public static int spanCount = 0x7f040107;
-        public static int stackFromEnd = 0x7f04010d;
-        public static int statusBarBackground = 0x7f040111;
+        public static int coordinatorLayoutStyle = 0x7f040070;
+        public static int fastScrollEnabled = 0x7f040093;
+        public static int fastScrollHorizontalThumbDrawable = 0x7f040094;
+        public static int fastScrollHorizontalTrackDrawable = 0x7f040095;
+        public static int fastScrollVerticalThumbDrawable = 0x7f040096;
+        public static int fastScrollVerticalTrackDrawable = 0x7f040097;
+        public static int font = 0x7f040098;
+        public static int fontProviderAuthority = 0x7f04009a;
+        public static int fontProviderCerts = 0x7f04009b;
+        public static int fontProviderFetchStrategy = 0x7f04009c;
+        public static int fontProviderFetchTimeout = 0x7f04009d;
+        public static int fontProviderPackage = 0x7f04009e;
+        public static int fontProviderQuery = 0x7f04009f;
+        public static int fontStyle = 0x7f0400a0;
+        public static int fontWeight = 0x7f0400a1;
+        public static int keylines = 0x7f0400bd;
+        public static int layoutManager = 0x7f0400bf;
+        public static int layout_anchor = 0x7f0400c0;
+        public static int layout_anchorGravity = 0x7f0400c1;
+        public static int layout_behavior = 0x7f0400c2;
+        public static int layout_dodgeInsetEdges = 0x7f0400c5;
+        public static int layout_insetEdge = 0x7f0400c6;
+        public static int layout_keyline = 0x7f0400c7;
+        public static int reverseLayout = 0x7f0400fa;
+        public static int spanCount = 0x7f04010a;
+        public static int stackFromEnd = 0x7f040110;
+        public static int statusBarBackground = 0x7f040114;
     }
     public static final class bool {
         public static int abc_action_bar_embed_tabs = 0x7f050001;
@@ -135,7 +135,7 @@ public final class R {
         public static int notification_template_part_time = 0x7f0f003b;
     }
     public static final class string {
-        public static int status_bar_notification_info_overflow = 0x7f150040;
+        public static int status_bar_notification_info_overflow = 0x7f150048;
     }
     public static final class style {
         public static int TextAppearance_Compat_Notification = 0x7f1600ef;
@@ -143,15 +143,15 @@ public final class R {
         public static int TextAppearance_Compat_Notification_Line2 = 0x7f1600f2;
         public static int TextAppearance_Compat_Notification_Time = 0x7f1600f5;
         public static int TextAppearance_Compat_Notification_Title = 0x7f1600f7;
-        public static int Widget_Compat_NotificationActionContainer = 0x7f16016d;
-        public static int Widget_Compat_NotificationActionText = 0x7f16016e;
-        public static int Widget_Support_CoordinatorLayout = 0x7f16017a;
+        public static int Widget_Compat_NotificationActionContainer = 0x7f16016e;
+        public static int Widget_Compat_NotificationActionText = 0x7f16016f;
+        public static int Widget_Support_CoordinatorLayout = 0x7f16017b;
     }
     public static final class styleable {
-        public static int[] CoordinatorLayout = { 0x7f0400ba, 0x7f040111 };
+        public static int[] CoordinatorLayout = { 0x7f0400bd, 0x7f040114 };
         public static int CoordinatorLayout_keylines = 0;
         public static int CoordinatorLayout_statusBarBackground = 1;
-        public static int[] CoordinatorLayout_Layout = { 0x010100b3, 0x7f0400bd, 0x7f0400be, 0x7f0400bf, 0x7f0400c2, 0x7f0400c3, 0x7f0400c4 };
+        public static int[] CoordinatorLayout_Layout = { 0x010100b3, 0x7f0400c0, 0x7f0400c1, 0x7f0400c2, 0x7f0400c5, 0x7f0400c6, 0x7f0400c7 };
         public static int CoordinatorLayout_Layout_android_layout_gravity = 0;
         public static int CoordinatorLayout_Layout_layout_anchor = 1;
         public static int CoordinatorLayout_Layout_layout_anchorGravity = 2;
@@ -159,21 +159,21 @@ public final class R {
         public static int CoordinatorLayout_Layout_layout_dodgeInsetEdges = 4;
         public static int CoordinatorLayout_Layout_layout_insetEdge = 5;
         public static int CoordinatorLayout_Layout_layout_keyline = 6;
-        public static int[] FontFamily = { 0x7f040097, 0x7f040098, 0x7f040099, 0x7f04009a, 0x7f04009b, 0x7f04009c };
+        public static int[] FontFamily = { 0x7f04009a, 0x7f04009b, 0x7f04009c, 0x7f04009d, 0x7f04009e, 0x7f04009f };
         public static int FontFamily_fontProviderAuthority = 0;
         public static int FontFamily_fontProviderCerts = 1;
         public static int FontFamily_fontProviderFetchStrategy = 2;
         public static int FontFamily_fontProviderFetchTimeout = 3;
         public static int FontFamily_fontProviderPackage = 4;
         public static int FontFamily_fontProviderQuery = 5;
-        public static int[] FontFamilyFont = { 0x01010532, 0x0101053f, 0x01010533, 0x7f040095, 0x7f04009d, 0x7f04009e };
+        public static int[] FontFamilyFont = { 0x01010532, 0x0101053f, 0x01010533, 0x7f040098, 0x7f0400a0, 0x7f0400a1 };
         public static int FontFamilyFont_android_font = 0;
         public static int FontFamilyFont_android_fontStyle = 1;
         public static int FontFamilyFont_android_fontWeight = 2;
         public static int FontFamilyFont_font = 3;
         public static int FontFamilyFont_fontStyle = 4;
         public static int FontFamilyFont_fontWeight = 5;
-        public static int[] RecyclerView = { 0x010100f1, 0x010100c4, 0x7f040090, 0x7f040091, 0x7f040092, 0x7f040093, 0x7f040094, 0x7f0400bc, 0x7f0400f7, 0x7f040107, 0x7f04010d };
+        public static int[] RecyclerView = { 0x010100f1, 0x010100c4, 0x7f040093, 0x7f040094, 0x7f040095, 0x7f040096, 0x7f040097, 0x7f0400bf, 0x7f0400fa, 0x7f04010a, 0x7f040110 };
         public static int RecyclerView_android_descendantFocusability = 0;
         public static int RecyclerView_android_orientation = 1;
         public static int RecyclerView_fastScrollEnabled = 2;
