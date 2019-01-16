@@ -121,7 +121,7 @@ public final class R {
         public static int notification_template_part_time = 0x7f0f003b;
     }
     public static final class string {
-        public static int common_google_play_services_unknown_issue = 0x7f15002b;
+        public static int common_google_play_services_unknown_issue = 0x7f15002c;
         public static int status_bar_notification_info_overflow = 0x7f150048;
     }
     public static final class style {

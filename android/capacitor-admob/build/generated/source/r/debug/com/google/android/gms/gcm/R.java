@@ -8,6 +8,6 @@ package com.google.android.gms.gcm;
 
 public final class R {
     public static final class string {
-        public static int gcm_fallback_notification_channel_label = 0x7f150036;
+        public static int gcm_fallback_notification_channel_label = 0x7f150037;
     }
 }
