@@ -1,3 +1,5 @@
+import { PluginListenerHandle } from '@capacitor/core';
+
 declare global {
   interface PluginRegistry {
     AdMob?: AdMobPlugin;
@@ -7,10 +9,10 @@ declare global {
 export interface AdMobPlugin {
 
   // Initialize AdMob with appId
-  initialize(options: { appId: string}): Promise<{value: boolean}>
+  initialize(options: { appId: string }): Promise<{ value: boolean }>
 
   // Show a banner Ad
-  showBanner(options: AdOptions): Promise<{value: boolean}>;
+  showBanner(options: AdOptions): Promise<{ value: boolean }>;
 
   // Show banner at position
   //showBanner(position: AdPosition): Promise<boolean>;
@@ -19,46 +21,74 @@ export interface AdMobPlugin {
   //showBannerAtXY(x: number, y: number): Promise<boolean>;
 
   // Hide the banner, remove it from screen, but can show it later
-  hideBanner(): Promise<{value: boolean}>;
+  hideBanner(): Promise<{ value: boolean }>;
 
   // Resume the banner, show it after hide
-  resumeBanner(): Promise<{value: boolean}>;
+  resumeBanner(): Promise<{ value: boolean }>;
 
   // Destroy the banner, remove it from screen.
-  removeBanner(): Promise<{value: boolean}>;
+  removeBanner(): Promise<{ value: boolean }>;
 
 
 
   // Prepare interstitial banner
-  prepareInterstitial(options: AdOptions): Promise<{value: boolean}>;
+  prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>;
 
   // Show interstitial ad when it’s ready
-  showInterstitial(): Promise<{value: boolean}>;
+  showInterstitial(): Promise<{ value: boolean }>;
 
 
 
   // Prepare a reward video ad
-  prepareRewardVideoAd(options: AdOptions): Promise<{value: boolean}>;
+  prepareRewardVideoAd(options: AdOptions): Promise<{ value: boolean }>;
 
   // Show a reward video ad
-  showRewardVideoAd(): Promise<{value: boolean}>;
+  showRewardVideoAd(): Promise<{ value: boolean }>;
 
   // Pause RewardedVideo
-  pauseRewardedVideo(): Promise<{value: boolean}>;
+  pauseRewardedVideo(): Promise<{ value: boolean }>;
 
   // Resume RewardedVideo
-  resumeRewardedVideo(): Promise<{value: boolean}>;
+  resumeRewardedVideo(): Promise<{ value: boolean }>;
 
   // Close RewardedVideo
-  stopRewardedVideo(): Promise<{value: boolean}>;
+  stopRewardedVideo(): Promise<{ value: boolean }>;
 
 
 
   // Sets the values for configuration and targeting
   // setOptions(options: AdOptions): Promise<void>;
 
-    // Get user ad settings
+  // Get user ad settings
   // getAdSettings(): Promise<any>;
+
+  // AdMob listeners
+  addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  // Admob RewardVideo listeners  
+  addListener(eventName: 'onRewardedVideoStarted', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onRewardedVideoAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onRewarded', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onRewardedVideoAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void): PluginListenerHandle;
 
 }
 
@@ -123,14 +153,14 @@ export enum AdSize {
 
   // A special variant of FLUID to be set on SearchAdView when
   // loading a DynamicHeightSearchAdRequest.
-  
+
   // SEARCH = 'SEARCH',
 
-  
+
   // IAB wide skyscraper ad size (160x600 density-independent pixels).
   // This size is currently not supported by the Google Mobile Ads network;
   // this is intended for mediation ad networks only.
- 
+
   // WIDE_SKYSCRAPER = 'WIDE_SKYSCRAPER',
 
 
@@ -146,7 +176,7 @@ export enum AdSize {
 * https://developer.android.com/reference/android/widget/LinearLayout#attr_android:gravity
 * */
 
-export enum  AdPosition {
+export enum AdPosition {
   TOP_CENTER = 'TOP_CENTER',
   CENTER = 'CENTER',
   BOTTOM_CENTER = 'BOTTOM_CENTER',
