@@ -2,6 +2,7 @@ package app.xplatform.capacitor.plugins;
 
 import android.Manifest;
 import android.support.design.widget.CoordinatorLayout;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,6 +83,7 @@ public class AdMob extends Plugin {
             if (mAdView == null) {
                 mAdView = new AdView(getContext());
                 mAdView.setAdUnitId(adId);
+                Log.d(getLogTag(), "Ad ID: "+ adId);
             }
 
             switch (adSize) {
@@ -189,8 +191,10 @@ public class AdMob extends Plugin {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mAdViewLayout.setVisibility(View.GONE);
-                    mAdView.pause();
+                    if (mAdViewLayout != null) {
+                        mAdViewLayout.setVisibility(View.GONE);
+                        mAdView.pause();
+                    }
                 }
             });
 
@@ -209,8 +213,11 @@ public class AdMob extends Plugin {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mAdViewLayout.setVisibility(View.VISIBLE);
-                    mAdView.resume();
+                    if (mAdViewLayout != null & mAdView != null) {
+                        mAdViewLayout.setVisibility(View.VISIBLE);
+                        mAdView.resume();
+                        Log.d(getLogTag(), "Banner AD Resumed");
+                    }
                 }
             });
 
@@ -226,13 +233,20 @@ public class AdMob extends Plugin {
     @PluginMethod()
     public void removeBanner(PluginCall call) {
         try {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mViewGroup.removeView(mAdViewLayout);
-                    mAdView.destroy();
-                }
-            });
+            if (mAdView != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mAdView != null) {
+                            mViewGroup.removeView(mAdViewLayout);
+                            mAdViewLayout.removeView(mAdView);
+                            mAdView.destroy();
+                            mAdView = null;
+                            Log.d(getLogTag(), "Banner AD Removed");
+                        }
+                    }
+                });
+            }
 
             call.success(new JSObject().put("value", true));
 

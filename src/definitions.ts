@@ -1,3 +1,4 @@
+
 declare global {
   interface PluginRegistry {
     AdMob?: AdMobPlugin;
@@ -59,7 +60,6 @@ export interface AdMobPlugin {
 
     // Get user ad settings
   // getAdSettings(): Promise<any>;
-
 }
 
 
