@@ -1,6 +1,6 @@
 
   Pod::Spec.new do |s|
-    s.name = 'CapacitorAdmob'
+    s.name = '`RdlaboCapacitorAdmob`'
     s.version = '0.0.1'
     s.summary = 'This This is Ionic Capacitor native plugin for IOS & Android'
     s.license = 'MIT'
@@ -10,4 +10,5 @@
     s.source_files = 'ios/Plugin/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
     s.ios.deployment_target  = '11.0'
     s.dependency 'Capacitor'
+    s.dependency 'Google-Mobile-Ads-SDK'
   end

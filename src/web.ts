@@ -9,14 +9,80 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     });
   }
 
-  async echo(options: { value: string }): Promise<{value: string}> {
-    console.log('ECHO', options);
-    return Promise.resolve({ value: options.value });
+  async initialize() {
+    return {
+      value: null,
+    }
   }
 
-  async createBanner(adOptions: AdOptions): Promise<{response: boolean}> {
-    console.log("ECHO", adOptions);
-    return Promise.resolve({response: true});
+
+  async showBanner(options: AdOptions) {
+    return {
+      value: null,
+    }
+  }
+
+  // Hide the banner, remove it from screen, but can show it later
+  async hideBanner() {
+    return {
+      value: null,
+    }
+  }
+
+  // Resume the banner, show it after hide
+  async resumeBanner() {
+    return {
+      value: null,
+    }
+  }
+
+  // Destroy the banner, remove it from screen.
+  async removeBanner() {
+    return {
+      value: null,
+    }
+  }
+
+  async prepareInterstitial(options: AdOptions) {
+    return {
+      value: null,
+    }
+  }
+
+  async showInterstitial() {
+    return {
+      value: null,
+    }
+  }
+
+  async prepareRewardVideoAd(options: AdOptions){
+    return {
+      value: null,
+    }
+  }
+
+  async showRewardVideoAd(){
+    return {
+      value: null,
+    }
+  }
+
+  async pauseRewardedVideo(){
+    return {
+      value: null,
+    }
+  }
+
+  async resumeRewardedVideo(){
+    return {
+      value: null,
+    }
+  }
+
+  async stopRewardedVideo(){
+    return {
+      value: null,
+    }
   }
 }
 
