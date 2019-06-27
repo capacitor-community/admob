@@ -10,7 +10,6 @@ import GoogleMobileAds
 public class AdMob: CAPPlugin {
 
     var bannerView: GADBannerView!
-    var bannerUIView: UIViewController!
 
     @objc func initialize(_ call: CAPPluginCall) {
         let appId = call.getString("appId") ?? "ca-app-pub-6564742920318187~7217030993"
