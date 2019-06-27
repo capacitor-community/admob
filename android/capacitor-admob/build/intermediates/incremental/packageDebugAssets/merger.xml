@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="C:\XPlatform\capacitor-admob\android\capacitor-admob\src\main\assets"/><source path="C:\XPlatform\capacitor-admob\android\capacitor-admob\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="C:\XPlatform\capacitor-admob\android\capacitor-admob\src\debug\assets"/></dataSet></merger>

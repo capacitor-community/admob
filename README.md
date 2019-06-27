@@ -18,7 +18,7 @@ Open your __app/src/Android/AndroidManifest.xml__ file and add this `meta-data` 
 ```xml
 <application>
   <!-- this line needs to be added (replace the value!) -->
-  <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713" />
+  <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-6564742920318187~3878397693" />
   <activity></activity>
 </application>
 
@@ -31,8 +31,6 @@ Open your Ionic Capacitor App in Android Studio, Now open __app/src/main/java/**
 
 ```java
 // Other imports...
-import app.xplatform.capacitor.plugins.AdMob;
-
 public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -40,11 +38,42 @@ public class MainActivity extends BridgeActivity {
 
     this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
       
-      add(AdMob.class);  // Add AdMob as a Capacitor Plugin
+      add(jp.rdlabo.capacitor.plugin.admob.AdMob.class);
 
     }});
   }
 }
+```
+
+## iOS
+
+### 📌 Update Info.plist
+Open your __apps/ios/App/App/Info.plist__ file and add this `GADApplicationIdentifier` line at the right spot (and replace the value by the actual App ID of your app!):
+
+
+```apps/ios/App/App/Info.plist
+<key>GADApplicationIdentifier</key>
+<string>ca-app-pub-6564742920318187~7217030993</string>
+```
+
+### 📌 Register AdMob to Capacitor
+
+Open your Ionic Capacitor App in Xcode, Now open __apps/ios/App/App/AppDelegate.swift__  of your app and Register AdMob to Capacitor Plugins.
+
+```
+import UIKit
+import Capacitor
+import GoogleMobileAds
+
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+  var window: UIWindow?
+
+
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    // Override point for customization after application launch.
+    GADMobileAds.sharedInstance().start(completionHandler: nil)
 ```
 
 ## 📌 Initialize AdMob
