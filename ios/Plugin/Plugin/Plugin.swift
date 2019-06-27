@@ -21,30 +21,36 @@ public class AdMob: CAPPlugin {
     @objc func showBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.bannerView = GADBannerView(adSize: kGADAdSizeBanner)
+
+            self.addBannerViewToView(self.bannerView)
             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
             self.bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
-            self.bannerView.backgroundColor = UIColor(red: 10, green: 0, blue: 0, alpha: 100)
+            self.bannerView.rootViewController = UIApplication.shared.keyWindow?.rootViewController
+            self.bannerView.load(GADRequest())
+        }
+    }
 
-            if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
-                rootViewController.view.addSubview(self.bannerView)
-                rootViewController.view.addConstraints(
-                    [NSLayoutConstraint(item: self.bannerView,
-                                        attribute: .bottom,
-                                        relatedBy: .equal,
-                                        toItem: self.bannerView,
-                                        attribute: .top,
-                                        multiplier: 1,
-                                        constant: 0),
-                     NSLayoutConstraint(item: self.bannerView,
-                                        attribute: .centerX,
-                                        relatedBy: .equal,
-                                        toItem: rootViewController.view,
-                                        attribute: .centerX,
-                                        multiplier: 1,
-                                        constant: 0)
-                    ])
-                self.bannerView.load(GADRequest())
-            }
+    func addBannerViewToView(_ bannerView: GADBannerView) {
+        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+            NSLog("AdMob: rendering rootView")
+            bannerView.translatesAutoresizingMaskIntoConstraints = false
+            rootViewController.view.addSubview(bannerView)
+            rootViewController.view.addConstraints(
+                [NSLayoutConstraint(item: bannerView,
+                                    attribute: .bottom,
+                                    relatedBy: .equal,
+                                    toItem: rootViewController.bottomLayoutGuide,
+                                    attribute: .top,
+                                    multiplier: 1,
+                                    constant: 0),
+                 NSLayoutConstraint(item: bannerView,
+                                    attribute: .centerX,
+                                    relatedBy: .equal,
+                                    toItem: rootViewController.view,
+                                    attribute: .centerX,
+                                    multiplier: 1,
+                                    constant: 0)
+                ])
         }
     }
 }
