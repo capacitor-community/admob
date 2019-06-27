@@ -7,6 +7,7 @@ target 'Plugin' do
 
   # Pods for IonicRunner
   pod 'Capacitor'
+  pod 'Google-Mobile-Ads-SDK'
 end
 
 target 'PluginTests' do

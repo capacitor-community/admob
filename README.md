@@ -1,10 +1,12 @@
-# [Capacitor AdMob](https://github.com/rahadur/capacitor-admob) 💰💰💰
+# [Capacitor AdMob](https://github.com/rdlabo/capacitor-admob) 💰💰💰
 
 Capacitor AdMob is a native AdMob  implementation for IOS & Android. Now you can use this package as a [Ionic Capacitor](https://capacitor.ionicframework.com) Plugin in your App.
 
 ## Installation
 
-` npm install --save capacitor-admob`
+```
+$ npm install --save @rdlabo/capacitor-admob
+```
 
 
 ## Android
@@ -24,7 +26,7 @@ Open your __app/src/Android/AndroidManifest.xml__ file and add this `meta-data` 
 
 ### 📌 Register AdMob to Capacitor
 
-Open your Ionic Capacitor App in Android Studio, Now open **MainActivity.java** of your app and Register AdMob to Capacitor Plugins.
+Open your Ionic Capacitor App in Android Studio, Now open __app/src/main/java/**/**/**/MainActivity.java__ of your app and Register AdMob to Capacitor Plugins.
 
 
 ```java
@@ -49,9 +51,9 @@ public class MainActivity extends BridgeActivity {
 
 Open our Ionic app __app.component.ts__ file and add this folloing code.
 
-```typescript
+```ts
 import { Plugins } from '@capacitor/core';
-import { initialize } from 'capacitor-admob';
+import { initialize } from '@rdlabo/capacitor-admob';
 
 const { AdMob } = Plugins;
 
@@ -72,9 +74,9 @@ export class AppComponent {
 
 ### showBanner(options: AdOptions): Promise<{ value: boolean }>
 
-```typescript
+```ts
 import { Plugins } from '@capacitor/core';
-import { AdOptions, AdSize, AdPosition } from 'capacitor-admob';
+import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
 
 const { AdMob } = Plugins;
 
@@ -115,7 +117,7 @@ export class AdMobComponent {
 
 ### hideBanner(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Hide the banner, remove it from screen, but can show it later
 
 AdMob.hideBanner().then(
@@ -131,7 +133,7 @@ AdMob.hideBanner().then(
 
 ### resumeBanner(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Resume the banner, show it after hide
 
 AdMob.resumeBanner().then(
@@ -146,7 +148,7 @@ AdMob.resumeBanner().then(
 
 ### removeBanner(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Destroy the banner, remove it from screen.
 
 AdMob.removeBanner().then(
@@ -161,7 +163,7 @@ AdMob.removeBanner().then(
 
 ### Event Listener
 This following Event Listener can be called in **Banner AD**.
-```typescript
+```ts
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
 
 addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -176,9 +178,9 @@ addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginL
 ## 📌 INTERSTITIAL
 
 ### prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>
-```typescript
+```ts
 import { Plugins } from '@capacitor/core';
-import { AdOptions } from 'capacitor-admob';
+import { AdOptions } from '@rdlabo/capacitor-admob';
 
 const { AdMob } = Plugins;
 
@@ -222,7 +224,7 @@ export class AppComponent {
 
 ### showInterstitial(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Show interstitial ad when it’s ready
 
 AdMob.showInterstitial().then(
@@ -237,7 +239,7 @@ AdMob.showInterstitial().then(
 
 ### Event Listener
 This following Event Listener can be called in **Interstitial AD**
-```typescript
+```ts
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
 
 addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -254,9 +256,9 @@ addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void)
 
 ### prepareRewardVideoAd(options: AdOptions): Promise<{ value: boolean }>
 
-```typescript
+```ts
 import { Plugins } from '@capacitor/core';
-import { AdOptions } from 'capacitor-admob';
+import { AdOptions } from '@rdlabo/capacitor-admob';
 
 const { AdMob } = Plugins;
 
@@ -315,7 +317,7 @@ AdMob.showRewardVideoAd().then(
 
 ### pauseRewardedVideo(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Pause a RewardVideo AD
 
 AdMob.pauseRewardedVideo().then(
@@ -331,7 +333,7 @@ AdMob.pauseRewardedVideo().then(
 
 ### resumeRewardedVideo(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Resume a RewardVideo AD
 
 AdMob.resumeRewardedVideo().then(
@@ -346,7 +348,7 @@ AdMob.resumeRewardedVideo().then(
 
 ### stopRewardedVideo(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Stop a RewardVideo AD
 
 AdMob.stopRewardedVideo().then(
@@ -361,7 +363,7 @@ AdMob.stopRewardedVideo().then(
 
 ### Event Listener
 This following Event Listener can be called in **RewardedVideo**
-```typescript
+```ts
 addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
 
 addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -382,7 +384,7 @@ addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => 
 # API 
 
 ### 📌 AdOptions
-```typescript
+```ts
 interface AdOptions {
   adId: string;
   adSize?: AdSize;
@@ -391,7 +393,7 @@ interface AdOptions {
 ```
 
 ### 📌 AdSize
-```typescript
+```ts
 enum AdSize {
   BANNER = 'BANNER',
 
@@ -412,7 +414,7 @@ enum AdSize {
 ```
 
 ### 📌 AdPosition
-```typescript
+```ts
 enum AdPosition {
     
   TOP_CENTER = 'TOP_CENTER',

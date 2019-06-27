@@ -6,15 +6,59 @@ PODS:
   - GCDWebServer (3.4.2):
     - GCDWebServer/Core (= 3.4.2)
   - GCDWebServer/Core (3.4.2)
+  - Google-Mobile-Ads-SDK (7.46.0):
+    - GoogleAppMeasurement (~> 6.0)
+  - GoogleAppMeasurement (6.0.2):
+    - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
+    - GoogleUtilities/MethodSwizzler (~> 6.0)
+    - GoogleUtilities/Network (~> 6.0)
+    - "GoogleUtilities/NSData+zlib (~> 6.0)"
+    - nanopb (~> 0.3)
+  - GoogleUtilities/AppDelegateSwizzler (6.2.1):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+  - GoogleUtilities/Environment (6.2.1)
+  - GoogleUtilities/Logger (6.2.1):
+    - GoogleUtilities/Environment
+  - GoogleUtilities/MethodSwizzler (6.2.1):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/Network (6.2.1):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (6.2.1)"
+  - GoogleUtilities/Reachability (6.2.1):
+    - GoogleUtilities/Logger
+  - nanopb (0.3.901):
+    - nanopb/decode (= 0.3.901)
+    - nanopb/encode (= 0.3.901)
+  - nanopb/decode (0.3.901)
+  - nanopb/encode (0.3.901)
 
 DEPENDENCIES:
   - Capacitor
+  - Google-Mobile-Ads-SDK
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Capacitor
+    - CapacitorCordova
+    - GCDWebServer
+    - Google-Mobile-Ads-SDK
+    - GoogleAppMeasurement
+    - GoogleUtilities
+    - nanopb
 
 SPEC CHECKSUMS:
   Capacitor: 36a275e2fd85b69a2cb9633e8920ecf5c5aab88d
   CapacitorCordova: cf26a9b075eb1f339118c920a975e4ff9e403193
   GCDWebServer: 8d67ee9f634b4bb91eb4b8aee440318a5fc6debd
+  Google-Mobile-Ads-SDK: 4bff3a7d621555f2317813e495fecce745681f7e
+  GoogleAppMeasurement: a35a645835bae31b6bdc0576396bc23908f12a22
+  GoogleUtilities: c7a0b08bda3bf808be823ed151f0e28ac6866e71
+  nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
 
-PODFILE CHECKSUM: 57e6d463d83fe9e2081ca17be52456b12c5e148c
+PODFILE CHECKSUM: c0386babebf9bb2de5044f06ad0a616a9f691e12
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.6.1
