@@ -91,6 +91,19 @@ export interface AdMobPlugin {
 
   addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void): PluginListenerHandle;
 
+  // iOS
+  addListener(eventName: 'adViewDidReceiveAd', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'adView:didFailToReceiveAdWithError', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'adViewWillPresentScreen', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'adViewWillDismissScreen', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'adViewDidDismissScreen', listenerFunc: (info: any) => void): PluginListenerHandle;
+
+  addListener(eventName: 'adViewWillLeaveApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
+
 }
 
 

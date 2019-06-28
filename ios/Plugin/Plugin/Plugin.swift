@@ -7,7 +7,7 @@ import GoogleMobileAds
  * here: https://capacitor.ionicframework.com/docs/plugins/ios
  */
 @objc(AdMob)
-public class AdMob: CAPPlugin {
+public class AdMob: CAPPlugin, GADBannerViewDelegate {
 
     var bannerView: GADBannerView!
 
@@ -56,6 +56,7 @@ public class AdMob: CAPPlugin {
             self.bannerView.adUnitID = adId
             self.bannerView.rootViewController = UIApplication.shared.keyWindow?.rootViewController
             self.bannerView.load(GADRequest())
+            self.bannerView.delegate = self
 
             call.success([
                 "value": true
@@ -70,6 +71,10 @@ public class AdMob: CAPPlugin {
                 subView.isHidden = true;
             }
         }
+
+        call.success([
+            "value": true
+            ])
     }
 
     @objc func resumeBanner(_ call: CAPPluginCall) {
@@ -79,10 +84,17 @@ public class AdMob: CAPPlugin {
                 subView.isHidden = false;
             }
         }
+
+        call.success([
+            "value": true
+            ])
     }
 
     @objc func removeBanner(_ call: CAPPluginCall) {
         removeBannerViewToView()
+        call.success([
+            "value": true
+            ])
     }
 
     private func addBannerViewToView(_ bannerView: GADBannerView, _ adPosition: String, _ Margin: String) {
@@ -135,5 +147,45 @@ public class AdMob: CAPPlugin {
                 subView.removeFromSuperview()
             }
         }
+    }
+
+
+    /// Tells the delegate an ad request loaded an ad.
+    public func adViewDidReceiveAd(_ bannerView: GADBannerView) {
+        print("adViewDidReceiveAd")
+        self.bridge.triggerJSEvent(eventName: "adViewDidReceiveAd", target: "window")
+    }
+
+    /// Tells the delegate an ad request failed.
+    public func adView(_ bannerView: GADBannerView,
+                didFailToReceiveAdWithError error: GADRequestError) {
+        print("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
+        self.bridge.triggerJSEvent(eventName: "adView:didFailToReceiveAdWithError", target: "window")
+    }
+
+    /// Tells the delegate that a full-screen view will be presented in response
+    /// to the user clicking on an ad.
+    public func adViewWillPresentScreen(_ bannerView: GADBannerView) {
+        print("adViewWillPresentScreen")
+        self.bridge.triggerJSEvent(eventName: "adViewWillPresentScreen", target: "window")
+    }
+
+    /// Tells the delegate that the full-screen view will be dismissed.
+    public func adViewWillDismissScreen(_ bannerView: GADBannerView) {
+        print("adViewWillDismissScreen")
+        self.bridge.triggerJSEvent(eventName: "adViewWillDismissScreen", target: "window")
+    }
+
+    /// Tells the delegate that the full-screen view has been dismissed.
+    public func adViewDidDismissScreen(_ bannerView: GADBannerView) {
+        print("adViewDidDismissScreen")
+        self.bridge.triggerJSEvent(eventName: "adViewDidDismissScreen", target: "window")
+    }
+
+    /// Tells the delegate that a user click will open another app (such as
+    /// the App Store), backgrounding the current app.
+    public func adViewWillLeaveApplication(_ bannerView: GADBannerView) {
+        print("adViewWillLeaveApplication")
+        self.bridge.triggerJSEvent(eventName: "adViewWillLeaveApplication", target: "window")
     }
 }
