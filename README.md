@@ -54,7 +54,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
 
-
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
     GADMobileAds.sharedInstance().start(completionHandler: nil)
@@ -188,11 +187,8 @@ AdMob.removeBanner().then(
 This following Event Listener can be called in **Banner AD**.
 ```ts
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
 
@@ -263,13 +259,9 @@ AdMob.showInterstitial().then(
 This following Event Listener can be called in **Interstitial AD**
 ```ts
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
 
@@ -323,7 +315,7 @@ export class AAdMobComponent {
 
 #### showRewardVideoAd(): Promise<{ value: boolean }>
 
-```typescript
+```ts
 // Show a RewardVideo AD
 
 AdMob.showRewardVideoAd().then(
@@ -387,19 +379,12 @@ AdMob.stopRewardedVideo().then(
 This following Event Listener can be called in **RewardedVideo**
 ```ts
 addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onRewardedVideoStarted', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onRewardedVideoAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onRewarded', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onRewardedVideoAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
-
 addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
 
@@ -418,19 +403,12 @@ interface AdOptions {
 ```ts
 enum AdSize {
   BANNER = 'BANNER',
-
   FLUID = 'FLUID',
-
   FULL_BANNER = 'FULL_BANNER',
-
   LARGE_BANNER = 'LARGE_BANNER',
-
   LEADERBOARD = 'LEADERBOARD',
-
   MEDIUM_RECTANGLE = 'MEDIUM_RECTANGLE',
-
   SMART_BANNER = 'SMART_BANNER',
-
   CUSTOM = 'CUSTOM'
 }
 ```
@@ -438,11 +416,8 @@ enum AdSize {
 ### AdPosition
 ```ts
 enum AdPosition {
-    
   TOP_CENTER = 'TOP_CENTER',
-
   CENTER = 'CENTER',
-
   BOTTOM_CENTER = 'BOTTOM_CENTER',
 }
 ```
