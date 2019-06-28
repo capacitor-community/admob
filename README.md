@@ -1,6 +1,9 @@
-# [Capacitor AdMob](https://github.com/rdlabo/capacitor-admob) 💰💰💰
+[![npm version](https://badge.fury.io/js/%40rdlabo%2Fcapacitor-admob.svg)](https://badge.fury.io/js/%40rdlabo%2Fcapacitor-admob)
 
-Capacitor AdMob is a native AdMob  implementation for IOS & Android. Now you can use this package as a [Ionic Capacitor](https://capacitor.ionicframework.com) Plugin in your App.
+# capacitor-admib
+
+Capacitor AdMob is a native AdMob implementation for iOS & Android. 
+This repository fork from `@rahadur/capacitor-admob` .
 
 ## Installation
 
@@ -9,12 +12,21 @@ $ npm install --save @rdlabo/capacitor-admob
 ```
 
 
-## Android
+## Android configuration
 
+In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to the initialization list:
 
-### 📌 Update Manifest
-
+```java
+this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
+  [...]
+  add(jp.rdlabo.capacitor.plugin.admob.AdMob.class);
+  [...]
+}});
 ```
+
+In file `android/app/src/main/AndroidManifest.xml`, add the following XML elements under `<manifest><application>` :
+
+```xml
 <meta-data
     android:name="com.google.android.gms.ads.APPLICATION_ID"
     android:value="@string/admob_app_id"/>
@@ -23,48 +35,18 @@ $ npm install --save @rdlabo/capacitor-admob
 In file `android/app/src/main/res/values/strings.xml` add the following lines :
 
 ```xml
-<string name="admob_app_id">ca-app-pub-6564742920318187~3878397693</string>
-```
-
-### 📌 Register AdMob to Capacitor
-
-Open your Ionic Capacitor App in Android Studio, Now open __app/src/main/java/**/**/**/MainActivity.java__ of your app and Register AdMob to Capacitor Plugins.
-
-
-```java
-// Other imports...
-public class MainActivity extends BridgeActivity {
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
-      
-      add(jp.rdlabo.capacitor.plugin.admob.AdMob.class);
-
-    }});
-  }
-}
-```
-
-## iOS
-
-### 📌 Update Info.plist
-Open your __apps/ios/App/App/Info.plist__ file and add this `GADApplicationIdentifier` line at the right spot (and replace the value by the actual App ID of your app!):
-
-
-```apps/ios/App/App/Info.plist
-<key>GADApplicationIdentifier</key>
-<string>ca-app-pub-6564742920318187~7217030993</string>
-```
-
-### 📌 Register AdMob to Capacitor
-
-Open your Ionic Capacitor App in Xcode, Now open __apps/ios/App/App/AppDelegate.swift__  of your app and Register AdMob to Capacitor Plugins.
+<string name="admob_app_id">[APP_ID]</string>
 
 ```
-import UIKit
-import Capacitor
+
+Don't forget to replace `[APP_ID]` by your Facebook application Id.
+
+
+## iOS configuration
+
+In file `ios/App/App/AppDelegate.swift` add or replace the following:
+
+```
 import GoogleMobileAds
 
 @UIApplicationMain
@@ -78,7 +60,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     GADMobileAds.sharedInstance().start(completionHandler: nil)
 ```
 
-## 📌 Initialize AdMob
+Add the following in the `ios/App/App/info.plist` file:
+
+```xml
+<key>GADApplicationIdentifier</key>
+<string>ca-app-pub-6564742920318187~7217030993</string>
+```
+
+
+## Initialize
 
 Open our Ionic app __app.component.ts__ file and add this folloing code.
 
@@ -101,9 +91,11 @@ export class AppComponent {
 }
 ```
 
-## 📌 BANNER
+## APIs
 
-### showBanner(options: AdOptions): Promise<{ value: boolean }>
+### 📌 BANNER
+
+#### showBanner(options: AdOptions): Promise<{ value: boolean }>
 
 ```ts
 import { Plugins } from '@capacitor/core';
@@ -146,7 +138,7 @@ export class AdMobComponent {
 ```
 
 
-### hideBanner(): Promise<{ value: boolean }>
+#### hideBanner(): Promise<{ value: boolean }>
 
 ```ts
 // Hide the banner, remove it from screen, but can show it later
@@ -162,7 +154,7 @@ AdMob.hideBanner().then(
 ```
 
 
-### resumeBanner(): Promise<{ value: boolean }>
+#### resumeBanner(): Promise<{ value: boolean }>
 
 ```ts
 // Resume the banner, show it after hide
@@ -177,7 +169,7 @@ AdMob.resumeBanner().then(
 );
 ```
 
-### removeBanner(): Promise<{ value: boolean }>
+#### removeBanner(): Promise<{ value: boolean }>
 
 ```ts
 // Destroy the banner, remove it from screen.
@@ -192,7 +184,7 @@ AdMob.removeBanner().then(
 );
 ```
 
-### Event Listener
+#### Event Listener
 This following Event Listener can be called in **Banner AD**.
 ```ts
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -205,10 +197,9 @@ addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginL
 ```
 
 
+### INTERSTITIAL
 
-## 📌 INTERSTITIAL
-
-### prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>
+#### prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>
 ```ts
 import { Plugins } from '@capacitor/core';
 import { AdOptions } from '@rdlabo/capacitor-admob';
@@ -253,7 +244,7 @@ export class AppComponent {
 ```
 
 
-### showInterstitial(): Promise<{ value: boolean }>
+#### showInterstitial(): Promise<{ value: boolean }>
 
 ```ts
 // Show interstitial ad when it’s ready
@@ -268,7 +259,7 @@ AdMob.showInterstitial().then(
 );
 ```
 
-### Event Listener
+#### Event Listener
 This following Event Listener can be called in **Interstitial AD**
 ```ts
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -283,9 +274,9 @@ addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void)
 ```
 
 
-## 📌 RewardVideo
+### RewardVideo
 
-### prepareRewardVideoAd(options: AdOptions): Promise<{ value: boolean }>
+#### prepareRewardVideoAd(options: AdOptions): Promise<{ value: boolean }>
 
 ```ts
 import { Plugins } from '@capacitor/core';
@@ -330,7 +321,7 @@ export class AAdMobComponent {
 ```
 
 
-### showRewardVideoAd(): Promise<{ value: boolean }>
+#### showRewardVideoAd(): Promise<{ value: boolean }>
 
 ```typescript
 // Show a RewardVideo AD
@@ -346,7 +337,7 @@ AdMob.showRewardVideoAd().then(
 ```
 
 
-### pauseRewardedVideo(): Promise<{ value: boolean }>
+#### pauseRewardedVideo(): Promise<{ value: boolean }>
 
 ```ts
 // Pause a RewardVideo AD
@@ -362,7 +353,7 @@ AdMob.pauseRewardedVideo().then(
 ```
 
 
-### resumeRewardedVideo(): Promise<{ value: boolean }>
+#### resumeRewardedVideo(): Promise<{ value: boolean }>
 
 ```ts
 // Resume a RewardVideo AD
@@ -377,7 +368,7 @@ AdMob.resumeRewardedVideo().then(
 );
 ```
 
-### stopRewardedVideo(): Promise<{ value: boolean }>
+#### stopRewardedVideo(): Promise<{ value: boolean }>
 
 ```ts
 // Stop a RewardVideo AD
@@ -392,7 +383,7 @@ AdMob.stopRewardedVideo().then(
 );
 ```
 
-### Event Listener
+#### Event Listener
 This following Event Listener can be called in **RewardedVideo**
 ```ts
 addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -412,9 +403,9 @@ addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (info: any
 addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
 
-# API 
+## Options
 
-### 📌 AdOptions
+### AdOptions
 ```ts
 interface AdOptions {
   adId: string;
@@ -423,7 +414,7 @@ interface AdOptions {
 }
 ```
 
-### 📌 AdSize
+### AdSize
 ```ts
 enum AdSize {
   BANNER = 'BANNER',
@@ -444,7 +435,7 @@ enum AdSize {
 }
 ```
 
-### 📌 AdPosition
+### AdPosition
 ```ts
 enum AdPosition {
     
@@ -457,20 +448,5 @@ enum AdPosition {
 ```
 
 
-## Contributing
-
-- 🌟 Star this repository
-- 📋 Open issue for feature requests
-
-
-## Roadmap
- - [Capacitor Plugins](https://capacitor.ionicframework.com/docs/plugins/)
-
- - [IOS](https://capacitor.ionicframework.com/docs/plugins/ios/)
-
- - [Android](https://capacitor.ionicframework.com/docs/plugins/android/)
-
-
 ## License
-
 Capacitor AdMob is [MIT licensed](./LICENSE).
