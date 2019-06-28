@@ -13,15 +13,17 @@ $ npm install --save @rdlabo/capacitor-admob
 
 
 ### 📌 Update Manifest
-Open your __app/src/Android/AndroidManifest.xml__ file and add this `meta-data` line at the right spot (and replace the value by the actual App ID of your app!):
+
+```
+<meta-data
+    android:name="com.google.android.gms.ads.APPLICATION_ID"
+    android:value="@string/admob_app_id"/>
+```
+
+In file `android/app/src/main/res/values/strings.xml` add the following lines :
 
 ```xml
-<application>
-  <!-- this line needs to be added (replace the value!) -->
-  <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-6564742920318187~3878397693" />
-  <activity></activity>
-</application>
-
+<string name="admob_app_id">ca-app-pub-6564742920318187~3878397693</string>
 ```
 
 ### 📌 Register AdMob to Capacitor
