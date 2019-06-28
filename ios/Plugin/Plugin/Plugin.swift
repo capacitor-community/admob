@@ -20,7 +20,12 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
 
     @objc func showBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            let adId = call.getString("adId") ?? "ca-app-pub-3940256099942544/6300978111"
+            var adId = call.getString("adId") ?? "ca-app-pub-3940256099942544/6300978111"
+            let isTest = call.getString("isTesting") ?? "TESTING"
+            if (isTest != "LIVE") {
+                adId = "ca-app-pub-3940256099942544/6300978111";
+            }
+
             let adSize = call.getString("adSize") ?? "SMART_BANNER"
             let adPosition = call.getString("position") ?? "BOTTOM_CENTER"
             let adMargin = call.getString("margin") ?? "0"
@@ -46,7 +51,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
                 bannerSize = kGADAdSizeMediumRectangle
                 break;
             default:
-                bannerSize = kGADAdSizeBanner
+                bannerSize = kGADAdSizeSmartBannerPortrait
                 break;
             }
 
@@ -65,36 +70,46 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
     }
 
     @objc func hideBanner(_ call: CAPPluginCall) {
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
-            if let subView = rootViewController.view.viewWithTag(2743243288699) {
-                NSLog("AdMob: find subView")
-                subView.isHidden = true;
+        DispatchQueue.main.async {
+            if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+                if let subView = rootViewController.view.viewWithTag(2743243288699) {
+                    NSLog("AdMob: find subView for hideBanner")
+                    subView.isHidden = true;
+                } else {
+                    NSLog("AdMob: not find subView for resumeBanner for hideBanner")
+                }
             }
-        }
 
-        call.success([
-            "value": true
-            ])
+            call.success([
+                "value": true
+                ])
+        }
     }
 
     @objc func resumeBanner(_ call: CAPPluginCall) {
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
-            if let subView = rootViewController.view.viewWithTag(2743243288699) {
-                NSLog("AdMob: find subView")
-                subView.isHidden = false;
+        DispatchQueue.main.async {
+            if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+                if let subView = rootViewController.view.viewWithTag(2743243288699) {
+                    NSLog("AdMob: find subView for resumeBanner")
+                    subView.isHidden = false;
+                } else {
+                    NSLog("AdMob: not find subView for resumeBanner")
+                }
             }
-        }
 
-        call.success([
-            "value": true
-            ])
+            call.success([
+                "value": true
+                ])
+        }
     }
 
     @objc func removeBanner(_ call: CAPPluginCall) {
-        removeBannerViewToView()
-        call.success([
-            "value": true
-            ])
+        DispatchQueue.main.async {
+            self.removeBannerViewToView()
+            call.success([
+                "value": true
+                ])
+        }
     }
 
     private func addBannerViewToView(_ bannerView: GADBannerView, _ adPosition: String, _ Margin: String) {
