@@ -77,6 +77,7 @@ public class AdMob extends Plugin {
         String adId       = call.getString("adId", "ca-app-pub-3940256099942544/6300978111");
         String adSize     = call.getString("adSize", "SMART_BANNER");
         String adPosition = call.getString("position", "BOTTOM_CENTER");
+        String adMargin   = call.getString("margin", "0");
 
         String isTesting  = call.getString("isTesting", "true");
         if (isTesting == "true") {
@@ -141,7 +142,7 @@ public class AdMob extends Plugin {
 
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
-            mAdViewLayout.setPadding(9999, 0, 9999, 0);
+            mAdViewLayout.setPadding(9999, Integer.parseInt(adMargin), 9999, Integer.parseInt(adMargin));
             // Add AdView into AdViewLayout
             mAdViewLayout.addView(mAdView);
 

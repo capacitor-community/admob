@@ -14,12 +14,6 @@ export interface AdMobPlugin {
   // Show a banner Ad
   showBanner(options: AdOptions): Promise<{ value: boolean }>;
 
-  // Show banner at position
-  //showBanner(position: AdPosition): Promise<boolean>;
-
-  // showBannerAtXY(x, y)
-  //showBannerAtXY(x: number, y: number): Promise<boolean>;
-
   // Hide the banner, remove it from screen, but can show it later
   hideBanner(): Promise<{ value: boolean }>;
 
@@ -29,6 +23,12 @@ export interface AdMobPlugin {
   // Destroy the banner, remove it from screen.
   removeBanner(): Promise<{ value: boolean }>;
 
+
+  // Show banner at position
+  //showBanner(position: AdPosition): Promise<boolean>;
+
+  // showBannerAtXY(x, y)
+  //showBannerAtXY(x: number, y: number): Promise<boolean>;
 
 
   // Prepare interstitial banner
@@ -98,24 +98,29 @@ export interface AdMobPlugin {
 export interface AdOptions {
   adId: string;       // Banner ad ID (required)
   /*
-  *
   * Banner Ad Size, defaults to SMART_BANNER.
   * IT can be: SMART_BANNER, BANNER, MEDIUM_RECTANGLE,
   * FULL_BANNER, LEADERBOARD, SKYSCRAPER, or CUSTOM
-  *
   */
   adSize?: AdSize;
   position?: AdPosition;
-  width?: number;
-  height?: number;
-  x?: number;
-  y?: number;
   isTesting?: boolean;
-  autoShow?: boolean
-  orientationRenew?: boolean;
-  adExtras?: AdExtras;
-  offsetTopBar?: boolean;
-  isTabs?: boolean;
+
+  /*
+  * Margin Banner. Default is 0;
+  * If position is BOTTOM_CENTER, margin is be margin-bottom.
+  * If position is TOP_CENTER, margin is be margin-top.
+  */
+  margin?: number;
+
+  // width?: number;
+  // height?: number;
+  // x?: number;
+  // y?: number;
+  // autoShow?: boolean
+  // orientationRenew?: boolean;
+  // adExtras?: AdExtras;
+  // offsetTopBar?: boolean;
 }
 
 
