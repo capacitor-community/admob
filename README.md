@@ -93,7 +93,7 @@ export class AppComponent {
 
 ## APIs
 
-### 📌 BANNER
+### BANNER
 
 #### showBanner(options: AdOptions): Promise<{ value: boolean }>
 
