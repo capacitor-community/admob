@@ -63,9 +63,10 @@ public class AdMob extends Plugin {
         String adPosition = call.getString("position", "BOTTOM_CENTER");
         String adMargin   = call.getString("margin", "0");
 
-        String isTesting  = call.getString("isTesting", "true");
-        if (isTesting == "true") {
-            adId = "ca-app-pub-3940256099942544/2934735716";
+        String isTesting  = call.getString("isTesting", "TESTING");
+        if (isTesting.equals("TESTING")) {
+            Log.d(getLogTag(), "TESTING");
+            adId = "ca-app-pub-3940256099942544/6300978111";
         }
 
         try {
@@ -95,7 +96,7 @@ public class AdMob extends Plugin {
                     mAdView.setAdSize(AdSize.MEDIUM_RECTANGLE);
                     break;
                 default:
-                    mAdView.setAdSize(AdSize.BANNER);
+                    mAdView.setAdSize(AdSize.SMART_BANNER);
                     break;
             }
 
@@ -122,7 +123,9 @@ public class AdMob extends Plugin {
             }
 
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-            mAdViewLayout.setPadding(9999, Integer.parseInt(adMargin), 9999, Integer.parseInt(adMargin));
+
+            Integer intMargin = Integer.parseInt(adMargin);
+            mAdViewLayout.setPadding(9999, intMargin, 9999, intMargin);
 
             // Add AdView into AdViewLayout
             mAdViewLayout.addView(mAdView);
