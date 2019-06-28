@@ -33,23 +33,11 @@ import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 public class AdMob extends Plugin {
 
     private PluginCall call;
-
     private ViewGroup mViewGroup;
-
-
     private RelativeLayout mAdViewLayout;
-
-
     private AdView mAdView;
-
-
     private InterstitialAd mInterstitialAd;
-
-
     private RewardedVideoAd mRewardedVideoAd;
-
-
-
 
     // Initialize AdMob with appId
     @PluginMethod()
@@ -59,16 +47,12 @@ public class AdMob extends Plugin {
 
         try {
             MobileAds.initialize(this.getContext(), appId);
-
             mViewGroup = (ViewGroup) ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);
-
-            call.success();
-
+            call.success(new JSObject().put("value", true));
         }catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
     }
-
 
     // Show a banner Ad
     @PluginMethod()
@@ -85,7 +69,6 @@ public class AdMob extends Plugin {
         }
 
         try {
-
             if (mAdView == null) {
                 mAdView = new AdView(getContext());
                 mAdView.setAdUnitId(adId);
@@ -116,9 +99,7 @@ public class AdMob extends Plugin {
                     break;
             }
 
-
             // Setup AdView Layout
-
             mAdViewLayout = new RelativeLayout(getContext());
             mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
             mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
@@ -141,11 +122,10 @@ public class AdMob extends Plugin {
             }
 
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-
             mAdViewLayout.setPadding(9999, Integer.parseInt(adMargin), 9999, Integer.parseInt(adMargin));
+
             // Add AdView into AdViewLayout
             mAdViewLayout.addView(mAdView);
-
 
             // Run AdMob In Main UI Thread
             getActivity().runOnUiThread(new Runnable() {
@@ -207,7 +187,6 @@ public class AdMob extends Plugin {
             });
 
             call.success(new JSObject().put("value", true));
-
         }catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
@@ -230,7 +209,6 @@ public class AdMob extends Plugin {
             });
 
             call.success(new JSObject().put("value", true));
-
         }catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
@@ -257,7 +235,6 @@ public class AdMob extends Plugin {
             }
 
             call.success(new JSObject().put("value", true));
-
         }catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
@@ -275,12 +252,9 @@ public class AdMob extends Plugin {
         */
         String adId = call.getString("adId", "ca-app-pub-3940256099942544/1033173712");
 
-
         try {
-
             mInterstitialAd = new InterstitialAd(getContext());
             mInterstitialAd.setAdUnitId(adId);
-
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -354,9 +328,6 @@ public class AdMob extends Plugin {
         }
     }
 
-
-
-
     // Prepare a RewardVideoAd
     @PluginMethod()
     public void prepareRewardVideoAd(final PluginCall call) {
@@ -418,7 +389,6 @@ public class AdMob extends Plugin {
                     });
                 }
             });
-
 
         }catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
