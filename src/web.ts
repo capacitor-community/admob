@@ -11,77 +11,79 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
 
   async initialize() {
     return {
-      value: null,
+      value: true,
     }
   }
 
-
   async showBanner(options: AdOptions) {
+    console.log(options);
     return {
-      value: null,
+      value: true,
     }
   }
 
   // Hide the banner, remove it from screen, but can show it later
   async hideBanner() {
     return {
-      value: null,
+      value: true,
     }
   }
 
   // Resume the banner, show it after hide
   async resumeBanner() {
     return {
-      value: null,
+      value: true,
     }
   }
 
   // Destroy the banner, remove it from screen.
   async removeBanner() {
     return {
-      value: null,
+      value: true,
     }
   }
 
   async prepareInterstitial(options: AdOptions) {
+    console.log(options);
     return {
-      value: null,
+      value: true,
     }
   }
 
   async showInterstitial() {
     return {
-      value: null,
+      value: true,
     }
   }
 
   async prepareRewardVideoAd(options: AdOptions){
+    console.log(options);
     return {
-      value: null,
+      value: true,
     }
   }
 
   async showRewardVideoAd(){
     return {
-      value: null,
+      value: true,
     }
   }
 
   async pauseRewardedVideo(){
     return {
-      value: null,
+      value: true,
     }
   }
 
   async resumeRewardedVideo(){
     return {
-      value: null,
+      value: true,
     }
   }
 
   async stopRewardedVideo(){
     return {
-      value: null,
+      value: true,
     }
   }
 }
@@ -89,3 +91,6 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
 const AdMob = new AdMobWeb();
 
 export { AdMob };
+
+import { registerWebPlugin } from '@capacitor/core';
+registerWebPlugin(AdMob);
