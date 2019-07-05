@@ -12,8 +12,9 @@ This repository fork from `@rahadur/capacitor-admob` .
 | **Reward** | Developing | No Tested |
 
 ## DONATE THIS PROJECT
-Thanks for considering donate. If this plugin help you, please share admob income. This help developing this plugin.
-This also help me easily determine how much time I would spend on the projects each month.
+Thanks for considering donate.
+
+If this plugin help you, please share admob income. This help developing this plugin.This also help me easily determine how much time I would spend on the projects each month.
 
 |  | TYPE | AMOUNT | LINK |
 |:--:|:--:|:--:|:--:|
