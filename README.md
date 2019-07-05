@@ -12,13 +12,12 @@ This repository fork from `@rahadur/capacitor-admob` .
 | **Reward** | Developing | No Tested |
 
 ## DONATE THIS PROJECT
-
-
-I prefer to have a few fixed amount subscription plans, which can be cancelled at any time, so people who want to fund more could simply subscribe the plan longer. This also help me easily determine how much time I would spend on the projects each month.
+Thanks for considering donate. If this plugin help you, please share admob income. This help developing this plugin.
+This also help me easily determine how much time I would spend on the projects each month.
 
 |  | TYPE | AMOUNT | LINK |
 |:--|:--:|:--:|:--:|
-| PayPal.me | Once | Any | [Donate](paypal.me) |
+| PayPal.me | Once | Any | [Donate](https://www.paypal.me/rdlabo) |
 | Paypal | Subscription | $15/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GE7XTRB3S6M4S) |
 | Paypal | Subscription | $30/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZV5NSRJ2MSMGN) |
 | Paypal | Subscription | $50/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5RKVFKZRE8F36) |
