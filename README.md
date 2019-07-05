@@ -129,7 +129,7 @@ export class AdMobComponent {
 
     const options: AdOptions = {
         adId: 'YOUR ADID',
-        adSize: AdSize.Banner,
+        adSize: AdSize.BANNER,
         position: AdPosition.BOTTOM_CENTER
     }
 
@@ -141,7 +141,7 @@ export class AdMobComponent {
                 console.log(value);  // true
             },
             (error) => {
-                console.err(error); // show error
+                console.error(error); // show error
             }
         );
 
