@@ -2,15 +2,33 @@
 
 # capacitor-admib
 
-Capacitor AdMob is a native AdMob implementation for iOS & Android. 
+Capacitor AdMob is a native AdMob implementation for iOS & Android.
 This repository fork from `@rahadur/capacitor-admob` .
+
+|  | iOS | Android    |
+|:-----------------|:------------------:|:------------------:|
+| **Banner** | Released | Released |
+| **Interstitial** | Developing | No Tested |
+| **Reward** | Developing | No Tested |
+
+## DONATE THIS PROJECT
+
+
+I prefer to have a few fixed amount subscription plans, which can be cancelled at any time, so people who want to fund more could simply subscribe the plan longer. This also help me easily determine how much time I would spend on the projects each month.
+
+|  | TYPE | AMOUNT | LINK |
+|:--|:--:|:--:|:--:|
+| PayPal.me | Once | Any | [Donate](paypal.me) |
+| Paypal | Subscription | $15/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GE7XTRB3S6M4S) |
+| Paypal | Subscription | $30/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZV5NSRJ2MSMGN) |
+| Paypal | Subscription | $50/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5RKVFKZRE8F36) |
+
 
 ## Installation
 
 ```
 $ npm install --save @rdlabo/capacitor-admob
 ```
-
 
 ## Android configuration
 
@@ -124,7 +142,7 @@ export class AdMobComponent {
             },
             (error) => {
                 console.err(error); // show error
-            } 
+            }
         );
 
 
@@ -148,7 +166,7 @@ AdMob.hideBanner().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
@@ -164,7 +182,7 @@ AdMob.resumeBanner().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
@@ -179,7 +197,7 @@ AdMob.removeBanner().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
@@ -224,13 +242,13 @@ export class AppComponent {
             },
             (error) => {
                 console.err(error); // show error
-            } 
+            }
         );
 
 
         // Subscibe Banner Event Listener
         AdMob.addListener('onAdLoaded', (info: boolean) => {
-            
+
             // You can call showInterstitial() here or anytime you want.
 
              console.log("Interstitial Ad Loaded");
@@ -251,7 +269,7 @@ AdMob.showInterstitial().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
@@ -297,13 +315,13 @@ export class AAdMobComponent {
             },
             (error) => {
                 console.err(error); // show error
-            } 
+            }
         );
 
 
         // Subscibe ReWardVideo Event Listener
         AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
-            
+
             // You can call showRewardVideoAd() here or anytime you want.
 
              console.log("RewardedVideoAd Loaded");
@@ -324,7 +342,7 @@ AdMob.showRewardVideoAd().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
@@ -340,7 +358,7 @@ AdMob.pauseRewardedVideo().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
@@ -356,7 +374,7 @@ AdMob.resumeRewardedVideo().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
@@ -371,7 +389,7 @@ AdMob.stopRewardedVideo().then(
     },
     (error) => {
         console.err(error); // show error
-    } 
+    }
 );
 ```
 
