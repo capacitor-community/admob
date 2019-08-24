@@ -120,11 +120,11 @@ export interface AdOptions {
   isTesting?: 'TESTING' | 'LIVE';
 
   /*
-  * Margin Banner. Default is 0;
+  * Margin Banner. Default is '0' px;
   * If position is BOTTOM_CENTER, margin is be margin-bottom.
   * If position is TOP_CENTER, margin is be margin-top.
   */
-  margin?: number;
+  margin?: string;
 
   // width?: number;
   // height?: number;
