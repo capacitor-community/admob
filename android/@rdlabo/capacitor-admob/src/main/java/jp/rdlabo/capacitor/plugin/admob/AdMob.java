@@ -23,7 +23,6 @@ import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
-
 @NativePlugin(
     permissions = {
         Manifest.permission.ACCESS_NETWORK_STATE,
@@ -105,7 +104,7 @@ public class AdMob extends Plugin {
             mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
             mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
 
-            CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
+            final CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
                     CoordinatorLayout.LayoutParams.WRAP_CONTENT,
                     CoordinatorLayout.LayoutParams.WRAP_CONTENT
             );
@@ -125,10 +124,20 @@ public class AdMob extends Plugin {
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
             Integer intMargin = Integer.parseInt(adMargin);
-            mAdViewLayout.setPadding(9999, intMargin, 9999, intMargin);
-
-            // Add AdView into AdViewLayout
-            mAdViewLayout.addView(mAdView);
+            int margin = (int) (adMargin * density);
+            mAdViewLayoutParams.setMargins(0, margin, 0, margin);
+            // Remove child from AdViewLayout
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mAdView.getParent() != null) {
+                        ((ViewGroup)mAdView.getParent()).removeView(mAdView);
+                    }
+                    mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
+                    // Add AdView into AdViewLayout
+                    mAdViewLayout.addView(mAdView);
+                }
+            });
 
             // Run AdMob In Main UI Thread
             getActivity().runOnUiThread(new Runnable() {
@@ -203,7 +212,7 @@ public class AdMob extends Plugin {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (mAdViewLayout != null & mAdView != null) {
+                    if (mAdViewLayout != null && mAdView != null) {
                         mAdViewLayout.setVisibility(View.VISIBLE);
                         mAdView.resume();
                         Log.d(getLogTag(), "Banner AD Resumed");
@@ -311,21 +320,27 @@ public class AdMob extends Plugin {
         }
     }
 
+
     // Show interstitial Ad
     @PluginMethod()
-    public void showInterstitial(PluginCall call) {
+    public void showInterstitial(final PluginCall call) {
         try {
-            if (mInterstitialAd.isLoaded()) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mInterstitialAd.show();
-                    }
-                });
-                call.success(new JSObject().put("value", true));
-            } else {
-                call.error("The interstitial wasn't loaded yet.");
-            }
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mInterstitialAd.show();
+                        }
+                    });
+                    call.success(new JSObject().put("value", true));
+                } else {
+                    call.error("The interstitial wasn't loaded yet.");
+                }
+                }
+            });
         }catch (Exception ex){
             call.error(ex.getLocalizedMessage(), ex);
         }
@@ -399,25 +414,32 @@ public class AdMob extends Plugin {
 
     }
 
-    // Show a RewardVideoAd
-    @PluginMethod()
-    public void showRewardVideoAd(PluginCall call) {
-        try {
-            if (mRewardedVideoAd.isLoaded()) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRewardedVideoAd.show();
-                    }
-                });
-                call.success(new JSObject().put("value", true));
-            }else {
-                call.error("The RewardedVideoAd wasn't loaded yet.");
-            }
-        }catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
-        }
-    }
+   // Show a RewardVideoAd
+   @PluginMethod()
+   public void showRewardVideoAd(final PluginCall call) {
+       try {
+           getActivity().runOnUiThread(new Runnable() {
+               @Override
+               public void run() {
+                   if (mRewardedVideoAd != null && mRewardedVideoAd.isLoaded()) {
+                       getActivity().runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               mRewardedVideoAd.show();
+                           }
+                       });
+                       call.success(new JSObject().put("value", true));
+                   }else {
+                       call.error("The RewardedVideoAd wasn't loaded yet.");
+                   }
+               }
+           });
+
+       }catch (Exception ex) {
+           call.error(ex.getLocalizedMessage(), ex);
+       }
+   }
+
 
     // Pause a RewardVideoAd
     @PluginMethod()
