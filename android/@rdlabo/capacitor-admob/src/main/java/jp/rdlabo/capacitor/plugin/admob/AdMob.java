@@ -124,8 +124,10 @@ public class AdMob extends Plugin {
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
             Integer intMargin = Integer.parseInt(adMargin);
-            int margin = (int) (adMargin * density);
-            mAdViewLayoutParams.setMargins(0, margin, 0, margin);
+            float density = getContext().getResources().getDisplayMetrics().density;
+            int densityMargin = (int) (intMargin * density);
+            mAdViewLayout.setPadding(9999, 0, 9999, 0);
+            mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
             // Remove child from AdViewLayout
             getActivity().runOnUiThread(new Runnable() {
                 @Override
