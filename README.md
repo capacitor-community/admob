@@ -54,7 +54,6 @@ In file `android/app/src/main/res/values/strings.xml` add the following lines :
 
 ```xml
 <string name="admob_app_id">[APP_ID]</string>
-
 ```
 
 Don't forget to replace `[APP_ID]` by your Facebook application Id.
@@ -91,7 +90,6 @@ Open our Ionic app __app.component.ts__ file and add this folloing code.
 
 ```ts
 import { Plugins } from '@capacitor/core';
-import { initialize } from '@rdlabo/capacitor-admob';
 
 const { AdMob } = Plugins;
 
@@ -130,7 +128,8 @@ export class AdMobComponent {
     const options: AdOptions = {
         adId: 'YOUR ADID',
         adSize: AdSize.BANNER,
-        position: AdPosition.BOTTOM_CENTER
+        position: AdPosition.BOTTOM_CENTER,
+        margin: 60,
     }
 
     constructor(){
@@ -144,7 +143,6 @@ export class AdMobComponent {
                 console.error(error); // show error
             }
         );
-
 
         // Subscibe Banner Event Listener
         AdMob.addListener('onAdLoaded', (info: boolean) => {
