@@ -129,7 +129,7 @@ export class AdMobComponent {
         adId: 'YOUR ADID',
         adSize: AdSize.BANNER,
         position: AdPosition.BOTTOM_CENTER,
-        margin: 60,
+        margin: 60, // If you use Tabs
     }
 
     constructor(){
