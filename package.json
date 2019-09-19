@@ -29,7 +29,8 @@
   "keywords": [
     "capacitor",
     "plugin",
-    "native"
+    "native",
+    "admob"
   ],
   "capacitor": {
     "ios": {
