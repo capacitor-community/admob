@@ -60,7 +60,7 @@ public class AdMob extends Plugin {
         String adId       = call.getString("adId", "ca-app-pub-3940256099942544/6300978111");
         String adSize     = call.getString("adSize", "SMART_BANNER");
         String adPosition = call.getString("position", "BOTTOM_CENTER");
-        String adMargin   = call.getString("margin", "0");
+        int adMargin      = call.getInt("margin", 0);
 
         String isTesting  = call.getString("isTesting", "TESTING");
         if (isTesting.equals("TESTING")) {
@@ -123,9 +123,8 @@ public class AdMob extends Plugin {
 
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
-            Integer intMargin = Integer.parseInt(adMargin);
             float density = getContext().getResources().getDisplayMetrics().density;
-            int densityMargin = (int) (intMargin * density);
+            int densityMargin = (int) (adMargin * density);
             mAdViewLayout.setPadding(9999, 0, 9999, 0);
             mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
             // Remove child from AdViewLayout
