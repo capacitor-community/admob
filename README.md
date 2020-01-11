@@ -11,6 +11,7 @@ This repository fork from `@rahadur/capacitor-admob` .
 | **Interstitial** | Developing | No Tested |
 | **Reward** | Developing | No Tested |
 AdMob.initialize();
+
 ## DONATE THIS PROJECT
 Thanks for considering donate.
 
