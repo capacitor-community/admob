@@ -10,7 +10,7 @@ This repository fork from `@rahadur/capacitor-admob` .
 | **Banner** | Released | Released |
 | **Interstitial** | Developing | No Tested |
 | **Reward** | Developing | No Tested |
-
+AdMob.initialize({appId: 'YOUR APPID'});
 ## DONATE THIS PROJECT
 Thanks for considering donate.
 
@@ -101,7 +101,7 @@ const { AdMob } = Plugins;
 export class AppComponent {
     constructor(){
         // Initialize AdMob for your Application
-        AdMob.initialize('YOUR APPID');
+        AdMob.initialize({appId: 'YOUR APPID'});
     }
 }
 ```
