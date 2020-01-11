@@ -112,11 +112,12 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
         }
     }
 
-    private func addBannerViewToView(_ bannerView: GADBannerView, _ adPosition: String, _ adMargin: Int) {
+    private func addBannerViewToView(_ bannerView: GADBannerView, _ adPosition: String, _ Margin: Int) {
         removeBannerViewToView()
         if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
             NSLog("AdMob: rendering rootView")
             var toItem = rootViewController.bottomLayoutGuide
+            var adMargin = Int(Margin)
 
             switch (adPosition) {
             case "TOP_CENTER":
