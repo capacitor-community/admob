@@ -1,7 +1,7 @@
 
   Pod::Spec.new do |s|
     s.name = 'RdlaboCapacitorAdmob'
-    s.version = '0.1.4'
+    s.version = '0.2.0'
     s.summary = 'This This is Ionic Capacitor native plugin for IOS & Android'
     s.license = 'MIT'
     s.homepage = 'https://github.com/rdlabo/capacitor-admob.git'
