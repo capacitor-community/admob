@@ -41,8 +41,9 @@ public class AdMob extends Plugin {
     // Initialize AdMob with appId
     @PluginMethod()
     public void initialize(PluginCall call) {
-        /* Sample AdMob App ID: ca-app-pub-6564742920318187~3878397693 */
-        String appId = call.getString("appId", "ca-app-pub-6564742920318187~3878397693");
+        Resources res = this.getContext().getResources();
+        int adsIdResource = res.getIdentifier("admob_app_id", "string", this.getContext().getPackageName());
+        String appId = res.getString(adsIdResource);
 
         try {
             MobileAds.initialize(this.getContext(), appId);
@@ -56,13 +57,12 @@ public class AdMob extends Plugin {
     // Show a banner Ad
     @PluginMethod()
     public void showBanner(PluginCall call) {
-        /* Dedicated test ad unit ID for Android banners: ca-app-pub-3940256099942544/6300978111*/
         String adId       = call.getString("adId", "ca-app-pub-3940256099942544/6300978111");
         String adSize     = call.getString("adSize", "SMART_BANNER");
         String adPosition = call.getString("position", "BOTTOM_CENTER");
         int adMargin      = call.getInt("margin", 0);
-
         String isTesting  = call.getString("isTesting", "TESTING");
+
         if (isTesting.equals("TESTING")) {
             Log.d(getLogTag(), "TESTING");
             adId = "ca-app-pub-3940256099942544/6300978111";

@@ -12,15 +12,13 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
     var bannerView: GADBannerView!
 
     @objc func initialize(_ call: CAPPluginCall) {
-        let appId = call.getString("appId") ?? "ca-app-pub-6564742920318187~7217030993"
         call.success([
-            "value": appId
+            "value": true
             ])
     }
 
     @objc func showBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            var adId = call.getString("adId") ?? "ca-app-pub-3940256099942544/6300978111"
             let isTest = call.getString("isTesting") ?? "TESTING"
             if (isTest != "LIVE") {
                 adId = "ca-app-pub-3940256099942544/6300978111";
