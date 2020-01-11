@@ -19,6 +19,8 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
 
     @objc func showBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
+            var adId = call.getString("adId") ?? "ca-app-pub-3940256099942544/6300978111"
+
             let isTest = call.getString("isTesting") ?? "TESTING"
             if (isTest != "LIVE") {
                 adId = "ca-app-pub-3940256099942544/6300978111";
