@@ -62,7 +62,7 @@ public class AdMob extends Plugin {
         String adSize     = call.getString("adSize", "SMART_BANNER");
         String adPosition = call.getString("position", "BOTTOM_CENTER");
         int adMargin      = call.getInt("margin", 0);
-        String isTesting  = call.getString("isTesting", "TESTING");
+        String isTesting  = call.getString("isTesting", "LIVE");
 
         if (isTesting.equals("TESTING")) {
             Log.d(getLogTag(), "TESTING");
