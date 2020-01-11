@@ -78,7 +78,7 @@ export interface AdMobPlugin {
 
   addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
 
-  // Admob RewardVideo listeners  
+  // Admob RewardVideo listeners
   addListener(eventName: 'onRewardedVideoStarted', listenerFunc: (info: any) => void): PluginListenerHandle;
 
   addListener(eventName: 'onRewardedVideoAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -124,7 +124,7 @@ export interface AdOptions {
   * If position is BOTTOM_CENTER, margin is be margin-bottom.
   * If position is TOP_CENTER, margin is be margin-top.
   */
-  margin?: string;
+  margin?: number;
 
   // width?: number;
   // height?: number;
