@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.content.res.Resources;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
