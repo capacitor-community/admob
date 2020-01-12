@@ -151,12 +151,24 @@ public class AdMob extends Plugin {
                         @Override
                         public void onAdLoaded() {
                             notifyListeners("onAdLoaded", new JSObject().put("value", true));
+
+                            JSObject ret = new JSObject();
+                            ret.put("width", mAdView.getAdSize().getWidth());
+                            ret.put("height", mAdView.getAdSize().getHeight());
+                            notifyListeners("onAdSize", ret);
+
                             super.onAdLoaded();
                         }
 
                         @Override
                         public void onAdFailedToLoad(int i) {
                             notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", i));
+
+                            JSObject ret = new JSObject();
+                            ret.put("width", 0);
+                            ret.put("height", 0);
+                            notifyListeners("onAdSize", ret);
+
                             super.onAdFailedToLoad(i);
                         }
 
@@ -200,6 +212,11 @@ public class AdMob extends Plugin {
                 }
             });
 
+            JSObject ret = new JSObject();
+            ret.put("width", 0);
+            ret.put("height", 0);
+            notifyListeners("onAdSize", ret);
+
             call.success(new JSObject().put("value", true));
         }catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
@@ -221,6 +238,11 @@ public class AdMob extends Plugin {
                     }
                 }
             });
+
+            JSObject ret = new JSObject();
+            ret.put("width", mAdView.getAdSize().getWidth());
+            ret.put("height", mAdView.getAdSize().getHeight());
+            notifyListeners("onAdSize", ret);
 
             call.success(new JSObject().put("value", true));
         }catch (Exception ex) {

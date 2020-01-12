@@ -63,6 +63,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
             self.bannerView.load(GADRequest())
             self.bannerView.delegate = self
 
+            self.notifyListeners("onAdSize", data: [
+                "width": self.bannerView.frame.width,
+                "height": self.bannerView.frame.height
+                ])
+
             call.success([
                 "value": true
                 ])
@@ -80,6 +85,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
                 }
             }
 
+            self.notifyListeners("onAdSize", data: [
+                "width": 0,
+                "height": 0
+                ])
+
             call.success([
                 "value": true
                 ])
@@ -92,14 +102,24 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
                 if let subView = rootViewController.view.viewWithTag(2743243288699) {
                     NSLog("AdMob: find subView for resumeBanner")
                     subView.isHidden = false;
+
+                    self.notifyListeners("onAdSize", data: [
+                        "width": subView.frame.width,
+                        "height": subView.frame.height
+                        ])
+
+                    call.success([
+                        "value": true
+                        ])
+
                 } else {
                     NSLog("AdMob: not find subView for resumeBanner")
+
+                    call.success([
+                        "value": false
+                        ])
                 }
             }
-
-            call.success([
-                "value": true
-                ])
         }
     }
 

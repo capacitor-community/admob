@@ -130,7 +130,7 @@ export class AdMobComponent {
         adId: 'YOUR ADID',
         adSize: AdSize.BANNER,
         position: AdPosition.BOTTOM_CENTER,
-        margin: 60, // If you use Tabs
+        margin: 0,
     }
 
     constructor(){
@@ -148,6 +148,11 @@ export class AdMobComponent {
         // Subscibe Banner Event Listener
         AdMob.addListener('onAdLoaded', (info: boolean) => {
              console.log("Banner Ad Loaded");
+        });
+
+        // Get Banner Size
+        AdMob.addListener('onAdSize', (info: boolean) => {
+             console.log(info);
         });
     }
 }
@@ -207,6 +212,7 @@ addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginL
 addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
 addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
 addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
+addListener(eventName: 'onAdSize', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
 
 
