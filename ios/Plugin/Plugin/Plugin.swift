@@ -63,11 +63,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
             self.bannerView.load(GADRequest())
             self.bannerView.delegate = self
 
-            self.notifyListeners("onAdSize", data: [
-                "width": self.bannerView.frame.width,
-                "height": self.bannerView.frame.height
-                ])
-
             call.success([
                 "value": true
                 ])
@@ -188,6 +183,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
     /// Tells the delegate an ad request loaded an ad.
     public func adViewDidReceiveAd(_ bannerView: GADBannerView) {
         print("adViewDidReceiveAd")
+
+        self.notifyListeners("onAdSize", data: [
+            "width": self.bannerView.frame.width,
+            "height": self.bannerView.frame.height
+            ])
         self.bridge.triggerJSEvent(eventName: "adViewDidReceiveAd", target: "window")
     }
 
@@ -195,6 +195,10 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate {
     public func adView(_ bannerView: GADBannerView,
                 didFailToReceiveAdWithError error: GADRequestError) {
         print("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
+        self.notifyListeners("onAdSize", data: [
+            "width": 0,
+            "height": 0
+            ])
         self.bridge.triggerJSEvent(eventName: "adView:didFailToReceiveAdWithError", target: "window")
     }
 
