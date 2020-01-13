@@ -1,6 +1,6 @@
 [![npm version](https://badge.fury.io/js/%40rdlabo%2Fcapacitor-admob.svg)](https://badge.fury.io/js/%40rdlabo%2Fcapacitor-admob)
 
-# capacitor-admib
+# @rdlabo/capacitor-admib
 
 Capacitor AdMob is a native AdMob implementation for iOS & Android.
 This repository fork from `@rahadur/capacitor-admob` .
@@ -10,7 +10,6 @@ This repository fork from `@rahadur/capacitor-admob` .
 | **Banner** | Released | Released |
 | **Interstitial** | Developing | No Tested |
 | **Reward** | Developing | No Tested |
-AdMob.initialize();
 
 ## DONATE THIS PROJECT
 Thanks for considering donate.
@@ -81,8 +80,10 @@ Add the following in the `ios/App/App/info.plist` file:
 
 ```xml
 <key>GADApplicationIdentifier</key>
-<string>ca-app-pub-6564742920318187~7217030993</string>
+<string>[APP_ID]</string>
 ```
+
+Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
 
 ## Initialize
