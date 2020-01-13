@@ -1,5 +1,5 @@
 # Breaking Changes
-## 0.2.0
+## 0.2.12
 __app.component.ts__
 ```ts
     import { Plugins } from '@capacitor/core';
