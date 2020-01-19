@@ -117,7 +117,7 @@ export interface AdOptions {
   */
   adSize?: AdSize;
   position?: AdPosition;
-  isTesting?: 'TESTING' | 'LIVE';
+  isTesting?: boolean;
 
   /*
   * Margin Banner. Default is 0 px;

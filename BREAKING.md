@@ -1,4 +1,7 @@
 # Breaking Changes
+## 0.2.13
+- isTest: 'LIVE' | 'TESTING' => boolean
+
 ## 0.2.12
 __app.component.ts__
 ```ts

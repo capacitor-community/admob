@@ -79,6 +79,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 Add the following in the `ios/App/App/info.plist` file:
 
 ```xml
+<key>GADIsAdManagerApp</key>
+<true/>
+
 <key>GADApplicationIdentifier</key>
 <string>[APP_ID]</string>
 ```

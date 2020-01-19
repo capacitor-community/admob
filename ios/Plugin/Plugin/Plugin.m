@@ -9,4 +9,6 @@ CAP_PLUGIN(AdMob, "AdMob",
            CAP_PLUGIN_METHOD(resumeBanner, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(hideBanner, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(removeBanner, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(prepareRewardVideoAd, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(showRewardVideoAd, CAPPluginReturnPromise);
 )
