@@ -187,7 +187,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     
     /// Tells the delegate an ad request loaded an ad.
     public func adViewDidReceiveAd(_ bannerView: GADBannerView) {
-        print("adViewDidReceiveAd")
+        NSLog("adViewDidReceiveAd")
         self.notifyListeners("onAdSize", data: [
             "width": self.bannerView.frame.width,
             "height": self.bannerView.frame.height
@@ -198,7 +198,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     /// Tells the delegate an ad request failed.
     public func adView(_ bannerView: GADBannerView,
                        didFailToReceiveAdWithError error: GADRequestError) {
-        print("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
+        NSLog("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
         self.notifyListeners("onAdSize", data: [
             "width": 0,
@@ -210,26 +210,26 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     /// Tells the delegate that a full-screen view will be presented in response
     /// to the user clicking on an ad.
     public func adViewWillPresentScreen(_ bannerView: GADBannerView) {
-        print("adViewWillPresentScreen")
+        NSLog("adViewWillPresentScreen")
         self.bridge.triggerJSEvent(eventName: "adViewWillPresentScreen", target: "window")
     }
     
     /// Tells the delegate that the full-screen view will be dismissed.
     public func adViewWillDismissScreen(_ bannerView: GADBannerView) {
-        print("adViewWillDismissScreen")
+        NSLog("adViewWillDismissScreen")
         self.bridge.triggerJSEvent(eventName: "adViewWillDismissScreen", target: "window")
     }
     
     /// Tells the delegate that the full-screen view has been dismissed.
     public func adViewDidDismissScreen(_ bannerView: GADBannerView) {
-        print("adViewDidDismissScreen")
+        NSLog("adViewDidDismissScreen")
         self.bridge.triggerJSEvent(eventName: "adViewDidDismissScreen", target: "window")
     }
     
     /// Tells the delegate that a user click will open another app (such as
     /// the App Store), backgrounding the current app.
     public func adViewWillLeaveApplication(_ bannerView: GADBannerView) {
-        print("adViewWillLeaveApplication")
+        NSLog("adViewWillLeaveApplication")
         self.bridge.triggerJSEvent(eventName: "adViewWillLeaveApplication", target: "window")
     }
     
@@ -259,7 +259,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
                 if self.interstitial.isReady {
                     self.interstitial.present(fromRootViewController: rootViewController)
                 } else {
-                    print("Ad wasn't ready")
+                    NSLog("Ad wasn't ready")
                 }
             }
             
@@ -270,37 +270,37 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     // Intertitial Events Degigates
     /// Tells the delegate an ad request succeeded.
     private func interstitialDidReceiveAd(_ ad: GADInterstitial) {
-        print("interstitialDidReceiveAd")
+        NSLog("interstitialDidReceiveAd")
         self.notifyListeners("onAdLoaded", data: ["value": true])
     }
     
     /// Tells the delegate an ad request failed.
     private func interstitial(_ ad: GADInterstitial, didFailToReceiveAdWithError error: GADRequestError) {
-        print("interstitial:didFailToReceiveAdWithError: \(error.localizedDescription)")
+        NSLog("interstitial:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.notifyListeners("onAdFailedToLoad", data: ["error": error.localizedDescription])
     }
     
     /// Tells the delegate that an interstitial will be presented.
     private func interstitialWillPresentScreen(_ ad: GADInterstitial) {
-        print("interstitialWillPresentScreen")
+        NSLog("interstitialWillPresentScreen")
         self.notifyListeners("onAdOpened", data: ["value": true])
     }
     
     /// Tells the delegate the interstitial is to be animated off the screen.
     private func interstitialWillDismissScreen(_ ad: GADInterstitial) {
-        print("interstitialWillDismissScreen")
+        NSLog("interstitialWillDismissScreen")
     }
     
     /// Tells the delegate the interstitial had been animated off the screen.
     private func interstitialDidDismissScreen(_ ad: GADInterstitial) {
-        print("interstitialDidDismissScreen")
+        NSLog("interstitialDidDismissScreen")
         self.notifyListeners("onAdClosed", data: ["value": true])
     }
     
     /// Tells the delegate that a user click will open another app
     /// (such as the App Store), backgrounding the current app.
     private func interstitialWillLeaveApplication(_ ad: GADInterstitial) {
-        print("interstitialWillLeaveApplication")
+        NSLog("interstitialWillLeaveApplication")
         self.notifyListeners("onAdLeftApplication", data: ["value": true])
     }
     
@@ -321,10 +321,12 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             self.rewardedAd = GADRewardedAd(adUnitID: adUnitID)
             self.rewardedAd?.load(GADRequest()) { error in
                 if let error = error {
-                    print("Reward: Loading failed: \(error)")
+                    NSLog("AdMob Reward: Loading failed: \(error)")
                     call.error("Loading failed")
                 } else {
-                    print("Reward: Loading Succeeded")
+                    NSLog("AdMob Reward: Loading Succeeded")
+                    // 広告が用意された
+                    self.notifyListeners("onRewardedVideoAdLoaded", data: ["value": true])
                     call.success(["value": true])
                 }
             }
@@ -338,6 +340,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
                 if self.rewardedAd?.isReady == true {
                     self.rewardedAd?.present(fromRootViewController: rootViewController, delegate: self)
+                    // 広告が用意された
                     call.resolve([ "value": true ])
                 } else {
                     call.error("Reward Video is Not Ready Yet")
@@ -347,24 +350,27 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         }
     }
     
-    /// Tells the delegate that the user earned a reward.
-    public func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
-        print("Reward received with currency: \(reward.type), amount \(reward.amount).")
-        self.notifyListeners("onRewarded", data: ["type": reward.type, "amount": reward.amount])
-    }
     /// Tells the delegate that the rewarded ad was presented.
     private func rewardedAdDidPresent(_ rewardedAd: GADRewardedAd) {
-        print("Rewarded ad presented.")
+        NSLog("AdMob Reward ad presented.")
         self.notifyListeners("onRewardedVideoAdOpened", data: ["value": true])
+        self.notifyListeners("onRewardedVideoStarted", data: ["value": true])
+    }
+    /// Tells the delegate that the user earned a reward.
+    public func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
+        NSLog("AdMob Reward received with currency: \(reward.type), amount \(reward.amount).")
+        self.notifyListeners("onRewardedVideoAdClosed", data: ["value": true])
+        self.notifyListeners("onRewarded", data: ["value": true])
+        self.notifyListeners("onRewardedVideoCompleted", data: ["type": reward.type, "amount": reward.amount])
     }
     /// Tells the delegate that the rewarded ad was dismissed.
     private func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
-        print("Rewarded ad dismissed.")
-        self.notifyListeners("onRewardedVideoAdClosed", data: ["value": true])
+        NSLog("AdMob Reward ad dismissed.")
+        self.notifyListeners("onRewardedVideoAdLeftApplication", data: ["value": true])
     }
     /// Tells the delegate that the rewarded ad failed to present.
     private func rewardedAd(_ rewardedAd: GADRewardedAd, didFailToPresentWithError error: Error) {
-        print("Rewarded ad failed to present.")
+        NSLog("AdMob Reward ad failed to present.")
         self.notifyListeners("onRewardedVideoAdFailedToLoad", data: ["error": error.localizedDescription])
     }
 }

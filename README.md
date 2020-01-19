@@ -9,7 +9,7 @@ This repository fork from `@rahadur/capacitor-admob` .
 |:-----------------|:------------------:|:------------------:|
 | **Banner** | Released | Released |
 | **Interstitial** | Developing | No Tested |
-| **Reward** | Developing | No Tested |
+| **Reward** | Released | Released |
 
 ## DONATE THIS PROJECT
 Thanks for considering donate.

@@ -62,9 +62,9 @@ public class AdMob extends Plugin {
         String adSize     = call.getString("adSize", "SMART_BANNER");
         String adPosition = call.getString("position", "BOTTOM_CENTER");
         int adMargin      = call.getInt("margin", 0);
-        String isTesting  = call.getString("isTesting", "LIVE");
+        boolean isTesting  = call.getBoolean("isTesting", false);
 
-        if (isTesting.equals("TESTING")) {
+        if (isTesting) {
             Log.d(getLogTag(), "TESTING");
             adId = "ca-app-pub-3940256099942544/6300978111";
         }
@@ -283,10 +283,14 @@ public class AdMob extends Plugin {
     @PluginMethod()
     public void prepareInterstitial(final PluginCall call) {
         this.call = call;
-        /* dedicated test ad unit ID for Android interstitials:
-            ca-app-pub-3940256099942544/1033173712
-        */
         String adId = call.getString("adId", "ca-app-pub-3940256099942544/1033173712");
+
+        boolean isTesting  = call.getBoolean("isTesting", false);
+
+        if (isTesting) {
+            Log.d(getLogTag(), "TESTING");
+            adId = "ca-app-pub-3940256099942544/1033173712";
+        }
 
         try {
             mInterstitialAd = new InterstitialAd(getContext());
@@ -377,7 +381,16 @@ public class AdMob extends Plugin {
         /* dedicated test ad unit ID for Android rewarded video:
             ca-app-pub-3940256099942544/5224354917
         */
-        final String adId = call.getString("adId", "ca-app-pub-3940256099942544/5224354917");
+
+        String _adId = call.getString("adId", "ca-app-pub-3940256099942544/5224354917");
+
+        boolean isTesting  = call.getBoolean("isTesting", false);
+        if (isTesting) {
+            Log.d(getLogTag(), "TESTING");
+            _adId = "ca-app-pub-3940256099942544/5224354917";
+        }
+
+        final String adId = _adId;
 
         try {
             mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getContext());
