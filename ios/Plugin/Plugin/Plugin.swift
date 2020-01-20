@@ -359,9 +359,9 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     /// Tells the delegate that the user earned a reward.
     public func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
         NSLog("AdMob Reward received with currency: \(reward.type), amount \(reward.amount).")
-        self.notifyListeners("onRewardedVideoAdClosed", data: ["value": true])
         self.notifyListeners("onRewarded", data: ["value": true])
         self.notifyListeners("onRewardedVideoCompleted", data: ["type": reward.type, "amount": reward.amount])
+        self.notifyListeners("onRewardedVideoAdClosed", data: ["value": true])
     }
     /// Tells the delegate that the rewarded ad was dismissed.
     private func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
@@ -373,4 +373,5 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         NSLog("AdMob Reward ad failed to present.")
         self.notifyListeners("onRewardedVideoAdFailedToLoad", data: ["error": error.localizedDescription])
     }
+    
 }
