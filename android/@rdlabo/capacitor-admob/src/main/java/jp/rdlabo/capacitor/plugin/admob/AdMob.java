@@ -1,7 +1,7 @@
 package jp.rdlabo.capacitor.plugin.admob;
 
 import android.Manifest;
-import android.support.design.widget.CoordinatorLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;

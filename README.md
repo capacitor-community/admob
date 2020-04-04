@@ -30,6 +30,11 @@ If this plugin help you, please share admob income. This help developing this pl
 $ npm install --save @rdlabo/capacitor-admob
 ```
 
+### If you use Capacitor 1.x
+```
+$ npm install --save @rdlabo/capacitor-admob@0.3.0
+```
+
 ## Android configuration
 
 In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to the initialization list:
@@ -89,7 +94,7 @@ Add the following in the `ios/App/App/info.plist` file:
 Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
 
-## Initialize
+## Initialize for @ionic/angular
 
 Open our Ionic app __app.component.ts__ file and add this folloing code.
 
@@ -110,6 +115,78 @@ export class AppComponent {
     }
 }
 ```
+
+### Initialize for @ionic/react
+
+This is implements simple sample from https://github.com/DavidFrahm . Thanks!
+
+```ts
+import React from 'react';
+import { Redirect, Route } from 'react-router-dom';
+import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/react';
+import { IonReactRouter } from '@ionic/react-router';
+import Home from './pages/Home';
+
+import { Plugins } from '@capacitor/core';
+import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
+
+const { AdMob } = Plugins;
+
+const App: React.FC = () => {
+
+  AdMob.initialize();
+
+  const adId = {
+    ios: 'ios-value-here',
+    android: 'android-value-here'
+  }
+
+  const platformAdId = isPlatform('android') ? adId.android : adId.ios;
+
+  const options: AdOptions = {
+    adId: platformAdId,
+    adSize: AdSize.BANNER,
+    position: AdPosition.BOTTOM_CENTER,
+    margin: 0,
+    // isTesting: true
+  }
+
+  AdMob.showBanner(options)
+    .then(
+      (value) => {
+        console.log("Show banner", value);  // Boolean true
+      },
+      (error) => {
+        console.error("Show banner ERROR", error);
+      }
+    );
+
+  // Subscibe Banner Event Listener
+  AdMob.addListener('onAdLoaded', (info: boolean) => {
+    console.log("Banner ad loaded");
+  });
+
+  // Get Banner Size
+  AdMob.addListener('onAdSize', (info: boolean) => {
+    console.log(info);
+  });
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route path="/home" component={Home} exact={true} />
+          <Route exact path="/" render={() => <Redirect to="/home" />} />
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  );
+
+};
+
+export default App;
+```
+
 
 ## APIs
 
