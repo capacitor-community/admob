@@ -101,7 +101,7 @@ Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
 Open our Ionic app __app.component.ts__ file and add this folloing code.
 
-```diff
+```ts
 + import { Plugins } from '@capacitor/core';Ω
 + const { AdMob } = Plugins;
 
