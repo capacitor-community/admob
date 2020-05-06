@@ -26,6 +26,12 @@
   </ion-list>
 
   <ion-list>
+    <ion-list-header><ion-label>Interstitial</ion-label></ion-list-header>
+    <ion-item detail="true" (click)="prepareInterstitial()">Prepare Interstitial</ion-item>
+    <ion-item detail="true" lines="full" (click)="showInterstitial()">Show Interstitial</ion-item>
+  </ion-list>
+
+  <ion-list>
     <ion-list-header><ion-label>Reward</ion-label></ion-list-header>
     <ion-item detail="true" (click)="prepareReward()" [disabled]="isPrepareReward">Prepare Reward</ion-item>
     <ion-item detail="true" lines="full" (click)="showReward()" [disabled]="!isPrepareReward">Show Reward</ion-item>

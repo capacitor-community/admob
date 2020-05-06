@@ -4,7 +4,6 @@ import { Plugins } from '@capacitor/core';
 import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
 const { AdMob } = Plugins;
 
-
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -21,6 +20,7 @@ export class HomePage implements OnInit, OnDestroy {
    */
   public isPrepareBanner = false;
   public isPrepareReward = false;
+  public isPrepareInterstitial = false;
 
   /**
    * Setting of Ads
@@ -35,11 +35,16 @@ export class HomePage implements OnInit, OnDestroy {
     adId: 'ca-app-pub-3940256099942544/5224354917',
   };
 
+  private interstitialOptions: AdOptions = {
+    adId: 'ca-app-pub-3940256099942544/1033173712',
+  };
+
   /**
    * for EventListener
    */
   private eventOnAdSize;
   private eventPrepareReward;
+  private eventPrepareInterstitial;
 
   public isLoading = false;
 
@@ -59,8 +64,12 @@ export class HomePage implements OnInit, OnDestroy {
     });
 
     this.eventPrepareReward = AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
-      console.log("RewardedVideoAd Loaded");
       this.isPrepareReward = true;
+      this.isLoading = false;
+    });
+
+    this.eventPrepareInterstitial = AdMob.addListener('onAdLoaded', (info: boolean) => {
+      this.isPrepareInterstitial = true;
       this.isLoading = false;
     });
   }
@@ -146,5 +155,31 @@ export class HomePage implements OnInit, OnDestroy {
   }
   /**
    * ==================== /REWARD ====================
+   */
+
+  /**
+   * ==================== Interstitial ====================
+   */
+  async prepareInterstitial() {
+    this.isLoading = true;
+    const result = AdMob.prepareInterstitial(this.interstitialOptions)
+      .catch(e => console.log(e));
+    if (result === undefined) {
+      return;
+    }
+  }
+
+
+  async showInterstitial() {
+    const result = await AdMob.showInterstitial()
+      .catch(e => console.log(e));
+    if (result === undefined) {
+      return;
+    }
+    this.isPrepareInterstitial = false;
+  }
+
+  /**
+   * ==================== /Interstitial ====================
    */
 }
