@@ -6,7 +6,7 @@ Capacitor AdMob is a native AdMob implementation for iOS & Android.
 This repository fork from `@rahadur/capacitor-admob` .
 
 ## Demo
-[Demo code is here.](https://github.com/rdlabo/capacitor-admob/tree/master/demo)
+[Demo code is here.](https://github.com/rdlabo-team/capacitor-admob/tree/master/demo)
 
 ### Screenshots
 |  | Banner | Interstitial | Reward |
