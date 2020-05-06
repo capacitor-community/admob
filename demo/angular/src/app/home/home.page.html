@@ -1,15 +1,13 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      @rdlabo/capacitor-admob
-    </ion-title>
+    <ion-title>capacitor-admob</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">@rdlabo/capacitor-admob</ion-title>
+      <ion-title size="large">capacitor-admob</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -27,8 +25,8 @@
 
   <ion-list>
     <ion-list-header><ion-label>Interstitial</ion-label></ion-list-header>
-    <ion-item detail="true" (click)="prepareInterstitial()">Prepare Interstitial</ion-item>
-    <ion-item detail="true" lines="full" (click)="showInterstitial()">Show Interstitial</ion-item>
+    <ion-item detail="true" (click)="prepareInterstitial()" [disabled]="isPrepareInterstitial">Prepare Interstitial</ion-item>
+    <ion-item detail="true" lines="full" (click)="showInterstitial()" [disabled]="!isPrepareInterstitial">Show Interstitial</ion-item>
   </ion-list>
 
   <ion-list>

@@ -67,11 +67,6 @@ export class HomePage implements OnInit, OnDestroy {
       this.isPrepareReward = true;
       this.isLoading = false;
     });
-
-    this.eventPrepareInterstitial = AdMob.addListener('onAdLoaded', (info: boolean) => {
-      this.isPrepareInterstitial = true;
-      this.isLoading = false;
-    });
   }
 
   ngOnDestroy() {
@@ -142,7 +137,11 @@ export class HomePage implements OnInit, OnDestroy {
   async prepareReward() {
     this.isLoading = true;
     const result = await AdMob.prepareRewardVideoAd(this.rewardOptions)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
+      .finally(() => this.isLoading = false);
+    if (result === undefined) {
+      return;
+    }
   }
 
   async showReward() {
@@ -163,10 +162,12 @@ export class HomePage implements OnInit, OnDestroy {
   async prepareInterstitial() {
     this.isLoading = true;
     const result = AdMob.prepareInterstitial(this.interstitialOptions)
-      .catch(e => console.log(e));
+      .catch(e => console.log(e))
+      .finally(() => this.isLoading = false);
     if (result === undefined) {
       return;
     }
+    this.isPrepareInterstitial = true;
   }
 
 

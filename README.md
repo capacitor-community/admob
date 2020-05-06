@@ -5,11 +5,14 @@
 Capacitor AdMob is a native AdMob implementation for iOS & Android.
 This repository fork from `@rahadur/capacitor-admob` .
 
-|  | iOS | Android    |
-|:-----------------|:------------------:|:------------------:|
-| **Banner** | Released | Released |
-| **Interstitial** | Developing | No Tested |
-| **Reward** | Released | Released |
+## Demo
+[Demo code is here.](https://github.com/rdlabo/capacitor-admob/tree/master/demo)
+
+### Screenshots
+|  | Banner | Interstitial | Reward |
+|:-----------------|:------------------:|:------------------:|:------------------:|
+| **iOS** | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) |
+| **Android** | ![](demo/screenshots/md_banner.png) | ![](demo/screenshots/md_interstitial.png) | ![](demo/screenshots/md_reward.png) |
 
 ## DONATE THIS PROJECT
 Thanks for considering donate.
@@ -39,26 +42,26 @@ $ npm install --save @rdlabo/capacitor-admob@0.3.0
 
 In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to the initialization list:
 
-```java
-this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
-  [...]
-  add(jp.rdlabo.capacitor.plugin.admob.AdMob.class);
-  [...]
-}});
+```diff
+  this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
+    [...]
++   add(jp.rdlabo.capacitor.plugin.admob.AdMob.class);
+    [...]
+  }});
 ```
 
 In file `android/app/src/main/AndroidManifest.xml`, add the following XML elements under `<manifest><application>` :
 
-```xml
-<meta-data
-    android:name="com.google.android.gms.ads.APPLICATION_ID"
-    android:value="@string/admob_app_id"/>
+```diff
++ <meta-data
++   android:name="com.google.android.gms.ads.APPLICATION_ID"
++   android:value="@string/admob_app_id"/>
 ```
 
 In file `android/app/src/main/res/values/strings.xml` add the following lines :
 
-```xml
-<string name="admob_app_id">[APP_ID]</string>
+```diff
++ <string name="admob_app_id">[APP_ID]</string>
 ```
 
 Don't forget to replace `[APP_ID]` by your AddMob application Id.
@@ -68,27 +71,27 @@ Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
 In file `ios/App/App/AppDelegate.swift` add or replace the following:
 
-```
-import GoogleMobileAds
+```diff
++ import GoogleMobileAds
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+  @UIApplicationMain
+  class AppDelegate: UIResponder, UIApplicationDelegate {
 
-  var window: UIWindow?
+    var window: UIWindow?
 
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
-    GADMobileAds.sharedInstance().start(completionHandler: nil)
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+      // Override point for customization after application launch.
++     GADMobileAds.sharedInstance().start(completionHandler: nil)
 ```
 
 Add the following in the `ios/App/App/info.plist` file:
 
-```xml
-<key>GADIsAdManagerApp</key>
-<true/>
+```diff
++ <key>GADIsAdManagerApp</key>
++ <true/>
 
-<key>GADApplicationIdentifier</key>
-<string>[APP_ID]</string>
++ <key>GADApplicationIdentifier</key>
++ <string>[APP_ID]</string>
 ```
 
 Don't forget to replace `[APP_ID]` by your AddMob application Id.
@@ -98,22 +101,21 @@ Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
 Open our Ionic app __app.component.ts__ file and add this folloing code.
 
-```ts
-import { Plugins } from '@capacitor/core';
+```diff
++ import { Plugins } from '@capacitor/core';Ω
++ const { AdMob } = Plugins;
 
-const { AdMob } = Plugins;
-
-@Component({
-  selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
-})
-export class AppComponent {
-    constructor(){
-        // Initialize AdMob for your Application
-        AdMob.initialize();
-    }
-}
+  @Component({
+    selector: 'app-root',
+    templateUrl: 'app.component.html',
+    styleUrls: ['app.component.scss']
+  })
+  export class AppComponent {
+      constructor(){
+          // Initialize AdMob for your Application
++         AdMob.initialize();
+      }
+  }
 ```
 
 ### Initialize for @ionic/react
@@ -121,55 +123,46 @@ export class AppComponent {
 This is implements simple sample from https://github.com/DavidFrahm . Thanks!
 
 ```ts
-import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
+  import React from 'react';
+  import { Redirect, Route } from 'react-router-dom';
+  import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/react';
+  import { IonReactRouter } from '@ionic/react-router';
+  import Home from './pages/Home';
 
-import { Plugins } from '@capacitor/core';
-import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
++ import { Plugins } from '@capacitor/core';
++ import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
++ const { AdMob } = Plugins;
 
-const { AdMob } = Plugins;
+  const App: React.FC = () => {
 
-const App: React.FC = () => {
-
-  AdMob.initialize();
-
-  const adId = {
-    ios: 'ios-value-here',
-    android: 'android-value-here'
-  }
-
-  const platformAdId = isPlatform('android') ? adId.android : adId.ios;
-
-  const options: AdOptions = {
-    adId: platformAdId,
-    adSize: AdSize.BANNER,
-    position: AdPosition.BOTTOM_CENTER,
-    margin: 0,
-    // isTesting: true
-  }
-
-  AdMob.showBanner(options)
-    .then(
-      (value) => {
-        console.log("Show banner", value);  // Boolean true
-      },
-      (error) => {
-        console.error("Show banner ERROR", error);
-      }
-    );
-
-  // Subscibe Banner Event Listener
-  AdMob.addListener('onAdLoaded', (info: boolean) => {
-    console.log("Banner ad loaded");
-  });
-
-  // Get Banner Size
-  AdMob.addListener('onAdSize', (info: boolean) => {
-    console.log(info);
-  });
++   AdMob.initialize();
++ 
++   const adId = {
++     ios: 'ios-value-here',
++     android: 'android-value-here'
++   }
++ 
++   const platformAdId = isPlatform('android') ? adId.android : adId.ios;
++ 
++   const options: AdOptions = {
++     adId: platformAdId,
++     adSize: AdSize.BANNER,
++     position: AdPosition.BOTTOM_CENTER,
++     margin: 0,
++     // isTesting: true
++   }
++ 
++   AdMob.showBanner(options);
++ 
++   // Subscibe Banner Event Listener
++   AdMob.addListener('onAdLoaded', (info: boolean) => {
++     console.log("Banner ad loaded");
++   });
++ 
++   // Get Banner Size
++   AdMob.addListener('onAdSize', (info: boolean) => {
++     console.log(info);
++   });
 
   return (
     <IonApp>
@@ -195,48 +188,39 @@ export default App;
 #### showBanner(options: AdOptions): Promise<{ value: boolean }>
 
 ```ts
-import { Plugins } from '@capacitor/core';
-import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
++ import { Plugins } from '@capacitor/core';
++ import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
++ const { AdMob } = Plugins;
 
-const { AdMob } = Plugins;
+  @Component({
+    selector: 'admob',
+    templateUrl: 'admob.component.html',
+    styleUrls: ['admob.component.scss']
+  })
+  export class AdMobComponent {
 
-@Component({
-  selector: 'admob',
-  templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss']
-})
-export class AdMobComponent {
-
-    const options: AdOptions = {
-        adId: 'YOUR ADID',
-        adSize: AdSize.BANNER,
-        position: AdPosition.BOTTOM_CENTER,
-        margin: 0,
-    }
++     private options: AdOptions = {
++         adId: 'YOUR ADID',
++         adSize: AdSize.BANNER,
++         position: AdPosition.BOTTOM_CENTER,
++         margin: 0,
++     }
 
     constructor(){
-        // Show Banner Ad
-        AdMob.showBanner(this.options)
-        .then(
-            (value) => {
-                console.log(value);  // true
-            },
-            (error) => {
-                console.error(error); // show error
-            }
-        );
-
-        // Subscibe Banner Event Listener
-        AdMob.addListener('onAdLoaded', (info: boolean) => {
-             console.log("Banner Ad Loaded");
-        });
-
-        // Get Banner Size
-        AdMob.addListener('onAdSize', (info: boolean) => {
-             console.log(info);
-        });
-    }
-}
++        // Show Banner Ad
++        AdMob.showBanner(this.options);
++ 
++         // Subscibe Banner Event Listener
++         AdMob.addListener('onAdLoaded', (info: boolean) => {
++              console.log("Banner Ad Loaded");
++         });
++ 
++         // Get Banner Size
++         AdMob.addListener('onAdSize', (info: boolean) => {
++              console.log(info);
++         });
++     }
+  }
 ```
 
 
@@ -244,15 +228,7 @@ export class AdMobComponent {
 
 ```ts
 // Hide the banner, remove it from screen, but can show it later
-
-AdMob.hideBanner().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.hideBanner();
 ```
 
 
@@ -260,30 +236,14 @@ AdMob.hideBanner().then(
 
 ```ts
 // Resume the banner, show it after hide
-
-AdMob.resumeBanner().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.resumeBanner();
 ```
 
 #### removeBanner(): Promise<{ value: boolean }>
 
 ```ts
 // Destroy the banner, remove it from screen.
-
-AdMob.removeBanner().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.removeBanner();
 ```
 
 #### Event Listener
@@ -301,46 +261,32 @@ addListener(eventName: 'onAdSize', listenerFunc: (info: any) => void): PluginLis
 
 #### prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>
 ```ts
-import { Plugins } from '@capacitor/core';
-import { AdOptions } from '@rdlabo/capacitor-admob';
++ import { Plugins } from '@capacitor/core';
++ import { AdOptions } from '@rdlabo/capacitor-admob';
++ const { AdMob } = Plugins;
 
-const { AdMob } = Plugins;
+  @Component({
+    selector: 'admob',
+    templateUrl: 'admob.component.html',
+    styleUrls: ['admob.component.scss']
+  })
+  export class AppComponent {
++     const options: AdOptions = {
++         adId: 'YOUR ADID',
++         autoShow: false
++     }
 
-@Component({
-  selector: 'admob',
-  templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss']
-})
-export class AppComponent {
-
-    const options: AdOptions = {
-        adId: 'YOUR ADID',
-        autoShow: false
-    }
-
-    constructor(){
-
-        // Prepare interstitial banner
-        AdMob.prepareInterstitial(this.options)
-        .then(
-            (value) => {
-                console.log(value);  // true
-            },
-            (error) => {
-                console.err(error); // show error
-            }
-        );
-
-
-        // Subscibe Banner Event Listener
-        AdMob.addListener('onAdLoaded', (info: boolean) => {
-
-            // You can call showInterstitial() here or anytime you want.
-
-             console.log("Interstitial Ad Loaded");
-        });
-    }
-}
+      constructor(){
++         // Prepare interstitial banner
++         AdMob.prepareInterstitial(this.options);
++ 
++         // Subscibe Banner Event Listener
++         AdMob.addListener('onAdLoaded', (info: boolean) => {
++             // You can call showInterstitial() here or anytime you want.
++              console.log("Interstitial Ad Loaded");
++         });
+      }
+  }
 ```
 
 
@@ -348,15 +294,7 @@ export class AppComponent {
 
 ```ts
 // Show interstitial ad when it’s ready
-
-AdMob.showInterstitial().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.showInterstitial();
 ```
 
 #### Event Listener
@@ -375,45 +313,31 @@ addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void)
 #### prepareRewardVideoAd(options: AdOptions): Promise<{ value: boolean }>
 
 ```ts
-import { Plugins } from '@capacitor/core';
-import { AdOptions } from '@rdlabo/capacitor-admob';
++ import { Plugins } from '@capacitor/core';
++ import { AdOptions } from '@rdlabo/capacitor-admob';
++ const { AdMob } = Plugins;
 
-const { AdMob } = Plugins;
+  @Component({
+    selector: 'admob',
+    templateUrl: 'admob.component.html',
+    styleUrls: ['admob.component.scss']
+  })
+  export class AdMobComponent {
++     const options: AdOptions = {
++         adId: 'YOUR ADID'
++     }
 
-@Component({
-  selector: 'admob',
-  templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss']
-})
-export class AAdMobComponent {
-
-    const options: AdOptions = {
-        adId: 'YOUR ADID'
-    }
-
-    constructor(){
-
-        // Prepare ReWardVideo
-        AdMob.prepareRewardVideoAd(this.options)
-        .then(
-            (value) => {
-                console.log(value);  // true
-            },
-            (error) => {
-                console.err(error); // show error
-            }
-        );
-
-
-        // Subscibe ReWardVideo Event Listener
-        AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
-
-            // You can call showRewardVideoAd() here or anytime you want.
-
-             console.log("RewardedVideoAd Loaded");
-        });
-    }
-}
+      constructor(){
++         // Prepare ReWardVideo
++         AdMob.prepareRewardVideoAd(this.options);
++ 
++         // Subscibe ReWardVideo Event Listener
++        AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
++             // You can call showRewardVideoAd() here or anytime you want.
++             console.log("RewardedVideoAd Loaded");
++         });
+      }
+  }
 ```
 
 
@@ -421,15 +345,7 @@ export class AAdMobComponent {
 
 ```ts
 // Show a RewardVideo AD
-
-AdMob.showRewardVideoAd().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.showRewardVideoAd();
 ```
 
 
@@ -437,15 +353,7 @@ AdMob.showRewardVideoAd().then(
 
 ```ts
 // Pause a RewardVideo AD
-
-AdMob.pauseRewardedVideo().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.pauseRewardedVideo();
 ```
 
 
@@ -453,30 +361,14 @@ AdMob.pauseRewardedVideo().then(
 
 ```ts
 // Resume a RewardVideo AD
-
-AdMob.resumeRewardedVideo().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.resumeRewardedVideo();
 ```
 
 #### stopRewardedVideo(): Promise<{ value: boolean }>
 
 ```ts
 // Stop a RewardVideo AD
-
-AdMob.stopRewardedVideo().then(
-    (value) => {
-        console.log(value);  // true
-    },
-    (error) => {
-        console.err(error); // show error
-    }
-);
+AdMob.stopRewardedVideo();
 ```
 
 #### Event Listener
