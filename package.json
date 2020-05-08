@@ -1,6 +1,6 @@
 {
   "name": "@rdlabo/capacitor-admob",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "This is Ionic Capacitor native AdMob plugin for IOS & Android",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -46,5 +46,8 @@
   },
   "bugs": {
     "url": "https://github.com/rdlabo-team/capacitor-admob.git/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   }
 }
