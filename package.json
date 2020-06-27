@@ -1,21 +1,22 @@
 {
-  "name": "@rdlabo/capacitor-admob",
-  "version": "1.0.4",
-  "description": "This is Ionic Capacitor native AdMob plugin for IOS & Android",
+  "name": "@capacitor-community/admob",
+  "version": "0.0.1",
+  "description": "A native plugin for AdMob",
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "scripts": {
     "build": "npm run clean && tsc",
-    "clean": "rm -rf ./dist",
+    "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
-  "author": "Masahiko Sakakibara",
+  "author": "Masahiko Sakakibara <sakakibara@rdlabo.jp>",
   "license": "MIT",
   "dependencies": {
     "@capacitor/core": "latest"
   },
   "devDependencies": {
+    "rimraf": "^3.0.0",
     "typescript": "^3.2.4",
     "@capacitor/ios": "latest",
     "@capacitor/android": "latest"
@@ -24,13 +25,12 @@
     "dist/",
     "ios/",
     "android/",
-    "RdlaboCapacitorAdmob.podspec"
+    "CapacitorCommunityAdmob.podspec"
   ],
   "keywords": [
     "capacitor",
     "plugin",
-    "native",
-    "admob"
+    "native"
   ],
   "capacitor": {
     "ios": {
@@ -42,9 +42,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rdlabo-team/capacitor-admob.git"
+    "url": "git@github.com:capacitor-community/admob.git"
   },
   "bugs": {
-    "url": "https://github.com/rdlabo-team/capacitor-admob.git/issues"
+    "url": "git@github.com:capacitor-community/admob.git/issues"
   }
 }
