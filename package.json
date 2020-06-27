@@ -8,7 +8,8 @@
     "build": "npm run clean && tsc",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "npm-publish": "np"
   },
   "author": "Masahiko Sakakibara <sakakibara@rdlabo.jp>",
   "license": "MIT",
@@ -16,10 +17,20 @@
     "@capacitor/core": "latest"
   },
   "devDependencies": {
-    "rimraf": "^3.0.0",
-    "typescript": "^3.2.4",
+    "@capacitor/android": "latest",
     "@capacitor/ios": "latest",
-    "@capacitor/android": "latest"
+    "husky": "^4.2.5",
+    "np": "^6.2.4",
+    "prettier": "^2.0.5",
+    "prettier-plugin-java": "^0.8.0",
+    "pretty-quick": "^2.0.1",
+    "rimraf": "^3.0.0",
+    "typescript": "^3.2.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   },
   "files": [
     "dist/",
