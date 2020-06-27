@@ -1,12 +1,20 @@
-[![npm version](https://badge.fury.io/js/%40rdlabo%2Fcapacitor-admob.svg)](https://badge.fury.io/js/%40rdlabo%2Fcapacitor-admob)
+[![npm version](https://badge.fury.io/js/%40capacitor-community%2Fadmob.svg)](https://badge.fury.io/js/%40capacitor-community%2Fadmob)
 
-# @rdlabo/capacitor-admib
+# @capacitor-community/admob
+Capacitory community plugin for AdMob.
 
-Capacitor AdMob is a native AdMob implementation for iOS & Android.
-This repository fork from `@rahadur/capacitor-admob` .
+## Maintainers
+
+| Maintainer | GitHub  | Social | Sponsoring Company |
+| --- | --- | --- | --- |
+| Masahiko Sakakibara  | [rdlabo](https://github.com/rdlabo)  | [@rdlabo](https://twitter.com/rdlabo) | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
+ 
+Mainteinance Status: Actively Maintained
 
 ## Demo
 [Demo code is here.](https://github.com/rdlabo-team/capacitor-admob/tree/master/demo)
+
+※ This will be move to this repository.
 
 ### Screenshots
 |  | Banner | Interstitial | Reward |
@@ -14,23 +22,10 @@ This repository fork from `@rahadur/capacitor-admob` .
 | **iOS** | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) |
 | **Android** | ![](demo/screenshots/md_banner.png) | ![](demo/screenshots/md_interstitial.png) | ![](demo/screenshots/md_reward.png) |
 
-## DONATE THIS PROJECT
-Thanks for considering donate.
-
-If this plugin help you, please share admob income. This help developing this plugin.This also help me easily determine how much time I would spend on the projects each month.
-
-|  | TYPE | AMOUNT | LINK |
-|:--:|:--:|:--:|:--:|
-| PayPal.me | Once | Any | [Donate](https://www.paypal.me/rdlabo) |
-| Paypal | Subscription | $15/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GE7XTRB3S6M4S) |
-| Paypal | Subscription | $30/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZV5NSRJ2MSMGN) |
-| Paypal | Subscription | $50/month | [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5RKVFKZRE8F36) |
-
-
 ## Installation
 
 ```
-$ npm install --save @rdlabo/capacitor-admob
+$ npm install --save @capacitor-community/admob
 ```
 
 ### If you use Capacitor 1.x
@@ -45,7 +40,7 @@ In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to t
 ```diff
   this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
     [...]
-+   add(jp.rdlabo.capacitor.plugin.admob.AdMob.class);
++   add(com.getcapacitor.community.admob.AdMob.class);
     [...]
   }});
 ```
@@ -102,7 +97,7 @@ Don't forget to replace `[APP_ID]` by your AddMob application Id.
 Open our Ionic app __app.component.ts__ file and add this folloing code.
 
 ```ts
-+ import { Plugins } from '@capacitor/core';Ω
++ import { Plugins } from '@capacitor/core';
 + const { AdMob } = Plugins;
 
   @Component({
@@ -130,7 +125,7 @@ This is implements simple sample from https://github.com/DavidFrahm . Thanks!
   import Home from './pages/Home';
 
 + import { Plugins } from '@capacitor/core';
-+ import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
++ import { AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
 + const { AdMob } = Plugins;
 
   const App: React.FC = () => {
@@ -189,7 +184,7 @@ export default App;
 
 ```ts
 + import { Plugins } from '@capacitor/core';
-+ import { AdOptions, AdSize, AdPosition } from '@rdlabo/capacitor-admob';
++ import { AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
 + const { AdMob } = Plugins;
 
   @Component({
@@ -417,7 +412,6 @@ enum AdPosition {
   BOTTOM_CENTER = 'BOTTOM_CENTER',
 }
 ```
-
 
 ## License
 Capacitor AdMob is [MIT licensed](./LICENSE).
