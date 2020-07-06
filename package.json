@@ -14,11 +14,11 @@
   "author": "Masahiko Sakakibara <sakakibara@rdlabo.jp>",
   "license": "MIT",
   "dependencies": {
-    "@capacitor/core": "latest"
+    "@capacitor/core": "^2.0.0"
   },
   "devDependencies": {
-    "@capacitor/android": "latest",
-    "@capacitor/ios": "latest",
+    "@capacitor/android": "^2.0.0",
+    "@capacitor/ios": "^2.0.0",
     "husky": "^4.2.5",
     "np": "^6.2.4",
     "prettier": "^2.0.5",
