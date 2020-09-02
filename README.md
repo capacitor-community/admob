@@ -25,12 +25,14 @@ Mainteinance Status: Actively Maintained
 ## Installation
 
 ```
-$ npm install --save @capacitor-community/admob
+% npm install --save @capacitor-community/admob
+% npx cap update
 ```
 
 ### If you use Capacitor 1.x
 ```
-$ npm install --save @rdlabo/capacitor-admob@0.3.0
+% npm install --save @rdlabo/capacitor-admob@0.3.0
+% npx cap update
 ```
 
 ## Android configuration
