@@ -65,22 +65,6 @@ Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
 
 ## iOS configuration
-
-In file `ios/App/App/AppDelegate.swift` add or replace the following:
-
-```swift
-import GoogleMobileAds
-
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-  var window: UIWindow?
-
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
-    GADMobileAds.sharedInstance().start(completionHandler: nil)
-```
-
 Add the following in the `ios/App/App/info.plist` file inside of the outermost `<dict>`:
 
 ```xml
@@ -89,6 +73,9 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
 
 <key>GADApplicationIdentifier</key>
 <string>[APP_ID]</string>
+
+<key>NSUserTrackingUsageDescription</key>
+<string>[Why you use NSUserTracking. ex: This identifier will be used to deliver personalized ads to you.]</string>
 ```
 
 Don't forget to replace `[APP_ID]` by your AddMob application Id.
@@ -414,6 +401,15 @@ enum AdPosition {
   BOTTOM_CENTER = 'BOTTOM_CENTER',
 }
 ```
+
+## TROUBLE SHOOTING
+
+### If you have error:
+
+> [error] Error running update: Analyzing dependencies
+[!] CocoaPods could not find compatible versions for pod "Google-Mobile-Ads-SDK":
+
+You should run `pod repo update` ;
 
 ## License
 

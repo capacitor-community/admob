@@ -1,4 +1,20 @@
 # Breaking Changes
+## 0.3.0
+In file `ios/App/App/AppDelegate.swift` remove the following:
+
+```diff
+- import GoogleMobileAds
+
+  @UIApplicationMain
+  class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    var window: UIWindow?
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+-     // Override point for customization after application launch.
+-     GADMobileAds.sharedInstance().start(completionHandler: nil)
+```
+
 ## 0.2.13
 - isTest: 'LIVE' | 'TESTING' => boolean
 

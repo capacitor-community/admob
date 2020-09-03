@@ -1,6 +1,9 @@
 import Foundation
 import Capacitor
 import GoogleMobileAds
+#if canImport(AppTrackingTransparency)
+    import AppTrackingTransparency
+#endif
 
 /**
  * Please read the Capacitor iOS Plugin Development Guide
@@ -13,10 +16,26 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     var interstitial: GADInterstitial!
     var rewardedAd: GADRewardedAd!
 
+    /**
+     * Enable SKAdNetwork to track conversions: https://developers.google.com/admob/ios/ios14
+     */
     @objc func initialize(_ call: CAPPluginCall) {
+        #if canImport(AppTrackingTransparency)
+        ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
+            // iOS >= 14
+            GADMobileAds.sharedInstance().start(completionHandler: nil)
+            call.success([
+                "value": true
+            ]);
+            
+        })
+        #else
+        // iOS < 14
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
         call.success([
             "value": true
         ]);
+        #endif
     }
 
     /**
