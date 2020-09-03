@@ -1,0 +1,41 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>capacitor-admob</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">capacitor-admob</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <section class="ion-text-center ion-padding-top" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+  </section>
+
+  <ion-list>
+    <ion-list-header><ion-label>Banner</ion-label></ion-list-header>
+    <ion-item detail="true" (click)="showBanner()" [disabled]="isPrepareBanner">Show Banner</ion-item>
+    <ion-item detail="true" (click)="hideBanner()" [disabled]="!isPrepareBanner">Hide Banner</ion-item>
+    <ion-item detail="true" (click)="resumeBanner()" [disabled]="!isPrepareBanner">Resume Banner</ion-item>
+    <ion-item detail="true" lines="full" (click)="removeBanner()" [disabled]="!isPrepareBanner">Remove Banner</ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header><ion-label>Interstitial</ion-label></ion-list-header>
+    <ion-item detail="true" (click)="prepareInterstitial()" [disabled]="isPrepareInterstitial">Prepare Interstitial</ion-item>
+    <ion-item detail="true" lines="full" (click)="showInterstitial()" [disabled]="!isPrepareInterstitial">Show Interstitial</ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header><ion-label>Reward</ion-label></ion-list-header>
+    <ion-item detail="true" (click)="prepareReward()" [disabled]="isPrepareReward">Prepare Reward</ion-item>
+    <ion-item detail="true" lines="full" (click)="showReward()" [disabled]="!isPrepareReward">Show Reward</ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="primary" class="ion-text-center">Footer Components</ion-toolbar>
+</ion-footer>
