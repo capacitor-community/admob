@@ -1,6 +1,7 @@
 # Breaking Changes
 ## 0.3.0
-In file `ios/App/App/AppDelegate.swift` remove the following:
+- Prepare for iOS 14+
+- In file `ios/App/App/AppDelegate.swift` remove the following:
 
 ```diff
 - import GoogleMobileAds
