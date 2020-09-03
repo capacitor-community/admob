@@ -1,5 +1,5 @@
 # Breaking Changes
-## 0.3.0
+## 1.1.0
 - Prepare for iOS 14+
 - In file `ios/App/App/AppDelegate.swift` remove the following:
 

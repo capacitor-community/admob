@@ -23,6 +23,7 @@ Mainteinance Status: Actively Maintained
 | **Android** | ![](demo/screenshots/md_banner.png) | ![](demo/screenshots/md_interstitial.png) | ![](demo/screenshots/md_reward.png) |
 
 ## Installation
+__Supporting iOS14 is be since @1.1.0.__
 
 ```
 % npm install --save @capacitor-community/admob
