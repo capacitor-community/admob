@@ -12,9 +12,7 @@ Capacitory community plugin for AdMob.
 Mainteinance Status: Actively Maintained
 
 ## Demo
-[Demo code is here.](https://github.com/rdlabo-team/capacitor-admob/tree/master/demo)
-
-※ This will be move to this repository.
+[Demo code is here.](https://github.com/capacitor-community/admob/tree/master/demo)
 
 ### Screenshots
 |  | Banner | Interstitial | Reward |
