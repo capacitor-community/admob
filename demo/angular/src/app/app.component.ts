@@ -29,7 +29,9 @@ export class AppComponent {
       /**
        * initialize() require after platform.ready();
        */
-      AdMob.initialize();
+      AdMob.initialize({
+        requestTrackingAuthorization: true,
+      });
     });
   }
 }

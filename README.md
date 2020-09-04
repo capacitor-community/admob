@@ -80,7 +80,19 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
 Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
 
-## Initialize for @ionic/angular
+## Initialize
+
+```
+initialize(options: { requestTrackingAuthorization?: boolean }): Promise<{ value: boolean }>
+```
+
+You can use option `requestTrackingAuthorization`. This change permission to requrire  `AppTrackingTransparency` in iOS >= 14:
+https://developers.google.com/admob/ios/ios14
+
+Default value is `true`. If you don't want to track, set requestTrackingAuthorization `false`.
+
+
+### Initialize for @ionic/angular
 
 Open our Ionic app __app.component.ts__ file and add this folloing code.
 

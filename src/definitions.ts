@@ -9,7 +9,7 @@ declare global {
 export interface AdMobPlugin {
 
   // Initialize AdMob with appId
-  initialize(options: { appId: string }): Promise<{ value: boolean }>
+  initialize(options: { requestTrackingAuthorization?: boolean }): Promise<{ value: boolean }>
 
   // Show a banner Ad
   showBanner(options: AdOptions): Promise<{ value: boolean }>;
@@ -109,7 +109,8 @@ export interface AdMobPlugin {
 
 
 export interface AdOptions {
-  adId: string;       // Banner ad ID (required)
+  // Banner ad ID (required)
+  adId: string;
   /*
   * Banner Ad Size, defaults to SMART_BANNER.
   * IT can be: SMART_BANNER, BANNER, MEDIUM_RECTANGLE,
@@ -125,21 +126,12 @@ export interface AdOptions {
   * If position is TOP_CENTER, margin is be margin-top.
   */
   margin?: number;
-
-  // width?: number;
-  // height?: number;
-  // x?: number;
-  // y?: number;
-  // autoShow?: boolean
-  // orientationRenew?: boolean;
-  // adExtras?: AdExtras;
-  // offsetTopBar?: boolean;
 }
 
 
 /*
-*  For more information
-*   Read:  https://developers.google.com/android/reference/com/google/android/gms/ads/AdSize
+*  For more information:
+*  https://developers.google.com/android/reference/com/google/android/gms/ads/AdSize
 * */
 export enum AdSize {
   // Mobile Marketing Association (MMA)
@@ -170,23 +162,8 @@ export enum AdSize {
   // A dynamically sized banner that is full-width and auto-height.
   SMART_BANNER = 'SMART_BANNER',
 
-
-  // A special variant of FLUID to be set on SearchAdView when
-  // loading a DynamicHeightSearchAdRequest.
-
-  // SEARCH = 'SEARCH',
-
-
-  // IAB wide skyscraper ad size (160x600 density-independent pixels).
-  // This size is currently not supported by the Google Mobile Ads network;
-  // this is intended for mediation ad networks only.
-
-  // WIDE_SKYSCRAPER = 'WIDE_SKYSCRAPER',
-
-
   // To define a custom banner size, set your desired AdSize
   CUSTOM = 'CUSTOM'
-
 }
 
 
@@ -200,14 +177,4 @@ export enum AdPosition {
   TOP_CENTER = 'TOP_CENTER',
   CENTER = 'CENTER',
   BOTTOM_CENTER = 'BOTTOM_CENTER',
-}
-
-
-export interface AdExtras {
-  color_bg?: string;
-  color_bg_top?: string;
-  color_border?: string;
-  color_link?: string;
-  color_text?: string;
-  color_url?: string;
 }

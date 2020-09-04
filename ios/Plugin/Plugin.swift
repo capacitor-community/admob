@@ -20,7 +20,14 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
      * Enable SKAdNetwork to track conversions: https://developers.google.com/admob/ios/ios14
      */
     @objc func initialize(_ call: CAPPluginCall) {
-        if #available(iOS 14, *) {
+        let isTrack = call.getBool("requestTrackingAuthorization") ?? true;
+
+        if (!isTrack) {
+            GADMobileAds.sharedInstance().start(completionHandler: nil)
+            call.success([
+                "value": true
+            ]);
+        } else if #available(iOS 14, *) {
             #if canImport(AppTrackingTransparency)
             ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
                 // iOS >= 14
