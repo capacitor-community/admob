@@ -125,6 +125,7 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     const app: HTMLElement = document.querySelector('ion-router-outlet');
+    app.style.marginTop = '0px';
     app.style.marginBottom = '0px';
   }
 
