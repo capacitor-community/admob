@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "JumBay",
+      "name": "Jean-Baptiste Malatrasi",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/216573?v=4",
+      "profile": "https://wako.app",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "admob",
+  "projectOwner": "capacitor-community",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
