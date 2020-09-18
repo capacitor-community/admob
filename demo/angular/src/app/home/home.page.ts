@@ -14,6 +14,7 @@ export class HomePage implements OnInit, OnDestroy {
    * Height of AdSize
    */
   private appMargin = 0;
+  private bannerPosition: 'top' | 'bottom';
 
   /**
    * For ion-item of template disabled
@@ -25,7 +26,13 @@ export class HomePage implements OnInit, OnDestroy {
   /**
    * Setting of Ads
    */
-  private bannerOptions: AdOptions = {
+  private bannerTopOptions: AdOptions = {
+    adId: 'ca-app-pub-3940256099942544/2934735716',
+    adSize: AdSize.SMART_BANNER,
+    position: AdPosition.TOP_CENTER,
+  };
+
+  private bannerBottomOptions: AdOptions = {
     adId: 'ca-app-pub-3940256099942544/2934735716',
     adSize: AdSize.SMART_BANNER,
     position: AdPosition.BOTTOM_CENTER,
@@ -59,7 +66,11 @@ export class HomePage implements OnInit, OnDestroy {
       this.appMargin = parseInt(info.height, 10);
       if (this.appMargin > 0) {
         const app: HTMLElement = document.querySelector('ion-router-outlet');
-        app.style.marginBottom = this.appMargin + 'px';
+        if (this.bannerPosition === 'top') {
+          app.style.marginTop = this.appMargin + 'px';
+        } else {
+          app.style.marginBottom = this.appMargin + 'px';
+        }
       }
     });
 
@@ -82,8 +93,9 @@ export class HomePage implements OnInit, OnDestroy {
   /**
    * ==================== BANNER ====================
    */
-  async showBanner() {
-    const result = await AdMob.showBanner(this.bannerOptions)
+  async showTopBanner() {
+    this.bannerPosition = 'top';
+    const result = await AdMob.showBanner(this.bannerTopOptions)
       .catch(e => console.log(e));
     if (result === undefined) {
       return;
@@ -91,6 +103,19 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.isPrepareBanner = true;
   }
+
+  async showBottomBanner() {
+    this.bannerPosition = 'bottom';
+    const result = await AdMob.showBanner(this.bannerBottomOptions)
+      .catch(e => console.log(e));
+    if (result === undefined) {
+      return;
+    }
+
+    this.isPrepareBanner = true;
+  }
+
+
 
   async hideBanner() {
     const result = await AdMob.hideBanner()
