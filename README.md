@@ -298,11 +298,11 @@ AdMob.showInterstitial();
 #### Event Listener
 This following Event Listener can be called in **Interstitial AD**
 ```ts
-addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
-addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
-addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
-addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
-addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
+addListener(eventName: 'onInterstitialAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
+addListener(eventName: 'onInterstitialAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
+addListener(eventName: 'onInterstitialAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
+addListener(eventName: 'onInterstitialAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
+addListener(eventName: 'onInterstitialAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
 
 
