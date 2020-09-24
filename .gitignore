@@ -58,3 +58,6 @@ captures/
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
+
+# vscode generates some debug.log files on some machines
+debug.log
