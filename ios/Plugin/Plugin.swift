@@ -280,6 +280,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
 
             self.interstitial = DFPInterstitial(adUnitID: adUnitID)
             self.interstitial.load(DFPRequest())
+            self.interstitial.delegate = self
 
             call.success(["value": true])
         }
@@ -303,19 +304,19 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     /// Tells the delegate an ad request succeeded.
     public func interstitialDidReceiveAd(_ ad: GADInterstitial) {
         NSLog("interstitialDidReceiveAd")
-        self.notifyListeners("onAdLoaded", data: ["value": true])
+        self.notifyListeners("onInterstitialAdLoaded", data: ["value": true])
     }
 
     /// Tells the delegate an ad request failed.
     public func interstitial(_ ad: GADInterstitial, didFailToReceiveAdWithError error: GADRequestError) {
         NSLog("interstitial:didFailToReceiveAdWithError: \(error.localizedDescription)")
-        self.notifyListeners("onAdFailedToLoad", data: ["error": error.localizedDescription])
+        self.notifyListeners("onInterstitialAdFailedToLoad", data: ["error": error.localizedDescription])
     }
 
     /// Tells the delegate that an interstitial will be presented.
     public func interstitialWillPresentScreen(_ ad: GADInterstitial) {
         NSLog("interstitialWillPresentScreen")
-        self.notifyListeners("onAdOpened", data: ["value": true])
+        self.notifyListeners("onInterstitialAdOpened", data: ["value": true])
     }
 
     /// Tells the delegate the interstitial is to be animated off the screen.
@@ -326,14 +327,14 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     /// Tells the delegate the interstitial had been animated off the screen.
     public func interstitialDidDismissScreen(_ ad: GADInterstitial) {
         NSLog("interstitialDidDismissScreen")
-        self.notifyListeners("onAdClosed", data: ["value": true])
+        self.notifyListeners("onInterstitialAdClosed", data: ["value": true])
     }
 
     /// Tells the delegate that a user click will open another app
     /// (such as the App Store), backgrounding the current app.
     public func interstitialWillLeaveApplication(_ ad: GADInterstitial) {
         NSLog("interstitialWillLeaveApplication")
-        self.notifyListeners("onAdLeftApplication", data: ["value": true])
+        self.notifyListeners("onInterstitialAdLeftApplication", data: ["value": true])
     }
 
 
