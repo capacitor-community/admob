@@ -152,7 +152,7 @@ const App: React.FC = () => {
 
   AdMob.showBanner(options);
 
-  // Subscibe Banner Event Listener
+  // Subscribe Banner Event Listener
   AdMob.addListener('onAdLoaded', (info: boolean) => {
     console.log("Banner ad loaded");
   });
