@@ -21,20 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class AdOptionsTest {
-
-  static class AdOptionsTesterClass extends AdOptions {
-    static final String TESTING_ID = "SOME TESTING ID HERE";
-
-    public AdOptionsTesterClass(PluginCall call) {
-      super(call);
-    }
-
-    @Override
-    public String getTestingId() {
-      return TESTING_ID;
-    }
-  }
-
   @Mock
   PluginCall pluginCallMock;
 
@@ -57,7 +43,9 @@ public class AdOptionsTest {
       when(pluginCallMock.getString(eq("adId"), anyString()))
         .thenReturn(expected);
 
-      final AdOptions adOptions = new AdOptionsTesterClass(pluginCallMock);
+      final AdOptions adOptions = AdOptions
+        .getFactory()
+        .createGenericOptions(pluginCallMock, "");
 
       assertEquals(expected, adOptions.adId);
     }
@@ -70,7 +58,9 @@ public class AdOptionsTest {
       when(pluginCallMock.getString(eq(wantedProperty), anyString()))
         .thenReturn(expected);
 
-      final AdOptions adOptions = new AdOptionsTesterClass(pluginCallMock);
+      final AdOptions adOptions = AdOptions
+        .getFactory()
+        .createGenericOptions(pluginCallMock, "");
 
       verify(pluginCallMock).getString(wantedProperty, defaultValue);
       assertEquals(expected, adOptions.position);
@@ -84,7 +74,9 @@ public class AdOptionsTest {
       when(pluginCallMock.getInt(eq(wantedProperty), anyInt()))
         .thenReturn(expected);
 
-      final AdOptions adOptions = new AdOptionsTesterClass(pluginCallMock);
+      final AdOptions adOptions = AdOptions
+        .getFactory()
+        .createGenericOptions(pluginCallMock, "");
 
       verify(pluginCallMock).getInt(wantedProperty, defaultValue);
       assertEquals(expected, adOptions.margin);
@@ -98,7 +90,9 @@ public class AdOptionsTest {
       when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean()))
         .thenReturn(expected);
 
-      final AdOptions adOptions = new AdOptionsTesterClass(pluginCallMock);
+      final AdOptions adOptions = AdOptions
+        .getFactory()
+        .createGenericOptions(pluginCallMock, "");
 
       verify(pluginCallMock).getBoolean(wantedProperty, defaultValue);
       assertEquals(expected, adOptions.isTesting);
@@ -113,7 +107,9 @@ public class AdOptionsTest {
         .when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean()))
         .thenReturn(expected);
 
-      final AdOptions adOptions = new AdOptionsTesterClass(pluginCallMock);
+      final AdOptions adOptions = AdOptions
+        .getFactory()
+        .createGenericOptions(pluginCallMock, "");
 
       verify(pluginCallMock).getBoolean(wantedProperty, defaultValue);
       assertEquals(expected, adOptions.npa);
@@ -131,10 +127,10 @@ public class AdOptionsTest {
     //        )
     //        .thenReturn(expected);
     //
-    //      final AdOptions adOptions = new AdOptionsTesterClass(pluginCallMock);
+    //      final AdOptions adOptions = AdOptions.getFactory().createGenericOptions(pluginCallMock, "");
     //
     //      verify(pluginCallMock)
-    //        .getArray(wantedProperty, AdOptions.EMPTY_TESTING_DEVICES);
+    //        .getArray(wantedProperty, AdOptions.getFactory().EMPTY_TESTING_DEVICES);
     //      assertEquals(expected, adOptions.testingDevices);
     //    }
   }
