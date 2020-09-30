@@ -20,35 +20,35 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
      * Enable SKAdNetwork to track conversions: https://developers.google.com/admob/ios/ios14
      */
     @objc func initialize(_ call: CAPPluginCall) {
-        let isTrack = call.getBool("requestTrackingAuthorization") ?? true;
+        let isTrack = call.getBool("requestTrackingAuthorization") ?? true
 
-        if (!isTrack) {
+        if !isTrack {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.success([
                 "value": true
-            ]);
+            ])
         } else if #available(iOS 14, *) {
             #if canImport(AppTrackingTransparency)
-            ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
+            ATTrackingManager.requestTrackingAuthorization(completionHandler: { _ in
                 // iOS >= 14
                 GADMobileAds.sharedInstance().start(completionHandler: nil)
                 call.success([
                     "value": true
-                ]);
-                
+                ])
+
             })
             #else
             GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.success([
                 "value": true
-            ]);
+            ])
             #endif
         } else {
             // iOS < 14
             GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.success([
                 "value": true
-            ]);
+            ])
         }
     }
 
@@ -60,8 +60,8 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         DispatchQueue.main.async {
             var adId = call.getString("adId") ?? "ca-app-pub-3940256099942544/6300978111"
             let isTest = call.getBool("isTesting") ?? false
-            if (isTest) {
-                adId = "ca-app-pub-3940256099942544/6300978111";
+            if isTest {
+                adId = "ca-app-pub-3940256099942544/6300978111"
             }
 
             let adSize = call.getString("adSize") ?? "SMART_BANNER"
@@ -69,28 +69,28 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             let adMargin = call.getInt("margin") ?? 0
             var bannerSize = kGADAdSizeBanner
 
-            switch (adSize) {
+            switch adSize {
             case "BANNER":
                 bannerSize = kGADAdSizeBanner
-                break;
+                break
             case "FLUID":
                 bannerSize = kGADAdSizeSmartBannerPortrait
-                break;
+                break
             case "FULL_BANNER":
                 bannerSize = kGADAdSizeFullBanner
-                break;
+                break
             case "LARGE_BANNER":
                 bannerSize = kGADAdSizeLargeBanner
-                break;
+                break
             case "LEADERBOARD":
                 bannerSize = kGADAdSizeLeaderboard
-                break;
+                break
             case "MEDIUM_RECTANGLE":
                 bannerSize = kGADAdSizeMediumRectangle
-                break;
+                break
             default:
                 bannerSize = kGADAdSizeSmartBannerPortrait
-                break;
+                break
             }
 
             self.bannerView = GADBannerView(adSize: bannerSize)
@@ -112,7 +112,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
                 if let subView = rootViewController.view.viewWithTag(2743243288699) {
                     NSLog("AdMob: find subView for hideBanner")
-                    subView.isHidden = true;
+                    subView.isHidden = true
                 } else {
                     NSLog("AdMob: not find subView for resumeBanner for hideBanner")
                 }
@@ -134,7 +134,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
                 if let subView = rootViewController.view.viewWithTag(2743243288699) {
                     NSLog("AdMob: find subView for resumeBanner")
-                    subView.isHidden = false;
+                    subView.isHidden = false
 
                     self.notifyListeners("onAdSize", data: [
                         "width": subView.frame.width,
@@ -169,21 +169,20 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         removeBannerViewToView()
         if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
             NSLog("AdMob: rendering rootView")
-            
+
             var toItem = rootViewController.bottomLayoutGuide
             var adMargin = Int(Margin)
-            
 
-            switch (adPosition) {
+            switch adPosition {
             case "CENTER":
                 // todo: position center
                 toItem = rootViewController.bottomLayoutGuide
                 adMargin = adMargin * -1
-                break;
+                break
             default:
                 toItem = rootViewController.bottomLayoutGuide
                 adMargin = adMargin * -1
-                break;
+                break
             }
             bannerView.translatesAutoresizingMaskIntoConstraints = false
             bannerView.tag = 2743243288699 // rand
@@ -215,7 +214,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             }
         }
     }
-
 
     /// Tells the delegate an ad request loaded an ad.
     public func adViewDidReceiveAd(_ bannerView: GADBannerView) {
@@ -265,7 +263,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         self.bridge.triggerJSEvent(eventName: "adViewWillLeaveApplication", target: "window")
     }
 
-
     /**
      *  AdMob: Intertitial
      *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/interstitial?hl=ja
@@ -274,8 +271,8 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         DispatchQueue.main.async {
             var adUnitID = call.getString("adId") ?? "ca-app-pub-3940256099942544/4411468910"
             let isTest = call.getBool("isTesting") ?? false
-            if (isTest) {
-                adUnitID = "ca-app-pub-3940256099942544/6300978111";
+            if isTest {
+                adUnitID = "ca-app-pub-3940256099942544/6300978111"
             }
 
             self.interstitial = DFPInterstitial(adUnitID: adUnitID)
@@ -337,8 +334,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         self.notifyListeners("onInterstitialAdLeftApplication", data: ["value": true])
     }
 
-
-
     /**
      *  AdMob: Rewarded Ads
      *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-ads?hl=ja
@@ -347,8 +342,8 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         DispatchQueue.main.async {
             var adUnitID: String = call.getString("adId") ?? "ca-app-pub-3940256099942544/1712485313"
             let isTest = call.getBool("isTesting") ?? false
-            if (isTest) {
-                adUnitID = "ca-app-pub-3940256099942544/1712485313";
+            if isTest {
+                adUnitID = "ca-app-pub-3940256099942544/1712485313"
             }
 
             self.rewardedAd = GADRewardedAd(adUnitID: adUnitID)
@@ -366,7 +361,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
 
         }
     }
-
 
     @objc func showRewardVideoAd(_ call: CAPPluginCall) {
         DispatchQueue.main.async {

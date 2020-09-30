@@ -10,27 +10,36 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "release": "np"
+    "release": "np",
+    "lint": "npm run prettier -- --check",
+    "fmt": "npm run prettier -- --write && npm run swiftlint -- autocorrect",
+    "prettier": "prettier \"{android,ios,src}/*.{css,html,java,js,ts}\"",
+    "swiftlint": "swiftlint"
   },
   "author": "Masahiko Sakakibara <sakakibara@rdlabo.jp>",
   "license": "MIT",
   "dependencies": {
     "@capacitor/core": "^2.0.0"
   },
+  "prettier": "@ionic/prettier-config",
+  "swiftlint": "@ionic/swiftlint-config",
   "devDependencies": {
     "@capacitor/android": "^2.0.0",
     "@capacitor/ios": "^2.0.0",
+    "@ionic/prettier-config": "^1.0.0",
+    "@ionic/swiftlint-config": "^1.0.2",
     "husky": "^4.2.5",
     "np": "^6.2.4",
     "prettier": "^2.0.5",
     "prettier-plugin-java": "^0.8.0",
     "pretty-quick": "^2.0.1",
     "rimraf": "^3.0.0",
+    "swiftlint": "^1.0.1",
     "typescript": "^3.2.4"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "npm run lint"
     }
   },
   "files": [

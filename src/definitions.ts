@@ -56,46 +56,102 @@ export interface AdMobPlugin {
   // getAdSettings(): Promise<any>;
 
   // AdMob listeners
-  addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
-
-  addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
-
-  addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
-
-  addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void
+  addListener(
+    eventName: 'onAdLoaded',
+    listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
-  addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
+  addListener(
+    eventName: 'onAdFailedToLoad',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
+  addListener(
+    eventName: 'onAdOpened',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'onAdClosed',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
+  addListener(
+    eventName: 'onRewardedVideoAdLoaded',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
+  addListener(
+    eventName: 'onRewardedVideoAdOpened',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
+  addListener(
+    eventName: 'onAdLeftApplication',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
   // Admob RewardVideo listeners
-  addListener(eventName: 'onRewardedVideoStarted', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'onRewardedVideoStarted',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'onRewardedVideoAdClosed', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'onRewardedVideoAdClosed',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'onRewarded', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'onRewarded',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'onRewardedVideoAdLeftApplication', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'onRewardedVideoAdLeftApplication',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'onRewardedVideoAdFailedToLoad',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'onRewardedVideoCompleted',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
   // iOS
-  addListener(eventName: 'adViewDidReceiveAd', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'adViewDidReceiveAd',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'adView:didFailToReceiveAdWithError', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'adView:didFailToReceiveAdWithError',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'adViewWillPresentScreen',listenerFunc: (info: any) => void): PluginListenerHandle;
+  addListener(
+    eventName: 'adViewWillPresentScreen',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'adViewWillDismissScreen', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'adViewWillDismissScreen',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'adViewDidDismissScreen', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'adViewDidDismissScreen',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 
-  addListener(eventName: 'adViewWillLeaveApplication', listenerFunc: (info: any) => void ): PluginListenerHandle;
+  addListener(
+    eventName: 'adViewWillLeaveApplication',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
 }
 
 export interface AdMobInitializationOptions {
