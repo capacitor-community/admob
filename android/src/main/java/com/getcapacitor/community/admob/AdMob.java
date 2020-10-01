@@ -33,12 +33,6 @@ import org.json.JSONException;
 @NativePlugin(permissions = { Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET })
 public class AdMob extends Plugin {
     public static final JSArray EMPTY_TESTING_DEVICES = new JSArray();
-    /**
-     * An Array of devices IDs that will be marked as tested devices.
-     *
-     * @see <a href="https://developers.google.com/admob/android/test-ads#enable_test_devices">Test Devices</a>
-     */
-    public JSArray testingDevices;
     private PluginCall call;
     private ViewGroup mViewGroup;
     private RelativeLayout mAdViewLayout;
@@ -49,7 +43,14 @@ public class AdMob extends Plugin {
     // Initialize AdMob with appId
     @PluginMethod
     public void initialize(PluginCall call) {
-        this.testingDevices = call.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES);
+        final boolean initializeForTesting = call.getBoolean("initializeForTesting", false);
+
+        if (initializeForTesting) {
+            JSArray testingDevices = call.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES);
+            this.setTestingDevicesTo(testingDevices);
+        } else {
+            this.setTestingDevicesTo(EMPTY_TESTING_DEVICES);
+        }
 
         try {
             MobileAds.initialize(
@@ -80,8 +81,7 @@ public class AdMob extends Plugin {
 
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
 
-        setTestDevicesIfNeeded(adOptions.isTesting);
-
+        // Why a try catch block?
         try {
             mAdView = new AdView(getContext());
             mAdView.setAdSize(adOptions.adSize.size);
@@ -275,7 +275,6 @@ public class AdMob extends Plugin {
     public void prepareInterstitial(final PluginCall call) {
         final AdOptions adOptions = AdOptions.getFactory().createInterstitialOptions(call);
 
-        setTestDevicesIfNeeded(adOptions.isTesting);
         // This is never read, why is saved?
         this.call = call;
 
@@ -382,8 +381,6 @@ public class AdMob extends Plugin {
             ca-app-pub-3940256099942544/5224354917
         */
         final AdOptions adOptions = AdOptions.getFactory().createRewardVideoOptions(call);
-
-        setTestDevicesIfNeeded(adOptions.isTesting);
 
         try {
             mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getContext());
@@ -544,14 +541,16 @@ public class AdMob extends Plugin {
         }
     }
 
-    private void setTestDevicesIfNeeded(boolean isTesting) {
-        if (!isTesting) {
-            return;
-        }
+    /**
+     * An Array of devices IDs that will be marked as tested devices.
+     *
+     * @see <a href="https://developers.google.com/admob/android/test-ads#enable_test_devices">Test Devices</a>
+     */
+    private void setTestingDevicesTo(JSArray testingDevices) {
         // TODO: create a function to automatically get the device ID when isTesting is true? https://stackoverflow.com/a/36242494/1255819
         try {
             final RequestConfiguration configuration = new RequestConfiguration.Builder()
-                .setTestDeviceIds(this.testingDevices.<String>toList())
+                .setTestDeviceIds(testingDevices.<String>toList())
                 .build();
 
             MobileAds.setRequestConfiguration(configuration);
