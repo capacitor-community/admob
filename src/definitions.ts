@@ -157,11 +157,17 @@ export interface AdMobPlugin {
 export interface AdMobInitializationOptions {
   requestTrackingAuthorization?: boolean;
   /**
-   * An Array of devices IDs that will be marked as tested devices
+   * An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true
    * (Real Ads will be served to Testing devices but they will not count as 'real').
    * @see https://developers.google.com/admob/android/test-ads#enable_test_devices
    */
   testingDevices?: string[];
+  /**
+   * If set to true, the devices on {@link AdMobInitializationOptions.testingDevices} will
+   * be registered to receive test production ads.
+   * @see AdMobInitializationOptions.testingDevices
+   */
+  initializeForTesting?: boolean;
 }
 
 export interface AdOptions {
