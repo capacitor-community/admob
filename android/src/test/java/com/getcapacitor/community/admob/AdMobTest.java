@@ -3,7 +3,6 @@ package com.getcapacitor.community.admob;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -140,12 +139,7 @@ public class AdMobTest {
     @Nested
     @DisplayName("Ads Creation")
     class AdsCreation {
-        AdOptions adOptionsWithNpaTrue = AdOptions
-            .getFactory()
-            ._createTesterAdOptions("The Id", "The Testing ID", false, "TOP", 0, true, AdSizeEnum.SMART_BANNER);
-        AdOptions adOptionsWithNpaFalse = AdOptions
-            .getFactory()
-            ._createTesterAdOptions("The Id", "The Testing ID", false, "TOP", 0, false, AdSizeEnum.SMART_BANNER);
+        AdOptions adOptionsWithNpaTrue = new AdOptions.TesterAdOptionsBuilder().setNpa(true).build();
 
         MockedStatic<MobileAds> mobileAdsMockedStatic;
         MockedConstruction<AdView> adViewMockedConstruction;

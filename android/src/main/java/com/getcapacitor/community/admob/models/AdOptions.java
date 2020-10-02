@@ -1,5 +1,6 @@
 package com.getcapacitor.community.admob.models;
 
+import androidx.annotation.VisibleForTesting;
 import com.getcapacitor.PluginCall;
 
 /**
@@ -139,27 +140,6 @@ public abstract class AdOptions {
                 }
             };
         }
-
-        /**
-         * Use this just for testing purposes
-         */
-        public AdOptions _createTesterAdOptions(
-            String id,
-            String testingID,
-            boolean isTesting,
-            String position,
-            int margin,
-            boolean npa,
-            AdSizeEnum adSize
-        ) {
-            return new AdOptions(id, isTesting, position, margin, npa, adSize) {
-
-                @Override
-                public String getTestingId() {
-                    return testingID;
-                }
-            };
-        }
     }
 
     private static AdOptionsFactory factory;
@@ -170,5 +150,64 @@ public abstract class AdOptions {
         }
         AdOptions.factory = new AdOptionsFactory();
         return AdOptions.factory;
+    }
+
+    /**
+     * Just for testing
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public static class TesterAdOptionsBuilder {
+        private String id = "TesterAdOptionsBuilder__defaultID";
+        private String testingID = "TesterAdOptionsBuilder__testingID";
+        private boolean isTesting = true;
+        private String position = "TesterAdOptionsBuilder__position";
+        private int margin = 1;
+        private boolean npa = false;
+        private AdSizeEnum adSize = AdSizeEnum.SMART_BANNER;
+
+        public TesterAdOptionsBuilder setIsTesting(boolean value) {
+            isTesting = value;
+            return this;
+        }
+
+        public TesterAdOptionsBuilder setNpa(boolean value) {
+            npa = value;
+            return this;
+        }
+
+        public TesterAdOptionsBuilder setPosition(String value) {
+            position = value;
+            return this;
+        }
+
+        public TesterAdOptionsBuilder setTestingID(String value) {
+            testingID = value;
+            return this;
+        }
+
+        public TesterAdOptionsBuilder setID(String value) {
+            id = value;
+            return this;
+        }
+
+        public TesterAdOptionsBuilder setMargin(int value) {
+            margin = value;
+            return this;
+        }
+
+        public TesterAdOptionsBuilder setAdSize(AdSizeEnum value) {
+            adSize = value;
+            return this;
+        }
+
+        public AdOptions build() {
+            return new AdOptions(id, isTesting, position, margin, npa, adSize) {
+
+                @Override
+                public String getTestingId() {
+                    return testingID;
+                }
+            };
+        }
     }
 }
