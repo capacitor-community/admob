@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -26,8 +27,10 @@ import com.getcapacitor.community.admob.models.AdSizeEnum;
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +45,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * TO be honest I am not 100% proud of this test file, but there is no other way to test it without
+ * split AdMob into more little classes like Banner/Interstitial/RewardVideo
+ * TODO: Split?
+ */
 @ExtendWith(MockitoExtension.class)
 public class AdMobTest {
     @Mock
@@ -192,13 +200,13 @@ public class AdMobTest {
                 when(viewGroupMock.getChildAt(anyInt())).thenReturn(viewGroupMock);
 
                 sut.initialize(pluginCallMock);
-                lenient().when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
-                lenient().when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
+
                 lenient().when(pluginCallMock.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES)).thenReturn(new JSArray());
             }
 
             @Test
-            void banner() {
+            @DisplayName("Banner with npa")
+            void showBanner() {
                 try (MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction = Mockito.mockConstruction(RelativeLayout.class)) {
                     when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsWithNpaTrue);
                     Resources mockedResourcesMock = mock(Resources.class);
@@ -217,6 +225,41 @@ public class AdMobTest {
                     verify(mockedBundle).putString("npa", "1");
                     verify(adRequestBuilder).addNetworkExtrasBundle(AdMobAdapter.class, mockedBundle);
                 }
+            }
+
+            @Test
+            @DisplayName("Interstitial with npa")
+            void prepareInterstitial() {
+                try (MockedConstruction<InterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(InterstitialAd.class)) {
+                    when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
+
+                    sut.prepareInterstitial(pluginCallMock);
+                    verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+                    Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+                    uiThreadRunnable.run();
+
+                    Bundle mockedBundle = bundleMockedConstruction.constructed().get(0);
+                    AdRequest.Builder adRequestBuilder = adRequestBuilderMockedConstruction.constructed().get(0);
+                    verify(mockedBundle).putString("npa", "1");
+                    verify(adRequestBuilder).addNetworkExtrasBundle(AdMobAdapter.class, mockedBundle);
+                }
+            }
+
+            @Test
+            @DisplayName("Rewarded Video Ad with npa")
+            void prepareRewardVideo() {
+                mobileAdsMockedStatic.when(() -> MobileAds.getRewardedVideoAdInstance(any())).thenReturn(mock(RewardedVideoAd.class));
+                when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
+
+                sut.prepareRewardVideoAd(pluginCallMock);
+                verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+                Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+                uiThreadRunnable.run();
+
+                Bundle mockedBundle = bundleMockedConstruction.constructed().get(0);
+                AdRequest.Builder adRequestBuilder = adRequestBuilderMockedConstruction.constructed().get(0);
+                verify(mockedBundle).putString("npa", "1");
+                verify(adRequestBuilder).addNetworkExtrasBundle(AdMobAdapter.class, mockedBundle);
             }
         }
     }
