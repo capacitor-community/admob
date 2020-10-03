@@ -8,7 +8,9 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 
-public class AdViewIdHelper {
+public final class AdViewIdHelper {
+
+    private AdViewIdHelper() {}
 
     public static String getFinalAdId(AdOptions adOptions, AdRequest adRequest, String logTag, Context context) {
         if (!adOptions.isTesting) {

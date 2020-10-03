@@ -104,7 +104,7 @@ export interface AdMobPlugin {
 
   addListener(
     eventName: 'onRewarded',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (adMobRewardItem: AdMobRewardItem) => void,
   ): PluginListenerHandle;
 
   addListener(
@@ -114,7 +114,7 @@ export interface AdMobPlugin {
 
   addListener(
     eventName: 'onRewardedVideoAdFailedToLoad',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (adMobError: AdMobError) => void,
   ): PluginListenerHandle;
 
   addListener(
@@ -247,4 +247,14 @@ export enum AdPosition {
   TOP_CENTER = 'TOP_CENTER',
   CENTER = 'CENTER',
   BOTTOM_CENTER = 'BOTTOM_CENTER',
+}
+
+export interface AdMobRewardItem {
+  type: string;
+  amount: number;
+}
+
+export interface AdMobError {
+  reason: string;
+  code: number;
 }
