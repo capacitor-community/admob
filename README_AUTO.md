@@ -35,6 +35,11 @@ This README is developing test.
 * [addListener()](#addlistener)
 * [addListener()](#addlistener)
 * [addListener()](#addlistener)
+* [addListener()](#addlistener)
+* [addListener()](#addlistener)
+* [addListener()](#addlistener)
+* [addListener()](#addlistener)
+* [addListener()](#addlistener)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 <!--DOCGEN_INDEX_END-->
@@ -51,11 +56,15 @@ This README is developing test.
 initialize(options: AdMobInitializationOptions) => Promise<{ value: boolean; }>
 ```
 
-| Param       | Type                                                      |
-| ----------- | --------------------------------------------------------- |
-| **options** | [AdMobInitializationOptions](#admobinitializationoptions) |
+Initialize AdMob with AdMobInitializationOptions
+
+| Param       | Type                                                      | Description                |
+| ----------- | --------------------------------------------------------- | -------------------------- |
+| **options** | [AdMobInitializationOptions](#admobinitializationoptions) | AdMobInitializationOptions |
 
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -66,11 +75,15 @@ initialize(options: AdMobInitializationOptions) => Promise<{ value: boolean; }>
 showBanner(options: AdOptions) => Promise<{ value: boolean; }>
 ```
 
-| Param       | Type                    |
-| ----------- | ----------------------- |
-| **options** | [AdOptions](#adoptions) |
+Show a banner Ad
+
+| Param       | Type                    | Description |
+| ----------- | ----------------------- | ----------- |
+| **options** | [AdOptions](#adoptions) | AdOptions   |
 
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -81,7 +94,11 @@ showBanner(options: AdOptions) => Promise<{ value: boolean; }>
 hideBanner() => Promise<{ value: boolean; }>
 ```
 
+Hide the banner, remove it from screen, but can show it later
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -92,7 +109,11 @@ hideBanner() => Promise<{ value: boolean; }>
 resumeBanner() => Promise<{ value: boolean; }>
 ```
 
+Resume the banner, show it after hide
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -103,7 +124,11 @@ resumeBanner() => Promise<{ value: boolean; }>
 removeBanner() => Promise<{ value: boolean; }>
 ```
 
+Destroy the banner, remove it from screen.
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -114,11 +139,15 @@ removeBanner() => Promise<{ value: boolean; }>
 prepareInterstitial(options: AdOptions) => Promise<{ value: boolean; }>
 ```
 
-| Param       | Type                    |
-| ----------- | ----------------------- |
-| **options** | [AdOptions](#adoptions) |
+Prepare interstitial banner
+
+| Param       | Type                    | Description |
+| ----------- | ----------------------- | ----------- |
+| **options** | [AdOptions](#adoptions) | AdOptions   |
 
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -129,7 +158,11 @@ prepareInterstitial(options: AdOptions) => Promise<{ value: boolean; }>
 showInterstitial() => Promise<{ value: boolean; }>
 ```
 
+Show interstitial ad when it’s ready
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -140,11 +173,15 @@ showInterstitial() => Promise<{ value: boolean; }>
 prepareRewardVideoAd(options: AdOptions) => Promise<{ value: boolean; }>
 ```
 
-| Param       | Type                    |
-| ----------- | ----------------------- |
-| **options** | [AdOptions](#adoptions) |
+Prepare a reward video ad
+
+| Param       | Type                    | Description |
+| ----------- | ----------------------- | ----------- |
+| **options** | [AdOptions](#adoptions) | AdOptions   |
 
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -155,7 +192,11 @@ prepareRewardVideoAd(options: AdOptions) => Promise<{ value: boolean; }>
 showRewardVideoAd() => Promise<{ value: boolean; }>
 ```
 
+Show a reward video ad
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -166,7 +207,11 @@ showRewardVideoAd() => Promise<{ value: boolean; }>
 pauseRewardedVideo() => Promise<{ value: boolean; }>
 ```
 
+Pause RewardedVideo
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -177,7 +222,11 @@ pauseRewardedVideo() => Promise<{ value: boolean; }>
 resumeRewardedVideo() => Promise<{ value: boolean; }>
 ```
 
+Resume RewardedVideo
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -188,7 +237,11 @@ resumeRewardedVideo() => Promise<{ value: boolean; }>
 stopRewardedVideo() => Promise<{ value: boolean; }>
 ```
 
+Close RewardedVideo
+
 **Returns:** Promise&lt;{ value: boolean; }&gt;
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -199,10 +252,12 @@ stopRewardedVideo() => Promise<{ value: boolean; }>
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                |
-| ---------------- | ------------------- |
-| **eventName**    | "onAdLoaded"        |
-| **listenerFunc** | (info: any) => void |
+Notice: banner ad is loaded(android)
+
+| Param            | Type                | Description |
+| ---------------- | ------------------- | ----------- |
+| **eventName**    | "onAdLoaded"        | onAdLoaded  |
+| **listenerFunc** | (info: any) => void |             |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -215,10 +270,12 @@ addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void) => Plugi
 addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                |
-| ---------------- | ------------------- |
-| **eventName**    | "onAdFailedToLoad"  |
-| **listenerFunc** | (info: any) => void |
+Notice: failed to load Banner ad(android)
+
+| Param            | Type                | Description      |
+| ---------------- | ------------------- | ---------------- |
+| **eventName**    | "onAdFailedToLoad"  | onAdFailedToLoad |
+| **listenerFunc** | (info: any) => void |                  |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -231,10 +288,12 @@ addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void) =>
 addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                |
-| ---------------- | ------------------- |
-| **eventName**    | "onAdOpened"        |
-| **listenerFunc** | (info: any) => void |
+Notice: banner ad is show(android)
+
+| Param            | Type                | Description |
+| ---------------- | ------------------- | ----------- |
+| **eventName**    | "onAdOpened"        | onAdOpened  |
+| **listenerFunc** | (info: any) => void |             |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -247,154 +306,12 @@ addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void) => Plugi
 addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                |
-| ---------------- | ------------------- |
-| **eventName**    | "onAdClosed"        |
-| **listenerFunc** | (info: any) => void |
+Notice: Banner ad is closed(android)
 
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                      |
-| ---------------- | ------------------------- |
-| **eventName**    | "onRewardedVideoAdLoaded" |
-| **listenerFunc** | (info: any) => void       |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                      |
-| ---------------- | ------------------------- |
-| **eventName**    | "onRewardedVideoAdOpened" |
-| **listenerFunc** | (info: any) => void       |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                  |
-| ---------------- | --------------------- |
-| **eventName**    | "onAdLeftApplication" |
-| **listenerFunc** | (info: any) => void   |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoStarted', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                     |
-| ---------------- | ------------------------ |
-| **eventName**    | "onRewardedVideoStarted" |
-| **listenerFunc** | (info: any) => void      |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdClosed', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                      |
-| ---------------- | ------------------------- |
-| **eventName**    | "onRewardedVideoAdClosed" |
-| **listenerFunc** | (info: any) => void       |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewarded', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                |
-| ---------------- | ------------------- |
-| **eventName**    | "onRewarded"        |
-| **listenerFunc** | (info: any) => void |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                               |
-| ---------------- | ---------------------------------- |
-| **eventName**    | "onRewardedVideoAdLeftApplication" |
-| **listenerFunc** | (info: any) => void                |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                            |
-| ---------------- | ------------------------------- |
-| **eventName**    | "onRewardedVideoAdFailedToLoad" |
-| **listenerFunc** | (info: any) => void             |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-| Param            | Type                       |
-| ---------------- | -------------------------- |
-| **eventName**    | "onRewardedVideoCompleted" |
-| **listenerFunc** | (info: any) => void        |
+| Param            | Type                | Description |
+| ---------------- | ------------------- | ----------- |
+| **eventName**    | "onAdClosed"        | onAdClosed  |
+| **listenerFunc** | (info: any) => void |             |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -407,10 +324,12 @@ addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => 
 addListener(eventName: 'adViewDidReceiveAd', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                 |
-| ---------------- | -------------------- |
-| **eventName**    | "adViewDidReceiveAd" |
-| **listenerFunc** | (info: any) => void  |
+Notice: request loaded Banner ad(iOS)
+
+| Param            | Type                 | Description        |
+| ---------------- | -------------------- | ------------------ |
+| **eventName**    | "adViewDidReceiveAd" | adViewDidReceiveAd |
+| **listenerFunc** | (info: any) => void  |                    |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -423,10 +342,12 @@ addListener(eventName: 'adViewDidReceiveAd', listenerFunc: (info: any) => void) 
 addListener(eventName: 'adView:didFailToReceiveAdWithError', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                                 |
-| ---------------- | ------------------------------------ |
-| **eventName**    | "adView:didFailToReceiveAdWithError" |
-| **listenerFunc** | (info: any) => void                  |
+Notice: request failed Banner ad(iOS)
+
+| Param            | Type                                 | Description                        |
+| ---------------- | ------------------------------------ | ---------------------------------- |
+| **eventName**    | "adView:didFailToReceiveAdWithError" | adView:didFailToReceiveAdWithError |
+| **listenerFunc** | (info: any) => void                  |                                    |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -439,10 +360,12 @@ addListener(eventName: 'adView:didFailToReceiveAdWithError', listenerFunc: (info
 addListener(eventName: 'adViewWillPresentScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                      |
-| ---------------- | ------------------------- |
-| **eventName**    | "adViewWillPresentScreen" |
-| **listenerFunc** | (info: any) => void       |
+Notice: full-screen view will be presented in response to the user clicking on an ad.(iOS)
+
+| Param            | Type                      | Description             |
+| ---------------- | ------------------------- | ----------------------- |
+| **eventName**    | "adViewWillPresentScreen" | adViewWillPresentScreen |
+| **listenerFunc** | (info: any) => void       |                         |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -455,10 +378,12 @@ addListener(eventName: 'adViewWillPresentScreen', listenerFunc: (info: any) => v
 addListener(eventName: 'adViewWillDismissScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                      |
-| ---------------- | ------------------------- |
-| **eventName**    | "adViewWillDismissScreen" |
-| **listenerFunc** | (info: any) => void       |
+Notice: The full-screen view will be dismissed.(iOS)
+
+| Param            | Type                      | Description             |
+| ---------------- | ------------------------- | ----------------------- |
+| **eventName**    | "adViewWillDismissScreen" | adViewWillDismissScreen |
+| **listenerFunc** | (info: any) => void       |                         |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -471,10 +396,12 @@ addListener(eventName: 'adViewWillDismissScreen', listenerFunc: (info: any) => v
 addListener(eventName: 'adViewDidDismissScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                     |
-| ---------------- | ------------------------ |
-| **eventName**    | "adViewDidDismissScreen" |
-| **listenerFunc** | (info: any) => void      |
+Notice: The full-screen view has been dismissed.(iOS)
+
+| Param            | Type                     | Description            |
+| ---------------- | ------------------------ | ---------------------- |
+| **eventName**    | "adViewDidDismissScreen" | adViewDidDismissScreen |
+| **listenerFunc** | (info: any) => void      |                        |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -487,10 +414,264 @@ addListener(eventName: 'adViewDidDismissScreen', listenerFunc: (info: any) => vo
 addListener(eventName: 'adViewWillLeaveApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-| Param            | Type                         |
-| ---------------- | ---------------------------- |
-| **eventName**    | "adViewWillLeaveApplication" |
-| **listenerFunc** | (info: any) => void          |
+Notice: User click will open another app.(iOS)
+
+| Param            | Type                         | Description                |
+| ---------------- | ---------------------------- | -------------------------- |
+| **eventName**    | "adViewWillLeaveApplication" | adViewWillLeaveApplication |
+| **listenerFunc** | (info: any) => void          |                            |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onInterstitialAdLoaded', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Interstitial ad loaded
+
+| Param            | Type                     | Description            |
+| ---------------- | ------------------------ | ---------------------- |
+| **eventName**    | "onInterstitialAdLoaded" | onInterstitialAdLoaded |
+| **listenerFunc** | (info: any) => void      |                        |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onInterstitialAdFailedToLoad', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Failed to load Interstitial ad
+
+| Param            | Type                           | Description                  |
+| ---------------- | ------------------------------ | ---------------------------- |
+| **eventName**    | "onInterstitialAdFailedToLoad" | onInterstitialAdFailedToLoad |
+| **listenerFunc** | (info: any) => void            |                              |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onInterstitialAdOpened', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Interstitial ad opened
+
+| Param            | Type                     | Description            |
+| ---------------- | ------------------------ | ---------------------- |
+| **eventName**    | "onInterstitialAdOpened" | onInterstitialAdOpened |
+| **listenerFunc** | (info: any) => void      |                        |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onInterstitialAdClosed', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Interstitial ad closed
+
+| Param            | Type                     | Description            |
+| ---------------- | ------------------------ | ---------------------- |
+| **eventName**    | "onInterstitialAdClosed" | onInterstitialAdClosed |
+| **listenerFunc** | (info: any) => void      |                        |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onInterstitialAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Click link of Interstitial ad
+
+| Param            | Type                              | Description                     |
+| ---------------- | --------------------------------- | ------------------------------- |
+| **eventName**    | "onInterstitialAdLeftApplication" | onInterstitialAdLeftApplication |
+| **listenerFunc** | (info: any) => void               |                                 |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Prepared RewardedVideo
+
+| Param            | Type                      | Description             |
+| ---------------- | ------------------------- | ----------------------- |
+| **eventName**    | "onRewardedVideoAdLoaded" | onRewardedVideoAdLoaded |
+| **listenerFunc** | (info: any) => void       |                         |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: RewardedVideo is opened
+
+| Param            | Type                      | Description             |
+| ---------------- | ------------------------- | ----------------------- |
+| **eventName**    | "onRewardedVideoAdOpened" | onRewardedVideoAdOpened |
+| **listenerFunc** | (info: any) => void       |                         |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: RewardedVideo go to background(Android)
+
+| Param            | Type                  | Description             |
+| ---------------- | --------------------- | ----------------------- |
+| **eventName**    | "onAdLeftApplication" | onRewardedVideoAdOpened |
+| **listenerFunc** | (info: any) => void   |                         |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoStarted', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: RewardedVideo is started
+
+| Param            | Type                     | Description            |
+| ---------------- | ------------------------ | ---------------------- |
+| **eventName**    | "onRewardedVideoStarted" | onRewardedVideoStarted |
+| **listenerFunc** | (info: any) => void      |                        |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoAdClosed', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: RewardedVideo is closed
+
+| Param            | Type                      | Description             |
+| ---------------- | ------------------------- | ----------------------- |
+| **eventName**    | "onRewardedVideoAdClosed" | onRewardedVideoAdClosed |
+| **listenerFunc** | (info: any) => void       |                         |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewarded', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: User get reward by RewardedVideo
+
+| Param            | Type                | Description |
+| ---------------- | ------------------- | ----------- |
+| **eventName**    | "onRewarded"        | onRewarded  |
+| **listenerFunc** | (info: any) => void |             |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: click link of RewardedVideo ad
+
+| Param            | Type                               | Description                      |
+| ---------------- | ---------------------------------- | -------------------------------- |
+| **eventName**    | "onRewardedVideoAdLeftApplication" | onRewardedVideoAdLeftApplication |
+| **listenerFunc** | (info: any) => void                |                                  |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Failed to load RewardVideo ad
+
+| Param            | Type                            | Description                   |
+| ---------------- | ------------------------------- | ----------------------------- |
+| **eventName**    | "onRewardedVideoAdFailedToLoad" | onRewardedVideoAdFailedToLoad |
+| **listenerFunc** | (info: any) => void             |                               |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: Watch RewardVideo complete
+
+| Param            | Type                       | Description              |
+| ---------------- | -------------------------- | ------------------------ |
+| **eventName**    | "onRewardedVideoCompleted" | onRewardedVideoCompleted |
+| **listenerFunc** | (info: any) => void        |                          |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -504,7 +685,7 @@ addListener(eventName: 'adViewWillLeaveApplication', listenerFunc: (info: any) =
 
 | Prop                             | Type     | Description                                                                                                                                                                                                      |
 | -------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **requestTrackingAuthorization** | boolean  |                                                                                                                                                                                                                  |
+| **requestTrackingAuthorization** | boolean  | Use or not requestTrackingAuthorization in iOS(>14)                                                                                                                                                              |
 | **testingDevices**               | string[] | An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true (Real Ads will be served to Testing devices but they will not count as 'real'). |
 | **initializeForTesting**         | boolean  | If set to true, the devices on {@link AdMobInitializationOptions.testingDevices} will be registered to receive test production ads.                                                                              |
 
