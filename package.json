@@ -10,6 +10,7 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
+    "docgen": "docgen --api AdMobPlugin --output-readme README_AUTO.md",
     "release": "np",
     "lint": "npm run prettier -- --check",
     "fmt": "npm run prettier -- --write && npm run swiftlint -- autocorrect",
@@ -25,6 +26,7 @@
   "swiftlint": "@ionic/swiftlint-config",
   "devDependencies": {
     "@capacitor/android": "^2.0.0",
+    "@capacitor/docgen": "0.0.4",
     "@capacitor/ios": "^2.0.0",
     "@ionic/prettier-config": "^1.0.0",
     "@ionic/swiftlint-config": "^1.0.2",
