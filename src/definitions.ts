@@ -516,7 +516,6 @@ export interface AdMobError {
   code: number;
 }
 
-
 /**
  *  For more information:
  *  https://developers.google.com/admob/ios/banner#banner_sizes
