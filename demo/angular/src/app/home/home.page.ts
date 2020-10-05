@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Plugins } from '@capacitor/core';
+import { ToastController } from '@ionic/angular';
 
 import { AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
 const { AdMob } = Plugins;
@@ -51,11 +52,16 @@ export class HomePage implements OnInit, OnDestroy {
    */
   private eventOnAdSize;
   private eventPrepareReward;
-  private eventPrepareInterstitial;
+  private eventRewardReceived: {
+    type: string;
+    amount: number;
+  };
 
   public isLoading = false;
 
-  constructor() {}
+  constructor(
+    private toastCtrl: ToastController,
+  ) {}
 
   ngOnInit() {
     /**
@@ -77,6 +83,19 @@ export class HomePage implements OnInit, OnDestroy {
     this.eventPrepareReward = AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
       this.isPrepareReward = true;
       this.isLoading = false;
+    });
+
+    AdMob.addListener('onRewarded', (info) => {
+      this.eventRewardReceived = info;
+    });
+    AdMob.addListener('onRewardedVideoAdClosed', async (info) => {
+      if (this.eventRewardReceived) {
+        const toast = await this.toastCtrl.create({
+          message: `AdMob Reward received with currency: ${this.eventRewardReceived.type}, amount ${this.eventRewardReceived.amount}.`,
+          duration: 2000,
+        });
+        await toast.present();
+      }
     });
   }
 
@@ -171,6 +190,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async showReward() {
+    this.eventRewardReceived = undefined;
     const result = AdMob.showRewardVideoAd()
       .catch(e => console.log(e));
     if (result === undefined) {

@@ -13,7 +13,7 @@
     "release": "np",
     "lint": "npm run prettier -- --check",
     "fmt": "npm run prettier -- --write && npm run swiftlint -- autocorrect",
-    "prettier": "prettier \"{android,ios,src}/*.{css,html,java,js,ts}\"",
+    "prettier": "prettier \"{android,ios,src}/**/*.{css,html,java,js,ts}\"",
     "swiftlint": "swiftlint"
   },
   "author": "Masahiko Sakakibara <sakakibara@rdlabo.jp>",
