@@ -5,86 +5,86 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   constructor() {
     super({
       name: 'AdMob',
-      platforms: ['web']
+      platforms: ['web'],
     });
   }
 
   async initialize() {
     return {
       value: true,
-    }
+    };
   }
 
   async showBanner(options: AdOptions) {
     console.log(options);
     return {
       value: true,
-    }
+    };
   }
 
   // Hide the banner, remove it from screen, but can show it later
   async hideBanner() {
     return {
       value: true,
-    }
+    };
   }
 
   // Resume the banner, show it after hide
   async resumeBanner() {
     return {
       value: true,
-    }
+    };
   }
 
   // Destroy the banner, remove it from screen.
   async removeBanner() {
     return {
       value: true,
-    }
+    };
   }
 
   async prepareInterstitial(options: AdOptions) {
     console.log(options);
     return {
       value: true,
-    }
+    };
   }
 
   async showInterstitial() {
     return {
       value: true,
-    }
+    };
   }
 
-  async prepareRewardVideoAd(options: AdOptions){
+  async prepareRewardVideoAd(options: AdOptions) {
     console.log(options);
     return {
       value: true,
-    }
+    };
   }
 
-  async showRewardVideoAd(){
+  async showRewardVideoAd() {
     return {
       value: true,
-    }
+    };
   }
 
-  async pauseRewardedVideo(){
+  async pauseRewardedVideo() {
     return {
       value: true,
-    }
+    };
   }
 
-  async resumeRewardedVideo(){
+  async resumeRewardedVideo() {
     return {
       value: true,
-    }
+    };
   }
 
-  async stopRewardedVideo(){
+  async stopRewardedVideo() {
     return {
       value: true,
-    }
+    };
   }
 }
 

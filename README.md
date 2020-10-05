@@ -1,30 +1,37 @@
 [![npm version](https://badge.fury.io/js/%40capacitor-community%2Fadmob.svg)](https://badge.fury.io/js/%40capacitor-community%2Fadmob)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # @capacitor-community/admob
+
 Capacitory community plugin for AdMob.
 
 ## Maintainers
 
-| Maintainer | GitHub  | Social | Sponsoring Company |
-| --- | --- | --- | --- |
-| Masahiko Sakakibara  | [rdlabo](https://github.com/rdlabo)  | [@rdlabo](https://twitter.com/rdlabo) | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
- 
+| Maintainer          | GitHub                              | Social                                | Sponsoring Company                             |
+| ------------------- | ----------------------------------- | ------------------------------------- | ---------------------------------------------- |
+| Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo) | [@rdlabo](https://twitter.com/rdlabo) | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
+
 Mainteinance Status: Actively Maintained
 
 ## Demo
+
 [Demo code is here.](https://github.com/capacitor-community/admob/tree/master/demo)
 
 ### Screenshots
-|  | Banner | Interstitial | Reward |
-|:-----------------|:------------------:|:------------------:|:------------------:|
-| **iOS** | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) |
-| **Android** | ![](demo/screenshots/md_banner.png) | ![](demo/screenshots/md_interstitial.png) | ![](demo/screenshots/md_reward.png) |
+
+|             |                Banner                |                Interstitial                |                Reward                |
+| :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: |
+| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) |
+| **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  |
 
 ## Installation
-__Supporting iOS14 is be since @1.1.0.__
+
+**Supporting iOS14 is be since @1.1.0.**
 
 ```
 % npm install --save @capacitor-community/admob
@@ -32,6 +39,7 @@ __Supporting iOS14 is be since @1.1.0.__
 ```
 
 ### If you use Capacitor 1.x
+
 ```
 % npm install --save @rdlabo/capacitor-admob@0.3.0
 % npx cap update
@@ -65,8 +73,8 @@ In file `android/app/src/main/res/values/strings.xml` add the following lines :
 
 Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
-
 ## iOS configuration
+
 Add the following in the `ios/App/App/info.plist` file inside of the outermost `<dict>`:
 
 ```xml
@@ -82,22 +90,22 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
 
 Don't forget to replace `[APP_ID]` by your AddMob application Id.
 
-
 ## Initialize
 
 ```
-initialize(options: { requestTrackingAuthorization?: boolean }): Promise<{ value: boolean }>
+initialize(options: { requestTrackingAuthorization?: boolean , testingDevices?: string[]}): Promise<{ value: boolean }>
 ```
 
-You can use option `requestTrackingAuthorization`. This change permission to requrire  `AppTrackingTransparency` in iOS >= 14:
+You can use option `requestTrackingAuthorization`. This change permission to require `AppTrackingTransparency` in iOS >= 14:
 https://developers.google.com/admob/ios/ios14
 
 Default value is `true`. If you don't want to track, set requestTrackingAuthorization `false`.
 
+Send and array of device Ids in `testingDevices? to use production like ads on your specified devices -> https://developers.google.com/admob/android/test-ads#enable_test_devices
 
 ### Initialize for @ionic/angular
 
-Open our Ionic app __app.component.ts__ file and add this folloing code.
+Open our Ionic app **app.component.ts** file and add this folloing code.
 
 ```ts
 import { Plugins } from '@capacitor/core';
@@ -106,7 +114,7 @@ const { AdMob } = Plugins;
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
   constructor() {
@@ -132,13 +140,12 @@ import { AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
 const { AdMob } = Plugins;
 
 const App: React.FC = () => {
-
   AdMob.initialize();
 
   const adId = {
     ios: 'ios-value-here',
-    android: 'android-value-here'
-  }
+    android: 'android-value-here',
+  };
 
   const platformAdId = isPlatform('android') ? adId.android : adId.ios;
 
@@ -148,13 +155,14 @@ const App: React.FC = () => {
     position: AdPosition.BOTTOM_CENTER,
     margin: 0,
     // isTesting: true
-  }
+    // npa: true
+  };
 
   AdMob.showBanner(options);
 
   // Subscribe Banner Event Listener
   AdMob.addListener('onAdLoaded', (info: boolean) => {
-    console.log("Banner ad loaded");
+    console.log('Banner ad loaded');
   });
 
   // Get Banner Size
@@ -172,12 +180,10 @@ const App: React.FC = () => {
       </IonReactRouter>
     </IonApp>
   );
-
 };
 
 export default App;
 ```
-
 
 ## APIs
 
@@ -193,34 +199,34 @@ const { AdMob } = Plugins;
 @Component({
   selector: 'admob',
   templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss']
+  styleUrls: ['admob.component.scss'],
 })
 export class AdMobComponent {
-
   private options: AdOptions = {
-      adId: 'YOUR ADID',
-      adSize: AdSize.BANNER,
-      position: AdPosition.BOTTOM_CENTER,
-      margin: 0,
-  }
+    adId: 'YOUR ADID',
+    adSize: AdSize.BANNER,
+    position: AdPosition.BOTTOM_CENTER,
+    margin: 0,
+    // isTesting: true
+    // npa: true
+  };
 
   constructor() {
-       // Show Banner Ad
-       AdMob.showBanner(this.options);
+    // Show Banner Ad
+    AdMob.showBanner(this.options);
 
-        // Subscibe Banner Event Listener
-        AdMob.addListener('onAdLoaded', (info: boolean) => {
-             console.log("Banner Ad Loaded");
-        });
+    // Subscibe Banner Event Listener
+    AdMob.addListener('onAdLoaded', (info: boolean) => {
+      console.log('Banner Ad Loaded');
+    });
 
-        // Get Banner Size
-        AdMob.addListener('onAdSize', (info: boolean) => {
-             console.log(info);
-        });
-    }
+    // Get Banner Size
+    AdMob.addListener('onAdSize', (info: boolean) => {
+      console.log(info);
+    });
+  }
 }
 ```
-
 
 #### hideBanner(): Promise<{ value: boolean }>
 
@@ -228,7 +234,6 @@ export class AdMobComponent {
 // Hide the banner, remove it from screen, but can show it later
 AdMob.hideBanner();
 ```
-
 
 #### resumeBanner(): Promise<{ value: boolean }>
 
@@ -245,7 +250,9 @@ AdMob.removeBanner();
 ```
 
 #### Event Listener
+
 This following Event Listener can be called in **Banner AD**.
+
 ```ts
 addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
 addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -254,10 +261,10 @@ addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void): PluginL
 addListener(eventName: 'onAdSize', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
 
-
 ### INTERSTITIAL
 
 #### prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>
+
 ```ts
 import { Plugins } from '@capacitor/core';
 import { AdOptions } from '@rdlabo/capacitor-admob';
@@ -266,27 +273,25 @@ const { AdMob } = Plugins;
 @Component({
   selector: 'admob',
   templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss']
+  styleUrls: ['admob.component.scss'],
 })
 export class AppComponent {
-    const options: AdOptions = {
-        adId: 'YOUR ADID',
-        autoShow: false
-    }
+  options: AdOptions = {
+    adId: 'YOUR ADID',
+  };
 
-    constructor(){
-        // Prepare interstitial banner
-        AdMob.prepareInterstitial(this.options);
+  constructor() {
+    // Prepare interstitial banner
+    AdMob.prepareInterstitial(this.options);
 
-        // Subscibe Banner Event Listener
-        AdMob.addListener('onAdLoaded', (info: boolean) => {
-            // You can call showInterstitial() here or anytime you want.
-             console.log("Interstitial Ad Loaded");
-        });
-    }
+    // Subscibe Banner Event Listener
+    AdMob.addListener('onAdLoaded', (info: boolean) => {
+      // You can call showInterstitial() here or anytime you want.
+      console.log('Interstitial Ad Loaded');
+    });
+  }
 }
 ```
-
 
 #### showInterstitial(): Promise<{ value: boolean }>
 
@@ -296,7 +301,9 @@ AdMob.showInterstitial();
 ```
 
 #### Event Listener
+
 This following Event Listener can be called in **Interstitial AD**
+
 ```ts
 addListener(eventName: 'onInterstitialAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
 addListener(eventName: 'onInterstitialAdFailedToLoad', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -304,7 +311,6 @@ addListener(eventName: 'onInterstitialAdOpened', listenerFunc: (info: any) => vo
 addListener(eventName: 'onInterstitialAdClosed', listenerFunc: (info: any) => void): PluginListenerHandle;
 addListener(eventName: 'onInterstitialAdLeftApplication', listenerFunc: (info: any) => void): PluginListenerHandle;
 ```
-
 
 ### RewardVideo
 
@@ -318,26 +324,25 @@ const { AdMob } = Plugins;
 @Component({
   selector: 'admob',
   templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss']
+  styleUrls: ['admob.component.scss'],
 })
 export class AdMobComponent {
-    const options: AdOptions = {
-        adId: 'YOUR ADID'
-    }
+  options: AdOptions = {
+    adId: 'YOUR ADID',
+  };
 
-    constructor(){
-        // Prepare ReWardVideo
-        AdMob.prepareRewardVideoAd(this.options);
+  constructor() {
+    // Prepare ReWardVideo
+    AdMob.prepareRewardVideoAd(this.options);
 
-        // Subscibe ReWardVideo Event Listener
-       AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
-            // You can call showRewardVideoAd() here or anytime you want.
-            console.log("RewardedVideoAd Loaded");
-        });
-    }
+    // Subscibe ReWardVideo Event Listener
+    AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
+      // You can call showRewardVideoAd() here or anytime you want.
+      console.log('RewardedVideoAd Loaded');
+    });
+  }
 }
 ```
-
 
 #### showRewardVideoAd(): Promise<{ value: boolean }>
 
@@ -346,14 +351,12 @@ export class AdMobComponent {
 AdMob.showRewardVideoAd();
 ```
 
-
 #### pauseRewardedVideo(): Promise<{ value: boolean }>
 
 ```ts
 // Pause a RewardVideo AD
 AdMob.pauseRewardedVideo();
 ```
-
 
 #### resumeRewardedVideo(): Promise<{ value: boolean }>
 
@@ -370,7 +373,9 @@ AdMob.stopRewardedVideo();
 ```
 
 #### Event Listener
+
 This following Event Listener can be called in **RewardedVideo**
+
 ```ts
 addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void): PluginListenerHandle;
 addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void): PluginListenerHandle;
@@ -385,6 +390,7 @@ addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => 
 ## Options
 
 ### AdOptions
+
 ```ts
 interface AdOptions {
   adId: string;
@@ -394,6 +400,7 @@ interface AdOptions {
 ```
 
 ### AdSize
+
 ```ts
 enum AdSize {
   BANNER = 'BANNER',
@@ -403,11 +410,12 @@ enum AdSize {
   LEADERBOARD = 'LEADERBOARD',
   MEDIUM_RECTANGLE = 'MEDIUM_RECTANGLE',
   SMART_BANNER = 'SMART_BANNER',
-  CUSTOM = 'CUSTOM'
+  CUSTOM = 'CUSTOM',
 }
 ```
 
 ### AdPosition
+
 ```ts
 enum AdPosition {
   TOP_CENTER = 'TOP_CENTER',
@@ -421,7 +429,7 @@ enum AdPosition {
 ### If you have error:
 
 > [error] Error running update: Analyzing dependencies
-[!] CocoaPods could not find compatible versions for pod "Google-Mobile-Ads-SDK":
+> [!] CocoaPods could not find compatible versions for pod "Google-Mobile-Ads-SDK":
 
 You should run `pod repo update` ;
 
@@ -445,6 +453,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
