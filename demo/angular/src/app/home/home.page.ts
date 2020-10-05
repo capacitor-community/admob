@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Plugins } from '@capacitor/core';
+import {PluginListenerHandle, Plugins} from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
+import { AdOptions, AdSize, AdPosition, AdMobRewardItem } from '@capacitor-community/admob';
 const { AdMob } = Plugins;
 
 @Component({
@@ -50,12 +50,9 @@ export class HomePage implements OnInit, OnDestroy {
   /**
    * for EventListener
    */
-  private eventOnAdSize;
-  private eventPrepareReward;
-  private eventRewardReceived: {
-    type: string;
-    amount: number;
-  };
+  private eventOnAdSize: PluginListenerHandle;
+  private eventPrepareReward: PluginListenerHandle
+  private eventRewardReceived: AdMobRewardItem;
 
   public isLoading = false;
 
@@ -85,6 +82,9 @@ export class HomePage implements OnInit, OnDestroy {
       this.isLoading = false;
     });
 
+    /**
+     * RewardedVideo ad
+     */
     AdMob.addListener('onRewarded', (info) => {
       this.eventRewardReceived = info;
     });
