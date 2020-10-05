@@ -429,15 +429,15 @@ Notice: The full-screen view has been dismissed.(iOS)
 ### addListener
 
 ```typescript
-addListener(eventName: 'adViewWillLeaveApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'onRewarded', listenerFunc: (adMobRewardItem: AdMobRewardItem) => void) => PluginListenerHandle
 ```
 
 Notice: User click will open another app.(iOS)
 
-| Param            | Type                         | Description                |
-| ---------------- | ---------------------------- | -------------------------- |
-| **eventName**    | "adViewWillLeaveApplication" | adViewWillLeaveApplication |
-| **listenerFunc** | (info: any) => void          |                            |
+| Param            | Type                                       | Description                |
+| ---------------- | ------------------------------------------ | -------------------------- |
+| **eventName**    | "onRewarded"                               | adViewWillLeaveApplication |
+| **listenerFunc** | (adMobRewardItem: AdMobRewardItem) => void |                            |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -469,15 +469,15 @@ Notice: Interstitial ad loaded
 ### addListener
 
 ```typescript
-addListener(eventName: 'onInterstitialAdFailedToLoad', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (adMobError: AdMobError) => void) => PluginListenerHandle
 ```
 
 Notice: Failed to load Interstitial ad
 
-| Param            | Type                           | Description                  |
-| ---------------- | ------------------------------ | ---------------------------- |
-| **eventName**    | "onInterstitialAdFailedToLoad" | onInterstitialAdFailedToLoad |
-| **listenerFunc** | (info: any) => void            |                              |
+| Param            | Type                             | Description                  |
+| ---------------- | -------------------------------- | ---------------------------- |
+| **eventName**    | "onRewardedVideoAdFailedToLoad"  | onInterstitialAdFailedToLoad |
+| **listenerFunc** | (adMobError: AdMobError) => void |                              |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -755,6 +755,22 @@ Notice: Watch RewardVideo complete
 | Prop       | Type       |
 | ---------- | ---------- |
 | **remove** | () => void |
+
+
+#### AdMobRewardItem
+
+| Prop       | Type   |
+| ---------- | ------ |
+| **type**   | string |
+| **amount** | number |
+
+
+#### AdMobError
+
+| Prop       | Type   |
+| ---------- | ------ |
+| **reason** | string |
+| **code**   | number |
 
 
 ### Enums

@@ -506,6 +506,17 @@ export interface AdOptions {
   npa?: boolean;
 }
 
+export interface AdMobRewardItem {
+  type: string;
+  amount: number;
+}
+
+export interface AdMobError {
+  reason: string;
+  code: number;
+}
+
+
 /**
  *  For more information:
  *  https://developers.google.com/admob/ios/banner#banner_sizes
@@ -577,14 +588,4 @@ export enum AdPosition {
    * Banner position be bottom-center(default)
    */
   BOTTOM_CENTER = 'BOTTOM_CENTER',
-}
-
-export interface AdMobRewardItem {
-  type: string;
-  amount: number;
-}
-
-export interface AdMobError {
-  reason: string;
-  code: number;
 }
