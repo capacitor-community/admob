@@ -400,7 +400,6 @@ public class AdMob extends Plugin {
 
                                     @Override
                                     public void onRewardedVideoAdLoaded() {
-                                        call.success(new JSObject().put("value", true));
                                         notifyListeners("onRewardedVideoAdLoaded", new JSObject().put("value", true));
                                     }
 
@@ -421,7 +420,7 @@ public class AdMob extends Plugin {
 
                                     @Override
                                     public void onRewarded(RewardItem rewardItem) {
-                                        notifyListeners("onRewarded", new JSObject().put("value", true));
+                                        notifyListeners("onRewarded", new JSObject().put("value", true).put("type", rewardItem.getType()).put("amount", rewardItem.getAmount()));
                                     }
 
                                     @Override

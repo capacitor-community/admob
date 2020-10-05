@@ -386,8 +386,10 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     /// Tells the delegate that the user earned a reward.
     public func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
         NSLog("AdMob Reward received with currency: \(reward.type), amount \(reward.amount).")
-        self.notifyListeners("onRewarded", data: ["value": true])
-        self.notifyListeners("onRewardedVideoCompleted", data: ["type": reward.type, "amount": reward.amount])
+        self.notifyListeners("onRewarded", data: ["value": true, "type": reward.type, "amount": reward.amount])
+        
+        // todo: Capacitor3で整理
+        self.notifyListeners("onRewardedVideoCompleted", data: ["value": true, "type": reward.type, "amount": reward.amount])
     }
     /// Tells the delegate that the rewarded ad was dismissed.
     public func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
