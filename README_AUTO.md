@@ -261,6 +261,8 @@ Notice: banner ad is loaded(android)
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -278,6 +280,8 @@ Notice: failed to load Banner ad(android)
 | **listenerFunc** | (info: any) => void |                  |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -297,6 +301,8 @@ Notice: banner ad is show(android)
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -314,6 +320,8 @@ Notice: Banner ad is closed(android)
 | **listenerFunc** | (info: any) => void |             |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -333,6 +341,8 @@ Notice: request loaded Banner ad(iOS)
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -350,6 +360,8 @@ Notice: request failed Banner ad(iOS)
 | **listenerFunc** | (info: any) => void                  |                                    |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -369,6 +381,8 @@ Notice: full-screen view will be presented in response to the user clicking on a
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -386,6 +400,8 @@ Notice: The full-screen view will be dismissed.(iOS)
 | **listenerFunc** | (info: any) => void       |                         |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -405,6 +421,8 @@ Notice: The full-screen view has been dismissed.(iOS)
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -422,6 +440,8 @@ Notice: User click will open another app.(iOS)
 | **listenerFunc** | (info: any) => void          |                            |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -441,6 +461,8 @@ Notice: Interstitial ad loaded
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -458,6 +480,8 @@ Notice: Failed to load Interstitial ad
 | **listenerFunc** | (info: any) => void            |                              |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -477,6 +501,8 @@ Notice: Interstitial ad opened
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -494,6 +520,8 @@ Notice: Interstitial ad closed
 | **listenerFunc** | (info: any) => void      |                        |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -513,6 +541,8 @@ Notice: Click link of Interstitial ad
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -530,6 +560,8 @@ Notice: Prepared RewardedVideo
 | **listenerFunc** | (info: any) => void       |                         |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -549,6 +581,8 @@ Notice: RewardedVideo is opened
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -566,6 +600,8 @@ Notice: RewardedVideo go to background(Android)
 | **listenerFunc** | (info: any) => void   |                         |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -585,6 +621,8 @@ Notice: RewardedVideo is started
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -602,6 +640,8 @@ Notice: RewardedVideo is closed
 | **listenerFunc** | (info: any) => void       |                         |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -621,6 +661,8 @@ Notice: User get reward by RewardedVideo
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -638,6 +680,8 @@ Notice: click link of RewardedVideo ad
 | **listenerFunc** | (info: any) => void                |                                  |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.1.2
 
 --------------------
 
@@ -657,6 +701,8 @@ Notice: Failed to load RewardVideo ad
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -675,6 +721,8 @@ Notice: Watch RewardVideo complete
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
+**Since:** 1.1.2
+
 --------------------
 
 
@@ -683,23 +731,23 @@ Notice: Watch RewardVideo complete
 
 #### AdMobInitializationOptions
 
-| Prop                             | Type     | Description                                                                                                                                                                                                      |
-| -------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **requestTrackingAuthorization** | boolean  | Use or not requestTrackingAuthorization in iOS(>14)                                                                                                                                                              |
-| **testingDevices**               | string[] | An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true (Real Ads will be served to Testing devices but they will not count as 'real'). |
-| **initializeForTesting**         | boolean  | If set to true, the devices on {@link AdMobInitializationOptions.testingDevices} will be registered to receive test production ads.                                                                              |
+| Prop                             | Type     | Description                                                                                                                                                                                                      | Since       |
+| -------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **requestTrackingAuthorization** | boolean  | Use or not requestTrackingAuthorization in iOS(>14)                                                                                                                                                              | 1.1.2       |
+| **testingDevices**               | string[] | An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true (Real Ads will be served to Testing devices but they will not count as 'real'). | 1.1.3(will) |
+| **initializeForTesting**         | boolean  | If set to true, the devices on {@link AdMobInitializationOptions.testingDevices} will be registered to receive test production ads.                                                                              | 1.1.3(will) |
 
 
 #### AdOptions
 
-| Prop          | Type                      | Description                                                                                                                                   | Default |
-| ------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **adId**      | string                    | The ad unit ID that you want to request                                                                                                       |         |
-| **adSize**    | [AdSize](#adsize)         | Banner Ad Size, defaults to SMART_BANNER. IT can be: SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD, SKYSCRAPER, or CUSTOM  |         |
-| **position**  | [AdPosition](#adposition) |                                                                                                                                               |         |
-| **isTesting** | boolean                   |                                                                                                                                               |         |
-| **margin**    | number                    | Margin Banner. Default is 0 px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. |         |
-| **npa**       | boolean                   | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads              | false   |
+| Prop          | Type                      | Description                                                                                                                                  | Default      | Since |
+| ------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----- |
+| **adId**      | string                    | The ad unit ID that you want to request                                                                                                      |              | 1.1.2 |
+| **adSize**    | [AdSize](#adsize)         | Banner Ad Size, defaults to SMART_BANNER. IT can be: SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD, SKYSCRAPER, or CUSTOM | SMART_BANNER | 1.1.2 |
+| **position**  | [AdPosition](#adposition) | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                                | TOP_CENTER   | 1.1.2 |
+| **isTesting** | boolean                   | You can use test mode of ad.                                                                                                                 | false        | 1.1.2 |
+| **margin**    | number                    | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. | 0            | 1.1.2 |
+| **npa**       | boolean                   | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             | false        | 1.1.2 |
 
 
 #### PluginListenerHandle
@@ -714,25 +762,25 @@ Notice: Watch RewardVideo complete
 
 #### AdSize
 
-| Members              | Value              |
-| -------------------- | ------------------ |
-| **BANNER**           | 'BANNER'           |
-| **FLUID**            | 'FLUID'            |
-| **FULL_BANNER**      | 'FULL_BANNER'      |
-| **LARGE_BANNER**     | 'LARGE_BANNER'     |
-| **LEADERBOARD**      | 'LEADERBOARD'      |
-| **MEDIUM_RECTANGLE** | 'MEDIUM_RECTANGLE' |
-| **SMART_BANNER**     | 'SMART_BANNER'     |
-| **CUSTOM**           | 'CUSTOM'           |
+| Members              | Value              | Description                                                                                                                                    |
+| -------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **BANNER**           | 'BANNER'           | Mobile Marketing Association (MMA) banner ad size (320x50 density-independent pixels).                                                         |
+| **FLUID**            | 'FLUID'            | A dynamically sized banner that matches its parent's width and expands/contracts its height to match the ad's content after loading completes. |
+| **FULL_BANNER**      | 'FULL_BANNER'      | Interactive Advertising Bureau (IAB) full banner ad size (468x60 density-independent pixels).                                                  |
+| **LARGE_BANNER**     | 'LARGE_BANNER'     | Large banner ad size (320x100 density-independent pixels).                                                                                     |
+| **LEADERBOARD**      | 'LEADERBOARD'      | Interactive Advertising Bureau (IAB) leaderboard ad size (728x90 density-independent pixels).                                                  |
+| **MEDIUM_RECTANGLE** | 'MEDIUM_RECTANGLE' | Interactive Advertising Bureau (IAB) medium rectangle ad size (300x250 density-independent pixels).                                            |
+| **SMART_BANNER**     | 'SMART_BANNER'     | A dynamically sized banner that is full-width and auto-height.                                                                                 |
+| **CUSTOM**           | 'CUSTOM'           | To define a custom banner size, set your desired AdSize                                                                                        |
 
 
 #### AdPosition
 
-| Members           | Value           |
-| ----------------- | --------------- |
-| **TOP_CENTER**    | 'TOP_CENTER'    |
-| **CENTER**        | 'CENTER'        |
-| **BOTTOM_CENTER** | 'BOTTOM_CENTER' |
+| Members           | Value           | Description                               |
+| ----------------- | --------------- | ----------------------------------------- |
+| **TOP_CENTER**    | 'TOP_CENTER'    | Banner position be top-center             |
+| **CENTER**        | 'CENTER'        | Banner position be center                 |
+| **BOTTOM_CENTER** | 'BOTTOM_CENTER' | Banner position be bottom-center(default) |
 
 
 <!--DOCGEN_API_END-->
