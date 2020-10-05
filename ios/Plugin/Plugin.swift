@@ -276,8 +276,8 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             }
 
             self.interstitial = DFPInterstitial(adUnitID: adUnitID)
-            self.interstitial.load(DFPRequest())
             self.interstitial.delegate = self
+            self.interstitial.load(DFPRequest())
 
             call.success(["value": true])
         }
