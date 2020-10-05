@@ -387,7 +387,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     public func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
         NSLog("AdMob Reward received with currency: \(reward.type), amount \(reward.amount).")
         self.notifyListeners("onRewarded", data: ["value": true, "type": reward.type, "amount": reward.amount])
-        
+
         // todo: Capacitor3で整理
         self.notifyListeners("onRewardedVideoCompleted", data: ["value": true, "type": reward.type, "amount": reward.amount])
     }

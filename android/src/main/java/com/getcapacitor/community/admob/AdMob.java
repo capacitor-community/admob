@@ -420,7 +420,13 @@ public class AdMob extends Plugin {
 
                                     @Override
                                     public void onRewarded(RewardItem rewardItem) {
-                                        notifyListeners("onRewarded", new JSObject().put("value", true).put("type", rewardItem.getType()).put("amount", rewardItem.getAmount()));
+                                        notifyListeners(
+                                            "onRewarded",
+                                            new JSObject()
+                                                .put("value", true)
+                                                .put("type", rewardItem.getType())
+                                                .put("amount", rewardItem.getAmount())
+                                        );
                                     }
 
                                     @Override
