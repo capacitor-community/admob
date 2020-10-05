@@ -20,7 +20,7 @@
     "@angular/platform-browser": "~10.0.0",
     "@angular/platform-browser-dynamic": "~10.0.0",
     "@angular/router": "~10.0.0",
-    "@capacitor-community/admob": "latest",
+    "@capacitor-community/admob": "1.1.2",
     "@capacitor/android": "^2.4.2",
     "@capacitor/core": "^2.4.2",
     "@capacitor/ios": "^2.4.2",

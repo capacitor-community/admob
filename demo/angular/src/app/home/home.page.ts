@@ -77,17 +77,22 @@ export class HomePage implements OnInit, OnDestroy {
       }
     });
 
-    this.eventPrepareReward = AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
-      this.isPrepareReward = true;
-      this.isLoading = false;
+    AdMob.addListener('onInterstitialAdLoaded', (info) => {
+      this.isPrepareInterstitial = true;
     });
 
     /**
      * RewardedVideo ad
      */
+    this.eventPrepareReward = AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
+      this.isPrepareReward = true;
+      this.isLoading = false;
+    });
+
     AdMob.addListener('onRewarded', (info) => {
       this.eventRewardReceived = info;
     });
+
     AdMob.addListener('onRewardedVideoAdClosed', async (info) => {
       if (this.eventRewardReceived) {
         const toast = await this.toastCtrl.create({
@@ -213,7 +218,6 @@ export class HomePage implements OnInit, OnDestroy {
     if (result === undefined) {
       return;
     }
-    this.isPrepareInterstitial = true;
   }
 
 
