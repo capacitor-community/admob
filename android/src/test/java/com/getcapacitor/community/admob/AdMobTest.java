@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -21,10 +20,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
+import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
-import com.getcapacitor.community.admob.models.AdSizeEnum;
-import com.google.ads.mediation.admob.AdMobAdapter;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -145,9 +142,8 @@ public class AdMobTest {
         MockedConstruction<AdView> adViewMockedConstruction;
         MockedStatic<AdOptions> adOptionsStaticMocked;
         MockedStatic<AdViewIdHelper> adViewIdHelperMockedStatic;
-        MockedConstruction<AdRequest.Builder> adRequestBuilderMockedConstruction;
-        MockedConstruction<Bundle> bundleMockedConstruction;
         MockedConstruction<CoordinatorLayout.LayoutParams> layoutParamsMockedConstruction;
+        MockedStatic<RequestHelper> requestHelperMockedStatic;
 
         @Mock
         AdOptions.AdOptionsFactory adOptionsFactoryMock;
@@ -161,15 +157,14 @@ public class AdMobTest {
 
             mobileAdsMockedStatic = Mockito.mockStatic(MobileAds.class);
             adViewMockedConstruction = Mockito.mockConstruction(AdView.class);
-            adRequestBuilderMockedConstruction = Mockito.mockConstruction(AdRequest.Builder.class);
-
-            bundleMockedConstruction = Mockito.mockConstruction(Bundle.class);
 
             layoutParamsMockedConstruction = Mockito.mockConstruction(CoordinatorLayout.LayoutParams.class);
             adViewIdHelperMockedStatic = Mockito.mockStatic(AdViewIdHelper.class);
 
             adOptionsStaticMocked = Mockito.mockStatic(AdOptions.class);
             adOptionsStaticMocked.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
+
+            requestHelperMockedStatic = Mockito.mockStatic(RequestHelper.class);
         }
 
         @AfterEach
@@ -177,15 +172,14 @@ public class AdMobTest {
             mobileAdsMockedStatic.close();
             adViewMockedConstruction.close();
             adOptionsStaticMocked.close();
-            adRequestBuilderMockedConstruction.close();
-            bundleMockedConstruction.close();
             layoutParamsMockedConstruction.close();
             adViewIdHelperMockedStatic.close();
+            requestHelperMockedStatic.close();
         }
 
         @Nested
-        @DisplayName("Non Personalized Ads")
-        class NonPersonalizedAds {
+        @DisplayName("Build request in the same way for all ad types")
+        class RequestBuilding {
 
             @BeforeEach
             public void beforeEach() {
@@ -199,7 +193,7 @@ public class AdMobTest {
             }
 
             @Test
-            @DisplayName("Banner with npa")
+            @DisplayName("Banner constructs the request using the RequestHelper")
             void showBanner() {
                 try (MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction = Mockito.mockConstruction(RelativeLayout.class)) {
                     when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsWithNpaTrue);
@@ -214,15 +208,12 @@ public class AdMobTest {
                     Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
                     uiThreadRunnable.run();
 
-                    Bundle mockedBundle = bundleMockedConstruction.constructed().get(0);
-                    AdRequest.Builder adRequestBuilder = adRequestBuilderMockedConstruction.constructed().get(0);
-                    verify(mockedBundle).putString("npa", "1");
-                    verify(adRequestBuilder).addNetworkExtrasBundle(AdMobAdapter.class, mockedBundle);
+                    requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
                 }
             }
 
             @Test
-            @DisplayName("Interstitial with npa")
+            @DisplayName("Interstitial constructs the request using the RequestHelper")
             void prepareInterstitial() {
                 try (MockedConstruction<InterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(InterstitialAd.class)) {
                     when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
@@ -232,15 +223,12 @@ public class AdMobTest {
                     Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
                     uiThreadRunnable.run();
 
-                    Bundle mockedBundle = bundleMockedConstruction.constructed().get(0);
-                    AdRequest.Builder adRequestBuilder = adRequestBuilderMockedConstruction.constructed().get(0);
-                    verify(mockedBundle).putString("npa", "1");
-                    verify(adRequestBuilder).addNetworkExtrasBundle(AdMobAdapter.class, mockedBundle);
+                    requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
                 }
             }
 
             @Test
-            @DisplayName("Rewarded Video Ad with npa")
+            @DisplayName("Rewarded Video Ad constructs the request using the RequestHelper")
             void prepareRewardVideo() {
                 mobileAdsMockedStatic.when(() -> MobileAds.getRewardedVideoAdInstance(any())).thenReturn(mock(RewardedVideoAd.class));
                 when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
@@ -250,10 +238,7 @@ public class AdMobTest {
                 Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
                 uiThreadRunnable.run();
 
-                Bundle mockedBundle = bundleMockedConstruction.constructed().get(0);
-                AdRequest.Builder adRequestBuilder = adRequestBuilderMockedConstruction.constructed().get(0);
-                verify(mockedBundle).putString("npa", "1");
-                verify(adRequestBuilder).addNetworkExtrasBundle(AdMobAdapter.class, mockedBundle);
+                requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
             }
         }
     }

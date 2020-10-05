@@ -233,8 +233,8 @@ export interface AdMobPlugin {
    * @since 1.1.2
    */
   addListener(
-    eventName: 'adViewWillLeaveApplication',
-    listenerFunc: (info: any) => void,
+    eventName: 'onRewarded',
+    listenerFunc: (adMobRewardItem: AdMobRewardItem) => void,
   ): PluginListenerHandle;
 
   /**
@@ -259,8 +259,8 @@ export interface AdMobPlugin {
    * @since 1.1.2
    */
   addListener(
-    eventName: 'onInterstitialAdFailedToLoad',
-    listenerFunc: (info: any) => void,
+    eventName: 'onRewardedVideoAdFailedToLoad',
+    listenerFunc: (adMobError: AdMobError) => void,
   ): PluginListenerHandle;
 
   /**
@@ -577,4 +577,14 @@ export enum AdPosition {
    * Banner position be bottom-center(default)
    */
   BOTTOM_CENTER = 'BOTTOM_CENTER',
+}
+
+export interface AdMobRewardItem {
+  type: string;
+  amount: number;
+}
+
+export interface AdMobError {
+  reason: string;
+  code: number;
 }
