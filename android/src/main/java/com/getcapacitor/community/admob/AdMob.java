@@ -223,16 +223,17 @@ public class AdMob extends Plugin {
                             if (mAdViewLayout != null && mAdView != null) {
                                 mAdViewLayout.setVisibility(View.VISIBLE);
                                 mAdView.resume();
+
+                                JSObject ret = new JSObject();
+                                ret.put("width", mAdView.getAdSize().getWidth());
+                                ret.put("height", mAdView.getAdSize().getHeight());
+                                notifyListeners("onAdSize", ret);
+
                                 Log.d(getLogTag(), "Banner AD Resumed");
                             }
                         }
                     }
                 );
-
-            JSObject ret = new JSObject();
-            ret.put("width", mAdView.getAdSize().getWidth());
-            ret.put("height", mAdView.getAdSize().getHeight());
-            notifyListeners("onAdSize", ret);
 
             call.success(new JSObject().put("value", true));
         } catch (Exception ex) {
