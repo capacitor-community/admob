@@ -42,9 +42,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * TO be honest I am not 100% proud of this test file, but there is no other way to test it without
- * split AdMob into more little classes like Banner/Interstitial/RewardVideo
- * TODO: Split?
+ * TODO: Move Interestial to their own executor and move all tests!
  */
 @ExtendWith(MockitoExtension.class)
 public class AdMobTest {
