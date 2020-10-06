@@ -15,12 +15,17 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     var bannerView: GADBannerView!
     var interstitial: GADInterstitial!
     var rewardedAd: GADRewardedAd!
+    var testingDevices: [String] = []
 
     /**
      * Enable SKAdNetwork to track conversions: https://developers.google.com/admob/ios/ios14
      */
     @objc func initialize(_ call: CAPPluginCall) {
         let isTrack = call.getBool("requestTrackingAuthorization") ?? true
+
+        if call.getBool("initializeForTesting") ?? false {
+            GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
+        }
 
         if !isTrack {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
@@ -98,7 +103,8 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
             self.bannerView.adUnitID = adId
             self.bannerView.rootViewController = UIApplication.shared.keyWindow?.rootViewController
-            self.bannerView.load(GADRequest())
+
+            self.bannerView.load(self.GADRequestWithOption(call.getBool("npa")!))
             self.bannerView.delegate = self
 
             call.success([
@@ -265,7 +271,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
 
     /**
      *  AdMob: Intertitial
-     *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/interstitial?hl=ja
+     *  https://developers.google.com/admob/ios/interstitial?hl=ja
      */
     @objc func prepareInterstitial(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
@@ -275,9 +281,9 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
                 adUnitID = "ca-app-pub-3940256099942544/6300978111"
             }
 
-            self.interstitial = DFPInterstitial(adUnitID: adUnitID)
+            self.interstitial = GADInterstitial(adUnitID: adUnitID)
             self.interstitial.delegate = self
-            self.interstitial.load(DFPRequest())
+            self.interstitial.load(self.GADRequestWithOption(call.getBool("npa")!))
 
             call.success(["value": true])
         }
@@ -347,7 +353,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             }
 
             self.rewardedAd = GADRewardedAd(adUnitID: adUnitID)
-            self.rewardedAd?.load(GADRequest()) { error in
+            self.rewardedAd?.load(self.GADRequestWithOption(call.getBool("npa")!)) { error in
                 if let error = error {
                     NSLog("AdMob Reward: Loading failed: \(error)")
                     call.error("Loading failed")
@@ -401,5 +407,18 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     public func rewardedAd(_ rewardedAd: GADRewardedAd, didFailToPresentWithError error: Error) {
         NSLog("AdMob Reward ad failed to present.")
         self.notifyListeners("onRewardedVideoAdFailedToLoad", data: ["error": error.localizedDescription])
+    }
+
+    private func GADRequestWithOption(_ npa: Bool) -> GADRequest {
+        let request = GADRequest()
+
+        if npa {
+            let extras = GADExtras()
+            extras.additionalParameters = ["npa": "1"]
+            request.register(extras)
+            NSLog("AdMob don't use Personalize Adsense.")
+        }
+
+        return request
     }
 }

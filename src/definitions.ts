@@ -443,6 +443,7 @@ export interface AdMobInitializationOptions {
    * be registered to receive test production ads.
    *
    * @see AdMobInitializationOptions.testingDevices
+   * @default false
    * @since 1.1.3(will)
    */
   initializeForTesting?: boolean;

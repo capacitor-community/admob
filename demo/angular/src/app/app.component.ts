@@ -5,6 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { Plugins } from '@capacitor/core';
+import { AdMobInitializationOptions } from '@capacitor-community/admob';
 const { AdMob } = Plugins;
 
 @Component({
@@ -31,7 +32,9 @@ export class AppComponent {
        */
       AdMob.initialize({
         requestTrackingAuthorization: true,
-      });
+        testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
+        initializeForTesting: true,
+      } as AdMobInitializationOptions);
     });
   }
 }

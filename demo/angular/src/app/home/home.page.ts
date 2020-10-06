@@ -31,12 +31,14 @@ export class HomePage implements OnInit, OnDestroy {
     adId: 'ca-app-pub-3940256099942544/2934735716',
     adSize: AdSize.SMART_BANNER,
     position: AdPosition.TOP_CENTER,
+    npa: false,
   };
 
   private bannerBottomOptions: AdOptions = {
     adId: 'ca-app-pub-3940256099942544/2934735716',
     adSize: AdSize.SMART_BANNER,
     position: AdPosition.BOTTOM_CENTER,
+    npa: true,
   };
 
   private rewardOptions: AdOptions = {
