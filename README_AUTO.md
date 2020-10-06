@@ -461,27 +461,7 @@ Notice: Interstitial ad loaded
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (adMobError: AdMobError) => void) => PluginListenerHandle
-```
-
-Notice: Failed to load Interstitial ad
-
-| Param            | Type                             | Description                  |
-| ---------------- | -------------------------------- | ---------------------------- |
-| **eventName**    | "onRewardedVideoAdFailedToLoad"  | onInterstitialAdFailedToLoad |
-| **listenerFunc** | (adMobError: AdMobError) => void |                              |
-
-**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
-
-**Since:** 1.1.2
+**Since:** 1.2.0
 
 --------------------
 
@@ -501,7 +481,7 @@ Notice: Interstitial ad opened
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
-**Since:** 1.1.2
+**Since:** 1.2.0
 
 --------------------
 
@@ -521,7 +501,7 @@ Notice: Interstitial ad closed
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
-**Since:** 1.1.2
+**Since:** 1.2.0
 
 --------------------
 
@@ -538,6 +518,26 @@ Notice: Click link of Interstitial ad
 | ---------------- | --------------------------------- | ------------------------------- |
 | **eventName**    | "onInterstitialAdLeftApplication" | onInterstitialAdLeftApplication |
 | **listenerFunc** | (info: any) => void               |                                 |
+
+**Returns:** [PluginListenerHandle](#pluginlistenerhandle)
+
+**Since:** 1.2.0
+
+--------------------
+
+
+### addListener
+
+```typescript
+addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (adMobError: AdMobError) => void) => PluginListenerHandle
+```
+
+Notice: Failed to load Interstitial ad
+
+| Param            | Type                             | Description                  |
+| ---------------- | -------------------------------- | ---------------------------- |
+| **eventName**    | "onRewardedVideoAdFailedToLoad"  | onInterstitialAdFailedToLoad |
+| **listenerFunc** | (adMobError: AdMobError) => void |                              |
 
 **Returns:** [PluginListenerHandle](#pluginlistenerhandle)
 
@@ -731,11 +731,11 @@ Notice: Watch RewardVideo complete
 
 #### AdMobInitializationOptions
 
-| Prop                             | Type     | Description                                                                                                                                                                                                      | Since       |
-| -------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **requestTrackingAuthorization** | boolean  | Use or not requestTrackingAuthorization in iOS(>14)                                                                                                                                                              | 1.1.2       |
-| **testingDevices**               | string[] | An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true (Real Ads will be served to Testing devices but they will not count as 'real'). | 1.1.3(will) |
-| **initializeForTesting**         | boolean  | If set to true, the devices on {@link AdMobInitializationOptions.testingDevices} will be registered to receive test production ads.                                                                              | 1.1.3(will) |
+| Prop                             | Type     | Description                                                                                                                                                                                                      | Default | Since |
+| -------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ----- |
+| **requestTrackingAuthorization** | boolean  | Use or not requestTrackingAuthorization in iOS(>14)                                                                                                                                                              |         | 1.1.2 |
+| **testingDevices**               | string[] | An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true (Real Ads will be served to Testing devices but they will not count as 'real'). |         | 1.2.0 |
+| **initializeForTesting**         | boolean  | If set to true, the devices on {@link AdMobInitializationOptions.testingDevices} will be registered to receive test production ads.                                                                              | false   | 1.2.0 |
 
 
 #### AdOptions
@@ -747,7 +747,7 @@ Notice: Watch RewardVideo complete
 | **position**  | [AdPosition](#adposition) | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                                | TOP_CENTER   | 1.1.2 |
 | **isTesting** | boolean                   | You can use test mode of ad.                                                                                                                 | false        | 1.1.2 |
 | **margin**    | number                    | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. | 0            | 1.1.2 |
-| **npa**       | boolean                   | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             | false        | 1.1.2 |
+| **npa**       | boolean                   | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             | false        | 1.2.0 |
 
 
 #### PluginListenerHandle

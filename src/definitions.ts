@@ -243,10 +243,49 @@ export interface AdMobPlugin {
    * @group Interstitial
    * @param eventName onInterstitialAdLoaded
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 1.2.0
    */
   addListener(
     eventName: 'onInterstitialAdLoaded',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
+  /**
+   * Notice: Interstitial ad opened
+   *
+   * @group Interstitial
+   * @param eventName onInterstitialAdOpened
+   * @param listenerFunc
+   * @since 1.2.0
+   */
+  addListener(
+    eventName: 'onInterstitialAdOpened',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
+  /**
+   * Notice: Interstitial ad closed
+   *
+   * @group Interstitial
+   * @param eventName onInterstitialAdClosed
+   * @param listenerFunc
+   * @since 1.2.0
+   */
+  addListener(
+    eventName: 'onInterstitialAdClosed',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
+  /**
+   * Notice: Click link of Interstitial ad
+   *
+   * @group Interstitial
+   * @param eventName onInterstitialAdLeftApplication
+   * @param listenerFunc
+   * @since 1.2.0
+   */
+  addListener(
+    eventName: 'onInterstitialAdLeftApplication',
     listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
@@ -261,45 +300,6 @@ export interface AdMobPlugin {
   addListener(
     eventName: 'onRewardedVideoAdFailedToLoad',
     listenerFunc: (adMobError: AdMobError) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Interstitial ad opened
-   *
-   * @group Interstitial
-   * @param eventName onInterstitialAdOpened
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onInterstitialAdOpened',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Interstitial ad closed
-   *
-   * @group Interstitial
-   * @param eventName onInterstitialAdClosed
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onInterstitialAdClosed',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Click link of Interstitial ad
-   *
-   * @group Interstitial
-   * @param eventName onInterstitialAdLeftApplication
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onInterstitialAdLeftApplication',
-    listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
   /**
@@ -434,7 +434,7 @@ export interface AdMobInitializationOptions {
    * (Real Ads will be served to Testing devices but they will not count as 'real').
    *
    * @see https://developers.google.com/admob/android/test-ads#enable_test_devices
-   * @since 1.1.3(will)
+   * @since 1.2.0
    */
   testingDevices?: string[];
 
@@ -444,7 +444,7 @@ export interface AdMobInitializationOptions {
    *
    * @see AdMobInitializationOptions.testingDevices
    * @default false
-   * @since 1.1.3(will)
+   * @since 1.2.0
    */
   initializeForTesting?: boolean;
 }
@@ -502,7 +502,7 @@ export interface AdOptions {
    * @see https://developers.google.com/admob/ios/eu-consent
    * @see https://developers.google.com/admob/android/eu-consent
    * @default false
-   * @since 1.1.2
+   * @since 1.2.0
    */
   npa?: boolean;
 }
