@@ -10,6 +10,10 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+<!-- Your Issue is plugin Issue or your implements issue? Please check demo code, and clear which is issue.
+     https://github.com/capacitor-community/admob/tree/master/demo/angular -->
+
+
 **To Reproduce**
 Steps to reproduce the behavior:
 1. Go to '...'
