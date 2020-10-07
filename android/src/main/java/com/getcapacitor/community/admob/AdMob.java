@@ -41,7 +41,6 @@ public class AdMob extends Plugin {
     private BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
     private PluginCall call;
     private InterstitialAd mInterstitialAd;
-    private ViewGroup mViewGroup;
 
     // Initialize AdMob with appId
     @PluginMethod
@@ -64,7 +63,7 @@ public class AdMob extends Plugin {
                     public void onInitializationComplete(InitializationStatus initializationStatus) {}
                 }
             );
-            mViewGroup = (ViewGroup) ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);
+            bannerExecutor.initialize();
             call.success(new JSObject().put("value", true));
         } catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
@@ -74,7 +73,7 @@ public class AdMob extends Plugin {
     // Show a banner Ad
     @PluginMethod
     public void showBanner(final PluginCall call) {
-        bannerExecutor.showBanner(call, mViewGroup);
+        bannerExecutor.showBanner(call);
     }
 
     // Hide the banner, remove it from screen, but can show it later
@@ -92,7 +91,7 @@ public class AdMob extends Plugin {
     // Destroy the banner, remove it from screen.
     @PluginMethod
     public void removeBanner(final PluginCall call) {
-        bannerExecutor.removeBanner(call, mViewGroup);
+        bannerExecutor.removeBanner(call);
     }
 
     @PluginMethod

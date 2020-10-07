@@ -11,7 +11,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -23,6 +22,7 @@ import com.google.android.gms.common.util.BiConsumer;
 public class BannerExecutor extends Executor {
     private RelativeLayout mAdViewLayout;
     private AdView mAdView;
+    private ViewGroup mViewGroup;
 
     public BannerExecutor(
         Supplier<Context> contextSupplier,
@@ -33,7 +33,11 @@ public class BannerExecutor extends Executor {
         super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "BannerExecutor");
     }
 
-    public void showBanner(final PluginCall call, ViewGroup mViewGroup) {
+    public void initialize() {
+        mViewGroup = (ViewGroup) ((ViewGroup) activitySupplier.get().findViewById(android.R.id.content)).getChildAt(0);
+    }
+
+    public void showBanner(final PluginCall call) {
         /**
          * TODO: Allow the user to manually reload the ad? (ignore mAdView != null)
          *  Why? Well the user could remove their personalized ads consent and we need to update that!
@@ -193,7 +197,7 @@ public class BannerExecutor extends Executor {
         }
     }
 
-    public void removeBanner(final PluginCall call, ViewGroup mViewGroup) {
+    public void removeBanner(final PluginCall call) {
         try {
             if (mAdView != null) {
                 activitySupplier

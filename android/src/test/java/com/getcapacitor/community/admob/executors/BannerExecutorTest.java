@@ -2,8 +2,10 @@ package com.getcapacitor.community.admob.executors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
@@ -15,6 +17,8 @@ import android.widget.RelativeLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
+import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.util.BiConsumer;
@@ -24,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
@@ -32,6 +37,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class BannerExecutorTest {
+    final String LOG_TAG = "AdRewardHandlerTest Log Tag";
+
     @Mock
     Context contextMock;
 
@@ -43,14 +50,17 @@ class BannerExecutorTest {
 
     MockedConstruction<AdView> adViewMockedConstruction;
 
-    final String LOG_TAG = "AdRewardHandlerTest Log Tag";
-
     BannerExecutor sut;
 
     @BeforeEach
     void beforeEach() {
         reset(contextMock, activityMock, notifierMock);
         adViewMockedConstruction = Mockito.mockConstruction(AdView.class);
+
+        final ViewGroup viewGroupMock = mock(ViewGroup.class);
+        when(activityMock.findViewById(anyInt())).thenReturn(viewGroupMock);
+        when(viewGroupMock.getChildAt(anyInt())).thenReturn(viewGroupMock);
+
         sut = new BannerExecutor(() -> contextMock, () -> activityMock, notifierMock, LOG_TAG);
     }
 
@@ -64,7 +74,9 @@ class BannerExecutorTest {
     class ShowBanner {
         MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction;
         MockedConstruction<CoordinatorLayout.LayoutParams> layoutParamsMockedConstruction;
-        MockedStatic<AdOptions> adOptionsStaticMocked;
+        MockedStatic<AdOptions> adOptionsMockedStatic;
+        MockedStatic<RequestHelper> requestHelperMockedStatic;
+        MockedStatic<AdViewIdHelper> adViewIdHelperMockedStatic;
 
         @Mock
         AdOptions.AdOptionsFactory adOptionsFactoryMock;
@@ -75,35 +87,58 @@ class BannerExecutorTest {
         @Mock
         DisplayMetrics displayMetricsMock;
 
+        ArgumentCaptor<Runnable> runnableArgumentCaptor;
+        AdOptions adOptionsMockForTesting;
+
         @BeforeEach
         void beforeEach() {
             reset(adOptionsFactoryMock, resourcesMock, displayMetricsMock);
+            runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
             displayMetricsMock.density = 1f;
 
-            adOptionsStaticMocked = Mockito.mockStatic(AdOptions.class);
             relativeLayoutMockedConstruction = Mockito.mockConstruction(RelativeLayout.class);
             layoutParamsMockedConstruction = Mockito.mockConstruction(CoordinatorLayout.LayoutParams.class);
+            requestHelperMockedStatic = Mockito.mockStatic(RequestHelper.class);
+            adViewIdHelperMockedStatic = Mockito.mockStatic(AdViewIdHelper.class);
 
-            adOptionsStaticMocked.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
-            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(new AdOptions.TesterAdOptionsBuilder().build());
+            adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().build();
+            adOptionsMockedStatic = Mockito.mockStatic(AdOptions.class);
+            adOptionsMockedStatic.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
 
             when(contextMock.getResources()).thenReturn(resourcesMock);
             when(resourcesMock.getDisplayMetrics()).thenReturn(displayMetricsMock);
+
+            sut.initialize();
         }
 
         @AfterEach
         void afterEach() {
-            adOptionsStaticMocked.close();
+            adOptionsMockedStatic.close();
             relativeLayoutMockedConstruction.close();
             layoutParamsMockedConstruction.close();
+            requestHelperMockedStatic.close();
+            adViewIdHelperMockedStatic.close();
+        }
+
+        @Test
+        @DisplayName("Banner constructs the request using the RequestHelper")
+        void showBannerUsesRequestHelper() {
+            PluginCall pluginCallMock = mock(PluginCall.class);
+
+            sut.showBanner(pluginCallMock);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+            uiThreadRunnable.run();
+
+            requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsMockForTesting));
         }
 
         @Test
         void showBanner() {
-            PluginCall pluginCall = mock(PluginCall.class);
-            ViewGroup mViewGroup = mock(ViewGroup.class);
+            PluginCall pluginCallMock = mock(PluginCall.class);
 
-            sut.showBanner(pluginCall, mViewGroup);
+            sut.showBanner(pluginCallMock);
 
             assertEquals(sut, sut);
         }
