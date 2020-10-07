@@ -275,10 +275,10 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
      */
     @objc func prepareInterstitial(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            var adUnitID = call.getString("adId") ?? "ca-app-pub-3940256099942544/4411468910"
+            var adUnitID = call.getString("adId") ?? "ca-app-pub-3940256099942544/1033173712"
             let isTest = call.getBool("isTesting") ?? false
             if isTest {
-                adUnitID = "ca-app-pub-3940256099942544/6300978111"
+                adUnitID = "ca-app-pub-3940256099942544/1033173712"
             }
 
             self.interstitial = GADInterstitial(adUnitID: adUnitID)
