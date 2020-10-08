@@ -104,7 +104,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             self.bannerView.adUnitID = adId
             self.bannerView.rootViewController = UIApplication.shared.keyWindow?.rootViewController
 
-            self.bannerView.load(self.GADRequestWithOption(call.getBool("npa")!))
+            self.bannerView.load(self.GADRequestWithOption(call.getBool("npa")))
             self.bannerView.delegate = self
 
             call.success([
@@ -283,7 +283,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
 
             self.interstitial = GADInterstitial(adUnitID: adUnitID)
             self.interstitial.delegate = self
-            self.interstitial.load(self.GADRequestWithOption(call.getBool("npa")!))
+            self.interstitial.load(self.GADRequestWithOption(call.getBool("npa")))
 
             call.success(["value": true])
         }
@@ -353,7 +353,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             }
 
             self.rewardedAd = GADRewardedAd(adUnitID: adUnitID)
-            self.rewardedAd?.load(self.GADRequestWithOption(call.getBool("npa")!)) { error in
+            self.rewardedAd?.load(self.GADRequestWithOption(call.getBool("npa"))) { error in
                 if let error = error {
                     NSLog("AdMob Reward: Loading failed: \(error)")
                     call.error("Loading failed")
@@ -409,10 +409,10 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
         self.notifyListeners("onRewardedVideoAdFailedToLoad", data: ["error": error.localizedDescription])
     }
 
-    private func GADRequestWithOption(_ npa: Bool) -> GADRequest {
+    private func GADRequestWithOption(_ npa: Bool?) -> GADRequest {
         let request = GADRequest()
 
-        if npa {
+        if npa != nil && npa {
             let extras = GADExtras()
             extras.additionalParameters = ["npa": "1"]
             request.register(extras)
