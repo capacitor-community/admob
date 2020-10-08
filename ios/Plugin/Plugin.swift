@@ -63,10 +63,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
      */
     @objc func showBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            var adId = call.getString("adId") ?? "ca-app-pub-3940256099942544/6300978111"
+            let testingID = "ca-app-pub-3940256099942544/6300978111"
+            var adId = call.getString("adId") ?? testingID
             let isTest = call.getBool("isTesting") ?? false
             if isTest {
-                adId = "ca-app-pub-3940256099942544/6300978111"
+                adId = testingID
             }
 
             let adSize = call.getString("adSize") ?? "SMART_BANNER"
@@ -275,10 +276,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
      */
     @objc func prepareInterstitial(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            var adUnitID = call.getString("adId") ?? "ca-app-pub-3940256099942544/1033173712"
+            let testingID = "ca-app-pub-3940256099942544/1033173712" 
+            var adUnitID = call.getString("adId") ?? testingID
             let isTest = call.getBool("isTesting") ?? false
             if isTest {
-                adUnitID = "ca-app-pub-3940256099942544/1033173712"
+                adUnitID = testingID
             }
 
             self.interstitial = GADInterstitial(adUnitID: adUnitID)
@@ -346,10 +348,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
      */
     @objc func prepareRewardVideoAd(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            var adUnitID: String = call.getString("adId") ?? "ca-app-pub-3940256099942544/1712485313"
+            let testingID = "ca-app-pub-3940256099942544/1712485313"
+            var adUnitID: String = call.getString("adId") ?? testingID
             let isTest = call.getBool("isTesting") ?? false
             if isTest {
-                adUnitID = "ca-app-pub-3940256099942544/1712485313"
+                adUnitID = testingID
             }
 
             self.rewardedAd = GADRewardedAd(adUnitID: adUnitID)

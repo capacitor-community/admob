@@ -13,7 +13,7 @@ Capacitory community plugin for AdMob.
 | ------------------- | ----------------------------------- | ------------------------------------- | ---------------------------------------------- |
 | Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo) | [@rdlabo](https://twitter.com/rdlabo) | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
 
-Mainteinance Status: Actively Maintained
+Maintenance Status: Actively Maintained
 
 ## Demo
 
@@ -102,7 +102,7 @@ Send and array of device Ids in `testingDevices? to use production like ads on y
 
 ### Initialize for @ionic/angular
 
-Open our Ionic app **app.component.ts** file and add this folloing code.
+Open our Ionic app **app.component.ts** file and add this following code.
 
 ```ts
 import { Plugins } from '@capacitor/core';
@@ -212,7 +212,7 @@ export class AdMobComponent {
     // Show Banner Ad
     AdMob.showBanner(this.options);
 
-    // Subscibe Banner Event Listener
+    // Subscribe Banner Event Listener
     AdMob.addListener('onAdLoaded', (info: boolean) => {
       console.log('Banner Ad Loaded');
     });
@@ -281,8 +281,8 @@ export class AppComponent {
     // Prepare interstitial banner
     AdMob.prepareInterstitial(this.options);
 
-    // Subscibe Banner Event Listener
-    AdMob.addListener('onAdLoaded', (info: boolean) => {
+    // Subscribe Banner Event Listener
+    AdMob.addListener('onInterstitialAdLoaded', (info: boolean) => {
       // You can call showInterstitial() here or anytime you want.
       console.log('Interstitial Ad Loaded');
     });
@@ -332,7 +332,7 @@ export class AdMobComponent {
     // Prepare ReWardVideo
     AdMob.prepareRewardVideoAd(this.options);
 
-    // Subscibe ReWardVideo Event Listener
+    // Subscribe ReWardVideo Event Listener
     AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
       // You can call showRewardVideoAd() here or anytime you want.
       console.log('RewardedVideoAd Loaded');
