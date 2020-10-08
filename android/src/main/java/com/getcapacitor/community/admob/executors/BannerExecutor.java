@@ -38,15 +38,12 @@ public class BannerExecutor extends Executor {
     }
 
     public void showBanner(final PluginCall call) {
-        /**
-         * TODO: Allow the user to manually reload the ad? (ignore mAdView != null)
-         *  Why? Well the user could remove their personalized ads consent and we need to update that!
-         */
+        final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
+
         if (mAdView != null) {
+            updateExistingAdView(adOptions);
             return;
         }
-
-        final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
 
         // Why a try catch block?
         try {
@@ -82,64 +79,7 @@ public class BannerExecutor extends Executor {
             int densityMargin = (int) (adOptions.margin * density);
             mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
 
-            // Run AdMob In Main UI Thread
-            activitySupplier
-                .get()
-                .runOnUiThread(
-                    () -> {
-                        final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                        // Assign the correct id needed
-                        AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
-                        // Add the AdView to the view hierarchy.
-                        mAdViewLayout.addView(mAdView);
-                        // Start loading the ad.
-                        mAdView.loadAd(adRequest);
-
-                        mAdView.setAdListener(
-                            new AdListener() {
-
-                                @Override
-                                public void onAdLoaded() {
-                                    notifyListenersFunction.accept("onAdLoaded", new JSObject().put("value", true));
-
-                                    JSObject ret = new JSObject();
-                                    ret.put("width", mAdView.getAdSize().getWidth());
-                                    ret.put("height", mAdView.getAdSize().getHeight());
-                                    notifyListeners("onAdSize", ret);
-
-                                    super.onAdLoaded();
-                                }
-
-                                @Override
-                                public void onAdFailedToLoad(int i) {
-                                    notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", i));
-
-                                    JSObject ret = new JSObject();
-                                    ret.put("width", 0);
-                                    ret.put("height", 0);
-                                    notifyListeners("onAdSize", ret);
-
-                                    super.onAdFailedToLoad(i);
-                                }
-
-                                @Override
-                                public void onAdOpened() {
-                                    notifyListeners("onAdOpened", new JSObject().put("value", true));
-                                    super.onAdOpened();
-                                }
-
-                                @Override
-                                public void onAdClosed() {
-                                    notifyListeners("onAdClosed", new JSObject().put("value", true));
-                                    super.onAdClosed();
-                                }
-                            }
-                        );
-
-                        // Add AdViewLayout top of the WebView
-                        mViewGroup.addView(mAdViewLayout);
-                    }
-                );
+            createNewAdView(adOptions);
 
             call.success(new JSObject().put("value", true));
         } catch (Exception ex) {
@@ -219,5 +159,77 @@ public class BannerExecutor extends Executor {
         } catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
+    }
+
+    private void updateExistingAdView(AdOptions adOptions) {
+        activitySupplier
+            .get()
+            .runOnUiThread(
+                () -> {
+                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                    mAdView.loadAd(adRequest);
+                }
+            );
+    }
+
+    private void createNewAdView(AdOptions adOptions) {
+        // Run AdMob In Main UI Thread
+        activitySupplier
+            .get()
+            .runOnUiThread(
+                () -> {
+                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                    // Assign the correct id needed
+                    AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
+                    // Add the AdView to the view hierarchy.
+                    mAdViewLayout.addView(mAdView);
+                    // Start loading the ad.
+                    mAdView.loadAd(adRequest);
+
+                    mAdView.setAdListener(
+                        new AdListener() {
+
+                            @Override
+                            public void onAdLoaded() {
+                                notifyListenersFunction.accept("onAdLoaded", new JSObject().put("value", true));
+
+                                JSObject ret = new JSObject();
+                                ret.put("width", mAdView.getAdSize().getWidth());
+                                ret.put("height", mAdView.getAdSize().getHeight());
+                                notifyListeners("onAdSize", ret);
+
+                                super.onAdLoaded();
+                            }
+
+                            @Override
+                            public void onAdFailedToLoad(int i) {
+                                notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", i));
+
+                                JSObject ret = new JSObject();
+                                ret.put("width", 0);
+                                ret.put("height", 0);
+                                notifyListeners("onAdSize", ret);
+
+                                super.onAdFailedToLoad(i);
+                            }
+
+                            @Override
+                            public void onAdOpened() {
+                                notifyListeners("onAdOpened", new JSObject().put("value", true));
+                                super.onAdOpened();
+                            }
+
+                            @Override
+                            public void onAdClosed() {
+                                notifyListeners("onAdClosed", new JSObject().put("value", true));
+                                super.onAdClosed();
+                            }
+                        }
+                    );
+
+                    // Add AdViewLayout top of the WebView
+                    mViewGroup.addView(mAdViewLayout);
+                }
+            );
     }
 }

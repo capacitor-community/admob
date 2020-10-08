@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob.executors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -23,6 +24,7 @@ import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.util.BiConsumer;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -145,11 +147,16 @@ class BannerExecutorTest {
         }
 
         @Test
-        @DisplayName("Updates the banner if more than 1 show request is done")
+        @DisplayName("Updates the banner if more than one show request is done")
         void showBanner() {
             PluginCall pluginCallMock = mock(PluginCall.class);
 
             sut.showBanner(pluginCallMock);
+            sut.showBanner(pluginCallMock);
+
+            verify(activityMock, atLeast(1)).runOnUiThread(runnableArgumentCaptor.capture());
+            List<Runnable> uiThreadRunnableSecondCall = runnableArgumentCaptor.getAllValues();
+            uiThreadRunnableSecondCall.forEach(Runnable::run);
 
             AdView adViewMocked = adViewMockedConstruction.constructed().get(0);
             verify(adViewMocked, times(2)).loadAd(any());
