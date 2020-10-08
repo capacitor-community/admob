@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +49,9 @@ class BannerExecutorTest {
     @Mock
     BiConsumer<String, JSObject> notifierMock;
 
+    @Mock
+    ViewGroup viewGroupMock = mock(ViewGroup.class);
+
     MockedConstruction<AdView> adViewMockedConstruction;
 
     BannerExecutor sut;
@@ -57,7 +61,6 @@ class BannerExecutorTest {
         reset(contextMock, activityMock, notifierMock);
         adViewMockedConstruction = Mockito.mockConstruction(AdView.class);
 
-        final ViewGroup viewGroupMock = mock(ViewGroup.class);
         when(activityMock.findViewById(anyInt())).thenReturn(viewGroupMock);
         when(viewGroupMock.getChildAt(anyInt())).thenReturn(viewGroupMock);
 
@@ -67,6 +70,13 @@ class BannerExecutorTest {
     @AfterEach
     void afterEach() {
         adViewMockedConstruction.close();
+    }
+
+    @Test
+    @DisplayName("#Initialize gets the reference of the reference of the viewGroup where the banner ad will go")
+    void initialize() {
+        sut.initialize();
+        verify(viewGroupMock).getChildAt(0);
     }
 
     @Nested
@@ -135,12 +145,14 @@ class BannerExecutorTest {
         }
 
         @Test
+        @DisplayName("Updates the banner if more than 1 show request is done")
         void showBanner() {
             PluginCall pluginCallMock = mock(PluginCall.class);
 
             sut.showBanner(pluginCallMock);
 
-            assertEquals(sut, sut);
+            AdView adViewMocked = adViewMockedConstruction.constructed().get(0);
+            verify(adViewMocked, times(2)).loadAd(any());
         }
     }
 }
