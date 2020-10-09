@@ -31,7 +31,7 @@ export class HomePage implements OnInit, OnDestroy {
     adId: 'ca-app-pub-3940256099942544/2934735716',
     adSize: AdSize.SMART_BANNER,
     position: AdPosition.TOP_CENTER,
-    npa: false,
+    // npa: false,
   };
 
   private bannerBottomOptions: AdOptions = {
