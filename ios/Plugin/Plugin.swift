@@ -105,7 +105,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             self.bannerView.adUnitID = adId
             self.bannerView.rootViewController = UIApplication.shared.keyWindow?.rootViewController
 
-            self.bannerView.load(self.GADRequestWithOption(call.getBool("npa", false)!))
+            self.bannerView.load(self.GADRequestWithOption(call.getBool("npa") ?? false))
             self.bannerView.delegate = self
 
             call.success([
@@ -276,7 +276,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
      */
     @objc func prepareInterstitial(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            let testingID = "ca-app-pub-3940256099942544/1033173712" 
+            let testingID = "ca-app-pub-3940256099942544/1033173712"
             var adUnitID = call.getString("adId") ?? testingID
             let isTest = call.getBool("isTesting") ?? false
             if isTest {
@@ -285,7 +285,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
 
             self.interstitial = GADInterstitial(adUnitID: adUnitID)
             self.interstitial.delegate = self
-            self.interstitial.load(self.GADRequestWithOption(call.getBool("npa", false)!))
+            self.interstitial.load(self.GADRequestWithOption(call.getBool("npa") ?? false))
 
             call.success(["value": true])
         }
@@ -356,7 +356,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
             }
 
             self.rewardedAd = GADRewardedAd(adUnitID: adUnitID)
-            self.rewardedAd?.load(self.GADRequestWithOption(call.getBool("npa", false)!)) { error in
+            self.rewardedAd?.load(self.GADRequestWithOption(call.getBool("npa") ?? false)) { error in
                 if let error = error {
                     NSLog("AdMob Reward: Loading failed: \(error)")
                     call.error("Loading failed")
