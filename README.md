@@ -68,7 +68,7 @@ In file `android/app/src/main/res/values/strings.xml` add the following lines :
 <string name="admob_app_id">[APP_ID]</string>
 ```
 
-Don't forget to replace `[APP_ID]` by your AddMob application Id.
+Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
 ## iOS configuration
 
