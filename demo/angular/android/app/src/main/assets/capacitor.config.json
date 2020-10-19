@@ -1,6 +1,6 @@
 {
   "appId": "io.ionic.starter",
-  "appName": "angular",
+  "appName": "capacitor-admob",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
