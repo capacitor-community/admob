@@ -17,16 +17,16 @@ import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.google.android.gms.common.util.BiConsumer;
 
-public class AdRewardExecutor {
-    final Supplier<Context> contextSupplier;
-    private final String logTag;
+public class AdRewardExecutor extends Executor {
     private RewardedVideoAd mRewardedVideoAd;
-    final Supplier<Activity> activitySupplier;
 
-    public AdRewardExecutor(Supplier<Context> contextSupplier, Supplier<Activity> activitySupplier, String logTag) {
-        this.contextSupplier = contextSupplier;
-        this.activitySupplier = activitySupplier;
-        this.logTag = logTag;
+    public AdRewardExecutor(
+        Supplier<Context> contextSupplier,
+        Supplier<Activity> activitySupplier,
+        BiConsumer<String, JSObject> notifyListenersFunction,
+        String pluginLogTag
+    ) {
+        super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "AdRewardExecutor");
     }
 
     /**

@@ -36,14 +36,17 @@ class AdRewardExecutorTest {
     @Mock
     Activity activity;
 
+    @Mock
+    BiConsumer<String, JSObject> notifierMock;
+
     final String LOG_TAG = "AdRewardHandlerTest Log Tag";
 
     AdRewardExecutor sut;
 
     @BeforeEach
     void beforeEach() {
-        reset(context, activity);
-        sut = new AdRewardExecutor(() -> context, () -> activity, LOG_TAG);
+        reset(context, activity, notifierMock);
+        sut = new AdRewardExecutor(() -> context, () -> activity, notifierMock, LOG_TAG);
     }
 
     @Nested
@@ -54,7 +57,7 @@ class AdRewardExecutorTest {
         void onRewarded() throws JSONException {
             ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
             PluginCall pluginCall = mock(PluginCall.class);
-            BiConsumer<String, JSObject> notifierMock = mock(BiConsumer.class);
+
             RewardedVideoAdListener listener = AdRewardExecutor.getRewardedVideoAdListener(pluginCall, notifierMock);
             String type = "My Type";
             int amount = 69;

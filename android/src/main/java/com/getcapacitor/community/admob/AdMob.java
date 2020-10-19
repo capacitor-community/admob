@@ -14,6 +14,7 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.executors.AdRewardExecutor;
+import com.getcapacitor.community.admob.executors.BannerExecutor;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -31,11 +32,14 @@ import org.json.JSONException;
 public class AdMob extends Plugin {
     public static final JSArray EMPTY_TESTING_DEVICES = new JSArray();
 
-    private AdRewardExecutor adRewardExecutor = new AdRewardExecutor(this::getContext, this::getActivity, getLogTag());
+    private AdRewardExecutor adRewardExecutor = new AdRewardExecutor(
+        this::getContext,
+        this::getActivity,
+        this::notifyListeners,
+        getLogTag()
+    );
+    private BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
     private PluginCall call;
-    private ViewGroup mViewGroup;
-    private RelativeLayout mAdViewLayout;
-    private AdView mAdView;
     private InterstitialAd mInterstitialAd;
 
     // Initialize AdMob with appId
@@ -59,7 +63,7 @@ public class AdMob extends Plugin {
                     public void onInitializationComplete(InitializationStatus initializationStatus) {}
                 }
             );
-            mViewGroup = (ViewGroup) ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);
+            bannerExecutor.initialize();
             call.success(new JSObject().put("value", true));
         } catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
@@ -69,205 +73,25 @@ public class AdMob extends Plugin {
     // Show a banner Ad
     @PluginMethod
     public void showBanner(final PluginCall call) {
-        /**
-         * TODO: Allow the user to manually reload the ad? (ignore mAdView != null)
-         *  Why? Well the user could remove their personalized ads consent and we need to update that!
-         */
-        if (mAdView != null) {
-            return;
-        }
-
-        final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
-
-        // Why a try catch block?
-        try {
-            mAdView = new AdView(getContext());
-            mAdView.setAdSize(adOptions.adSize.size);
-
-            // Setup AdView Layout
-            mAdViewLayout = new RelativeLayout(getContext());
-            mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
-            mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
-
-            final CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
-                CoordinatorLayout.LayoutParams.WRAP_CONTENT,
-                CoordinatorLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            // TODO: Make an enum like the AdSizeEnum?
-            switch (adOptions.position) {
-                case "TOP_CENTER":
-                    mAdViewLayoutParams.gravity = Gravity.TOP;
-                    break;
-                case "CENTER":
-                    mAdViewLayoutParams.gravity = Gravity.CENTER;
-                    break;
-                default:
-                    mAdViewLayoutParams.gravity = Gravity.BOTTOM;
-                    break;
-            }
-
-            mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-
-            float density = getContext().getResources().getDisplayMetrics().density;
-            int densityMargin = (int) (adOptions.margin * density);
-            mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
-
-            // Run AdMob In Main UI Thread
-            getActivity()
-                .runOnUiThread(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-                            final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                            // Assign the correct id needed
-                            AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, getLogTag(), getContext());
-                            // Add the AdView to the view hierarchy.
-                            mAdViewLayout.addView(mAdView);
-                            // Start loading the ad.
-                            mAdView.loadAd(adRequest);
-
-                            mAdView.setAdListener(
-                                new AdListener() {
-
-                                    @Override
-                                    public void onAdLoaded() {
-                                        notifyListeners("onAdLoaded", new JSObject().put("value", true));
-
-                                        JSObject ret = new JSObject();
-                                        ret.put("width", mAdView.getAdSize().getWidth());
-                                        ret.put("height", mAdView.getAdSize().getHeight());
-                                        notifyListeners("onAdSize", ret);
-
-                                        super.onAdLoaded();
-                                    }
-
-                                    @Override
-                                    public void onAdFailedToLoad(int i) {
-                                        notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", i));
-
-                                        JSObject ret = new JSObject();
-                                        ret.put("width", 0);
-                                        ret.put("height", 0);
-                                        notifyListeners("onAdSize", ret);
-
-                                        super.onAdFailedToLoad(i);
-                                    }
-
-                                    @Override
-                                    public void onAdOpened() {
-                                        notifyListeners("onAdOpened", new JSObject().put("value", true));
-                                        super.onAdOpened();
-                                    }
-
-                                    @Override
-                                    public void onAdClosed() {
-                                        notifyListeners("onAdClosed", new JSObject().put("value", true));
-                                        super.onAdClosed();
-                                    }
-                                }
-                            );
-
-                            // Add AdViewLayout top of the WebView
-                            mViewGroup.addView(mAdViewLayout);
-                        }
-                    }
-                );
-
-            call.success(new JSObject().put("value", true));
-        } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
-        }
+        bannerExecutor.showBanner(call);
     }
 
     // Hide the banner, remove it from screen, but can show it later
     @PluginMethod
     public void hideBanner(final PluginCall call) {
-        try {
-            getActivity()
-                .runOnUiThread(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (mAdViewLayout != null) {
-                                mAdViewLayout.setVisibility(View.GONE);
-                                mAdView.pause();
-                            }
-                        }
-                    }
-                );
-
-            JSObject ret = new JSObject();
-            ret.put("width", 0);
-            ret.put("height", 0);
-            notifyListeners("onAdSize", ret);
-
-            call.success(new JSObject().put("value", true));
-        } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
-        }
+        bannerExecutor.hideBanner(call);
     }
 
     // Resume the banner, show it after hide
     @PluginMethod
     public void resumeBanner(final PluginCall call) {
-        try {
-            getActivity()
-                .runOnUiThread(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (mAdViewLayout != null && mAdView != null) {
-                                mAdViewLayout.setVisibility(View.VISIBLE);
-                                mAdView.resume();
-
-                                JSObject ret = new JSObject();
-                                ret.put("width", mAdView.getAdSize().getWidth());
-                                ret.put("height", mAdView.getAdSize().getHeight());
-                                notifyListeners("onAdSize", ret);
-
-                                Log.d(getLogTag(), "Banner AD Resumed");
-                            }
-                        }
-                    }
-                );
-
-            call.success(new JSObject().put("value", true));
-        } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
-        }
+        bannerExecutor.resumeBanner(call);
     }
 
     // Destroy the banner, remove it from screen.
     @PluginMethod
     public void removeBanner(final PluginCall call) {
-        try {
-            if (mAdView != null) {
-                getActivity()
-                    .runOnUiThread(
-                        new Runnable() {
-
-                            @Override
-                            public void run() {
-                                if (mAdView != null) {
-                                    mViewGroup.removeView(mAdViewLayout);
-                                    mAdViewLayout.removeView(mAdView);
-                                    mAdView.destroy();
-                                    mAdView = null;
-                                    Log.d(getLogTag(), "Banner AD Removed");
-                                }
-                            }
-                        }
-                    );
-            }
-
-            call.success(new JSObject().put("value", true));
-        } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
-        }
+        bannerExecutor.removeBanner(call);
     }
 
     @PluginMethod

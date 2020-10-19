@@ -9,6 +9,11 @@ public final class RequestHelper {
 
     private RequestHelper() {}
 
+    /**
+     * Use this function to create all requests, here we can centralize request extras
+     * @param adOptions
+     * @return
+     */
     public static AdRequest createRequest(AdOptions adOptions) {
         AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
 

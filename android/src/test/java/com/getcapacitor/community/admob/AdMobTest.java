@@ -2,7 +2,6 @@ package com.getcapacitor.community.admob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -11,14 +10,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.util.DisplayMetrics;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.executors.BannerExecutor;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -42,9 +38,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * TO be honest I am not 100% proud of this test file, but there is no other way to test it without
- * split AdMob into more little classes like Banner/Interstitial/RewardVideo
- * TODO: Split?
+ * TODO: Move Interestial to their own executor and move all tests!
  */
 @ExtendWith(MockitoExtension.class)
 public class AdMobTest {
@@ -57,10 +51,15 @@ public class AdMobTest {
     @Mock
     PluginCall pluginCallMock;
 
+    @Mock
+    MockedConstruction<BannerExecutor> bannerExecutorMockedConstruction;
+
     AdMob sut;
 
     @BeforeEach
     public void beforeEach() {
+        reset(pluginCallMock, mockedContext);
+
         sut =
             new AdMob() {
 
@@ -79,6 +78,11 @@ public class AdMobTest {
                     return "LogTag";
                 }
             };
+    }
+
+    @AfterEach
+    public void afterEach() {
+        bannerExecutorMockedConstruction.close();
     }
 
     @Nested
@@ -130,6 +134,17 @@ public class AdMobTest {
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        @Test
+        @DisplayName("Initializes the banner executor")
+        public void bannerExecutorInitialize() {
+            when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(false);
+
+            sut.initialize(pluginCallMock);
+
+            BannerExecutor bannerExecutor = bannerExecutorMockedConstruction.constructed().get(0);
+            verify(bannerExecutor).initialize();
         }
     }
 
@@ -183,33 +198,9 @@ public class AdMobTest {
 
             @BeforeEach
             public void beforeEach() {
-                final ViewGroup viewGroupMock = mock(ViewGroup.class);
-                when(mockedActivity.findViewById(anyInt())).thenReturn(viewGroupMock);
-                when(viewGroupMock.getChildAt(anyInt())).thenReturn(viewGroupMock);
-
                 sut.initialize(pluginCallMock);
 
                 lenient().when(pluginCallMock.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES)).thenReturn(new JSArray());
-            }
-
-            @Test
-            @DisplayName("Banner constructs the request using the RequestHelper")
-            void showBanner() {
-                try (MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction = Mockito.mockConstruction(RelativeLayout.class)) {
-                    when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsWithNpaTrue);
-                    Resources mockedResourcesMock = mock(Resources.class);
-                    DisplayMetrics displayMetricsMock = mock(DisplayMetrics.class);
-                    displayMetricsMock.density = 1f;
-                    when(mockedContext.getResources()).thenReturn(mockedResourcesMock);
-                    when(mockedResourcesMock.getDisplayMetrics()).thenReturn(displayMetricsMock);
-
-                    sut.showBanner(pluginCallMock);
-                    verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
-                    Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
-                    uiThreadRunnable.run();
-
-                    requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
-                }
             }
 
             @Test
