@@ -42,7 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class BannerExecutorTest {
     final String LOG_TAG = "AdRewardHandlerTest Log Tag";
 
-    @Mock
+    @Mock(lenient = true)
     Context contextMock;
 
     @Mock
@@ -84,10 +84,19 @@ class BannerExecutorTest {
     @Nested
     @DisplayName("Show Banner")
     class ShowBanner {
+        @Mock
         MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction;
+
+        @Mock
         MockedConstruction<CoordinatorLayout.LayoutParams> layoutParamsMockedConstruction;
+
+        @Mock
         MockedStatic<AdOptions> adOptionsMockedStatic;
+
+        @Mock
         MockedStatic<RequestHelper> requestHelperMockedStatic;
+
+        @Mock
         MockedStatic<AdViewIdHelper> adViewIdHelperMockedStatic;
 
         @Mock
@@ -108,13 +117,8 @@ class BannerExecutorTest {
             runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
             displayMetricsMock.density = 1f;
 
-            relativeLayoutMockedConstruction = Mockito.mockConstruction(RelativeLayout.class);
-            layoutParamsMockedConstruction = Mockito.mockConstruction(CoordinatorLayout.LayoutParams.class);
-            requestHelperMockedStatic = Mockito.mockStatic(RequestHelper.class);
-            adViewIdHelperMockedStatic = Mockito.mockStatic(AdViewIdHelper.class);
-
             adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().build();
-            adOptionsMockedStatic = Mockito.mockStatic(AdOptions.class);
+
             adOptionsMockedStatic.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
             when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
 
@@ -160,6 +164,91 @@ class BannerExecutorTest {
 
             AdView adViewMocked = adViewMockedConstruction.constructed().get(0);
             verify(adViewMocked, times(2)).loadAd(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Hide Banner")
+    class HideBanner {
+        @Mock
+        MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction;
+
+        @Mock
+        MockedConstruction<CoordinatorLayout.LayoutParams> layoutParamsMockedConstruction;
+
+        @Mock(lenient = true)
+        MockedStatic<AdOptions> adOptionsMockedStatic;
+
+        @Mock(lenient = true)
+        MockedStatic<RequestHelper> requestHelperMockedStatic;
+
+        @Mock(lenient = true)
+        MockedStatic<AdViewIdHelper> adViewIdHelperMockedStatic;
+
+        @Mock(lenient = true)
+        AdOptions.AdOptionsFactory adOptionsFactoryMock;
+
+        @Mock(lenient = true)
+        Resources resourcesMock;
+
+        @Mock(lenient = true)
+        DisplayMetrics displayMetricsMock;
+
+        ArgumentCaptor<Runnable> runnableArgumentCaptor;
+        AdOptions adOptionsMockForTesting;
+
+        @BeforeEach
+        void beforeEach() {
+            reset(adOptionsFactoryMock, resourcesMock, displayMetricsMock);
+            runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+            displayMetricsMock.density = 1f;
+
+            adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().build();
+
+            adOptionsMockedStatic.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
+
+            when(contextMock.getResources()).thenReturn(resourcesMock);
+            when(resourcesMock.getDisplayMetrics()).thenReturn(displayMetricsMock);
+
+            sut.initialize();
+        }
+
+        @AfterEach
+        void afterEach() {
+            adOptionsMockedStatic.close();
+            relativeLayoutMockedConstruction.close();
+            layoutParamsMockedConstruction.close();
+            requestHelperMockedStatic.close();
+            adViewIdHelperMockedStatic.close();
+        }
+
+        @Test
+        @DisplayName("Hides the banner if it exist")
+        void hideBanner() {
+            PluginCall pluginCallMock = mock(PluginCall.class);
+
+            sut.showBanner(pluginCallMock);
+            sut.hideBanner(pluginCallMock);
+
+            verify(activityMock, atLeast(1)).runOnUiThread(runnableArgumentCaptor.capture());
+            List<Runnable> uiThreadRunnableSecondCall = runnableArgumentCaptor.getAllValues();
+            uiThreadRunnableSecondCall.forEach(Runnable::run);
+
+            AdView adViewMocked = adViewMockedConstruction.constructed().get(0);
+            verify(adViewMocked, times(1)).pause();
+        }
+
+        @Test
+        @DisplayName("If not banner exist, return an error")
+        void hideBannerWithoutExistentBanner() {
+            PluginCall pluginCallMock = mock(PluginCall.class);
+            assertEquals(0, adViewMockedConstruction.constructed().size()); // Correct environment
+
+            sut.hideBanner(pluginCallMock);
+
+            verify(activityMock, times(0)).runOnUiThread(runnableArgumentCaptor.capture()); // No Ui Calls
+            verify(pluginCallMock, times(1)).error(any());
         }
     }
 }
