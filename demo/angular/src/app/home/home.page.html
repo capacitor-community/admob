@@ -17,11 +17,11 @@
 
   <ion-list>
     <ion-list-header><ion-label>Banner</ion-label></ion-list-header>
-    <ion-item detail="true" (click)="showTopBanner()" [disabled]="isPrepareBanner">Show Top Banner</ion-item>
-    <ion-item detail="true" (click)="showBottomBanner()" [disabled]="isPrepareBanner">Show Bottom Banner</ion-item>
-    <ion-item detail="true" (click)="hideBanner()" [disabled]="!isPrepareBanner">Hide Banner</ion-item>
-    <ion-item detail="true" (click)="resumeBanner()" [disabled]="!isPrepareBanner">Resume Banner</ion-item>
-    <ion-item detail="true" lines="full" (click)="removeBanner()" [disabled]="!isPrepareBanner">Remove Banner</ion-item>
+    <ion-item detail="true" (click)="showTopBanner()">Show Top Banner</ion-item>
+    <ion-item detail="true" (click)="showBottomBanner()">Show Bottom Banner</ion-item>
+    <ion-item detail="true" (click)="hideBanner()">Hide Banner</ion-item>
+    <ion-item detail="true" (click)="resumeBanner()">Resume Banner</ion-item>
+    <ion-item detail="true" lines="full" (click)="removeBanner()">Remove Banner</ion-item>
   </ion-list>
 
   <ion-list>
