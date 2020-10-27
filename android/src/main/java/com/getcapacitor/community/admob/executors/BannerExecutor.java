@@ -88,6 +88,11 @@ public class BannerExecutor extends Executor {
     }
 
     public void hideBanner(final PluginCall call) {
+        if (mAdView == null) {
+            call.error("You tried to hide a banner that was never shown");
+            return;
+        }
+
         try {
             activitySupplier
                 .get()
@@ -96,16 +101,16 @@ public class BannerExecutor extends Executor {
                         if (mAdViewLayout != null) {
                             mAdViewLayout.setVisibility(View.GONE);
                             mAdView.pause();
+
+                            JSObject ret = new JSObject();
+                            ret.put("width", 0);
+                            ret.put("height", 0);
+                            notifyListeners("onAdSize", ret);
+
+                            call.success(new JSObject().put("value", true));
                         }
                     }
                 );
-
-            JSObject ret = new JSObject();
-            ret.put("width", 0);
-            ret.put("height", 0);
-            notifyListeners("onAdSize", ret);
-
-            call.success(new JSObject().put("value", true));
         } catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
