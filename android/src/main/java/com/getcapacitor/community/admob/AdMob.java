@@ -121,7 +121,7 @@ public class AdMob extends Plugin {
                                     @Override
                                     public void onAdLoaded() {
                                         // Code to be executed when an ad finishes loading.
-                                        notifyListeners("onAdLoaded", new JSObject().put("value", true));
+                                        notifyListeners("onInterstitialAdLoaded", new JSObject().put("value", true));
                                         call.success(new JSObject().put("value", true));
                                         super.onAdLoaded();
                                     }
@@ -129,28 +129,28 @@ public class AdMob extends Plugin {
                                     @Override
                                     public void onAdFailedToLoad(int errorCode) {
                                         // Code to be executed when an ad request fails.
-                                        notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", errorCode));
+                                        notifyListeners("onInterstitialAdFailedToLoad", new JSObject().put("errorCode", errorCode));
                                         super.onAdFailedToLoad(errorCode);
                                     }
 
                                     @Override
                                     public void onAdOpened() {
                                         // Code to be executed when the ad is displayed.
-                                        notifyListeners("onAdOpened", new JSObject().put("value", true));
+                                        notifyListeners("onInterstitialAdOpened", new JSObject().put("value", true));
                                         super.onAdOpened();
                                     }
 
                                     @Override
                                     public void onAdLeftApplication() {
                                         // Code to be executed when the user has left the app.
-                                        notifyListeners("onAdLeftApplication", new JSObject().put("value", true));
+                                        notifyListeners("onInterstitialAdLeftApplication", new JSObject().put("value", true));
                                         super.onAdLeftApplication();
                                     }
 
                                     @Override
                                     public void onAdClosed() {
                                         // Code to be executed when when the interstitial ad is closed.
-                                        notifyListeners("onAdClosed", new JSObject().put("value", true));
+                                        notifyListeners("onInterstitialAdClosed", new JSObject().put("value", true));
                                         super.onAdClosed();
                                     }
                                 }
