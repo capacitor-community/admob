@@ -299,7 +299,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onInterstitialAdFailedToLoad',
-    listenerFunc: (info: { error: string }) => void,
+    listenerFunc: (info: { error: string; errorCode: number }) => void,
   ): PluginListenerHandle;
 
   /**
