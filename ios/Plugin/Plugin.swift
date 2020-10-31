@@ -315,7 +315,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     /// Tells the delegate an ad request failed.
     public func interstitial(_ ad: GADInterstitial, didFailToReceiveAdWithError error: GADRequestError) {
         NSLog("interstitial:didFailToReceiveAdWithError: \(error.localizedDescription)")
-        self.notifyListeners("onInterstitialAdFailedToLoad", data: ["error": error.localizedDescription])
+        self.notifyListeners("onInterstitialAdFailedToLoad", data: ["error": error.localizedDescription, "errorCode": error.code])
     }
 
     /// Tells the delegate that an interstitial will be presented.

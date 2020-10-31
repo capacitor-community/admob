@@ -27,6 +27,7 @@ import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 @NativePlugin(permissions = { Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET })
 public class AdMob extends Plugin {
@@ -129,7 +130,13 @@ public class AdMob extends Plugin {
                                     @Override
                                     public void onAdFailedToLoad(int errorCode) {
                                         // Code to be executed when an ad request fails.
-                                        notifyListeners("onInterstitialAdFailedToLoad", new JSObject().put("errorCode", errorCode));
+
+                                        final JSObject responseJSObject = new JSObject()
+                                            .put("errorCode", errorCode)
+                                            // TODO: Map errors to messages
+                                            .put("error", "InterstitialAdFailedToLoad");
+
+                                        notifyListeners("onInterstitialAdFailedToLoad", responseJSObject);
                                         super.onAdFailedToLoad(errorCode);
                                     }
 
