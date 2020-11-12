@@ -298,8 +298,8 @@ export interface AdMobPlugin {
    * @since 1.1.2
    */
   addListener(
-    eventName: 'onRewardedVideoAdFailedToLoad',
-    listenerFunc: (adMobError: AdMobError) => void,
+    eventName: 'onInterstitialAdFailedToLoad',
+    listenerFunc: (info: { error: string; errorCode: number }) => void,
   ): PluginListenerHandle;
 
   /**
@@ -403,7 +403,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onRewardedVideoAdFailedToLoad',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (error: AdMobError) => void,
   ): PluginListenerHandle;
 
   /**
