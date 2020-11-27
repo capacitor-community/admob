@@ -77,7 +77,13 @@ public class BannerExecutor extends Executor {
 
             float density = contextSupplier.get().getResources().getDisplayMetrics().density;
             int densityMargin = (int) (adOptions.margin * density);
-            mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
+            
+            // Center Banner Ads
+            int screenWidth = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
+            int adWidth = (int) (adOptions.adSize.size.getWidth() * density);
+            int sideMargin = (screenWidth - adWidth) / 2 ;
+
+            mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
 
             createNewAdView(adOptions);
 
