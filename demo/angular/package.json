@@ -14,12 +14,12 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "~10.0.0",
-    "@angular/core": "~10.0.0",
-    "@angular/forms": "~10.0.0",
-    "@angular/platform-browser": "~10.0.0",
-    "@angular/platform-browser-dynamic": "~10.0.0",
-    "@angular/router": "~10.0.0",
+    "@angular/common": "~11.0.5",
+    "@angular/core": "~11.0.5",
+    "@angular/forms": "~11.0.5",
+    "@angular/platform-browser": "~11.0.5",
+    "@angular/platform-browser-dynamic": "~11.0.5",
+    "@angular/router": "~11.0.5",
     "@capacitor-community/admob": "1.2.0-0",
     "@capacitor/android": "^2.4.2",
     "@capacitor/core": "^2.4.2",
@@ -33,11 +33,11 @@
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.1000.0",
-    "@angular/cli": "~10.0.5",
-    "@angular/compiler": "~10.0.0",
-    "@angular/compiler-cli": "~10.0.0",
-    "@angular/language-service": "~10.0.0",
+    "@angular-devkit/build-angular": "~0.1100.5",
+    "@angular/cli": "~11.0.5",
+    "@angular/compiler": "~11.0.5",
+    "@angular/compiler-cli": "~11.0.5",
+    "@angular/language-service": "~11.0.5",
     "@capacitor/cli": "^2.4.0",
     "@ionic/angular-toolkit": "^2.3.0",
     "@types/jasmine": "~3.5.0",
@@ -46,7 +46,7 @@
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.0",
-    "karma": "~5.0.0",
+    "karma": "~5.1.1",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~3.3.0",
@@ -54,6 +54,6 @@
     "protractor": "~7.0.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
-    "typescript": "~3.9.5"
+    "typescript": "~4.0.5"
   }
 }
