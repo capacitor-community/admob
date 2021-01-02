@@ -70,11 +70,15 @@ export class HomePage implements OnInit, OnDestroy {
     this.eventOnAdSize = AdMob.addListener('onAdSize', (info: any) => {
       this.appMargin = parseInt(info.height, 10);
       if (this.appMargin > 0) {
+        const body = document.querySelector('body');
+        const bodyStyles = window.getComputedStyle(body);
+        const safeAreaBottom = bodyStyles.getPropertyValue("--ion-safe-area-bottom");
+
         const app: HTMLElement = document.querySelector('ion-router-outlet');
         if (this.bannerPosition === 'top') {
           app.style.marginTop = this.appMargin + 'px';
         } else {
-          app.style.marginBottom = this.appMargin + 'px';
+          app.style.marginBottom = `calc(${safeAreaBottom} + ${this.appMargin}px)`;
         }
       }
     });
