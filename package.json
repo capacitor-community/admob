@@ -25,7 +25,7 @@
   "prettier": "@ionic/prettier-config",
   "devDependencies": {
     "@capacitor/android": "^2.0.0",
-    "@capacitor/docgen": "0.0.10",
+    "@capacitor/docgen": "0.0.14",
     "@capacitor/ios": "^2.0.0",
     "@ionic/prettier-config": "^1.0.0",
     "@ionic/swiftlint-config": "^1.0.2",
