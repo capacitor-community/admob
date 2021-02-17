@@ -31,6 +31,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "NLueg",
+      "name": "Nico Lueg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/48101693?v=4",
+      "profile": "https://www.nicolueg.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
