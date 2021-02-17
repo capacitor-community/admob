@@ -8,7 +8,7 @@ export interface AdMobPlugin {
    * @param options AdMobInitializationOptions
    * @since 1.1.2
    */
-  initialize(options: AdMobInitializationOptions): Promise<{ value: boolean }>;
+  initialize(options: AdMobInitializationOptions): Promise<void>;
 
   /**
    * Show a banner Ad
@@ -17,7 +17,7 @@ export interface AdMobPlugin {
    * @param options AdOptions
    * @since 1.1.2
    */
-  showBanner(options: AdOptions): Promise<{ value: boolean }>;
+  showBanner(options: AdOptions): Promise<void>;
 
   /**
    * Hide the banner, remove it from screen, but can show it later
@@ -25,7 +25,7 @@ export interface AdMobPlugin {
    * @group Banner
    * @since 1.1.2
    */
-  hideBanner(): Promise<{ value: boolean }>;
+  hideBanner(): Promise<void>;
 
   /**
    * Resume the banner, show it after hide
@@ -33,7 +33,7 @@ export interface AdMobPlugin {
    * @group Banner
    * @since 1.1.2
    */
-  resumeBanner(): Promise<{ value: boolean }>;
+  resumeBanner(): Promise<void>;
 
   /**
    * Destroy the banner, remove it from screen.
@@ -41,7 +41,7 @@ export interface AdMobPlugin {
    * @group Banner
    * @since 1.1.2
    */
-  removeBanner(): Promise<{ value: boolean }>;
+  removeBanner(): Promise<void>;
 
   /**
    * Prepare interstitial banner
@@ -50,7 +50,7 @@ export interface AdMobPlugin {
    * @param options AdOptions
    * @since 1.1.2
    */
-  prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>;
+  prepareInterstitial(options: AdOptions): Promise<void>;
 
   /**
    * Show interstitial ad when it’s ready
@@ -58,7 +58,7 @@ export interface AdMobPlugin {
    * @group Interstitial
    * @since 1.1.2
    */
-  showInterstitial(): Promise<{ value: boolean }>;
+  showInterstitial(): Promise<void>;
 
   /**
    * Prepare a reward video ad
@@ -67,7 +67,7 @@ export interface AdMobPlugin {
    * @param options AdOptions
    * @since 1.1.2
    */
-  prepareRewardVideoAd(options: AdOptions): Promise<{ value: boolean }>;
+  prepareRewardVideoAd(options: AdOptions): Promise<void>;
 
   /**
    * Show a reward video ad
@@ -75,7 +75,7 @@ export interface AdMobPlugin {
    * @group RewardVideo
    * @since 1.1.2
    */
-  showRewardVideoAd(): Promise<{ value: boolean }>;
+  showRewardVideoAd(): Promise<void>;
 
   /**
    * Pause RewardedVideo
@@ -83,7 +83,7 @@ export interface AdMobPlugin {
    * @group RewardVideo
    * @since 1.1.2
    */
-  pauseRewardedVideo(): Promise<{ value: boolean }>;
+  pauseRewardedVideo(): Promise<void>;
 
   /**
    * Resume RewardedVideo
@@ -91,7 +91,7 @@ export interface AdMobPlugin {
    * @group RewardVideo
    * @since 1.1.2
    */
-  resumeRewardedVideo(): Promise<{ value: boolean }>;
+  resumeRewardedVideo(): Promise<void>;
 
   /**
    * Close RewardedVideo
@@ -99,7 +99,7 @@ export interface AdMobPlugin {
    * @group RewardVideo
    * @since 1.1.2
    */
-  stopRewardedVideo(): Promise<{ value: boolean }>;
+  stopRewardedVideo(): Promise<void>;
 
   /**
    * Notice: banner ad is loaded(android)
@@ -107,25 +107,16 @@ export interface AdMobPlugin {
    * @group Banner
    * @param eventName onAdLoaded
    * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onAdLoaded',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-
-  /**
-   * Notice: banner size changed and notice size
-   *
-   * @group Banner
-   * @param eventName onAdSize
-   * @param listenerFunc
    * @since 3.0.0
    */
   addListener(
-    eventName: 'onAdSize',
-    listenerFunc: (info: any) => void,
+    eventName: 'onAdLoaded',
+    listenerFunc: (info: {
+      size: {
+        width: number
+        height: number;
+      };
+    }) => void,
   ): PluginListenerHandle;
 
   /**
@@ -138,7 +129,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onAdFailedToLoad',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (info: AdMobError) => void,
   ): PluginListenerHandle;
 
   /**
@@ -151,7 +142,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onAdOpened',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (info: void) => void,
   ): PluginListenerHandle;
 
   /**
@@ -164,7 +155,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onAdClosed',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (info: void) => void,
   ): PluginListenerHandle;
 
   /**
@@ -177,7 +168,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'adViewDidReceiveAd',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (info: void) => void,
   ): PluginListenerHandle;
 
   /**
@@ -190,7 +181,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'adView:didFailToReceiveAdWithError',
-    listenerFunc: (info: any) => void,
+    listenerFunc: (info: AdMobError) => void,
   ): PluginListenerHandle;
 
   /**
@@ -307,7 +298,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onInterstitialAdFailedToLoad',
-    listenerFunc: (info: { error: string; errorCode: number }) => void,
+    listenerFunc: (info: AdMobError) => void,
   ): PluginListenerHandle;
 
   /**
@@ -521,8 +512,10 @@ export interface AdMobRewardItem {
 }
 
 export interface AdMobError {
-  reason: string;
   code: number;
+  message: string;
+  cause: string;
+  domain: string;
 }
 
 /**
