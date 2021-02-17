@@ -1,11 +1,5 @@
 import { PluginListenerHandle } from '@capacitor/core';
 
-declare global {
-  interface PluginRegistry {
-    AdMob?: AdMobPlugin;
-  }
-}
-
 export interface AdMobPlugin {
   /**
    * Initialize AdMob with AdMobInitializationOptions

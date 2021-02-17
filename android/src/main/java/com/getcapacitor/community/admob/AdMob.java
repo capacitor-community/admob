@@ -13,6 +13,8 @@ import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.community.admob.executors.AdRewardExecutor;
 import com.getcapacitor.community.admob.executors.BannerExecutor;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
@@ -29,7 +31,18 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 import org.json.JSONException;
 import org.json.JSONObject;
 
-@NativePlugin(permissions = { Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET })
+@CapacitorPlugin(
+        name = "AdMob",
+        permissions = {
+                @Permission(
+                    alias = "network",
+                    strings = {
+                            Manifest.permission.ACCESS_NETWORK_STATE,
+                            Manifest.permission.INTERNET
+                    }
+                ),
+        }
+)
 public class AdMob extends Plugin {
     public static final JSArray EMPTY_TESTING_DEVICES = new JSArray();
 
