@@ -90,21 +90,17 @@ public class BannerExecutor extends Executor {
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
             }
 
-            Log.d("size-screenWidth", screenWidth + "px");
-            Log.d("size-adWidth", adWidth + "px");
-            Log.d("size-sideMargin", sideMargin + "px");
-
             createNewAdView(adOptions);
 
-            call.success(new JSObject().put("value", true));
+            call.resolve(new JSObject().put("value", true));
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
     public void hideBanner(final PluginCall call) {
         if (mAdView == null) {
-            call.error("You tried to hide a banner that was never shown");
+            call.reject("You tried to hide a banner that was never shown");
             return;
         }
 
@@ -122,12 +118,12 @@ public class BannerExecutor extends Executor {
                             ret.put("height", 0);
                             notifyListeners("onAdSize", ret);
 
-                            call.success(new JSObject().put("value", true));
+                            call.resolve(new JSObject().put("value", true));
                         }
                     }
                 );
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -151,9 +147,9 @@ public class BannerExecutor extends Executor {
                     }
                 );
 
-            call.success(new JSObject().put("value", true));
+            call.resolve(new JSObject().put("value", true));
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -175,9 +171,9 @@ public class BannerExecutor extends Executor {
                     );
             }
 
-            call.success(new JSObject().put("value", true));
+            call.resolve(new JSObject().put("value", true));
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 

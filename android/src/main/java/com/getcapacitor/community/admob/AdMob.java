@@ -32,7 +32,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @CapacitorPlugin(
-        name = "AdMob",
         permissions = {
                 @Permission(
                     alias = "network",
@@ -78,9 +77,9 @@ public class AdMob extends Plugin {
                 }
             );
             bannerExecutor.initialize();
-            call.success(new JSObject().put("value", true));
+            call.resolve(new JSObject().put("value", true));
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -136,7 +135,7 @@ public class AdMob extends Plugin {
                                     public void onAdLoaded() {
                                         // Code to be executed when an ad finishes loading.
                                         notifyListeners("onInterstitialAdLoaded", new JSObject().put("value", true));
-                                        call.success(new JSObject().put("value", true));
+                                        call.resolve(new JSObject().put("value", true));
                                         super.onAdLoaded();
                                     }
 
@@ -179,7 +178,7 @@ public class AdMob extends Plugin {
                     }
                 );
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -204,15 +203,15 @@ public class AdMob extends Plugin {
                                             }
                                         }
                                     );
-                                call.success(new JSObject().put("value", true));
+                                call.resolve(new JSObject().put("value", true));
                             } else {
-                                call.error("The interstitial wasn't loaded yet.");
+                                call.reject("The interstitial wasn't loaded yet.");
                             }
                         }
                     }
                 );
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -255,7 +254,7 @@ public class AdMob extends Plugin {
 
             MobileAds.setRequestConfiguration(configuration);
         } catch (JSONException error) {
-            call.error(error.toString());
+            call.reject(error.toString());
         }
     }
 }

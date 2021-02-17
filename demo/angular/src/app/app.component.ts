@@ -4,9 +4,7 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
-import { Plugins } from '@capacitor/core';
-import { AdMobInitializationOptions } from '@capacitor-community/admob';
-const { AdMob } = Plugins;
+import { AdMob, AdMobInitializationOptions } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-root',

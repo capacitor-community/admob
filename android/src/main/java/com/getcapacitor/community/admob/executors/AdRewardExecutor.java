@@ -38,7 +38,7 @@ public class AdRewardExecutor extends Executor {
 
             @Override
             public void onRewardedVideoAdLoaded() {
-                call.success(new JSObject().put("value", true));
+                call.resolve(new JSObject().put("value", true));
                 notifyListenersFunction.accept(RewardedAdEventName.onRewardedVideoAdLoaded.name(), new JSObject().put("value", true));
             }
 
@@ -105,7 +105,7 @@ public class AdRewardExecutor extends Executor {
                     }
                 );
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -118,14 +118,14 @@ public class AdRewardExecutor extends Executor {
                     () -> {
                         if (mRewardedVideoAd != null && mRewardedVideoAd.isLoaded()) {
                             mRewardedVideoAd.show();
-                            call.success(new JSObject().put("value", true));
+                            call.resolve(new JSObject().put("value", true));
                         } else {
-                            call.error("The RewardedVideoAd wasn't loaded yet.");
+                            call.reject("The RewardedVideoAd wasn't loaded yet.");
                         }
                     }
                 );
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -133,9 +133,9 @@ public class AdRewardExecutor extends Executor {
     public void pauseRewardedVideo(PluginCall call) {
         try {
             activitySupplier.get().runOnUiThread(() -> mRewardedVideoAd.pause(contextSupplier.get()));
-            call.success(new JSObject().put("value", true));
+            call.resolve(new JSObject().put("value", true));
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -143,18 +143,18 @@ public class AdRewardExecutor extends Executor {
     public void resumeRewardedVideo(PluginCall call) {
         try {
             activitySupplier.get().runOnUiThread(() -> mRewardedVideoAd.resume(contextSupplier.get()));
-            call.success(new JSObject().put("value", true));
+            call.resolve(new JSObject().put("value", true));
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 
     public void destroyRewardedVideo(PluginCall call) {
         try {
             activitySupplier.get().runOnUiThread(() -> mRewardedVideoAd.destroy(contextSupplier.get()));
-            call.success(new JSObject().put("value", true));
+            call.resolve(new JSObject().put("value", true));
         } catch (Exception ex) {
-            call.error(ex.getLocalizedMessage(), ex);
+            call.reject(ex.getLocalizedMessage(), ex);
         }
     }
 }

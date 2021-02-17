@@ -61,7 +61,7 @@ public abstract class AdOptions {
         /*
          * TODO: Since the Id in the Typescript AdOptions interface is not optional
          *  the default value here should never be used. In case it is used it means this is an error.
-         *  Would not be better to print an error (call.error()) and do not create any Ad?
+         *  Would not be better to print an error (call.reject()) and do not create any Ad?
          *  Why? Because an distracted dev could think that everything is working when it is not.
          */
 
