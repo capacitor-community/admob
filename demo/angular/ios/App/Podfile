@@ -8,8 +8,8 @@ install! 'cocoapods', :disable_input_output_paths => true
 
 def capacitor_pods
   # Automatic Capacitor Pod dependencies, do not delete
-  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'Capacitor', :path => '../../../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../../../node_modules/@capacitor/ios'
   pod 'CapacitorCommunityAdmob', :path => '../../../..'
   # Do not delete
 end
