@@ -4,7 +4,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # ✅ Please check
-This is development README for Capacitor v3. If you use v1 or v2, please check [./README_v2.md](README_v2.md)
+This is development README for Capacitor v1-2. If you use v3 please check [README.md](README.md)
 
 # @capacitor-community/admob
 
@@ -20,7 +20,7 @@ Maintenance Status: Actively Maintained
 
 ## Demo
 
-[Demo code is here.](https://github.com/capacitor-community/admob/tree/feat/v3/demo)
+[Demo code is here.](https://github.com/capacitor-community/admob/tree/master/demo)
 
 ### Screenshots
 
@@ -31,8 +31,17 @@ Maintenance Status: Actively Maintained
 
 ## Installation
 
+**Supporting iOS14 is be since @1.1.0.**
+
 ```
-% npm install --save @capacitor-community/admob@next
+% npm install --save @capacitor-community/admob
+% npx cap update
+```
+
+### If you use Capacitor 1.x
+
+```
+% npm install --save @rdlabo/capacitor-admob@0.3.0
 % npx cap update
 ```
 
@@ -41,13 +50,11 @@ Maintenance Status: Actively Maintained
 In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to the initialization list:
 
 ```java
-public class MainActivity extends BridgeActivity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        registerPlugin(com.getcapacitor.community.admob.AdMob.class);
-    }
-}
+this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
+  [...]
+  add(com.getcapacitor.community.admob.AdMob.class);
+  [...]
+}});
 ```
 
 In file `android/app/src/main/AndroidManifest.xml`, add the following XML elements under `<manifest><application>` :
@@ -101,7 +108,8 @@ Send and array of device Ids in `testingDevices? to use production like ads on y
 Open our Ionic app **app.component.ts** file and add this following code.
 
 ```ts
-import { AdMob } from '@capacitor-community/admob';
+import { Plugins } from '@capacitor/core';
+const { AdMob } = Plugins;
 
 @Component({
   selector: 'app-root',
@@ -127,7 +135,9 @@ import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 
-import { AdMob, AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
+import { Plugins } from '@capacitor/core';
+import { AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
+const { AdMob } = Plugins;
 
 const App: React.FC = () => {
   AdMob.initialize();
@@ -182,7 +192,9 @@ export default App;
 #### showBanner(options: AdOptions): Promise<{ value: boolean }>
 
 ```ts
-import { AdMob, AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
+import { Plugins } from '@capacitor/core';
+import { AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
+const { AdMob } = Plugins;
 
 @Component({
   selector: 'admob',
@@ -254,7 +266,9 @@ addListener(eventName: 'onAdSize', listenerFunc: (info: any) => void): PluginLis
 #### prepareInterstitial(options: AdOptions): Promise<{ value: boolean }>
 
 ```ts
-import { AdMob, AdOptions } from '@capacitor-community/admob';
+import { Plugins } from '@capacitor/core';
+import { AdOptions } from '@capacitor-community/admob';
+const { AdMob } = Plugins;
 
 @Component({
   selector: 'admob',
@@ -303,7 +317,9 @@ addListener(eventName: 'onInterstitialAdLeftApplication', listenerFunc: (info: a
 #### prepareRewardVideoAd(options: AdOptions): Promise<{ value: boolean }>
 
 ```ts
-import { AdMob, AdOptions } from '@capacitor-community/admob';
+import { Plugins } from '@capacitor/core';
+import { AdOptions } from '@capacitor-community/admob';
+const { AdMob } = Plugins;
 
 @Component({
   selector: 'admob',
