@@ -114,6 +114,20 @@ export interface AdMobPlugin {
     listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
+
+  /**
+   * Notice: banner size changed and notice size
+   *
+   * @group Banner
+   * @param eventName onAdSize
+   * @param listenerFunc
+   * @since 3.0.0
+   */
+  addListener(
+    eventName: 'onAdSize',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
   /**
    * Notice: failed to load Banner ad(android)
    *

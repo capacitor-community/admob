@@ -48,6 +48,7 @@ npx cap sync
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
+* [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -268,6 +269,26 @@ Notice: banner ad is loaded(android)
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 **Since:** 1.1.2
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'onAdSize', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: banner size changed and notice size
+
+| Param              | Type                                | Description |
+| ------------------ | ----------------------------------- | ----------- |
+| **`eventName`**    | <code>"onAdSize"</code>             | onAdSize    |
+| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |             |
+
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+**Since:** 3.0.0
 
 --------------------
 
