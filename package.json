@@ -1,6 +1,6 @@
 {
   "name": "@capacitor-community/admob",
-  "version": "3.0.0",
+  "version": "3.0.0-0",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -37,7 +37,7 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "release": "np"
+    "release": "np --any-branch"
   },
   "devDependencies": {
     "@capacitor/android": "3.0.0-beta.2",
