@@ -1,8 +1,8 @@
 {
-  "appId": "io.ionic.starter",
-  "appName": "capacitor-admob",
-  "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "www",
-  "cordova": {}
+	"appId": "io.ionic.starter",
+	"appName": "capacitor-admob",
+	"bundledWebRuntime": false,
+	"npmClient": "npm",
+	"webDir": "www",
+	"cordova": {}
 }

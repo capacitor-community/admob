@@ -229,7 +229,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
             "width": self.bannerView.frame.width,
             "height": self.bannerView.frame.height
         ])
-        self.bridge.triggerJSEvent(eventName: "adViewDidReceiveAd", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "adViewDidReceiveAd", target: "window")
     }
 
     /// Tells the delegate an ad request failed.
@@ -241,33 +241,33 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
             "width": 0,
             "height": 0
         ])
-        self.bridge.triggerJSEvent(eventName: "adView:didFailToReceiveAdWithError", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "adView:didFailToReceiveAdWithError", target: "window")
     }
 
     /// Tells the delegate that a full-screen view will be presented in response
     /// to the user clicking on an ad.
     public func adViewWillPresentScreen(_ bannerView: GADBannerView) {
         NSLog("adViewWillPresentScreen")
-        self.bridge.triggerJSEvent(eventName: "adViewWillPresentScreen", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "adViewWillPresentScreen", target: "window")
     }
 
     /// Tells the delegate that the full-screen view will be dismissed.
     public func adViewWillDismissScreen(_ bannerView: GADBannerView) {
         NSLog("adViewWillDismissScreen")
-        self.bridge.triggerJSEvent(eventName: "adViewWillDismissScreen", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "adViewWillDismissScreen", target: "window")
     }
 
     /// Tells the delegate that the full-screen view has been dismissed.
     public func adViewDidDismissScreen(_ bannerView: GADBannerView) {
         NSLog("adViewDidDismissScreen")
-        self.bridge.triggerJSEvent(eventName: "adViewDidDismissScreen", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "adViewDidDismissScreen", target: "window")
     }
 
     /// Tells the delegate that a user click will open another app (such as
     /// the App Store), backgrounding the current app.
     public func adViewWillLeaveApplication(_ bannerView: GADBannerView) {
         NSLog("adViewWillLeaveApplication")
-        self.bridge.triggerJSEvent(eventName: "adViewWillLeaveApplication", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "adViewWillLeaveApplication", target: "window")
     }
 
     /**
@@ -287,7 +287,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
             let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
             self.interstitial.load(request)
             self.interstitial.delegate = self
-            call.success(["value": true])
+            call.resolve(["value": true])
         }
     }
 
@@ -301,7 +301,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                 }
             }
 
-            call.success(["value": true])
+            call.resolve(["value": true])
         }
     }
 
@@ -351,13 +351,13 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
               if let error = error {
                 // Handle ad failed to load case.
                 NSLog("Rewarded ad failed to load with error: \(error.localizedDescription)")
-                call.error("Loading failed")
+                call.reject("Loading failed")
                 return
               } else {
                 // Ad successfully loaded.
                 NSLog("AdMob Reward: Loading Succeeded")
                 self.notifyListeners("onRewardedVideoAdLoaded", data: ["value": true])
-                call.success(["value": true])
+                call.resolve(["value": true])
               }
             }
         }
@@ -370,7 +370,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                     self.rewardedAd?.present(fromRootViewController: rootViewController, delegate:self)
                     call.resolve([ "value": true ])
                 } else {
-                    call.error("Reward Video is Not Ready Yet")
+                    call.reject("Reward Video is Not Ready Yet")
                 }
             }
 

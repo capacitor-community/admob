@@ -17,23 +17,23 @@
 
   <ion-list>
     <ion-list-header><ion-label>Banner</ion-label></ion-list-header>
-    <ion-item detail="true" (click)="showTopBanner()">Show Top Banner</ion-item>
-    <ion-item detail="true" (click)="showBottomBanner()">Show Bottom Banner</ion-item>
-    <ion-item detail="true" (click)="hideBanner()">Hide Banner</ion-item>
-    <ion-item detail="true" (click)="resumeBanner()">Resume Banner</ion-item>
-    <ion-item detail="true" lines="full" (click)="removeBanner()">Remove Banner</ion-item>
+    <ion-item button="true" (click)="showTopBanner()">Show Top Banner</ion-item>
+    <ion-item button="true" (click)="showBottomBanner()">Show Bottom Banner</ion-item>
+    <ion-item button="true" (click)="hideBanner()">Hide Banner</ion-item>
+    <ion-item button="true" (click)="resumeBanner()">Resume Banner</ion-item>
+    <ion-item button="true" lines="full" (click)="removeBanner()">Remove Banner</ion-item>
   </ion-list>
 
   <ion-list>
     <ion-list-header><ion-label>Interstitial</ion-label></ion-list-header>
-    <ion-item detail="true" (click)="prepareInterstitial()" [disabled]="isPrepareInterstitial">Prepare Interstitial</ion-item>
-    <ion-item detail="true" lines="full" (click)="showInterstitial()" [disabled]="!isPrepareInterstitial">Show Interstitial</ion-item>
+    <ion-item button="true" (click)="prepareInterstitial()" [disabled]="isPrepareInterstitial">Prepare Interstitial</ion-item>
+    <ion-item button="true" lines="full" (click)="showInterstitial()" [disabled]="!isPrepareInterstitial">Show Interstitial</ion-item>
   </ion-list>
 
   <ion-list>
     <ion-list-header><ion-label>Reward</ion-label></ion-list-header>
-    <ion-item detail="true" (click)="prepareReward()" [disabled]="isPrepareReward">Prepare Reward</ion-item>
-    <ion-item detail="true" lines="full" (click)="showReward()" [disabled]="!isPrepareReward">Show Reward</ion-item>
+    <ion-item button="true" (click)="prepareReward()" [disabled]="isPrepareReward">Prepare Reward</ion-item>
+    <ion-item button="true" lines="full" (click)="showReward()" [disabled]="!isPrepareReward">Show Reward</ion-item>
   </ion-list>
 </ion-content>
 
