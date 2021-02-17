@@ -10,10 +10,10 @@ import GoogleMobileAds
  * here: https://capacitor.ionicframework.com/docs/plugins/ios
  */
 @objc(AdMob)
-public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, GADRewardedAdDelegate {
+public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelegate {
 
     var bannerView: GADBannerView!
-    var interstitial: GADInterstitial!
+    var interstitial: GADInterstitialAd!
     var rewardedAd: GADRewardedAd!
     var testingDevices: [String] = []
 
@@ -234,7 +234,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
 
     /// Tells the delegate an ad request failed.
     public func adView(_ bannerView: GADBannerView,
-                       didFailToReceiveAdWithError error: GADRequestError) {
+                       didFailToReceiveAdWithError error: NSError) {
         NSLog("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
         self.notifyListeners("onAdSize", data: [
@@ -283,19 +283,31 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
                 adUnitID = testingID
             }
 
-            self.interstitial = GADInterstitial(adUnitID: adUnitID)
-            self.interstitial.delegate = self
-            self.interstitial.load(self.GADRequestWithOption(call.getBool("npa") ?? false))
+            let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
+            GADInterstitialAd.load(
+                withAdUnitID: adUnitID,
+                request: request,
+                completionHandler: { (ad, error) in
+                    if error != nil {
+                        NSLog("Received error on loading interstatial ad");
+                        call.error("Loading failed")
+                        return;
+                    }
 
-            call.success(["value": true])
+                    self.interstitial = ad;
+                    self.interstitial.fullScreenContentDelegate = self;
+                    call.success(["value": true])
+                }
+            )
+
         }
     }
 
     @objc func showInterstitial(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
-                if self.interstitial.isReady {
-                    self.interstitial.present(fromRootViewController: rootViewController)
+                if let ad = self.interstitial {
+                    ad.present(fromRootViewController: rootViewController)
                 } else {
                     NSLog("Ad wasn't ready")
                 }
@@ -307,39 +319,29 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
 
     // Intertitial Events Degigates
     /// Tells the delegate an ad request succeeded.
-    public func interstitialDidReceiveAd(_ ad: GADInterstitial) {
+    public func interstitialDidReceiveAd(_ ad: GADInterstitialAd) {
         NSLog("interstitialDidReceiveAd")
         self.notifyListeners("onInterstitialAdLoaded", data: ["value": true])
     }
 
     /// Tells the delegate an ad request failed.
-    public func interstitial(_ ad: GADInterstitial, didFailToReceiveAdWithError error: GADRequestError) {
+    public func interstitial(_ ad: GADInterstitialAd, didFailToReceiveAdWithError error: NSError) {
         NSLog("interstitial:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.notifyListeners("onInterstitialAdFailedToLoad", data: ["error": error.localizedDescription, "errorCode": error.code])
     }
 
-    /// Tells the delegate that an interstitial will be presented.
-    public func interstitialWillPresentScreen(_ ad: GADInterstitial) {
-        NSLog("interstitialWillPresentScreen")
+    public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        NSLog("Ad did present full screen content.")
         self.notifyListeners("onInterstitialAdOpened", data: ["value": true])
     }
 
-    /// Tells the delegate the interstitial is to be animated off the screen.
-    public func interstitialWillDismissScreen(_ ad: GADInterstitial) {
-        NSLog("interstitialWillDismissScreen")
+    public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        NSLog("Ad failed to present full screen content with error \(error.localizedDescription).")
     }
 
-    /// Tells the delegate the interstitial had been animated off the screen.
-    public func interstitialDidDismissScreen(_ ad: GADInterstitial) {
-        NSLog("interstitialDidDismissScreen")
+    public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        NSLog("Ad did dismiss full screen content.")
         self.notifyListeners("onInterstitialAdClosed", data: ["value": true])
-    }
-
-    /// Tells the delegate that a user click will open another app
-    /// (such as the App Store), backgrounding the current app.
-    public func interstitialWillLeaveApplication(_ ad: GADInterstitial) {
-        NSLog("interstitialWillLeaveApplication")
-        self.notifyListeners("onInterstitialAdLeftApplication", data: ["value": true])
     }
 
     /**
@@ -355,18 +357,25 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
                 adUnitID = testingID
             }
 
-            self.rewardedAd = GADRewardedAd(adUnitID: adUnitID)
-            self.rewardedAd?.load(self.GADRequestWithOption(call.getBool("npa") ?? false)) { error in
-                if let error = error {
-                    NSLog("AdMob Reward: Loading failed: \(error)")
-                    call.error("Loading failed")
-                } else {
+            let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
+            GADRewardedAd.load(
+                withAdUnitID: adUnitID,
+                request: request,
+                completionHandler: { (ad, error) in
+                    if let error = error {
+                        NSLog("Rewarded ad failed to load with error: \(error.localizedDescription)")
+                        call.error("Loading failed")
+                        return
+                    }
+
                     NSLog("AdMob Reward: Loading Succeeded")
-                    // 広告が用意された
+
                     self.notifyListeners("onRewardedVideoAdLoaded", data: ["value": true])
+                    self.rewardedAd = ad
+                    self.rewardedAd?.fullScreenContentDelegate = self
                     call.success(["value": true])
                 }
-            }
+            )
 
         }
     }
@@ -374,13 +383,15 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADInterstitialDelegate, G
     @objc func showRewardVideoAd(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
-                if self.rewardedAd?.isReady == true {
-                    self.rewardedAd?.present(fromRootViewController: rootViewController, delegate: self)
-                    // 広告が用意された
-                    call.resolve([ "value": true ])
-                } else {
+                if let ad = self.rewardedAd {
+                    ad.present(fromRootViewController: rootViewController,
+                        userDidEarnRewardHandler: {
+                            call.resolve([ "value": true ])
+                        }
+                    )
+                  } else {
                     call.error("Reward Video is Not Ready Yet")
-                }
+                  }
             }
 
         }
