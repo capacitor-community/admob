@@ -20,6 +20,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.util.BiConsumer;
 
 public class BannerExecutor extends Executor {
+
     private RelativeLayout mAdViewLayout;
     private AdView mAdView;
     private ViewGroup mViewGroup;
@@ -77,13 +78,21 @@ public class BannerExecutor extends Executor {
 
             float density = contextSupplier.get().getResources().getDisplayMetrics().density;
             int densityMargin = (int) (adOptions.margin * density);
-            
+
             // Center Banner Ads
             int screenWidth = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
             int adWidth = (int) (adOptions.adSize.size.getWidth() * density);
-            int sideMargin = (screenWidth - adWidth) / 2 ;
+            int sideMargin = (screenWidth - adWidth) / 2;
 
-            mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
+            if (adWidth <= 0) {
+                mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
+            } else {
+                mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
+            }
+
+            Log.d("size-screenWidth", screenWidth + "px");
+            Log.d("size-adWidth", adWidth + "px");
+            Log.d("size-sideMargin", sideMargin + "px");
 
             createNewAdView(adOptions);
 
@@ -199,7 +208,6 @@ public class BannerExecutor extends Executor {
 
                     mAdView.setAdListener(
                         new AdListener() {
-
                             @Override
                             public void onAdLoaded() {
                                 notifyListenersFunction.accept("onAdLoaded", new JSObject().put("value", true));
