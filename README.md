@@ -3,6 +3,8 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+__Please check [branch 'feat/v3'](https://github.com/capacitor-community/admob/tree/feat/v3), if you want use capacitor v3@beta__
+
 # @capacitor-community/admob
 
 Capacitory community plugin for AdMob.
