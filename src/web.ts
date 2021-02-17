@@ -89,10 +89,3 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 }
-
-const AdMob = new AdMobWeb();
-
-export { AdMob };
-
-import { registerWebPlugin } from '@capacitor/core';
-registerWebPlugin(AdMob);

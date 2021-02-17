@@ -1,9 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import {PluginListenerHandle, Plugins} from '@capacitor/core';
+import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdOptions, AdSize, AdPosition, AdMobRewardItem } from '@capacitor-community/admob';
-const { AdMob } = Plugins;
+import { AdMob, AdOptions, AdSize, AdPosition, AdMobRewardItem } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-home',
