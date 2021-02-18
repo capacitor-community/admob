@@ -48,7 +48,6 @@ npx cap sync
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -60,7 +59,7 @@ npx cap sync
 ### initialize(...)
 
 ```typescript
-initialize(options: AdMobInitializationOptions) => Promise<{ value: boolean; }>
+initialize(options: AdMobInitializationOptions) => Promise<void>
 ```
 
 Initialize AdMob with <a href="#admobinitializationoptions">AdMobInitializationOptions</a>
@@ -68,8 +67,6 @@ Initialize AdMob with <a href="#admobinitializationoptions">AdMobInitializationO
 | Param         | Type                                                                              | Description                                                          |
 | ------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | **`options`** | <code><a href="#admobinitializationoptions">AdMobInitializationOptions</a></code> | <a href="#admobinitializationoptions">AdMobInitializationOptions</a> |
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -79,7 +76,7 @@ Initialize AdMob with <a href="#admobinitializationoptions">AdMobInitializationO
 ### showBanner(...)
 
 ```typescript
-showBanner(options: AdOptions) => Promise<{ value: boolean; }>
+showBanner(options: AdOptions) => Promise<void>
 ```
 
 Show a banner Ad
@@ -87,8 +84,6 @@ Show a banner Ad
 | Param         | Type                                            | Description                        |
 | ------------- | ----------------------------------------------- | ---------------------------------- |
 | **`options`** | <code><a href="#adoptions">AdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -98,12 +93,10 @@ Show a banner Ad
 ### hideBanner()
 
 ```typescript
-hideBanner() => Promise<{ value: boolean; }>
+hideBanner() => Promise<void>
 ```
 
 Hide the banner, remove it from screen, but can show it later
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -113,12 +106,10 @@ Hide the banner, remove it from screen, but can show it later
 ### resumeBanner()
 
 ```typescript
-resumeBanner() => Promise<{ value: boolean; }>
+resumeBanner() => Promise<void>
 ```
 
 Resume the banner, show it after hide
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -128,12 +119,10 @@ Resume the banner, show it after hide
 ### removeBanner()
 
 ```typescript
-removeBanner() => Promise<{ value: boolean; }>
+removeBanner() => Promise<void>
 ```
 
 Destroy the banner, remove it from screen.
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -143,7 +132,7 @@ Destroy the banner, remove it from screen.
 ### prepareInterstitial(...)
 
 ```typescript
-prepareInterstitial(options: AdOptions) => Promise<{ value: boolean; }>
+prepareInterstitial(options: AdOptions) => Promise<void>
 ```
 
 Prepare interstitial banner
@@ -151,8 +140,6 @@ Prepare interstitial banner
 | Param         | Type                                            | Description                        |
 | ------------- | ----------------------------------------------- | ---------------------------------- |
 | **`options`** | <code><a href="#adoptions">AdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -162,12 +149,10 @@ Prepare interstitial banner
 ### showInterstitial()
 
 ```typescript
-showInterstitial() => Promise<{ value: boolean; }>
+showInterstitial() => Promise<void>
 ```
 
 Show interstitial ad when it’s ready
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -177,7 +162,7 @@ Show interstitial ad when it’s ready
 ### prepareRewardVideoAd(...)
 
 ```typescript
-prepareRewardVideoAd(options: AdOptions) => Promise<{ value: boolean; }>
+prepareRewardVideoAd(options: AdOptions) => Promise<void>
 ```
 
 Prepare a reward video ad
@@ -185,8 +170,6 @@ Prepare a reward video ad
 | Param         | Type                                            | Description                        |
 | ------------- | ----------------------------------------------- | ---------------------------------- |
 | **`options`** | <code><a href="#adoptions">AdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -196,12 +179,10 @@ Prepare a reward video ad
 ### showRewardVideoAd()
 
 ```typescript
-showRewardVideoAd() => Promise<{ value: boolean; }>
+showRewardVideoAd() => Promise<void>
 ```
 
 Show a reward video ad
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -211,12 +192,10 @@ Show a reward video ad
 ### pauseRewardedVideo()
 
 ```typescript
-pauseRewardedVideo() => Promise<{ value: boolean; }>
+pauseRewardedVideo() => Promise<void>
 ```
 
 Pause RewardedVideo
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -226,12 +205,10 @@ Pause RewardedVideo
 ### resumeRewardedVideo()
 
 ```typescript
-resumeRewardedVideo() => Promise<{ value: boolean; }>
+resumeRewardedVideo() => Promise<void>
 ```
 
 Resume RewardedVideo
-
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
 **Since:** 1.1.2
 
@@ -241,13 +218,11 @@ Resume RewardedVideo
 ### stopRewardedVideo()
 
 ```typescript
-stopRewardedVideo() => Promise<{ value: boolean; }>
+stopRewardedVideo() => Promise<void>
 ```
 
 Close RewardedVideo
 
-**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
-
 **Since:** 1.1.2
 
 --------------------
@@ -256,35 +231,15 @@ Close RewardedVideo
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdLoaded', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'onAdLoaded', listenerFunc: (info: { size: { width: number; height: number; }; }) => void) => PluginListenerHandle
 ```
 
 Notice: banner ad is loaded(android)
 
-| Param              | Type                                | Description |
-| ------------------ | ----------------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdLoaded"</code>           | onAdLoaded  |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |             |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onAdSize', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: banner size changed and notice size
-
-| Param              | Type                                | Description |
-| ------------------ | ----------------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdSize"</code>             | onAdSize    |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |             |
+| Param              | Type                                                                          | Description |
+| ------------------ | ----------------------------------------------------------------------------- | ----------- |
+| **`eventName`**    | <code>"onAdLoaded"</code>                                                     | onAdLoaded  |
+| **`listenerFunc`** | <code>(info: { size: { width: number; height: number; }; }) =&gt; void</code> |             |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -296,15 +251,15 @@ Notice: banner size changed and notice size
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
 ```
 
 Notice: failed to load Banner ad(android)
 
-| Param              | Type                                | Description      |
-| ------------------ | ----------------------------------- | ---------------- |
-| **`eventName`**    | <code>"onAdFailedToLoad"</code>     | onAdFailedToLoad |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |                  |
+| Param              | Type                                                                 | Description      |
+| ------------------ | -------------------------------------------------------------------- | ---------------- |
+| **`eventName`**    | <code>"onAdFailedToLoad"</code>                                      | onAdFailedToLoad |
+| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                  |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -316,15 +271,15 @@ Notice: failed to load Banner ad(android)
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdOpened', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'onAdOpened', listenerFunc: () => void) => PluginListenerHandle
 ```
 
 Notice: banner ad is show(android)
 
-| Param              | Type                                | Description |
-| ------------------ | ----------------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdOpened"</code>           | onAdOpened  |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |             |
+| Param              | Type                       | Description |
+| ------------------ | -------------------------- | ----------- |
+| **`eventName`**    | <code>"onAdOpened"</code>  | onAdOpened  |
+| **`listenerFunc`** | <code>() =&gt; void</code> |             |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -336,15 +291,15 @@ Notice: banner ad is show(android)
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdClosed', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'onAdClosed', listenerFunc: () => void) => PluginListenerHandle
 ```
 
 Notice: Banner ad is closed(android)
 
-| Param              | Type                                | Description |
-| ------------------ | ----------------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdClosed"</code>           | onAdClosed  |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |             |
+| Param              | Type                       | Description |
+| ------------------ | -------------------------- | ----------- |
+| **`eventName`**    | <code>"onAdClosed"</code>  | onAdClosed  |
+| **`listenerFunc`** | <code>() =&gt; void</code> |             |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -356,15 +311,15 @@ Notice: Banner ad is closed(android)
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'adViewDidReceiveAd', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'adViewDidReceiveAd', listenerFunc: () => void) => PluginListenerHandle
 ```
 
 Notice: request loaded Banner ad(iOS)
 
-| Param              | Type                                | Description        |
-| ------------------ | ----------------------------------- | ------------------ |
-| **`eventName`**    | <code>"adViewDidReceiveAd"</code>   | adViewDidReceiveAd |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |                    |
+| Param              | Type                              | Description        |
+| ------------------ | --------------------------------- | ------------------ |
+| **`eventName`**    | <code>"adViewDidReceiveAd"</code> | adViewDidReceiveAd |
+| **`listenerFunc`** | <code>() =&gt; void</code>        |                    |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -376,15 +331,15 @@ Notice: request loaded Banner ad(iOS)
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'adView:didFailToReceiveAdWithError', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'adView:didFailToReceiveAdWithError', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
 ```
 
 Notice: request failed Banner ad(iOS)
 
-| Param              | Type                                              | Description                        |
-| ------------------ | ------------------------------------------------- | ---------------------------------- |
-| **`eventName`**    | <code>"adView:didFailToReceiveAdWithError"</code> | adView:didFailToReceiveAdWithError |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>               |                                    |
+| Param              | Type                                                                 | Description                        |
+| ------------------ | -------------------------------------------------------------------- | ---------------------------------- |
+| **`eventName`**    | <code>"adView:didFailToReceiveAdWithError"</code>                    | adView:didFailToReceiveAdWithError |
+| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                                    |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -556,15 +511,15 @@ Notice: Click link of Interstitial ad
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onInterstitialAdFailedToLoad', listenerFunc: (info: { error: string; errorCode: number; }) => void) => PluginListenerHandle
+addListener(eventName: 'onInterstitialAdFailedToLoad', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
 ```
 
 Notice: Failed to load Interstitial ad
 
-| Param              | Type                                                                  | Description                  |
-| ------------------ | --------------------------------------------------------------------- | ---------------------------- |
-| **`eventName`**    | <code>"onInterstitialAdFailedToLoad"</code>                           | onInterstitialAdFailedToLoad |
-| **`listenerFunc`** | <code>(info: { error: string; errorCode: number; }) =&gt; void</code> |                              |
+| Param              | Type                                                                 | Description                  |
+| ------------------ | -------------------------------------------------------------------- | ---------------------------- |
+| **`eventName`**    | <code>"onInterstitialAdFailedToLoad"</code>                          | onInterstitialAdFailedToLoad |
+| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                              |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -784,20 +739,25 @@ Notice: Watch RewardVideo complete
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
+#### AdMobError
+
+For more information
+https://developers.google.com/android/reference/com/google/android/gms/ads/AdError
+
+| Prop          | Type                | Description                                                                                                                                            |
+| ------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`code`**    | <code>number</code> | Gets the error's code.                                                                                                                                 |
+| **`message`** | <code>string</code> | Gets the message describing the error.                                                                                                                 |
+| **`cause`**   | <code>string</code> | Gets the cause of this error or null if the cause is nonexistent or unknown.                                                                           |
+| **`domain`**  | <code>string</code> | Gets the domain of the error. MobileAds.ERROR_DOMAIN for Google Mobile Ads SDK errors, or a domain defined by mediation networks for mediation errors. |
+
+
 #### AdMobRewardItem
 
 | Prop         | Type                |
 | ------------ | ------------------- |
 | **`type`**   | <code>string</code> |
 | **`amount`** | <code>number</code> |
-
-
-#### AdMobError
-
-| Prop         | Type                |
-| ------------ | ------------------- |
-| **`reason`** | <code>string</code> |
-| **`code`**   | <code>number</code> |
 
 
 ### Enums
