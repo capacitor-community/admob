@@ -229,9 +229,8 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: User click will open another app.(iOS)
+   * Notice: User click will open another app.
    *
-   * @deprecated iOS Only
    * @group Banner
    * @param eventName adViewWillLeaveApplication
    * @param listenerFunc
