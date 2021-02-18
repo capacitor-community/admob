@@ -11,5 +11,5 @@
     s.ios.deployment_target  = '11.0'
     s.static_framework = true
     s.dependency 'Capacitor'
-    s.dependency 'Google-Mobile-Ads-SDK', '>= 7.64.0'
+    s.dependency 'Google-Mobile-Ads-SDK', '7.69.0'
   end
