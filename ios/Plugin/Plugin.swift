@@ -282,7 +282,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
             if isTest {
                 adUnitID = testingID
             }
- 
+
             self.interstitial = GADInterstitial(adUnitID: adUnitID)
             let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
             self.interstitial.load(request)
@@ -387,9 +387,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
     public func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
         NSLog("AdMob Reward received with currency: \(reward.type), amount \(reward.amount).")
         self.notifyListeners("onRewarded", data: ["value": true, "type": reward.type, "amount": reward.amount])
-
-        // todo: Capacitor3で整理
-        self.notifyListeners("onRewardedVideoCompleted", data: ["value": true, "type": reward.type, "amount": reward.amount])
     }
     /// Tells the delegate that the rewarded ad was dismissed.
     public func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {

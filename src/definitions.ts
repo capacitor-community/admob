@@ -161,6 +161,7 @@ export interface AdMobPlugin {
   /**
    * Notice: request loaded Banner ad(iOS)
    *
+   * @deprecated iOS Only
    * @group Banner
    * @param eventName adViewDidReceiveAd
    * @param listenerFunc
@@ -174,6 +175,7 @@ export interface AdMobPlugin {
   /**
    * Notice: request failed Banner ad(iOS)
    *
+   * @deprecated iOS Only
    * @group Banner
    * @param eventName adView:didFailToReceiveAdWithError
    * @param listenerFunc
@@ -187,6 +189,7 @@ export interface AdMobPlugin {
   /**
    * Notice: full-screen view will be presented in response to the user clicking on an ad.(iOS)
    *
+   * @deprecated iOS Only
    * @group Banner
    * @param eventName adViewWillPresentScreen
    * @param listenerFunc
@@ -200,6 +203,7 @@ export interface AdMobPlugin {
   /**
    * Notice: The full-screen view will be dismissed.(iOS)
    *
+   * @deprecated iOS Only
    * @group Banner
    * @param eventName adViewWillDismissScreen
    * @param listenerFunc
@@ -213,6 +217,7 @@ export interface AdMobPlugin {
   /**
    * Notice: The full-screen view has been dismissed.(iOS)
    *
+   * @deprecated iOS Only
    * @group Banner
    * @param eventName adViewDidDismissScreen
    * @param listenerFunc
@@ -226,6 +231,7 @@ export interface AdMobPlugin {
   /**
    * Notice: User click will open another app.(iOS)
    *
+   * @deprecated iOS Only
    * @group Banner
    * @param eventName adViewWillLeaveApplication
    * @param listenerFunc
@@ -330,6 +336,7 @@ export interface AdMobPlugin {
   /**
    * Notice: RewardedVideo go to background(Android)
    *
+   * @deprecated Android Only
    * @group RewardedVideo
    * @param eventName onRewardedVideoAdOpened
    * @param listenerFunc
@@ -406,8 +413,9 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: Watch RewardVideo complete
+   * Notice: Watch RewardVideo complete(Android)
    *
+   * @deprecated Android Only
    * @group RewardedVideo
    * @param eventName onRewardedVideoCompleted
    * @param listenerFunc
@@ -506,8 +514,19 @@ export interface AdOptions {
   npa?: boolean;
 }
 
+/**
+ * For more information
+ * https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
+ */
 export interface AdMobRewardItem {
+  /**
+   * Rewarded type user got
+   */
   type: string;
+
+  /**
+   * Rewarded amount user got
+   */
   amount: number;
 }
 
