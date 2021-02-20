@@ -32,7 +32,7 @@ Maintenance Status: Actively Maintained
 ## Installation
 
 ```
-% npm install --save @capacitor-community/admob@next
+% npm install --save @capacitor-community/admob@3.0.0-2
 % npx cap update
 ```
 
