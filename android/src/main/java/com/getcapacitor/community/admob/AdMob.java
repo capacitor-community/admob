@@ -41,7 +41,7 @@ public class AdMob extends Plugin {
     );
     private BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
     private PluginCall call;
-    private InterstitialAd mInterstitialAd;
+    private InterstitialAd mInterstitialAd=null;
 
     // Initialize AdMob with appId
     @PluginMethod
@@ -102,6 +102,10 @@ public class AdMob extends Plugin {
         // This is never read, why is saved?
         this.call = call;
 
+        if(mInterstitialAd!=null) {
+            return;
+        }
+        
         try {
             mInterstitialAd = new InterstitialAd(getContext());
 
@@ -168,6 +172,7 @@ public class AdMob extends Plugin {
         } catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
+        
     }
 
     // Show interstitial Ad
