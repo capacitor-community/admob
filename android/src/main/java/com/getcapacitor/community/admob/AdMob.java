@@ -102,6 +102,7 @@ public class AdMob extends Plugin {
         // This is never read, why is saved?
         this.call = call;
 
+        // If this method already been called, then skip it.
         if(mInterstitialAd!=null) {
             return;
         }
