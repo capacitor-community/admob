@@ -414,7 +414,7 @@ Notice: The full-screen view has been dismissed.(iOS)
 addListener(eventName: 'onRewarded', listenerFunc: (adMobRewardItem: AdMobRewardItem) => void) => PluginListenerHandle
 ```
 
-Notice: User click will open another app.(iOS)
+Notice: User click will open another app.
 
 | Param              | Type                                                                                      | Description                |
 | ------------------ | ----------------------------------------------------------------------------------------- | -------------------------- |
@@ -694,7 +694,7 @@ Notice: Failed to load RewardVideo ad
 addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-Notice: Watch RewardVideo complete
+Notice: Watch RewardVideo complete(Android)
 
 | Param              | Type                                    | Description              |
 | ------------------ | --------------------------------------- | ------------------------ |
@@ -754,10 +754,13 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 
 #### AdMobRewardItem
 
-| Prop         | Type                |
-| ------------ | ------------------- |
-| **`type`**   | <code>string</code> |
-| **`amount`** | <code>number</code> |
+For more information
+https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
+
+| Prop         | Type                | Description              |
+| ------------ | ------------------- | ------------------------ |
+| **`type`**   | <code>string</code> | Rewarded type user got   |
+| **`amount`** | <code>number</code> | Rewarded amount user got |
 
 
 ### Enums
