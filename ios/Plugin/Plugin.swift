@@ -223,51 +223,44 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
     }
 
     /// Tells the delegate an ad request loaded an ad.
-    public func adViewDidReceiveAd(_ bannerView: GADBannerView) {
-        NSLog("adViewDidReceiveAd")
+    public func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
+        NSLog("bannerViewDidReceiveAd")
         self.notifyListeners("onAdSize", data: [
-            "width": self.bannerView.frame.width,
-            "height": self.bannerView.frame.height
+            "width": bannerView.frame.width,
+            "height": bannerView.frame.height
         ])
-        self.bridge?.triggerJSEvent(eventName: "adViewDidReceiveAd", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "bannerViewDidReceiveAd", target: "window")
     }
 
     /// Tells the delegate an ad request failed.
-    public func adView(_ bannerView: GADBannerView,
+    public func bannerView(_ bannerView: GADBannerView,
                        didFailToReceiveAdWithError error: NSError) {
-        NSLog("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
+        NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
         self.notifyListeners("onAdSize", data: [
             "width": 0,
             "height": 0
         ])
-        self.bridge?.triggerJSEvent(eventName: "adView:didFailToReceiveAdWithError", target: "window")
+        self.bridge?.triggerJSEvent(eventName: "bannerView:didFailToReceiveAdWithError", target: "window")
     }
 
     /// Tells the delegate that a full-screen view will be presented in response
     /// to the user clicking on an ad.
-    public func adViewWillPresentScreen(_ bannerView: GADBannerView) {
-        NSLog("adViewWillPresentScreen")
-        self.bridge?.triggerJSEvent(eventName: "adViewWillPresentScreen", target: "window")
+    public func bannerViewWillPresentScreen(_ bannerView: GADBannerView) {
+        NSLog("bannerViewWillPresentScreen")
+        self.bridge?.triggerJSEvent(eventName: "bannerViewWillPresentScreen", target: "window")
     }
 
     /// Tells the delegate that the full-screen view will be dismissed.
-    public func adViewWillDismissScreen(_ bannerView: GADBannerView) {
-        NSLog("adViewWillDismissScreen")
-        self.bridge?.triggerJSEvent(eventName: "adViewWillDismissScreen", target: "window")
+    public func bannerViewWillDismissScreen(_ bannerView: GADBannerView) {
+        NSLog("bannerViewWillDismissScreen")
+        self.bridge?.triggerJSEvent(eventName: "bannerViewWillDismissScreen", target: "window")
     }
 
     /// Tells the delegate that the full-screen view has been dismissed.
-    public func adViewDidDismissScreen(_ bannerView: GADBannerView) {
-        NSLog("adViewDidDismissScreen")
-        self.bridge?.triggerJSEvent(eventName: "adViewDidDismissScreen", target: "window")
-    }
-
-    /// Tells the delegate that a user click will open another app (such as
-    /// the App Store), backgrounding the current app.
-    public func adViewWillLeaveApplication(_ bannerView: GADBannerView) {
-        NSLog("adViewWillLeaveApplication")
-        self.bridge?.triggerJSEvent(eventName: "adViewWillLeaveApplication", target: "window")
+    public func bannerViewDidDismissScreen(_ bannerView: GADBannerView) {
+        NSLog("bannerViewDidDismissScreen")
+        self.bridge?.triggerJSEvent(eventName: "bannerViewDidDismissScreen", target: "window")
     }
 
     /**

@@ -170,12 +170,12 @@ export interface AdMobPlugin {
    *
    * @deprecated iOS Only
    * @group Banner
-   * @param eventName adViewDidReceiveAd
+   * @param eventName bannerViewDidReceiveAd
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 3.0.0
    */
   addListener(
-    eventName: 'adViewDidReceiveAd',
+    eventName: 'bannerViewDidReceiveAd',
     listenerFunc: () => void,
   ): PluginListenerHandle;
 
@@ -184,12 +184,12 @@ export interface AdMobPlugin {
    *
    * @deprecated iOS Only
    * @group Banner
-   * @param eventName adView:didFailToReceiveAdWithError
+   * @param eventName bannerView:didFailToReceiveAdWithError
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 3.0.0
    */
   addListener(
-    eventName: 'adView:didFailToReceiveAdWithError',
+    eventName: 'bannerView:didFailToReceiveAdWithError',
     listenerFunc: (info: AdMobError) => void,
   ): PluginListenerHandle;
 
@@ -198,12 +198,12 @@ export interface AdMobPlugin {
    *
    * @deprecated iOS Only
    * @group Banner
-   * @param eventName adViewWillPresentScreen
+   * @param eventName bannerViewWillPresentScreen
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 3.0.0
    */
   addListener(
-    eventName: 'adViewWillPresentScreen',
+    eventName: 'bannerViewWillPresentScreen',
     listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
@@ -212,12 +212,26 @@ export interface AdMobPlugin {
    *
    * @deprecated iOS Only
    * @group Banner
-   * @param eventName adViewWillDismissScreen
+   * @param eventName bannerViewWillDismissScreen
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 3.0.0
    */
   addListener(
-    eventName: 'adViewWillDismissScreen',
+    eventName: 'bannerViewWillDismissScreen',
+    listenerFunc: (info: any) => void,
+  ): PluginListenerHandle;
+
+  /**
+   * Notice: The full-screen will been dismissed.(iOS)
+   *
+   * @deprecated iOS Only
+   * @group Banner
+   * @param eventName bannerViewWillDismissScreen
+   * @param listenerFunc
+   * @since 3.0.0
+   */
+  addListener(
+    eventName: 'bannerViewWillDismissScreen',
     listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
@@ -226,12 +240,12 @@ export interface AdMobPlugin {
    *
    * @deprecated iOS Only
    * @group Banner
-   * @param eventName adViewDidDismissScreen
+   * @param eventName bannerViewDidDismissScreen
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 3.0.0
    */
   addListener(
-    eventName: 'adViewDidDismissScreen',
+    eventName: 'bannerViewDidDismissScreen',
     listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
@@ -239,7 +253,7 @@ export interface AdMobPlugin {
    * Notice: User click will open another app.
    *
    * @group Banner
-   * @param eventName adViewWillLeaveApplication
+   * @param eventName onRewarded
    * @param listenerFunc
    * @since 1.1.2
    */
