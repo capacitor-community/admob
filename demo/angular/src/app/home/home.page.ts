@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdMob, AdOptions, AdSize, AdPosition, AdMobRewardItem, AdMobBannerSizeOnAdLoaded } from '@capacitor-community/admob';
+import { AdMob, AdOptions, AdSize, AdPosition, AdMobRewardItem, AdMobBannerSize } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-home',
@@ -66,8 +66,8 @@ export class HomePage implements OnInit, OnDestroy {
      * Run every time the Ad height changes.
      * AdMob cannot be displayed above the content, so create margin for AdMob.
      */
-    this.eventOnAdSize = AdMob.addListener('onAdLoaded', (info: AdMobBannerSizeOnAdLoaded) => {
-      this.appMargin = info.size.height;
+    this.eventOnAdSize = AdMob.addListener('onAdSize', (info: AdMobBannerSize) => {
+      this.appMargin = info.height;
       if (this.appMargin > 0) {
         const body = document.querySelector('body');
         const bodyStyles = window.getComputedStyle(body);

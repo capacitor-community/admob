@@ -48,6 +48,7 @@ npx cap sync
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
+* [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -231,15 +232,33 @@ Close RewardedVideo
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdLoaded', listenerFunc: (info: AdMobBannerSizeOnAdLoaded) => void) => PluginListenerHandle
+addListener(eventName: 'onAdLoaded', listenerFunc: () => void) => PluginListenerHandle
 ```
 
 Notice: banner ad is loaded(android)
 
-| Param              | Type                                                                                               | Description |
-| ------------------ | -------------------------------------------------------------------------------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdLoaded"</code>                                                                          | onAdLoaded  |
-| **`listenerFunc`** | <code>(info: <a href="#admobbannersizeonadloaded">AdMobBannerSizeOnAdLoaded</a>) =&gt; void</code> |             |
+| Param              | Type                       | Description |
+| ------------------ | -------------------------- | ----------- |
+| **`eventName`**    | <code>"onAdLoaded"</code>  | onAdLoaded  |
+| **`listenerFunc`** | <code>() =&gt; void</code> |             |
+
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+**Since:** 1.1.2
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'onAdSize', listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
+```
+
+| Param              | Type                                                                           | Description |
+| ------------------ | ------------------------------------------------------------------------------ | ----------- |
+| **`eventName`**    | <code>"onAdSize"</code>                                                        | onAdSize    |
+| **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |             |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -739,14 +758,14 @@ Notice: Watch RewardVideo complete(Android)
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
-#### AdMobBannerSizeOnAdLoaded
+#### AdMobBannerSize
 
-For more information
-https://developers.google.com/android/reference/com/google/android/gms/ads/AdListener?hl=ja#onAdLoaded()
+When notice listener of OnAdLoaded, you can get banner size.
 
-| Prop       | Type                                            |
-| ---------- | ----------------------------------------------- |
-| **`size`** | <code>{ width: number; height: number; }</code> |
+| Prop         | Type                |
+| ------------ | ------------------- |
+| **`width`**  | <code>number</code> |
+| **`height`** | <code>number</code> |
 
 
 #### AdMobError
