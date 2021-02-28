@@ -231,15 +231,15 @@ Close RewardedVideo
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdLoaded', listenerFunc: (info: { size: { width: number; height: number; }; }) => void) => PluginListenerHandle
+addListener(eventName: 'onAdLoaded', listenerFunc: (info: AdMobBannerSizeOnAdLoaded) => void) => PluginListenerHandle
 ```
 
 Notice: banner ad is loaded(android)
 
-| Param              | Type                                                                          | Description |
-| ------------------ | ----------------------------------------------------------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdLoaded"</code>                                                     | onAdLoaded  |
-| **`listenerFunc`** | <code>(info: { size: { width: number; height: number; }; }) =&gt; void</code> |             |
+| Param              | Type                                                                                               | Description |
+| ------------------ | -------------------------------------------------------------------------------------------------- | ----------- |
+| **`eventName`**    | <code>"onAdLoaded"</code>                                                                          | onAdLoaded  |
+| **`listenerFunc`** | <code>(info: <a href="#admobbannersizeonadloaded">AdMobBannerSizeOnAdLoaded</a>) =&gt; void</code> |             |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -737,6 +737,16 @@ Notice: Watch RewardVideo complete(Android)
 | Prop         | Type                                      |
 | ------------ | ----------------------------------------- |
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
+
+#### AdMobBannerSizeOnAdLoaded
+
+For more information
+https://developers.google.com/android/reference/com/google/android/gms/ads/AdListener?hl=ja#onAdLoaded()
+
+| Prop       | Type                                            |
+| ---------- | ----------------------------------------------- |
+| **`size`** | <code>{ width: number; height: number; }</code> |
 
 
 #### AdMobError

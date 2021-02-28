@@ -111,12 +111,7 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onAdLoaded',
-    listenerFunc: (info: {
-      size: {
-        width: number
-        height: number;
-      };
-    }) => void,
+    listenerFunc: (info: AdMobBannerSizeOnAdLoaded) => void,
   ): PluginListenerHandle;
 
   /**
@@ -527,6 +522,16 @@ export interface AdMobRewardItem {
    * Rewarded amount user got
    */
   amount: number;
+}
+
+/**
+ * When notice listener of OnAdLoaded, you can get banner size.
+ */
+export interface AdMobBannerSizeOnAdLoaded {
+  size: {
+    width: number
+    height: number;
+  };
 }
 
 /**
