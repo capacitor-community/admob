@@ -75,100 +75,23 @@ export interface AdMobPlugin {
    * @group RewardVideo
    * @since 1.1.2
    */
-  showRewardVideoAd(): Promise<void>;
-
-  /**
-   * Pause RewardedVideo
-   *
-   * @group RewardVideo
-   * @since 1.1.2
-   */
-  pauseRewardedVideo(): Promise<void>;
-
-  /**
-   * Resume RewardedVideo
-   *
-   * @group RewardVideo
-   * @since 1.1.2
-   */
-  resumeRewardedVideo(): Promise<void>;
-
-  /**
-   * Close RewardedVideo
-   *
-   * @group RewardVideo
-   * @since 1.1.2
-   */
-  stopRewardedVideo(): Promise<void>;
-
-  /**
-   * Notice: banner ad is loaded(android)
-   *
-   * @group Banner
-   * @param eventName onAdLoaded
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onAdLoaded',
-    listenerFunc: () => void,
-  ): PluginListenerHandle;
+  showRewardVideoAd(): Promise<AdMobRewardItem>;
 
   /**
    *
    * @group Banner
-   * @param eventName onAdSize
+   * @param eventName bannerViewReceiveAdSize
    * @param listenerFunc
    * @since 3.0.0
    */
   addListener(
-    eventName: 'onAdSize',
+    eventName: 'bannerViewReceiveAdSize',
     listenerFunc: (info: AdMobBannerSize) => void,
   ): PluginListenerHandle;
 
   /**
-   * Notice: failed to load Banner ad(android)
+   * Notice: request loaded Banner ad
    *
-   * @group Banner
-   * @param eventName onAdFailedToLoad
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onAdFailedToLoad',
-    listenerFunc: (info: AdMobError) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: banner ad is show(android)
-   *
-   * @group Banner
-   * @param eventName onAdOpened
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onAdOpened',
-    listenerFunc: () => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Banner ad is closed(android)
-   *
-   * @group Banner
-   * @param eventName onAdClosed
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onAdClosed',
-    listenerFunc: () => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: request loaded Banner ad(iOS)
-   *
-   * @deprecated iOS Only
    * @group Banner
    * @param eventName bannerViewDidReceiveAd
    * @param listenerFunc
@@ -180,9 +103,8 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: request failed Banner ad(iOS)
+   * Notice: request failed Banner ad
    *
-   * @deprecated iOS Only
    * @group Banner
    * @param eventName bannerView:didFailToReceiveAdWithError
    * @param listenerFunc
@@ -194,9 +116,8 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: full-screen view will be presented in response to the user clicking on an ad.(iOS)
+   * Notice: full-screen banner view will be presented in response to the user clicking on an ad.
    *
-   * @deprecated iOS Only
    * @group Banner
    * @param eventName bannerViewWillPresentScreen
    * @param listenerFunc
@@ -208,9 +129,8 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: The full-screen view will be dismissed.(iOS)
+   * Notice: The full-screen banner view will be dismissed.
    *
-   * @deprecated iOS Only
    * @group Banner
    * @param eventName bannerViewWillDismissScreen
    * @param listenerFunc
@@ -222,9 +142,8 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: The full-screen will been dismissed.(iOS)
+   * Notice: The full-screen banner view will been dismissed.
    *
-   * @deprecated iOS Only
    * @group Banner
    * @param eventName bannerViewWillDismissScreen
    * @param listenerFunc
@@ -236,9 +155,8 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: The full-screen view has been dismissed.(iOS)
+   * Notice: The full-screen banner view has been dismissed.
    *
-   * @deprecated iOS Only
    * @group Banner
    * @param eventName bannerViewDidDismissScreen
    * @param listenerFunc
@@ -250,81 +168,16 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: User click will open another app.
+   * Notice: Prepared InterstitialAd
    *
-   * @group Banner
-   * @param eventName onRewarded
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewarded',
-    listenerFunc: (adMobRewardItem: AdMobRewardItem) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Interstitial ad loaded
-   *
-   * @group Interstitial
+   * @group InterstitialAd
    * @param eventName onInterstitialAdLoaded
    * @param listenerFunc
-   * @since 1.2.0
+   * @since 1.1.2
    */
   addListener(
     eventName: 'onInterstitialAdLoaded',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Interstitial ad opened
-   *
-   * @group Interstitial
-   * @param eventName onInterstitialAdOpened
-   * @param listenerFunc
-   * @since 1.2.0
-   */
-  addListener(
-    eventName: 'onInterstitialAdOpened',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Interstitial ad closed
-   *
-   * @group Interstitial
-   * @param eventName onInterstitialAdClosed
-   * @param listenerFunc
-   * @since 1.2.0
-   */
-  addListener(
-    eventName: 'onInterstitialAdClosed',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Click link of Interstitial ad
-   *
-   * @group Interstitial
-   * @param eventName onInterstitialAdLeftApplication
-   * @param listenerFunc
-   * @since 1.2.0
-   */
-  addListener(
-    eventName: 'onInterstitialAdLeftApplication',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Failed to load Interstitial ad
-   *
-   * @group Interstitial
-   * @param eventName onInterstitialAdFailedToLoad
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onInterstitialAdFailedToLoad',
-    listenerFunc: (info: AdMobError) => void,
+    listenerFunc: () => void,
   ): PluginListenerHandle;
 
   /**
@@ -337,113 +190,46 @@ export interface AdMobPlugin {
    */
   addListener(
     eventName: 'onRewardedVideoAdLoaded',
+    listenerFunc: () => void,
+  ): PluginListenerHandle;
+
+  /**
+   * Notice: Interstitial ad opened
+   *
+   * @group fullscreen
+   * @param eventName adDidPresentFullScreenContent
+   * @param listenerFunc
+   * @since 3.0.0
+   */
+  addListener(
+    eventName: 'adDidPresentFullScreenContent',
     listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
   /**
-   * Notice: RewardedVideo is opened
+   * Notice: Dismiss Content
    *
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoAdOpened
+   * @group fullscreen
+   * @param eventName adDidDismissFullScreenContent
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 3.0.0
    */
   addListener(
-    eventName: 'onRewardedVideoAdOpened',
+    eventName: 'adDidDismissFullScreenContent',
     listenerFunc: (info: any) => void,
   ): PluginListenerHandle;
 
   /**
-   * Notice: RewardedVideo go to background(Android)
+   * Notice: Interstitial ad is be failed to open
    *
-   * @deprecated Android Only
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoAdOpened
+   * @group fullscreen
+   * @param eventName didFailToPresentFullScreenContentWithError
    * @param listenerFunc
-   * @since 1.1.2
+   * @since 1.2.0
    */
   addListener(
-    eventName: 'onAdLeftApplication',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: RewardedVideo is started
-   *
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoStarted
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewardedVideoStarted',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: RewardedVideo is closed
-   *
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoAdClosed
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewardedVideoAdClosed',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: User get reward by RewardedVideo
-   *
-   * @group RewardedVideo
-   * @param eventName onRewarded
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewarded',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: click link of RewardedVideo ad
-   *
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoAdLeftApplication
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewardedVideoAdLeftApplication',
-    listenerFunc: (info: any) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Failed to load RewardVideo ad
-   *
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoAdFailedToLoad
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewardedVideoAdFailedToLoad',
-    listenerFunc: (error: AdMobError) => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Watch RewardVideo complete(Android)
-   *
-   * @deprecated Android Only
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoCompleted
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewardedVideoCompleted',
-    listenerFunc: (info: any) => void,
+    eventName: 'didFailToPresentFullScreenContentWithError',
+    listenerFunc: (info: AdMobError) => void,
   ): PluginListenerHandle;
 }
 
@@ -628,9 +414,14 @@ export enum AdSize {
   MEDIUM_RECTANGLE = 'MEDIUM_RECTANGLE',
 
   /**
-   * A dynamically sized banner that is full-width and auto-height.
+   * deprecated: A dynamically sized banner that is full-width and auto-height.
    */
   SMART_BANNER = 'SMART_BANNER',
+
+  /**
+   * A dynamically sized banner that is full-width and auto-height.
+   */
+  ADAPTIVE_BANNER = 'ADAPTIVE_BANNER',
 
   /**
    * To define a custom banner size, set your desired AdSize

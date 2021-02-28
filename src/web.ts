@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import { AdOptions } from './definitions';
+import { AdMobRewardItem, AdOptions } from './definitions';
 
 import type { AdMobPlugin } from './definitions';
 
@@ -37,11 +37,10 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log(options);
   }
 
-  async showRewardVideoAd() {}
-
-  async pauseRewardedVideo() {}
-
-  async resumeRewardedVideo() {}
-
-  async stopRewardedVideo() {}
+  async showRewardVideoAd(): Promise<AdMobRewardItem> {
+    return {
+      type: '',
+      amount: 0,
+    };
+  }
 }

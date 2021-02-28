@@ -28,14 +28,14 @@ export class HomePage implements OnInit, OnDestroy {
    */
   private bannerTopOptions: AdOptions = {
     adId: 'ca-app-pub-3940256099942544/2934735716',
-    adSize: AdSize.SMART_BANNER,
+    adSize: AdSize.ADAPTIVE_BANNER,
     position: AdPosition.TOP_CENTER,
     // npa: false,
   };
 
   private bannerBottomOptions: AdOptions = {
     adId: 'ca-app-pub-3940256099942544/2934735716',
-    adSize: AdSize.SMART_BANNER,
+    adSize: AdSize.ADAPTIVE_BANNER,
     position: AdPosition.BOTTOM_CENTER,
     npa: true,
   };
@@ -66,7 +66,7 @@ export class HomePage implements OnInit, OnDestroy {
      * Run every time the Ad height changes.
      * AdMob cannot be displayed above the content, so create margin for AdMob.
      */
-    this.eventOnAdSize = AdMob.addListener('onAdSize', (info: AdMobBannerSize) => {
+    this.eventOnAdSize = AdMob.addListener('bannerViewReceiveAdSize', (info: AdMobBannerSize) => {
       this.appMargin = info.height;
       if (this.appMargin > 0) {
         const body = document.querySelector('body');
@@ -82,30 +82,16 @@ export class HomePage implements OnInit, OnDestroy {
       }
     });
 
-    AdMob.addListener('onInterstitialAdLoaded', (info) => {
+    AdMob.addListener('onInterstitialAdLoaded', () => {
       this.isPrepareInterstitial = true;
     });
 
     /**
      * RewardedVideo ad
      */
-    this.eventPrepareReward = AdMob.addListener('onRewardedVideoAdLoaded', (info: boolean) => {
+    this.eventPrepareReward = AdMob.addListener('onRewardedVideoAdLoaded', () => {
       this.isPrepareReward = true;
       this.isLoading = false;
-    });
-
-    AdMob.addListener('onRewarded', (info) => {
-      this.eventRewardReceived = info;
-    });
-
-    AdMob.addListener('onRewardedVideoAdClosed', async (info) => {
-      if (this.eventRewardReceived) {
-        const toast = await this.toastCtrl.create({
-          message: `AdMob Reward received with currency: ${this.eventRewardReceived.type}, amount ${this.eventRewardReceived.amount}.`,
-          duration: 2000,
-        });
-        await toast.present();
-      }
     });
   }
 
@@ -201,11 +187,17 @@ export class HomePage implements OnInit, OnDestroy {
 
   async showReward() {
     this.eventRewardReceived = undefined;
-    const result = AdMob.showRewardVideoAd()
-      .catch(e => console.log(e));
+    const result: AdMobRewardItem = await AdMob.showRewardVideoAd()
+      .catch(e => undefined);
     if (result === undefined) {
       return;
     }
+    const toast = await this.toastCtrl.create({
+      message: `AdMob Reward received with currency: ${result.type}, amount ${result.amount}.`,
+      duration: 2000,
+    });
+    await toast.present();
+
     this.isPrepareReward = false;
   }
   /**

@@ -21,22 +21,6 @@ npx cap sync
 * [`showInterstitial()`](#showinterstitial)
 * [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
 * [`showRewardVideoAd()`](#showrewardvideoad)
-* [`pauseRewardedVideo()`](#pauserewardedvideo)
-* [`resumeRewardedVideo()`](#resumerewardedvideo)
-* [`stopRewardedVideo()`](#stoprewardedvideo)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
@@ -180,49 +164,12 @@ Prepare a reward video ad
 ### showRewardVideoAd()
 
 ```typescript
-showRewardVideoAd() => Promise<void>
+showRewardVideoAd() => Promise<AdMobRewardItem>
 ```
 
 Show a reward video ad
 
-**Since:** 1.1.2
-
---------------------
-
-
-### pauseRewardedVideo()
-
-```typescript
-pauseRewardedVideo() => Promise<void>
-```
-
-Pause RewardedVideo
-
-**Since:** 1.1.2
-
---------------------
-
-
-### resumeRewardedVideo()
-
-```typescript
-resumeRewardedVideo() => Promise<void>
-```
-
-Resume RewardedVideo
-
-**Since:** 1.1.2
-
---------------------
-
-
-### stopRewardedVideo()
-
-```typescript
-stopRewardedVideo() => Promise<void>
-```
-
-Close RewardedVideo
+**Returns:** <code>Promise&lt;<a href="#admobrewarditem">AdMobRewardItem</a>&gt;</code>
 
 **Since:** 1.1.2
 
@@ -232,33 +179,13 @@ Close RewardedVideo
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdLoaded', listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: 'bannerViewReceiveAdSize', listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
 ```
 
-Notice: banner ad is loaded(android)
-
-| Param              | Type                       | Description |
-| ------------------ | -------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdLoaded"</code>  | onAdLoaded  |
-| **`listenerFunc`** | <code>() =&gt; void</code> |             |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onAdSize', listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
-```
-
-| Param              | Type                                                                           | Description |
-| ------------------ | ------------------------------------------------------------------------------ | ----------- |
-| **`eventName`**    | <code>"onAdSize"</code>                                                        | onAdSize    |
-| **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |             |
+| Param              | Type                                                                           | Description             |
+| ------------------ | ------------------------------------------------------------------------------ | ----------------------- |
+| **`eventName`**    | <code>"bannerViewReceiveAdSize"</code>                                         | bannerViewReceiveAdSize |
+| **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |                         |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -270,159 +197,19 @@ addListener(eventName: 'onAdSize', listenerFunc: (info: AdMobBannerSize) => void
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdFailedToLoad', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: 'bannerViewDidReceiveAd', listenerFunc: () => void) => PluginListenerHandle
 ```
 
-Notice: failed to load Banner ad(android)
-
-| Param              | Type                                                                 | Description      |
-| ------------------ | -------------------------------------------------------------------- | ---------------- |
-| **`eventName`**    | <code>"onAdFailedToLoad"</code>                                      | onAdFailedToLoad |
-| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                  |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onAdOpened', listenerFunc: () => void) => PluginListenerHandle
-```
-
-Notice: banner ad is show(android)
-
-| Param              | Type                       | Description |
-| ------------------ | -------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdOpened"</code>  | onAdOpened  |
-| **`listenerFunc`** | <code>() =&gt; void</code> |             |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onAdClosed', listenerFunc: () => void) => PluginListenerHandle
-```
-
-Notice: Banner ad is closed(android)
-
-| Param              | Type                       | Description |
-| ------------------ | -------------------------- | ----------- |
-| **`eventName`**    | <code>"onAdClosed"</code>  | onAdClosed  |
-| **`listenerFunc`** | <code>() =&gt; void</code> |             |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'adViewDidReceiveAd', listenerFunc: () => void) => PluginListenerHandle
-```
-
-Notice: request loaded Banner ad(iOS)
-
-| Param              | Type                              | Description        |
-| ------------------ | --------------------------------- | ------------------ |
-| **`eventName`**    | <code>"adViewDidReceiveAd"</code> | adViewDidReceiveAd |
-| **`listenerFunc`** | <code>() =&gt; void</code>        |                    |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'adView:didFailToReceiveAdWithError', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
-```
-
-Notice: request failed Banner ad(iOS)
-
-| Param              | Type                                                                 | Description                        |
-| ------------------ | -------------------------------------------------------------------- | ---------------------------------- |
-| **`eventName`**    | <code>"adView:didFailToReceiveAdWithError"</code>                    | adView:didFailToReceiveAdWithError |
-| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                                    |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'adViewWillPresentScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: full-screen view will be presented in response to the user clicking on an ad.(iOS)
-
-| Param              | Type                                   | Description             |
-| ------------------ | -------------------------------------- | ----------------------- |
-| **`eventName`**    | <code>"adViewWillPresentScreen"</code> | adViewWillPresentScreen |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>    |                         |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'adViewWillDismissScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: The full-screen view will be dismissed.(iOS)
-
-| Param              | Type                                   | Description             |
-| ------------------ | -------------------------------------- | ----------------------- |
-| **`eventName`**    | <code>"adViewWillDismissScreen"</code> | adViewWillDismissScreen |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>    |                         |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'adViewDidDismissScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: The full-screen view has been dismissed.(iOS)
+Notice: request loaded Banner ad
 
 | Param              | Type                                  | Description            |
 | ------------------ | ------------------------------------- | ---------------------- |
-| **`eventName`**    | <code>"adViewDidDismissScreen"</code> | adViewDidDismissScreen |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>   |                        |
+| **`eventName`**    | <code>"bannerViewDidReceiveAd"</code> | bannerViewDidReceiveAd |
+| **`listenerFunc`** | <code>() =&gt; void</code>            |                        |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 1.1.2
+**Since:** 3.0.0
 
 --------------------
 
@@ -430,19 +217,19 @@ Notice: The full-screen view has been dismissed.(iOS)
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onRewarded', listenerFunc: (adMobRewardItem: AdMobRewardItem) => void) => PluginListenerHandle
+addListener(eventName: 'bannerView:didFailToReceiveAdWithError', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
 ```
 
-Notice: User click will open another app.
+Notice: request failed Banner ad
 
-| Param              | Type                                                                                      | Description                |
-| ------------------ | ----------------------------------------------------------------------------------------- | -------------------------- |
-| **`eventName`**    | <code>"onRewarded"</code>                                                                 | adViewWillLeaveApplication |
-| **`listenerFunc`** | <code>(adMobRewardItem: <a href="#admobrewarditem">AdMobRewardItem</a>) =&gt; void</code> |                            |
+| Param              | Type                                                                 | Description                            |
+| ------------------ | -------------------------------------------------------------------- | -------------------------------------- |
+| **`eventName`**    | <code>"bannerView:didFailToReceiveAdWithError"</code>                | bannerView:didFailToReceiveAdWithError |
+| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                                        |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 1.1.2
+**Since:** 3.0.0
 
 --------------------
 
@@ -450,95 +237,95 @@ Notice: User click will open another app.
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onInterstitialAdLoaded', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'bannerViewWillPresentScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-Notice: Interstitial ad loaded
+Notice: full-screen banner view will be presented in response to the user clicking on an ad.
+
+| Param              | Type                                       | Description                 |
+| ------------------ | ------------------------------------------ | --------------------------- |
+| **`eventName`**    | <code>"bannerViewWillPresentScreen"</code> | bannerViewWillPresentScreen |
+| **`listenerFunc`** | <code>(info: any) =&gt; void</code>        |                             |
+
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+**Since:** 3.0.0
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'bannerViewWillDismissScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: The full-screen banner view will be dismissed.
+
+| Param              | Type                                       | Description                 |
+| ------------------ | ------------------------------------------ | --------------------------- |
+| **`eventName`**    | <code>"bannerViewWillDismissScreen"</code> | bannerViewWillDismissScreen |
+| **`listenerFunc`** | <code>(info: any) =&gt; void</code>        |                             |
+
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+**Since:** 3.0.0
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'bannerViewWillDismissScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: The full-screen banner view will been dismissed.
+
+| Param              | Type                                       | Description                 |
+| ------------------ | ------------------------------------------ | --------------------------- |
+| **`eventName`**    | <code>"bannerViewWillDismissScreen"</code> | bannerViewWillDismissScreen |
+| **`listenerFunc`** | <code>(info: any) =&gt; void</code>        |                             |
+
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+**Since:** 3.0.0
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'bannerViewDidDismissScreen', listenerFunc: (info: any) => void) => PluginListenerHandle
+```
+
+Notice: The full-screen banner view has been dismissed.
+
+| Param              | Type                                      | Description                |
+| ------------------ | ----------------------------------------- | -------------------------- |
+| **`eventName`**    | <code>"bannerViewDidDismissScreen"</code> | bannerViewDidDismissScreen |
+| **`listenerFunc`** | <code>(info: any) =&gt; void</code>       |                            |
+
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+**Since:** 3.0.0
+
+--------------------
+
+
+### addListener(...)
+
+```typescript
+addListener(eventName: 'onInterstitialAdLoaded', listenerFunc: () => void) => PluginListenerHandle
+```
+
+Notice: Prepared InterstitialAd
 
 | Param              | Type                                  | Description            |
 | ------------------ | ------------------------------------- | ---------------------- |
 | **`eventName`**    | <code>"onInterstitialAdLoaded"</code> | onInterstitialAdLoaded |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>   |                        |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.2.0
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onInterstitialAdOpened', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: Interstitial ad opened
-
-| Param              | Type                                  | Description            |
-| ------------------ | ------------------------------------- | ---------------------- |
-| **`eventName`**    | <code>"onInterstitialAdOpened"</code> | onInterstitialAdOpened |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>   |                        |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.2.0
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onInterstitialAdClosed', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: Interstitial ad closed
-
-| Param              | Type                                  | Description            |
-| ------------------ | ------------------------------------- | ---------------------- |
-| **`eventName`**    | <code>"onInterstitialAdClosed"</code> | onInterstitialAdClosed |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>   |                        |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.2.0
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onInterstitialAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: Click link of Interstitial ad
-
-| Param              | Type                                           | Description                     |
-| ------------------ | ---------------------------------------------- | ------------------------------- |
-| **`eventName`**    | <code>"onInterstitialAdLeftApplication"</code> | onInterstitialAdLeftApplication |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>            |                                 |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.2.0
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onInterstitialAdFailedToLoad', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
-```
-
-Notice: Failed to load Interstitial ad
-
-| Param              | Type                                                                 | Description                  |
-| ------------------ | -------------------------------------------------------------------- | ---------------------------- |
-| **`eventName`**    | <code>"onInterstitialAdFailedToLoad"</code>                          | onInterstitialAdFailedToLoad |
-| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                              |
+| **`listenerFunc`** | <code>() =&gt; void</code>            |                        |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -550,7 +337,7 @@ Notice: Failed to load Interstitial ad
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: () => void) => PluginListenerHandle
 ```
 
 Notice: Prepared RewardedVideo
@@ -558,7 +345,7 @@ Notice: Prepared RewardedVideo
 | Param              | Type                                   | Description             |
 | ------------------ | -------------------------------------- | ----------------------- |
 | **`eventName`**    | <code>"onRewardedVideoAdLoaded"</code> | onRewardedVideoAdLoaded |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>    |                         |
+| **`listenerFunc`** | <code>() =&gt; void</code>             |                         |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
@@ -570,19 +357,19 @@ Notice: Prepared RewardedVideo
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onRewardedVideoAdOpened', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'adDidPresentFullScreenContent', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-Notice: RewardedVideo is opened
+Notice: Interstitial ad opened
 
-| Param              | Type                                   | Description             |
-| ------------------ | -------------------------------------- | ----------------------- |
-| **`eventName`**    | <code>"onRewardedVideoAdOpened"</code> | onRewardedVideoAdOpened |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>    |                         |
+| Param              | Type                                         | Description                   |
+| ------------------ | -------------------------------------------- | ----------------------------- |
+| **`eventName`**    | <code>"adDidPresentFullScreenContent"</code> | adDidPresentFullScreenContent |
+| **`listenerFunc`** | <code>(info: any) =&gt; void</code>          |                               |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 1.1.2
+**Since:** 3.0.0
 
 --------------------
 
@@ -590,19 +377,19 @@ Notice: RewardedVideo is opened
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'adDidDismissFullScreenContent', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
-Notice: RewardedVideo go to background(Android)
+Notice: Dismiss Content
 
-| Param              | Type                                | Description             |
-| ------------------ | ----------------------------------- | ----------------------- |
-| **`eventName`**    | <code>"onAdLeftApplication"</code>  | onRewardedVideoAdOpened |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |                         |
+| Param              | Type                                         | Description                   |
+| ------------------ | -------------------------------------------- | ----------------------------- |
+| **`eventName`**    | <code>"adDidDismissFullScreenContent"</code> | adDidDismissFullScreenContent |
+| **`listenerFunc`** | <code>(info: any) =&gt; void</code>          |                               |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 1.1.2
+**Since:** 3.0.0
 
 --------------------
 
@@ -610,119 +397,19 @@ Notice: RewardedVideo go to background(Android)
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onRewardedVideoStarted', listenerFunc: (info: any) => void) => PluginListenerHandle
+addListener(eventName: 'didFailToPresentFullScreenContentWithError', listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
 ```
 
-Notice: RewardedVideo is started
+Notice: Interstitial ad is be failed to open
 
-| Param              | Type                                  | Description            |
-| ------------------ | ------------------------------------- | ---------------------- |
-| **`eventName`**    | <code>"onRewardedVideoStarted"</code> | onRewardedVideoStarted |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>   |                        |
+| Param              | Type                                                                 | Description                                |
+| ------------------ | -------------------------------------------------------------------- | ------------------------------------------ |
+| **`eventName`**    | <code>"didFailToPresentFullScreenContentWithError"</code>            | didFailToPresentFullScreenContentWithError |
+| **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                                            |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdClosed', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: RewardedVideo is closed
-
-| Param              | Type                                   | Description             |
-| ------------------ | -------------------------------------- | ----------------------- |
-| **`eventName`**    | <code>"onRewardedVideoAdClosed"</code> | onRewardedVideoAdClosed |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>    |                         |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onRewarded', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: User get reward by RewardedVideo
-
-| Param              | Type                                | Description |
-| ------------------ | ----------------------------------- | ----------- |
-| **`eventName`**    | <code>"onRewarded"</code>           | onRewarded  |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code> |             |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdLeftApplication', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: click link of RewardedVideo ad
-
-| Param              | Type                                            | Description                      |
-| ------------------ | ----------------------------------------------- | -------------------------------- |
-| **`eventName`**    | <code>"onRewardedVideoAdLeftApplication"</code> | onRewardedVideoAdLeftApplication |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>             |                                  |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdFailedToLoad', listenerFunc: (error: AdMobError) => void) => PluginListenerHandle
-```
-
-Notice: Failed to load RewardVideo ad
-
-| Param              | Type                                                                  | Description                   |
-| ------------------ | --------------------------------------------------------------------- | ----------------------------- |
-| **`eventName`**    | <code>"onRewardedVideoAdFailedToLoad"</code>                          | onRewardedVideoAdFailedToLoad |
-| **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code> |                               |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onRewardedVideoCompleted', listenerFunc: (info: any) => void) => PluginListenerHandle
-```
-
-Notice: Watch RewardVideo complete(Android)
-
-| Param              | Type                                    | Description              |
-| ------------------ | --------------------------------------- | ------------------------ |
-| **`eventName`**    | <code>"onRewardedVideoCompleted"</code> | onRewardedVideoCompleted |
-| **`listenerFunc`** | <code>(info: any) =&gt; void</code>     |                          |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
+**Since:** 1.2.0
 
 --------------------
 
@@ -749,6 +436,17 @@ Notice: Watch RewardVideo complete(Android)
 | **`isTesting`** | <code>boolean</code>                              | You can use test mode of ad.                                                                                                                 | <code>false</code>        | 1.1.2 |
 | **`margin`**    | <code>number</code>                               | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. | <code>0</code>            | 1.1.2 |
 | **`npa`**       | <code>boolean</code>                              | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             | <code>false</code>        | 1.2.0 |
+
+
+#### AdMobRewardItem
+
+For more information
+https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
+
+| Prop         | Type                | Description              |
+| ------------ | ------------------- | ------------------------ |
+| **`type`**   | <code>string</code> | Rewarded type user got   |
+| **`amount`** | <code>number</code> | Rewarded amount user got |
 
 
 #### PluginListenerHandle
@@ -781,17 +479,6 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`domain`**  | <code>string</code> | Gets the domain of the error. MobileAds.ERROR_DOMAIN for Google Mobile Ads SDK errors, or a domain defined by mediation networks for mediation errors. |
 
 
-#### AdMobRewardItem
-
-For more information
-https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
-
-| Prop         | Type                | Description              |
-| ------------ | ------------------- | ------------------------ |
-| **`type`**   | <code>string</code> | Rewarded type user got   |
-| **`amount`** | <code>number</code> | Rewarded amount user got |
-
-
 ### Enums
 
 
@@ -805,7 +492,8 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`LARGE_BANNER`**     | <code>'LARGE_BANNER'</code>     | Large banner ad size (320x100 density-independent pixels).                                                                                     |
 | **`LEADERBOARD`**      | <code>'LEADERBOARD'</code>      | Interactive Advertising Bureau (IAB) leaderboard ad size (728x90 density-independent pixels).                                                  |
 | **`MEDIUM_RECTANGLE`** | <code>'MEDIUM_RECTANGLE'</code> | Interactive Advertising Bureau (IAB) medium rectangle ad size (300x250 density-independent pixels).                                            |
-| **`SMART_BANNER`**     | <code>'SMART_BANNER'</code>     | A dynamically sized banner that is full-width and auto-height.                                                                                 |
+| **`SMART_BANNER`**     | <code>'SMART_BANNER'</code>     | deprecated: A dynamically sized banner that is full-width and auto-height.                                                                     |
+| **`ADAPTIVE_BANNER`**  | <code>'ADAPTIVE_BANNER'</code>  | A dynamically sized banner that is full-width and auto-height.                                                                                 |
 | **`CUSTOM`**           | <code>'CUSTOM'</code>           | To define a custom banner size, set your desired <a href="#adsize">AdSize</a>                                                                  |
 
 
