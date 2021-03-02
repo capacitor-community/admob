@@ -1,6 +1,6 @@
 {
   "name": "@capacitor-community/admob",
-  "version": "3.0.0-2",
+  "version": "3.0.0-3",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -32,7 +32,7 @@
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
-    "docgen": "docgen --api AdMobPlugin --output-readme README_AUTO.md --output-json dist/docs.json",
+    "docgen": "docgen --api AdMobPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
@@ -40,10 +40,10 @@
     "release": "np --any-branch"
   },
   "devDependencies": {
-    "@capacitor/android": "3.0.0-beta.3",
-    "@capacitor/cli": "3.0.0-beta.3",
+    "@capacitor/android": "^3.0.0-beta.6",
+    "@capacitor/cli": "^3.0.0-beta.6",
     "@capacitor/docgen": "^0.0.10",
-    "@capacitor/ios": "3.0.0-beta.3",
+    "@capacitor/ios": "^3.0.0-beta.6",
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
@@ -57,7 +57,7 @@
     "typescript": "~4.0.3"
   },
   "dependencies": {
-    "@capacitor/core": "3.0.0-beta.3"
+    "@capacitor/core": "3.0.0-beta.6"
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",

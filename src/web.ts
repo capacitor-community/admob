@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import { AdOptions } from './definitions';
+import { AdMobRewardItem, AdOptions } from './definitions';
 
 import type { AdMobPlugin } from './definitions';
 
@@ -11,81 +11,36 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     });
   }
 
-  async initialize() {
-    return {
-      value: true,
-    };
-  }
+  async initialize() {}
 
+  // @ts-ignore
   async showBanner(options: AdOptions) {
     console.log(options);
-    return {
-      value: true,
-    };
   }
 
   // Hide the banner, remove it from screen, but can show it later
-  async hideBanner() {
-    return {
-      value: true,
-    };
-  }
+  async hideBanner() {}
 
   // Resume the banner, show it after hide
-  async resumeBanner() {
-    return {
-      value: true,
-    };
-  }
+  async resumeBanner() {}
 
   // Destroy the banner, remove it from screen.
-  async removeBanner() {
-    return {
-      value: true,
-    };
-  }
+  async removeBanner() {}
 
   async prepareInterstitial(options: AdOptions) {
     console.log(options);
-    return {
-      value: true,
-    };
   }
 
-  async showInterstitial() {
-    return {
-      value: true,
-    };
-  }
+  async showInterstitial() {}
 
   async prepareRewardVideoAd(options: AdOptions) {
     console.log(options);
-    return {
-      value: true,
-    };
   }
 
-  async showRewardVideoAd() {
+  async showRewardVideoAd(): Promise<AdMobRewardItem> {
     return {
-      value: true,
-    };
-  }
-
-  async pauseRewardedVideo() {
-    return {
-      value: true,
-    };
-  }
-
-  async resumeRewardedVideo() {
-    return {
-      value: true,
-    };
-  }
-
-  async stopRewardedVideo() {
-    return {
-      value: true,
+      type: '',
+      amount: 0,
     };
   }
 }
