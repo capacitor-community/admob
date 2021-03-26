@@ -295,13 +295,20 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
         DispatchQueue.main.async {
             if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
                 if let ad = self.interstitial {
-                    ad.present(fromRootViewController: rootViewController)
+                    if (ad.isReady) {
+                        ad.present(fromRootViewController: rootViewController)
+                        call.success(["value": true])
+                    } else {
+                        NSLog("Ad wasn't ready")
+                        call.error("Ad wasn't ready")
+                    }
                 } else {
                     NSLog("Ad wasn't ready")
+                    call.error("Ad wasn't ready")
                 }
+            } else {
+                call.error("Ad wasn't ready")
             }
-
-            call.success(["value": true])
         }
     }
 
@@ -318,16 +325,12 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
         self.notifyListeners("onInterstitialAdFailedToLoad", data: ["error": error.localizedDescription, "errorCode": error.code])
     }
 
-    public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    public func interstitialWillPresentScreen(_ ad: GADInterstitial) {
         NSLog("Ad did present full screen content.")
         self.notifyListeners("onInterstitialAdOpened", data: ["value": true])
     }
 
-    public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        NSLog("Ad failed to present full screen content with error \(error.localizedDescription).")
-    }
-
-    public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    public func interstitialDidDismissScreen(_ ad: GADInterstitial) {
         NSLog("Ad did dismiss full screen content.")
         self.notifyListeners("onInterstitialAdClosed", data: ["value": true])
     }
