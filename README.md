@@ -79,10 +79,15 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
 ```xml
 <key>GADIsAdManagerApp</key>
 <true/>
-
 <key>GADApplicationIdentifier</key>
 <string>[APP_ID]</string>
-
+<key>SKAdNetworkItems</key>
+<array>
+  <dict>
+    <key>SKAdNetworkIdentifier</key>
+    <string>cstr6suwn9.skadnetwork</string>
+  </dict>
+</array>
 <key>NSUserTrackingUsageDescription</key>
 <string>[Why you use NSUserTracking. ex: This identifier will be used to deliver personalized ads to you.]</string>
 ```
