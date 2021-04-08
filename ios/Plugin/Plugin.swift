@@ -349,7 +349,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                     ad.present(fromRootViewController: rootViewController,
                         userDidEarnRewardHandler: {
                             let reward = ad.adReward
-                            call.resolve(["value": true, "type": reward.type, "amount": reward.amount])
+                            call.resolve(["type": reward.type, "amount": reward.amount])
                         }
                     )
                   } else {
