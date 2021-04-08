@@ -30,6 +30,12 @@ public final class AdViewIdHelper {
         return adOptions.getTestingId();
     }
 
+    public static void assignIdToAdView(AdView adView, AdOptions adOptions, AdRequest adRequest, String logTag, Context context) {
+        String finalId = getFinalAdId(adOptions, adRequest, logTag, context);
+        adView.setAdUnitId(finalId);
+        Log.d(logTag, "Ad ID: " + finalId);
+    }
+
     public static FullScreenContentCallback getFullScreenContentCallback(
         BiConsumer<String, JSObject> notifyListenersFunction
     ) {
