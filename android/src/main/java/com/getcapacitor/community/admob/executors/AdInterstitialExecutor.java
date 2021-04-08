@@ -2,13 +2,12 @@ package com.getcapacitor.community.admob.executors;
 
 import android.app.Activity;
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.core.util.Supplier;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -22,9 +21,9 @@ import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback;
 import com.google.android.gms.common.util.BiConsumer;
-import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 
 public class AdInterstitialExecutor extends Executor {
+
     public static RewardedInterstitialAd mRewardedAd;
 
     public AdInterstitialExecutor(
@@ -47,7 +46,12 @@ public class AdInterstitialExecutor extends Executor {
                     () -> {
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                        RewardedInterstitialAd.load(activitySupplier.get(), id, adRequest, getRewardedInterstitialAdLoadCallbackk(call, notifyListenersFunction));
+                        RewardedInterstitialAd.load(
+                            activitySupplier.get(),
+                            id,
+                            adRequest,
+                            getRewardedInterstitialAdLoadCallbackk(call, notifyListenersFunction)
+                        );
                     }
                 );
         } catch (Exception ex) {
@@ -71,12 +75,14 @@ public class AdInterstitialExecutor extends Executor {
         }
     }
 
-
     /**
      * Will return a {@link RewardedInterstitialAdLoadCallback} ready to attach to a new created
      * {@link RewardedInterstitialAd}
      */
-    static RewardedInterstitialAdLoadCallback getRewardedInterstitialAdLoadCallbackk(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
+    static RewardedInterstitialAdLoadCallback getRewardedInterstitialAdLoadCallbackk(
+        PluginCall call,
+        BiConsumer<String, JSObject> notifyListenersFunction
+    ) {
         return new RewardedInterstitialAdLoadCallback() {
             @Override
             public void onAdLoaded(RewardedInterstitialAd ad) {
@@ -109,7 +115,6 @@ public class AdInterstitialExecutor extends Executor {
             }
         };
     }
-
     /**
      * Will return a {@link OnUserEarnedRewardListener} ready to attach to a new created
      * {@link RewardedInterstitialAd}

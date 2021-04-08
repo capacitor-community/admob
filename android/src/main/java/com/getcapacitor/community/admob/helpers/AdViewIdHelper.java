@@ -2,9 +2,7 @@ package com.getcapacitor.community.admob.helpers;
 
 import android.content.Context;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -31,7 +29,10 @@ public final class AdViewIdHelper {
         return adOptions.getTestingId();
     }
 
-    public static FullScreenContentCallback getFullScreenContentCallback(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
+    public static FullScreenContentCallback getFullScreenContentCallback(
+        PluginCall call,
+        BiConsumer<String, JSObject> notifyListenersFunction
+    ) {
         return new FullScreenContentCallback() {
             @Override
             public void onAdShowedFullScreenContent() {
@@ -40,8 +41,10 @@ public final class AdViewIdHelper {
 
             @Override
             public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
-                notifyListenersFunction.accept("didFailToPresentFullScreenContentWithError",
-                        new JSObject().put("code", 0).put("message", adError.getMessage()));
+                notifyListenersFunction.accept(
+                    "didFailToPresentFullScreenContentWithError",
+                    new JSObject().put("code", 0).put("message", adError.getMessage())
+                );
             }
 
             @Override

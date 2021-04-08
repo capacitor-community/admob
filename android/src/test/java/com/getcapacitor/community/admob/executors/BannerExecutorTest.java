@@ -40,6 +40,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class BannerExecutorTest {
+
     final String LOG_TAG = "AdRewardHandlerTest Log Tag";
 
     @Mock(lenient = true)
@@ -84,6 +85,7 @@ class BannerExecutorTest {
     @Nested
     @DisplayName("Show Banner")
     class ShowBanner {
+
         @Mock
         MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction;
 
@@ -170,6 +172,7 @@ class BannerExecutorTest {
     @Nested
     @DisplayName("Hide Banner")
     class HideBanner {
+
         @Mock
         MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction;
 

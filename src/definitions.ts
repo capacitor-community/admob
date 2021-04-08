@@ -1,4 +1,4 @@
-import { PluginListenerHandle } from '@capacitor/core';
+import type { PluginListenerHandle } from '@capacitor/core';
 
 export interface AdMobPlugin {
   /**
@@ -340,7 +340,7 @@ export interface AdMobRewardItem {
  * When notice listener of OnAdLoaded, you can get banner size.
  */
 export interface AdMobBannerSize {
-  width: number
+  width: number;
   height: number;
 }
 

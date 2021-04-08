@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob.models;
 import com.getcapacitor.JSObject;
 
 public final class RewardedAdEvent {
+
     RewardedAdEventName name;
     JSObject payload;
 

@@ -9,6 +9,7 @@ import com.getcapacitor.community.admob.models.RewardedAdEvent;
 import com.google.android.gms.common.util.BiConsumer;
 
 public abstract class Executor {
+
     protected final Supplier<Context> contextSupplier;
     protected final Supplier<Activity> activitySupplier;
     BiConsumer<String, JSObject> notifyListenersFunction;

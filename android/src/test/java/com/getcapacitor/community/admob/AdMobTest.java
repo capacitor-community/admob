@@ -42,6 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 public class AdMobTest {
+
     @Mock
     Context mockedContext;
 
@@ -62,7 +63,6 @@ public class AdMobTest {
 
         sut =
             new AdMob() {
-
                 @Override
                 public Context getContext() {
                     return mockedContext;
@@ -88,6 +88,7 @@ public class AdMobTest {
     @Nested
     @DisplayName("Initialize()")
     class Initialize {
+
         MockedStatic<MobileAds> mobileAdsMockedStatic;
         JSArray testingDevices;
 
@@ -151,6 +152,7 @@ public class AdMobTest {
     @Nested
     @DisplayName("Ads Creation")
     class AdsCreation {
+
         AdOptions adOptionsWithNpaTrue = new AdOptions.TesterAdOptionsBuilder().setNpa(true).build();
 
         MockedStatic<MobileAds> mobileAdsMockedStatic;

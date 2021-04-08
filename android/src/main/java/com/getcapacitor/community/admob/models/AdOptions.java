@@ -8,6 +8,7 @@ import com.getcapacitor.PluginCall;
  * TODO: automatically create type definitions https://github.com/vojtechhabarta/typescript-generator ?
  */
 public abstract class AdOptions {
+
     /**
      * The ad unit ID that you want to request
      *
@@ -103,7 +104,6 @@ public abstract class AdOptions {
 
         public AdOptions createBannerOptions(PluginCall call) {
             return new AdOptions(call) {
-
                 @Override
                 public String getTestingId() {
                     return AdOptions.BANNER_TESTER_ID;
@@ -113,7 +113,6 @@ public abstract class AdOptions {
 
         public AdOptions createInterstitialOptions(PluginCall call) {
             return new AdOptions(call) {
-
                 @Override
                 public String getTestingId() {
                     return AdOptions.INTERSTITIAL_TESTER_ID;
@@ -123,7 +122,6 @@ public abstract class AdOptions {
 
         public AdOptions createRewardVideoOptions(PluginCall call) {
             return new AdOptions(call) {
-
                 @Override
                 public String getTestingId() {
                     return AdOptions.REWARD_VIDEO_TESTER_ID;
@@ -133,7 +131,6 @@ public abstract class AdOptions {
 
         public AdOptions createGenericOptions(PluginCall call, final String testingID) {
             return new AdOptions(call) {
-
                 @Override
                 public String getTestingId() {
                     return testingID;
@@ -157,6 +154,7 @@ public abstract class AdOptions {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public static class TesterAdOptionsBuilder {
+
         private String id = "TesterAdOptionsBuilder__defaultID";
         private String testingID = "TesterAdOptionsBuilder__testingID";
         private boolean isTesting = true;
@@ -202,7 +200,6 @@ public abstract class AdOptions {
 
         public AdOptions build() {
             return new AdOptions(id, isTesting, position, margin, npa, adSize) {
-
                 @Override
                 public String getTestingId() {
                     return testingID;

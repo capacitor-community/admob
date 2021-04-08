@@ -1,7 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
-import { AdMobRewardItem, AdOptions } from './definitions';
 
-import type { AdMobPlugin } from './definitions';
+import type { AdMobRewardItem, AdOptions, AdMobPlugin } from './definitions';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   constructor() {
@@ -11,29 +10,38 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     });
   }
 
-  async initialize() {}
+  async initialize(): Promise<void> {
+    console.log();
+  }
 
-  // @ts-ignore
-  async showBanner(options: AdOptions) {
+  async showBanner(options: AdOptions): Promise<void> {
     console.log(options);
   }
 
   // Hide the banner, remove it from screen, but can show it later
-  async hideBanner() {}
+  async hideBanner(): Promise<void> {
+    console.log();
+  }
 
   // Resume the banner, show it after hide
-  async resumeBanner() {}
+  async resumeBanner(): Promise<void> {
+    console.log();
+  }
 
   // Destroy the banner, remove it from screen.
-  async removeBanner() {}
+  async removeBanner(): Promise<void> {
+    console.log();
+  }
 
-  async prepareInterstitial(options: AdOptions) {
+  async prepareInterstitial(options: AdOptions): Promise<void> {
     console.log(options);
   }
 
-  async showInterstitial() {}
+  async showInterstitial(): Promise<void> {
+    console.log();
+  }
 
-  async prepareRewardVideoAd(options: AdOptions) {
+  async prepareRewardVideoAd(options: AdOptions): Promise<void> {
     console.log(options);
   }
 

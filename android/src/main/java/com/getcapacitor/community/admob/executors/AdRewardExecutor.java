@@ -2,10 +2,8 @@ package com.getcapacitor.community.admob.executors;
 
 import android.app.Activity;
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.core.util.Supplier;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
@@ -15,15 +13,16 @@ import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.RewardedAdEventName;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.common.util.BiConsumer;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
-import com.google.android.gms.ads.FullScreenContentCallback;
 
 public class AdRewardExecutor extends Executor {
+
     public static RewardedAd mRewardedAd;
 
     public AdRewardExecutor(
@@ -69,7 +68,6 @@ public class AdRewardExecutor extends Executor {
             call.reject(ex.getLocalizedMessage(), ex);
         }
     }
-
 
     /**
      * Will return a {@link RewardedAdLoadCallback} ready to attach to a new created

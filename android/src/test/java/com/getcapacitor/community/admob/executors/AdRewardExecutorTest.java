@@ -30,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class AdRewardExecutorTest {
+
     @Mock
     Context context;
 
@@ -62,7 +63,6 @@ class AdRewardExecutorTest {
             String type = "My Type";
             int amount = 69;
             RewardItem rewardItem = new RewardItem() {
-
                 @Override
                 public String getType() {
                     return type;

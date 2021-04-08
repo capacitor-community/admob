@@ -2,7 +2,7 @@ import Foundation
 import Capacitor
 import GoogleMobileAds
 #if canImport(AppTrackingTransparency)
-    import AppTrackingTransparency
+import AppTrackingTransparency
 #endif
 
 /**
@@ -92,13 +92,13 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                     break
                 default: // ADAPTIVE_BANNER
                     let frame = { () -> CGRect in
-                      // Here safe area is taken into account, hence the view frame is used
-                      // after the view has been laid out.
-                      if #available(iOS 11.0, *) {
-                        return rootViewController.view.frame.inset(by: rootViewController.view.safeAreaInsets)
-                      } else {
-                        return rootViewController.view.frame
-                      }
+                        // Here safe area is taken into account, hence the view frame is used
+                        // after the view has been laid out.
+                        if #available(iOS 11.0, *) {
+                            return rootViewController.view.frame.inset(by: rootViewController.view.safeAreaInsets)
+                        } else {
+                            return rootViewController.view.frame
+                        }
                     }()
                     let viewWidth = frame.size.width
                     bannerSize = GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(viewWidth)
@@ -205,7 +205,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                                     attribute: .centerX,
                                     multiplier: 1,
                                     constant: 0)
-            ])
+                ])
         }
     }
 
@@ -230,7 +230,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
     /// Tells the delegate an ad request failed.
     public func bannerView(_ bannerView: GADBannerView,
-                       didFailToReceiveAdWithError error: NSError) {
+                           didFailToReceiveAdWithError error: NSError) {
         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
         self.notifyListeners("bannerViewRecieveAdSize", data: [
@@ -278,13 +278,13 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                 request: request,
                 completionHandler: { (ad, error) in
                     if error != nil {
-                        NSLog("Received error on loading interstatial ad");
+                        NSLog("Received error on loading interstatial ad")
                         call.reject("Loading failed")
-                        return;
+                        return
                     }
 
-                    self.interstitial = ad;
-                    self.interstitial.fullScreenContentDelegate = self;
+                    self.interstitial = ad
+                    self.interstitial.fullScreenContentDelegate = self
                     self.notifyListeners("onInterstitialAdLoaded", data: [:])
                     call.resolve([:])
                 }
@@ -347,19 +347,18 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
             if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
                 if let ad = self.rewardedAd {
                     ad.present(fromRootViewController: rootViewController,
-                        userDidEarnRewardHandler: {
-                            let reward = ad.adReward
-                            call.resolve(["type": reward.type, "amount": reward.amount])
-                        }
+                               userDidEarnRewardHandler: {
+                                let reward = ad.adReward
+                                call.resolve(["type": reward.type, "amount": reward.amount])
+                               }
                     )
-                  } else {
+                } else {
                     call.reject("Reward Video is Not Ready Yet")
-                  }
+                }
             }
 
         }
     }
-
 
     public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("Ad did present full screen content.")
@@ -370,7 +369,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
         NSLog("Ad failed to present full screen content with error \(error.localizedDescription).")
         self.notifyListeners("didFailToPresentFullScreenContentWithError", data: [
             "code": 0,
-            "message": error.localizedDescription,
+            "message": error.localizedDescription
         ])
     }
 
