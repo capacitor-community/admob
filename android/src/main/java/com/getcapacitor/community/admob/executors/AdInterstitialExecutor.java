@@ -22,6 +22,7 @@ import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback;
 import com.google.android.gms.common.util.BiConsumer;
+import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 
 public class AdInterstitialExecutor extends Executor {
     public static RewardedInterstitialAd mRewardedAd;
@@ -80,7 +81,7 @@ public class AdInterstitialExecutor extends Executor {
             @Override
             public void onAdLoaded(RewardedInterstitialAd ad) {
                 mRewardedAd = ad;
-                mRewardedAd.setFullScreenContentCallback(getFullScreenContentCallback(call, notifyListenersFunction));
+                mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(call, notifyListenersFunction));
                 call.resolve(new JSObject());
                 notifyListenersFunction.accept(RewardedAdEventName.onAdLoaded.name(), new JSObject().put("value", true));
             }
@@ -113,23 +114,5 @@ public class AdInterstitialExecutor extends Executor {
      * Will return a {@link OnUserEarnedRewardListener} ready to attach to a new created
      * {@link RewardedInterstitialAd}
      */
-    static FullScreenContentCallback getFullScreenContentCallback(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        return new FullScreenContentCallback() {
-            @Override
-            public void onAdShowedFullScreenContent() {
-                notifyListenersFunction.accept("adDidPresentFullScreenContent", new JSObject());
-            }
 
-            @Override
-            public void onAdFailedToShowFullScreenContent(AdError adError) {
-                notifyListenersFunction.accept("didFailToPresentFullScreenContentWithError",
-                        new JSObject().put("code", 0).put("message", adError.getMessage()));
-            }
-
-            @Override
-            public void onAdDismissedFullScreenContent() {
-                notifyListenersFunction.accept("adDidDismissFullScreenContent", new JSObject());
-            }
-        };
-    }
 }

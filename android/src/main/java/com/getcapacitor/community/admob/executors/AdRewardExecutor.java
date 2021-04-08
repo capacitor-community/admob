@@ -80,7 +80,7 @@ public class AdRewardExecutor extends Executor {
             @Override
             public void onAdLoaded(@NonNull RewardedAd ad) {
                 mRewardedAd = ad;
-                mRewardedAd.setFullScreenContentCallback(getFullScreenContentCallback(call, notifyListenersFunction));
+                mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(call, notifyListenersFunction));
                 call.resolve(new JSObject().put("value", true));
                 notifyListenersFunction.accept(RewardedAdEventName.onAdLoaded.name(), new JSObject().put("value", true));
             }
@@ -105,30 +105,6 @@ public class AdRewardExecutor extends Executor {
             @Override
             public void onUserEarnedReward(@NonNull RewardItem item) {
                 call.resolve(new JSObject().put("type", item.getType()).put("amount", item.getAmount()));
-            }
-        };
-    }
-
-    /**
-     * Will return a {@link OnUserEarnedRewardListener} ready to attach to a new created
-     * {@link RewardedAd}
-     */
-    static FullScreenContentCallback getFullScreenContentCallback(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        return new FullScreenContentCallback() {
-            @Override
-            public void onAdShowedFullScreenContent() {
-                notifyListenersFunction.accept("adDidPresentFullScreenContent", new JSObject());
-            }
-
-            @Override
-            public void onAdFailedToShowFullScreenContent(AdError adError) {
-                notifyListenersFunction.accept("didFailToPresentFullScreenContentWithError",
-                        new JSObject().put("code", 0).put("message", adError.getMessage()));
-            }
-
-            @Override
-            public void onAdDismissedFullScreenContent() {
-                notifyListenersFunction.accept("adDidDismissFullScreenContent", new JSObject());
             }
         };
     }
