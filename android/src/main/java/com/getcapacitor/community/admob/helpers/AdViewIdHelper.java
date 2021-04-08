@@ -30,7 +30,6 @@ public final class AdViewIdHelper {
     }
 
     public static FullScreenContentCallback getFullScreenContentCallback(
-        PluginCall call,
         BiConsumer<String, JSObject> notifyListenersFunction
     ) {
         return new FullScreenContentCallback() {

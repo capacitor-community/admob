@@ -8,13 +8,10 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
-import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.RewardedAdEventName;
-import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.rewarded.RewardItem;
@@ -87,7 +84,7 @@ public class AdInterstitialExecutor extends Executor {
             @Override
             public void onAdLoaded(RewardedInterstitialAd ad) {
                 mRewardedAd = ad;
-                mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(call, notifyListenersFunction));
+                mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(notifyListenersFunction));
                 call.resolve(new JSObject());
                 notifyListenersFunction.accept(RewardedAdEventName.onAdLoaded.name(), new JSObject().put("value", true));
             }
@@ -115,9 +112,5 @@ public class AdInterstitialExecutor extends Executor {
             }
         };
     }
-    /**
-     * Will return a {@link OnUserEarnedRewardListener} ready to attach to a new created
-     * {@link RewardedInterstitialAd}
-     */
 
 }
