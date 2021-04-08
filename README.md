@@ -14,6 +14,7 @@ Capacitory community plugin for AdMob.
 | Maintainer          | GitHub                              | Social                                | Sponsoring Company                             |
 | ------------------- | ----------------------------------- | ------------------------------------- | ---------------------------------------------- |
 | Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo) | [@rdlabo](https://twitter.com/rdlabo) | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
+| Saninn Salas Diaz | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) | |
 
 Maintenance Status: Actively Maintained
 
