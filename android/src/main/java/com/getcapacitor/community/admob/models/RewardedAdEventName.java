@@ -1,14 +1,8 @@
 package com.getcapacitor.community.admob.models;
 
 public enum RewardedAdEventName {
-    onRewardedVideoAdLoaded("onRewardedVideoAdLoaded"),
-    onRewardedVideoAdOpened("onRewardedVideoAdOpened"),
-    onRewardedVideoStarted("onRewardedVideoStarted"),
-    onRewardedVideoAdClosed("onRewardedVideoAdClosed"),
-    onRewarded("onRewarded"),
-    onRewardedVideoAdLeftApplication("onRewardedVideoAdLeftApplication"),
-    onRewardedVideoAdFailedToLoad("onRewardedVideoAdLeftApplication"),
-    onRewardedVideoCompleted("onRewardedVideoAdFailedToLoad");
+    onAdLoaded("onAdLoaded"),
+    onAdFailedToLoad("onAdFailedToLoad");
 
     private String event;
 

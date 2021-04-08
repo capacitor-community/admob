@@ -15,15 +15,15 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
-import com.getcapacitor.community.admob.executors.AdRewardExecutor;
 import com.getcapacitor.community.admob.executors.BannerExecutor;
+import com.getcapacitor.community.admob.executors.AdRewardExecutor;
+import com.getcapacitor.community.admob.executors.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -45,15 +45,20 @@ import org.json.JSONObject;
 public class AdMob extends Plugin {
     public static final JSArray EMPTY_TESTING_DEVICES = new JSArray();
 
+    private BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
     private AdRewardExecutor adRewardExecutor = new AdRewardExecutor(
         this::getContext,
         this::getActivity,
         this::notifyListeners,
         getLogTag()
     );
-    private BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
-    private PluginCall call;
-    private InterstitialAd mInterstitialAd;
+    private AdInterstitialExecutor adInterstitialExecutor = new AdInterstitialExecutor(
+            this::getContext,
+            this::getActivity,
+            this::notifyListeners,
+            getLogTag()
+    );
+
 
     // Initialize AdMob with appId
     @PluginMethod
@@ -62,9 +67,9 @@ public class AdMob extends Plugin {
 
         if (initializeForTesting) {
             JSArray testingDevices = call.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES);
-            this.setTestingDevicesTo(testingDevices);
+            this.setTestingDevicesTo(call, testingDevices);
         } else {
-            this.setTestingDevicesTo(EMPTY_TESTING_DEVICES);
+            this.setTestingDevicesTo(call, EMPTY_TESTING_DEVICES);
         }
 
         try {
@@ -109,110 +114,13 @@ public class AdMob extends Plugin {
 
     @PluginMethod
     public void prepareInterstitial(final PluginCall call) {
-        final AdOptions adOptions = AdOptions.getFactory().createInterstitialOptions(call);
-
-        // This is never read, why is saved?
-        this.call = call;
-
-        try {
-            mInterstitialAd = new InterstitialAd(getContext());
-
-            getActivity()
-                .runOnUiThread(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-                            final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                            AdViewIdHelper.assignIdToAdView(mInterstitialAd, adOptions, adRequest, getLogTag(), getContext());
-
-                            mInterstitialAd.loadAd(adRequest);
-
-                            mInterstitialAd.setAdListener(
-                                new AdListener() {
-
-                                    @Override
-                                    public void onAdLoaded() {
-                                        // Code to be executed when an ad finishes loading.
-                                        notifyListeners("onInterstitialAdLoaded", new JSObject().put("value", true));
-                                        call.resolve(new JSObject().put("value", true));
-                                        super.onAdLoaded();
-                                    }
-
-                                    @Override
-                                    public void onAdFailedToLoad(int errorCode) {
-                                        // Code to be executed when an ad request fails.
-
-                                        final JSObject responseJSObject = new JSObject()
-                                            .put("errorCode", errorCode)
-                                            // TODO: Map errors to messages
-                                            .put("error", "InterstitialAdFailedToLoad");
-
-                                        notifyListeners("onInterstitialAdFailedToLoad", responseJSObject);
-                                        super.onAdFailedToLoad(errorCode);
-                                    }
-
-                                    @Override
-                                    public void onAdOpened() {
-                                        // Code to be executed when the ad is displayed.
-                                        notifyListeners("onInterstitialAdOpened", new JSObject().put("value", true));
-                                        super.onAdOpened();
-                                    }
-
-                                    @Override
-                                    public void onAdLeftApplication() {
-                                        // Code to be executed when the user has left the app.
-                                        notifyListeners("onInterstitialAdLeftApplication", new JSObject().put("value", true));
-                                        super.onAdLeftApplication();
-                                    }
-
-                                    @Override
-                                    public void onAdClosed() {
-                                        // Code to be executed when when the interstitial ad is closed.
-                                        notifyListeners("onInterstitialAdClosed", new JSObject().put("value", true));
-                                        super.onAdClosed();
-                                    }
-                                }
-                            );
-                        }
-                    }
-                );
-        } catch (Exception ex) {
-            call.reject(ex.getLocalizedMessage(), ex);
-        }
+        adInterstitialExecutor.prepareInterstitial(call, this::notifyListeners);
     }
 
     // Show interstitial Ad
     @PluginMethod
     public void showInterstitial(final PluginCall call) {
-        try {
-            getActivity()
-                .runOnUiThread(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
-                                getActivity()
-                                    .runOnUiThread(
-                                        new Runnable() {
-
-                                            @Override
-                                            public void run() {
-                                                mInterstitialAd.show();
-                                            }
-                                        }
-                                    );
-                                call.resolve(new JSObject().put("value", true));
-                            } else {
-                                call.reject("The interstitial wasn't loaded yet.");
-                            }
-                        }
-                    }
-                );
-        } catch (Exception ex) {
-            call.reject(ex.getLocalizedMessage(), ex);
-        }
+        adInterstitialExecutor.showInterstitial(call);
     }
 
     @PluginMethod
@@ -225,27 +133,12 @@ public class AdMob extends Plugin {
         adRewardExecutor.showRewardVideoAd(call);
     }
 
-    @PluginMethod
-    public void pauseRewardedVideo(final PluginCall call) {
-        adRewardExecutor.pauseRewardedVideo(call);
-    }
-
-    @PluginMethod
-    public void resumeRewardedVideo(final PluginCall call) {
-        adRewardExecutor.resumeRewardedVideo(call);
-    }
-
-    @PluginMethod
-    public void stopRewardedVideo(final PluginCall call) {
-        adRewardExecutor.destroyRewardedVideo(call);
-    }
-
     /**
      * An Array of devices IDs that will be marked as tested devices.
      *
      * @see <a href="https://developers.google.com/admob/android/test-ads#enable_test_devices">Test Devices</a>
      */
-    private void setTestingDevicesTo(JSArray testingDevices) {
+    private void setTestingDevicesTo(final PluginCall call, JSArray testingDevices) {
         // TODO: create a function to automatically get the device ID when isTesting is true? https://stackoverflow.com/a/36242494/1255819
         try {
             final RequestConfiguration configuration = new RequestConfiguration.Builder()

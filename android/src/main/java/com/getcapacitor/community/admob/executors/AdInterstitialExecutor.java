@@ -15,18 +15,18 @@ import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.RewardedAdEventName;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.rewarded.RewardItem;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-import com.google.android.gms.common.util.BiConsumer;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback;
+import com.google.android.gms.common.util.BiConsumer;
 
-public class AdRewardExecutor extends Executor {
-    public static RewardedAd mRewardedAd;
+public class AdInterstitialExecutor extends Executor {
+    public static RewardedInterstitialAd mRewardedAd;
 
-    public AdRewardExecutor(
+    public AdInterstitialExecutor(
         Supplier<Context> contextSupplier,
         Supplier<Activity> activitySupplier,
         BiConsumer<String, JSObject> notifyListenersFunction,
@@ -36,7 +36,7 @@ public class AdRewardExecutor extends Executor {
     }
 
     @PluginMethod
-    public void prepareRewardVideoAd(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
+    public void prepareInterstitial(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         final AdOptions adOptions = AdOptions.getFactory().createRewardVideoOptions(call);
 
         try {
@@ -46,7 +46,7 @@ public class AdRewardExecutor extends Executor {
                     () -> {
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                        RewardedAd.load(contextSupplier.get(), id, adRequest, getRewardedAdLoadCallback(call, notifyListenersFunction));
+                        RewardedInterstitialAd.load(activitySupplier.get(), id, adRequest, getRewardedInterstitialAdLoadCallbackk(call, notifyListenersFunction));
                     }
                 );
         } catch (Exception ex) {
@@ -55,7 +55,7 @@ public class AdRewardExecutor extends Executor {
     }
 
     @PluginMethod
-    public void showRewardVideoAd(final PluginCall call) {
+    public void showInterstitial(final PluginCall call) {
         try {
             activitySupplier
                 .get()
@@ -72,16 +72,16 @@ public class AdRewardExecutor extends Executor {
 
 
     /**
-     * Will return a {@link RewardedAdLoadCallback} ready to attach to a new created
-     * {@link RewardedAd}
+     * Will return a {@link RewardedInterstitialAdLoadCallback} ready to attach to a new created
+     * {@link RewardedInterstitialAd}
      */
-    static RewardedAdLoadCallback getRewardedAdLoadCallback(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        return new RewardedAdLoadCallback() {
+    static RewardedInterstitialAdLoadCallback getRewardedInterstitialAdLoadCallbackk(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
+        return new RewardedInterstitialAdLoadCallback() {
             @Override
-            public void onAdLoaded(@NonNull RewardedAd ad) {
+            public void onAdLoaded(RewardedInterstitialAd ad) {
                 mRewardedAd = ad;
                 mRewardedAd.setFullScreenContentCallback(getFullScreenContentCallback(call, notifyListenersFunction));
-                call.resolve(new JSObject().put("value", true));
+                call.resolve(new JSObject());
                 notifyListenersFunction.accept(RewardedAdEventName.onAdLoaded.name(), new JSObject().put("value", true));
             }
 
@@ -98,7 +98,7 @@ public class AdRewardExecutor extends Executor {
 
     /**
      * Will return a {@link OnUserEarnedRewardListener} ready to attach to a new created
-     * {@link RewardedAd}
+     * {@link RewardedInterstitialAd}
      */
     static OnUserEarnedRewardListener getOnUserEarnedRewardListener(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         return new OnUserEarnedRewardListener() {
@@ -111,7 +111,7 @@ public class AdRewardExecutor extends Executor {
 
     /**
      * Will return a {@link OnUserEarnedRewardListener} ready to attach to a new created
-     * {@link RewardedAd}
+     * {@link RewardedInterstitialAd}
      */
     static FullScreenContentCallback getFullScreenContentCallback(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         return new FullScreenContentCallback() {

@@ -58,7 +58,7 @@ class AdRewardExecutorTest {
             ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
             PluginCall pluginCall = mock(PluginCall.class);
 
-            RewardedVideoAdListener listener = AdRewardExecutor.getRewardedVideoAdListener(pluginCall, notifierMock);
+            RewardedVideoAdListener listener = AdRewardExecutor.getRewardedAdLoadCallback(pluginCall, notifierMock);
             String type = "My Type";
             int amount = 69;
             RewardItem rewardItem = new RewardItem() {
@@ -93,7 +93,7 @@ class AdRewardExecutorTest {
                 ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
                 PluginCall pluginCall = mock(PluginCall.class);
                 BiConsumer<String, JSObject> notifierMock = mock(BiConsumer.class);
-                RewardedVideoAdListener listener = AdRewardExecutor.getRewardedVideoAdListener(pluginCall, notifierMock);
+                RewardedVideoAdListener listener = AdRewardExecutor.getRewardedAdLoadCallback(pluginCall, notifierMock);
                 int errorCode = 1;
 
                 listener.onRewardedVideoAdFailedToLoad(errorCode);

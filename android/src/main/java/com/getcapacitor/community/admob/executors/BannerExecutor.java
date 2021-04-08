@@ -17,6 +17,7 @@ import com.getcapacitor.community.admob.models.AdOptions;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.common.util.BiConsumer;
 
 public class BannerExecutor extends Executor {
@@ -217,15 +218,15 @@ public class BannerExecutor extends Executor {
                             }
 
                             @Override
-                            public void onAdFailedToLoad(int i) {
-                                notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", i));
+                            public void onAdFailedToLoad(LoadAdError AdError) {
+                                notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", AdError.getCode()));
 
                                 JSObject ret = new JSObject();
                                 ret.put("width", 0);
                                 ret.put("height", 0);
                                 notifyListeners("onAdSize", ret);
 
-                                super.onAdFailedToLoad(i);
+                                super.onAdFailedToLoad(AdError);
                             }
 
                             @Override
