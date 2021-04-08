@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.models.AdOptions;
+import com.getcapacitor.community.admob.models.FullScreenAdEventName;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -35,20 +36,20 @@ public final class AdViewIdHelper {
         return new FullScreenContentCallback() {
             @Override
             public void onAdShowedFullScreenContent() {
-                notifyListenersFunction.accept("adDidPresentFullScreenContent", new JSObject());
+                notifyListenersFunction.accept(FullScreenAdEventName.adDidPresentFullScreenContent.name(), new JSObject());
             }
 
             @Override
             public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                 notifyListenersFunction.accept(
-                    "didFailToPresentFullScreenContentWithError",
+                    FullScreenAdEventName.didFailToPresentFullScreenContentWithError.name(),
                     new JSObject().put("code", 0).put("message", adError.getMessage())
                 );
             }
 
             @Override
             public void onAdDismissedFullScreenContent() {
-                notifyListenersFunction.accept("adDidDismissFullScreenContent", new JSObject());
+                notifyListenersFunction.accept(FullScreenAdEventName.adDidDismissFullScreenContent.name(), new JSObject());
             }
         };
     }

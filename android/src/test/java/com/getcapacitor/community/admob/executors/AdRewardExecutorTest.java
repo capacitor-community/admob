@@ -12,7 +12,7 @@ import android.content.Context;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
-import com.getcapacitor.community.admob.models.RewardedAdEventName;
+import com.getcapacitor.community.admob.models.FullScreenAdEventName;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.google.android.gms.common.util.BiConsumer;
@@ -77,7 +77,7 @@ class AdRewardExecutorTest {
             // ACt
             listener.onRewarded(rewardItem);
 
-            verify(notifierMock).accept(eq(RewardedAdEventName.onRewarded.name()), argumentCaptor.capture());
+            verify(notifierMock).accept(eq(FullScreenAdEventName.onRewarded.name()), argumentCaptor.capture());
             final JSObject emittedItem = argumentCaptor.getValue();
 
             assertEquals(emittedItem.getString("type"), type);
@@ -98,7 +98,7 @@ class AdRewardExecutorTest {
 
                 listener.onRewardedVideoAdFailedToLoad(errorCode);
 
-                verify(notifierMock).accept(eq(RewardedAdEventName.onRewardedVideoAdFailedToLoad.name()), argumentCaptor.capture());
+                verify(notifierMock).accept(eq(FullScreenAdEventName.onRewardedVideoAdFailedToLoad.name()), argumentCaptor.capture());
                 final JSObject emittedError = argumentCaptor.getValue();
 
                 assertEquals(emittedError.getInt("code"), errorCode);

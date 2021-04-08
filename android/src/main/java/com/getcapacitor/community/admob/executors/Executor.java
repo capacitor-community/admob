@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
-import com.getcapacitor.community.admob.models.RewardedAdEvent;
 import com.google.android.gms.common.util.BiConsumer;
 
 public abstract class Executor {

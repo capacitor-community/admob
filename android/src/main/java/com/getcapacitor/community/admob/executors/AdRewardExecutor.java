@@ -10,7 +10,7 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
-import com.getcapacitor.community.admob.models.RewardedAdEventName;
+import com.getcapacitor.community.admob.models.FullScreenAdEventName;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.OnUserEarnedRewardListener;
@@ -78,7 +78,7 @@ public class AdRewardExecutor extends Executor {
                 mRewardedAd = ad;
                 mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(notifyListenersFunction));
                 call.resolve(new JSObject().put("value", true));
-                notifyListenersFunction.accept(RewardedAdEventName.onAdLoaded.name(), new JSObject().put("value", true));
+                notifyListenersFunction.accept(FullScreenAdEventName.onAdLoaded.name(), new JSObject().put("value", true));
             }
 
             @Override
@@ -87,7 +87,7 @@ public class AdRewardExecutor extends Executor {
                 adMobError.put("code", adError.getCode());
                 adMobError.put("reason", adError.getMessage());
 
-                notifyListenersFunction.accept(RewardedAdEventName.onAdFailedToLoad.name(), new JSObject().put("value", true));
+                notifyListenersFunction.accept(FullScreenAdEventName.onAdFailedToLoad.name(), new JSObject().put("value", true));
             }
         };
     }
