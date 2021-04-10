@@ -230,7 +230,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
     /// Tells the delegate an ad request failed.
     public func bannerView(_ bannerView: GADBannerView,
-                           didFailToReceiveAdWithError error: NSError) {
+                           didFailToReceiveAdWithError error: Error) {
         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
         self.notifyListeners("bannerViewRecieveAdSize", data: [
