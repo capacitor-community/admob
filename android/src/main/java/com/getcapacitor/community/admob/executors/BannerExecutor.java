@@ -22,6 +22,12 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.common.util.BiConsumer;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+
+import com.google.android.gms.ads.MobileAds;
+
 public class BannerExecutor extends Executor {
 
     private RelativeLayout mAdViewLayout;
@@ -43,6 +49,8 @@ public class BannerExecutor extends Executor {
 
     public void showBanner(final PluginCall call) {
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
+        float widthPixels = (int)contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
+        float density = contextSupplier.get().getResources().getDisplayMetrics().density;
 
         if (mAdView != null) {
             updateExistingAdView(adOptions);
@@ -52,7 +60,13 @@ public class BannerExecutor extends Executor {
         // Why a try catch block?
         try {
             mAdView = new AdView(contextSupplier.get());
-            mAdView.setAdSize(adOptions.adSize.size);
+
+            if (!adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
+                mAdView.setAdSize(adOptions.adSize.size);
+            } else {
+                // ADAPTIVE BANNER
+                mAdView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (widthPixels / density)));
+            }
 
             // Setup AdView Layout
             mAdViewLayout = new RelativeLayout(contextSupplier.get());
@@ -79,15 +93,13 @@ public class BannerExecutor extends Executor {
 
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
-            float density = contextSupplier.get().getResources().getDisplayMetrics().density;
             int densityMargin = (int) (adOptions.margin * density);
 
             // Center Banner Ads
-            int screenWidth = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
             int adWidth = (int) (adOptions.adSize.size.getWidth() * density);
-            int sideMargin = (screenWidth - adWidth) / 2;
+            int sideMargin = ((int) widthPixels - adWidth) / 2;
 
-            if (adWidth <= 0) {
+            if (adWidth <= 0 || adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
                 mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
             } else {
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
@@ -119,7 +131,7 @@ public class BannerExecutor extends Executor {
                             JSObject ret = new JSObject();
                             ret.put("width", 0);
                             ret.put("height", 0);
-                            notifyListeners("onAdSize", ret);
+                            notifyListeners("bannerViewReceiveAdSize", ret);
 
                             call.resolve(new JSObject());
                         }
@@ -143,7 +155,7 @@ public class BannerExecutor extends Executor {
                             JSObject ret = new JSObject();
                             ret.put("width", mAdView.getAdSize().getWidth());
                             ret.put("height", mAdView.getAdSize().getHeight());
-                            notifyListeners("onAdSize", ret);
+                            notifyListeners("bannerViewReceiveAdSize", ret);
 
                             Log.d(logTag, "Banner AD Resumed");
                         }
@@ -218,7 +230,7 @@ public class BannerExecutor extends Executor {
                                 JSObject ret = new JSObject();
                                 ret.put("width", mAdView.getAdSize().getWidth());
                                 ret.put("height", mAdView.getAdSize().getHeight());
-                                notifyListeners("bannerViewDidReceiveAd", ret);
+                                notifyListeners("bannerViewReceiveAdSize", ret);
 
                                 super.onAdLoaded();
                             }

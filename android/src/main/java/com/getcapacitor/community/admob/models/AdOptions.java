@@ -16,8 +16,8 @@ public abstract class AdOptions {
      */
     public final String adId;
     /**
-     * Banner Ad Size, defaults to SMART_BANNER.
-     * IT can be: SMART_BANNER, BANNER, MEDIUM_RECTANGLE,
+     * Banner Ad Size, defaults to ADAPTIVE_BANNER.
+     * IT can be: ADAPTIVE_BANNER, BANNER, MEDIUM_RECTANGLE,
      * FULL_BANNER, LEADERBOARD, SKYSCRAPER, or CUSTOM
      */
     public final AdSizeEnum adSize;
@@ -72,7 +72,7 @@ public abstract class AdOptions {
         this.margin = call.getInt("margin", 0);
         this.npa = call.getBoolean("npa", false);
 
-        String sizeString = call.getString("adSize", AdSizeEnum.SMART_BANNER.name);
+        String sizeString = call.getString("adSize", AdSizeEnum.ADAPTIVE_BANNER.name);
         this.adSize = AdOptions.adSizeStringToAdSizeEnum(sizeString);
     }
 
@@ -94,7 +94,7 @@ public abstract class AdOptions {
         try {
             return AdSizeEnum.valueOf(sizeString);
         } catch (IllegalArgumentException error) {
-            return AdSizeEnum.SMART_BANNER;
+            return AdSizeEnum.ADAPTIVE_BANNER;
         }
     }
 
@@ -161,7 +161,7 @@ public abstract class AdOptions {
         private String position = "TesterAdOptionsBuilder__position";
         private int margin = 1;
         private boolean npa = false;
-        private AdSizeEnum adSize = AdSizeEnum.SMART_BANNER;
+        private AdSizeEnum adSize = AdSizeEnum.ADAPTIVE_BANNER;
 
         public TesterAdOptionsBuilder setIsTesting(boolean value) {
             isTesting = value;
