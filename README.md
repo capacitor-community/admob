@@ -1,14 +1,21 @@
-[![npm version](https://badge.fury.io/js/%40capacitor-community%2Fadmob.svg)](https://badge.fury.io/js/%40capacitor-community%2Fadmob)
+<p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
+<h3 align="center">AdMob</h3>
+<p align="center"><strong><code>@capacitor-community/admob</code></strong></p>
+<p align="center">
+  Capacitor community plugin for native AdMob.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/maintenance/yes/2021?style=flat-square" />
+  <!-- <a href="https://github.com/capacitor-community/example/actions?query=workflow%3A%22CI%22"><img src="https://img.shields.io/github/workflow/status/capacitor-community/example/CI?style=flat-square" /></a> -->
+  <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/l/@capacitor-community/admob?style=flat-square" /></a>
+<br>
+  <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/dw/@capacitor-community/admob?style=flat-square" /></a>
+  <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/v/@capacitor-community/admob?style=flat-square" /></a>
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
-
-# ✅ Please check
-This is development README for Capacitor v3. If you use v1 or v2, please check [./README_v2.md](README_v2.md)
-
-# @capacitor-community/admob
-
-Capacitory community plugin for AdMob.
+</p>
 
 ## Maintainers
 
@@ -32,7 +39,7 @@ Maintenance Status: Actively Maintained
 ## Installation
 
 ```
-% npm install --save @capacitor-community/admob@3.0.0-2
+% npm install --save @capacitor-community/admob@next
 % npx cap update
 ```
 
