@@ -38,14 +38,14 @@ public class AdMob extends Plugin {
 
     public static final JSArray EMPTY_TESTING_DEVICES = new JSArray();
 
-    private BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
-    private AdRewardExecutor adRewardExecutor = new AdRewardExecutor(
+    private final BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
+    private final AdRewardExecutor adRewardExecutor = new AdRewardExecutor(
         this::getContext,
         this::getActivity,
         this::notifyListeners,
         getLogTag()
     );
-    private AdInterstitialExecutor adInterstitialExecutor = new AdInterstitialExecutor(
+    private final AdInterstitialExecutor adInterstitialExecutor = new AdInterstitialExecutor(
         this::getContext,
         this::getActivity,
         this::notifyListeners,

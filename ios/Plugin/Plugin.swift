@@ -253,12 +253,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
         self.bridge?.triggerJSEvent(eventName: "bannerViewWillDismissScreen", target: "window")
     }
 
-    /// Tells the delegate that the full-screen view has been dismissed.
-    public func bannerViewDidDismissScreen(_ bannerView: GADBannerView) {
-        NSLog("bannerViewDidDismissScreen")
-        self.bridge?.triggerJSEvent(eventName: "bannerViewDidDismissScreen", target: "window")
-    }
-
     /**
      *  AdMob: Intertitial
      *  https://developers.google.com/admob/ios/interstitial?hl=ja

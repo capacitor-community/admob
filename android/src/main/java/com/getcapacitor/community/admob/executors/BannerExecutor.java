@@ -7,6 +7,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSObject;
@@ -93,7 +95,7 @@ public class BannerExecutor extends Executor {
 
             createNewAdView(adOptions);
 
-            call.resolve(new JSObject().put("value", true));
+            call.resolve(new JSObject());
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
@@ -119,7 +121,7 @@ public class BannerExecutor extends Executor {
                             ret.put("height", 0);
                             notifyListeners("onAdSize", ret);
 
-                            call.resolve(new JSObject().put("value", true));
+                            call.resolve(new JSObject());
                         }
                     }
                 );
@@ -148,7 +150,7 @@ public class BannerExecutor extends Executor {
                     }
                 );
 
-            call.resolve(new JSObject().put("value", true));
+            call.resolve(new JSObject());
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
@@ -172,7 +174,7 @@ public class BannerExecutor extends Executor {
                     );
             }
 
-            call.resolve(new JSObject().put("value", true));
+            call.resolve(new JSObject());
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
@@ -189,6 +191,11 @@ public class BannerExecutor extends Executor {
             );
     }
 
+
+    /**
+     * Follow iOS method Name:
+     * https://developers.google.com/admob/ios/banner?hl=ja
+     */
     private void createNewAdView(AdOptions adOptions) {
         // Run AdMob In Main UI Thread
         activitySupplier
@@ -202,42 +209,41 @@ public class BannerExecutor extends Executor {
                     mAdViewLayout.addView(mAdView);
                     // Start loading the ad.
                     mAdView.loadAd(adRequest);
-
                     mAdView.setAdListener(
                         new AdListener() {
                             @Override
                             public void onAdLoaded() {
-                                notifyListenersFunction.accept("onAdLoaded", new JSObject().put("value", true));
+                                notifyListenersFunction.accept("bannerViewDidReceiveAd", new JSObject());
 
                                 JSObject ret = new JSObject();
                                 ret.put("width", mAdView.getAdSize().getWidth());
                                 ret.put("height", mAdView.getAdSize().getHeight());
-                                notifyListeners("onAdSize", ret);
+                                notifyListeners("bannerViewDidReceiveAd", ret);
 
                                 super.onAdLoaded();
                             }
 
                             @Override
-                            public void onAdFailedToLoad(LoadAdError AdError) {
-                                notifyListeners("onAdFailedToLoad", new JSObject().put("errorCode", AdError.getCode()));
+                            public void onAdFailedToLoad(@NonNull LoadAdError AdError) {
+                                notifyListeners("bannerView:didFailToReceiveAdWithError", new JSObject().put("errorCode", AdError.getCode()));
 
                                 JSObject ret = new JSObject();
                                 ret.put("width", 0);
                                 ret.put("height", 0);
-                                notifyListeners("onAdSize", ret);
+                                notifyListeners("bannerViewDidReceiveAd", ret);
 
                                 super.onAdFailedToLoad(AdError);
                             }
 
                             @Override
                             public void onAdOpened() {
-                                notifyListeners("onAdOpened", new JSObject().put("value", true));
+                                notifyListeners("bannerViewWillPresentScreen", new JSObject());
                                 super.onAdOpened();
                             }
 
                             @Override
                             public void onAdClosed() {
-                                notifyListeners("onAdClosed", new JSObject().put("value", true));
+                                notifyListeners("bannerViewWillDismissScreen", new JSObject());
                                 super.onAdClosed();
                             }
                         }
