@@ -243,20 +243,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
     /// Tells the delegate that a full-screen view will be presented in response
     /// to the user clicking on an ad.
     public func bannerViewWillPresentScreen(_ bannerView: GADBannerView) {
-        self.notifyListeners("bannerViewChangeSize", data: [
-            "width": bannerView.frame.width,
-            "height": bannerView.frame.height
-        ])
         self.bridge?.triggerJSEvent(eventName: "bannerViewWillPresentScreen", target: "window")
     }
 
     /// Tells the delegate that the full-screen view will be dismissed.
     public func bannerViewWillDismissScreen(_ bannerView: GADBannerView) {
-        NSLog("bannerViewWillDismissScreen")
-        self.notifyListeners("bannerViewChangeSize", data: [
-            "width": 0,
-            "height": 0
-        ])
         self.bridge?.triggerJSEvent(eventName: "bannerViewWillDismissScreen", target: "window")
     }
 
