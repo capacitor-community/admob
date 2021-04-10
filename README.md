@@ -85,7 +85,7 @@ Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
 ## Initialize
 
-```
+```ts
 initialize(options: { requestTrackingAuthorization?: boolean , testingDevices?: string[]}): Promise<{ value: boolean }>
 ```
 
@@ -96,28 +96,48 @@ Default value is `true`. If you don't want to track, set requestTrackingAuthoriz
 
 Send and array of device Ids in `testingDevices? to use production like ads on your specified devices -> https://developers.google.com/admob/android/test-ads#enable_test_devices
 
-### Initialize for @ionic/angular
+## APIs
 
-Open our Ionic app **app.component.ts** file and add this following code.
+### BANNER
+
+#### Angular
 
 ```ts
-import { AdMob } from '@capacitor-community/admob';
+import { AdMob, AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss'],
+  selector: 'admob',
+  templateUrl: 'admob.component.html',
+  styleUrls: ['admob.component.scss'],
 })
-export class AppComponent {
+export class AdMobComponent {
+  private options: AdOptions = {
+    adId: 'YOUR ADID',
+    adSize: AdSize.BANNER,
+    position: AdPosition.BOTTOM_CENTER,
+    margin: 0,
+    // isTesting: true
+    // npa: true
+  };
+
   constructor() {
-    // Initialize AdMob for your Application
-    AdMob.initialize();
+    // Subscribe Banner Event Listener
+    AdMob.addListener('bannerViewDidReceiveAd', (info: boolean) => {
+      console.log('Banner Ad Loaded');
+    });
+
+    // Get Banner Size
+    AdMob.addListener('bannerViewChangeSize', (info: boolean) => {
+      console.log(info);
+    });
+
+    // Show Banner Ad
+    AdMob.showBanner(this.options);
   }
 }
 ```
 
-### Initialize for @ionic/react
-
+#### React
 This is implements simple sample from https://github.com/DavidFrahm . Thanks!
 
 ```ts
@@ -151,12 +171,12 @@ const App: React.FC = () => {
   AdMob.showBanner(options);
 
   // Subscribe Banner Event Listener
-  AdMob.addListener('onAdLoaded', (info: boolean) => {
+  AdMob.addListener('bannerViewDidReceiveAd', (info: boolean) => {
     console.log('Banner ad loaded');
   });
 
   // Get Banner Size
-  AdMob.addListener('onAdSize', (info: boolean) => {
+  AdMob.addListener('bannerViewChangeSize', (info: boolean) => {
     console.log(info);
   });
 
@@ -173,68 +193,6 @@ const App: React.FC = () => {
 };
 
 export default App;
-```
-
-## APIs
-
-### BANNER
-
-#### showBanner(options: AdOptions): Promise<{ value: boolean }>
-
-```ts
-import { AdMob, AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
-
-@Component({
-  selector: 'admob',
-  templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss'],
-})
-export class AdMobComponent {
-  private options: AdOptions = {
-    adId: 'YOUR ADID',
-    adSize: AdSize.BANNER,
-    position: AdPosition.BOTTOM_CENTER,
-    margin: 0,
-    // isTesting: true
-    // npa: true
-  };
-
-  constructor() {
-    // Show Banner Ad
-    AdMob.showBanner(this.options);
-
-    // Subscribe Banner Event Listener
-    AdMob.addListener('bannerViewDidReceiveAd', (info: boolean) => {
-      console.log('Banner Ad Loaded');
-    });
-
-    // Get Banner Size
-    AdMob.addListener('bannerViewChangeSize', (info: boolean) => {
-      console.log(info);
-    });
-  }
-}
-```
-
-#### hideBanner(): Promise<{ value: boolean }>
-
-```ts
-// Hide the banner, remove it from screen, but can show it later
-AdMob.hideBanner();
-```
-
-#### resumeBanner(): Promise<{ value: boolean }>
-
-```ts
-// Resume the banner, show it after hide
-AdMob.resumeBanner();
-```
-
-#### removeBanner(): Promise<{ value: boolean }>
-
-```ts
-// Destroy the banner, remove it from screen.
-AdMob.removeBanner();
 ```
 
 ### INTERSTITIAL
@@ -254,7 +212,7 @@ export class AppComponent {
 
   constructor() {
     // Subscribe interstitial Event Listener
-    AdMob.addListener('onInterstitialAdLoaded', (info: boolean) => {
+    AdMob.addListener('adDidPresentFullScreenContent', (info: boolean) => {
       AdMob.showInterstitial();
     });
 
@@ -280,7 +238,7 @@ export class AdMobComponent {
   };
 
   constructor() {
-    AdMob.addListener('onRewardedVideoAdLoaded', () => {
+    AdMob.addListener('adDidPresentFullScreenContent', () => {
       AdMob.showRewardVideoAd();
     });
     AdMob.prepareRewardVideoAd(this.options);
