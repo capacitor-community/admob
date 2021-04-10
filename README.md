@@ -460,10 +460,10 @@ Show a reward video ad
 addListener(eventName: 'bannerViewChangeSize', listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
 ```
 
-| Param              | Type                                                                           | Description             |
-| ------------------ | ------------------------------------------------------------------------------ | ----------------------- |
-| **`eventName`**    | <code>"bannerViewChangeSize"</code>                                         | bannerViewChangeSize |
-| **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |                         |
+| Param              | Type                                                                           | Description          |
+| ------------------ | ------------------------------------------------------------------------------ | -------------------- |
+| **`eventName`**    | <code>"bannerViewChangeSize"</code>                                            | bannerViewChangeSize |
+| **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |                      |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
