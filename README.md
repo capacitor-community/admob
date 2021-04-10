@@ -310,8 +310,6 @@ export class AdMobComponent {
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
 * [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
-* [`addListener(...)`](#addlistener)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -597,46 +595,6 @@ Notice: The full-screen banner view has been dismissed.
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'onInterstitialAdLoaded', listenerFunc: () => void) => PluginListenerHandle
-```
-
-Notice: Prepared InterstitialAd
-
-| Param              | Type                                  | Description            |
-| ------------------ | ------------------------------------- | ---------------------- |
-| **`eventName`**    | <code>"onInterstitialAdLoaded"</code> | onInterstitialAdLoaded |
-| **`listenerFunc`** | <code>() =&gt; void</code>            |                        |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
-addListener(eventName: 'onRewardedVideoAdLoaded', listenerFunc: () => void) => PluginListenerHandle
-```
-
-Notice: Prepared RewardedVideo
-
-| Param              | Type                                   | Description             |
-| ------------------ | -------------------------------------- | ----------------------- |
-| **`eventName`**    | <code>"onRewardedVideoAdLoaded"</code> | onRewardedVideoAdLoaded |
-| **`listenerFunc`** | <code>() =&gt; void</code>             |                         |
-
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 1.1.2
-
---------------------
-
-
-### addListener(...)
-
-```typescript
 addListener(eventName: 'adDidPresentFullScreenContent', listenerFunc: (info: any) => void) => PluginListenerHandle
 ```
 
@@ -689,7 +647,7 @@ Notice: Interstitial ad is be failed to open
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 1.2.0
+**Since:** 3.0.0
 
 --------------------
 

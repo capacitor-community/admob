@@ -168,32 +168,6 @@ export interface AdMobPlugin {
   ): PluginListenerHandle;
 
   /**
-   * Notice: Prepared InterstitialAd
-   *
-   * @group InterstitialAd
-   * @param eventName onInterstitialAdLoaded
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onInterstitialAdLoaded',
-    listenerFunc: () => void,
-  ): PluginListenerHandle;
-
-  /**
-   * Notice: Prepared RewardedVideo
-   *
-   * @group RewardedVideo
-   * @param eventName onRewardedVideoAdLoaded
-   * @param listenerFunc
-   * @since 1.1.2
-   */
-  addListener(
-    eventName: 'onRewardedVideoAdLoaded',
-    listenerFunc: () => void,
-  ): PluginListenerHandle;
-
-  /**
    * Notice: Interstitial ad opened
    *
    * @group fullscreen
@@ -225,7 +199,7 @@ export interface AdMobPlugin {
    * @group fullscreen
    * @param eventName didFailToPresentFullScreenContentWithError
    * @param listenerFunc
-   * @since 1.2.0
+   * @since 3.0.0
    */
   addListener(
     eventName: 'didFailToPresentFullScreenContentWithError',

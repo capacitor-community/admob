@@ -285,7 +285,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
                     self.interstitial = ad
                     self.interstitial.fullScreenContentDelegate = self
-                    self.notifyListeners("onInterstitialAdLoaded", data: [:])
                     call.resolve([:])
                 }
             )
@@ -335,7 +334,6 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
                     self.rewardedAd = ad
                     self.rewardedAd?.fullScreenContentDelegate = self
-                    self.notifyListeners("onRewardedVideoAdLoaded", data: [:])
                     call.resolve([:])
                 }
             )

@@ -52,8 +52,6 @@ export class HomePage implements OnInit, OnDestroy {
    * for EventListener
    */
   private eventOnAdSize: PluginListenerHandle;
-  private eventPrepareReward: PluginListenerHandle
-  private eventRewardReceived: AdMobRewardItem;
 
   public isLoading = false;
 
@@ -81,27 +79,11 @@ export class HomePage implements OnInit, OnDestroy {
         }
       }
     });
-
-    AdMob.addListener('onInterstitialAdLoaded', () => {
-      this.isPrepareInterstitial = true;
-    });
-
-    /**
-     * RewardedVideo ad
-     */
-    this.eventPrepareReward = AdMob.addListener('onRewardedVideoAdLoaded', () => {
-      this.isPrepareReward = true;
-      this.isLoading = false;
-    });
   }
 
   ngOnDestroy() {
     if (this.eventOnAdSize) {
       this.eventOnAdSize.remove();
-    }
-
-    if (this.eventPrepareReward) {
-      this.eventPrepareReward.remove();
     }
   }
 
@@ -183,10 +165,10 @@ export class HomePage implements OnInit, OnDestroy {
     if (result === undefined) {
       return;
     }
+    this.isPrepareReward = true;
   }
 
   async showReward() {
-    this.eventRewardReceived = undefined;
     const result: AdMobRewardItem = await AdMob.showRewardVideoAd()
       .catch(e => undefined);
     if (result === undefined) {
@@ -215,6 +197,7 @@ export class HomePage implements OnInit, OnDestroy {
     if (result === undefined) {
       return;
     }
+    this.isPrepareInterstitial = true;
   }
 
 

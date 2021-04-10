@@ -64,7 +64,6 @@ public class AdInterstitialExecutor extends Executor {
                 .runOnUiThread(
                     () -> {
                         mRewardedAd.show(activitySupplier.get(), getOnUserEarnedRewardListener(call, notifyListenersFunction));
-                        call.resolve(new JSObject().put("value", true));
                     }
                 );
         } catch (Exception ex) {
@@ -85,8 +84,7 @@ public class AdInterstitialExecutor extends Executor {
             public void onAdLoaded(RewardedInterstitialAd ad) {
                 mRewardedAd = ad;
                 mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(notifyListenersFunction));
-                call.resolve(new JSObject());
-                notifyListenersFunction.accept(FullScreenAdEventName.onAdLoaded.name(), new JSObject().put("value", true));
+                notifyListenersFunction.accept(FullScreenAdEventName.onAdLoaded.name(), new JSObject());
             }
 
             @Override
@@ -95,7 +93,7 @@ public class AdInterstitialExecutor extends Executor {
                 adMobError.put("code", adError.getCode());
                 adMobError.put("reason", adError.getMessage());
 
-                notifyListenersFunction.accept(FullScreenAdEventName.onAdFailedToLoad.name(), new JSObject().put("value", true));
+                notifyListenersFunction.accept(FullScreenAdEventName.onAdFailedToLoad.name(), new JSObject());
             }
         };
     }
@@ -112,5 +110,4 @@ public class AdInterstitialExecutor extends Executor {
             }
         };
     }
-
 }
