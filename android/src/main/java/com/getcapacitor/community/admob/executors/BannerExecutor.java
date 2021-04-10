@@ -131,7 +131,7 @@ public class BannerExecutor extends Executor {
                             JSObject ret = new JSObject();
                             ret.put("width", 0);
                             ret.put("height", 0);
-                            notifyListeners("bannerViewReceiveAdSize", ret);
+                            notifyListeners("bannerViewChangeSize", ret);
 
                             call.resolve(new JSObject());
                         }
@@ -155,7 +155,7 @@ public class BannerExecutor extends Executor {
                             JSObject ret = new JSObject();
                             ret.put("width", mAdView.getAdSize().getWidth());
                             ret.put("height", mAdView.getAdSize().getHeight());
-                            notifyListeners("bannerViewReceiveAdSize", ret);
+                            notifyListeners("bannerViewChangeSize", ret);
 
                             Log.d(logTag, "Banner AD Resumed");
                         }
@@ -230,7 +230,7 @@ public class BannerExecutor extends Executor {
                                 JSObject ret = new JSObject();
                                 ret.put("width", mAdView.getAdSize().getWidth());
                                 ret.put("height", mAdView.getAdSize().getHeight());
-                                notifyListeners("bannerViewReceiveAdSize", ret);
+                                notifyListeners("bannerViewChangeSize", ret);
 
                                 super.onAdLoaded();
                             }

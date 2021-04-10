@@ -209,7 +209,7 @@ export class AdMobComponent {
     });
 
     // Get Banner Size
-    AdMob.addListener('bannerViewReceiveAdSize', (info: boolean) => {
+    AdMob.addListener('bannerViewChangeSize', (info: boolean) => {
       console.log(info);
     });
   }
@@ -457,12 +457,12 @@ Show a reward video ad
 ### addListener(...)
 
 ```typescript
-addListener(eventName: 'bannerViewReceiveAdSize', listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
+addListener(eventName: 'bannerViewChangeSize', listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
 ```
 
 | Param              | Type                                                                           | Description             |
 | ------------------ | ------------------------------------------------------------------------------ | ----------------------- |
-| **`eventName`**    | <code>"bannerViewReceiveAdSize"</code>                                         | bannerViewReceiveAdSize |
+| **`eventName`**    | <code>"bannerViewChangeSize"</code>                                         | bannerViewChangeSize |
 | **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |                         |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>

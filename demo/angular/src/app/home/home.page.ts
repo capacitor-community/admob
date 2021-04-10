@@ -64,8 +64,8 @@ export class HomePage implements OnInit, OnDestroy {
      * Run every time the Ad height changes.
      * AdMob cannot be displayed above the content, so create margin for AdMob.
      */
-    this.eventOnAdSize = AdMob.addListener('bannerViewReceiveAdSize', (info: AdMobBannerSize) => {
-      console.log(['bannerViewReceiveAdSize', info]);
+    this.eventOnAdSize = AdMob.addListener('bannerViewChangeSize', (info: AdMobBannerSize) => {
+      console.log(['bannerViewChangeSize', info]);
       this.appMargin = info.height;
       if (this.appMargin > 0) {
         const body = document.querySelector('body');

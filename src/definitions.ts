@@ -80,12 +80,12 @@ export interface AdMobPlugin {
   /**
    *
    * @group Banner
-   * @param eventName bannerViewReceiveAdSize
+   * @param eventName bannerViewChangeSize
    * @param listenerFunc
    * @since 3.0.0
    */
   addListener(
-    eventName: 'bannerViewReceiveAdSize',
+    eventName: 'bannerViewChangeSize',
     listenerFunc: (info: AdMobBannerSize) => void,
   ): PluginListenerHandle;
 

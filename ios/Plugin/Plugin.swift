@@ -130,7 +130,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                 }
             }
 
-            self.notifyListeners("bannerViewReceiveAdSize", data: [
+            self.notifyListeners("bannerViewChangeSize", data: [
                 "width": 0,
                 "height": 0
             ])
@@ -146,7 +146,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                     NSLog("AdMob: find subView for resumeBanner")
                     subView.isHidden = false
 
-                    self.notifyListeners("bannerViewReceiveAdSize", data: [
+                    self.notifyListeners("bannerViewChangeSize", data: [
                         "width": subView.frame.width,
                         "height": subView.frame.height
                     ])
@@ -221,7 +221,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
     /// Tells the delegate an ad request loaded an ad.
     public func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
         NSLog("bannerViewDidReceiveAd")
-        self.notifyListeners("bannerViewReceiveAdSize", data: [
+        self.notifyListeners("bannerViewChangeSize", data: [
             "width": bannerView.frame.width,
             "height": bannerView.frame.height
         ])
@@ -233,7 +233,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                            didFailToReceiveAdWithError error: Error) {
         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
-        self.notifyListeners("bannerViewReceiveAdSize", data: [
+        self.notifyListeners("bannerViewChangeSize", data: [
             "width": 0,
             "height": 0
         ])
@@ -243,7 +243,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
     /// Tells the delegate that a full-screen view will be presented in response
     /// to the user clicking on an ad.
     public func bannerViewWillPresentScreen(_ bannerView: GADBannerView) {
-        self.notifyListeners("bannerViewReceiveAdSize", data: [
+        self.notifyListeners("bannerViewChangeSize", data: [
             "width": bannerView.frame.width,
             "height": bannerView.frame.height
         ])
@@ -253,7 +253,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
     /// Tells the delegate that the full-screen view will be dismissed.
     public func bannerViewWillDismissScreen(_ bannerView: GADBannerView) {
         NSLog("bannerViewWillDismissScreen")
-        self.notifyListeners("bannerViewReceiveAdSize", data: [
+        self.notifyListeners("bannerViewChangeSize", data: [
             "width": 0,
             "height": 0
         ])
