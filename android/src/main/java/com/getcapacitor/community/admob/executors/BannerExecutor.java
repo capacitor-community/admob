@@ -107,7 +107,7 @@ public class BannerExecutor extends Executor {
 
             createNewAdView(adOptions);
 
-            call.resolve(new JSObject());
+            call.resolve();
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
@@ -133,7 +133,7 @@ public class BannerExecutor extends Executor {
                             ret.put("height", 0);
                             notifyListeners("bannerViewChangeSize", ret);
 
-                            call.resolve(new JSObject());
+                            call.resolve();
                         }
                     }
                 );
@@ -162,7 +162,7 @@ public class BannerExecutor extends Executor {
                     }
                 );
 
-            call.resolve(new JSObject());
+            call.resolve();
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
@@ -186,7 +186,7 @@ public class BannerExecutor extends Executor {
                     );
             }
 
-            call.resolve(new JSObject());
+            call.resolve();
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }

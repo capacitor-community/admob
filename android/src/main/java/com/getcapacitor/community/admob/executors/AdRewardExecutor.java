@@ -76,7 +76,7 @@ public class AdRewardExecutor extends Executor {
             public void onAdLoaded(@NonNull RewardedAd ad) {
                 mRewardedAd = ad;
                 mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(notifyListenersFunction));
-                call.resolve(new JSObject());
+                call.resolve();
                 notifyListenersFunction.accept(FullScreenAdEventName.onAdLoaded.name(), new JSObject());
             }
 

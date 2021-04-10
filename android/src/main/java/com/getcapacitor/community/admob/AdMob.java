@@ -73,7 +73,7 @@ public class AdMob extends Plugin {
                 }
             );
             bannerExecutor.initialize();
-            call.resolve(new JSObject().put("value", true));
+            call.resolve();
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
