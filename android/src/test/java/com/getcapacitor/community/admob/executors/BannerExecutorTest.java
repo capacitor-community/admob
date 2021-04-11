@@ -22,6 +22,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.util.BiConsumer;
 import java.util.List;
@@ -41,7 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class BannerExecutorTest {
 
-    final String LOG_TAG = "AdRewardHandlerTest Log Tag";
+    final String LOG_TAG = "BannerExecutorTest Log Tag";
 
     @Mock(lenient = true)
     Context contextMock;
@@ -59,13 +60,20 @@ class BannerExecutorTest {
 
     BannerExecutor sut;
 
+
+    MockedStatic<AdSize> AdSizeStaticMock;
+
     @BeforeEach
     void beforeEach() {
+        AdSizeStaticMock = Mockito.mockStatic(AdSize.class);
         reset(contextMock, activityMock, notifierMock);
-        adViewMockedConstruction = Mockito.mockConstruction(AdView.class);
+        adViewMockedConstruction = Mockito.mockConstruction(AdView.class, (mock, context)-> {
+//            when(mock.setAdSize(any(AdSize.cl))).thenReturn(null);
+        });
 
         when(activityMock.findViewById(anyInt())).thenReturn(viewGroupMock);
         when(viewGroupMock.getChildAt(anyInt())).thenReturn(viewGroupMock);
+
 
         sut = new BannerExecutor(() -> contextMock, () -> activityMock, notifierMock, LOG_TAG);
     }
@@ -73,6 +81,7 @@ class BannerExecutorTest {
     @AfterEach
     void afterEach() {
         adViewMockedConstruction.close();
+        AdSizeStaticMock.close();
     }
 
     @Test
@@ -251,7 +260,7 @@ class BannerExecutorTest {
             sut.hideBanner(pluginCallMock);
 
             verify(activityMock, times(0)).runOnUiThread(runnableArgumentCaptor.capture()); // No Ui Calls
-            verify(pluginCallMock, times(1)).error(any());
+            verify(pluginCallMock, times(1)).reject(any());
         }
     }
 }

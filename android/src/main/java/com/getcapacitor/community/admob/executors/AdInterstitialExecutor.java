@@ -32,7 +32,6 @@ public class AdInterstitialExecutor extends Executor {
         super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "AdRewardExecutor");
     }
 
-    @PluginMethod
     public void prepareInterstitial(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         final AdOptions adOptions = AdOptions.getFactory().createRewardVideoOptions(call);
 
@@ -56,7 +55,7 @@ public class AdInterstitialExecutor extends Executor {
         }
     }
 
-    @PluginMethod
+
     public void showInterstitial(final PluginCall call) {
         try {
             activitySupplier
