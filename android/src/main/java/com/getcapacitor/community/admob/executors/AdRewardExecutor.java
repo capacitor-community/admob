@@ -2,21 +2,18 @@ package com.getcapacitor.community.admob.executors;
 
 import android.app.Activity;
 import android.content.Context;
-import androidx.annotation.NonNull;
+
 import androidx.core.util.Supplier;
+
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.community.admob.callbackandlisteners.RewardedAdCallbackAndListeners;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
-import com.getcapacitor.community.admob.models.FullScreenAdEventName;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
-import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.common.util.BiConsumer;
 
 public class AdRewardExecutor extends Executor {
@@ -43,7 +40,7 @@ public class AdRewardExecutor extends Executor {
                     () -> {
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                        RewardedAd.load(contextSupplier.get(), id, adRequest, getRewardedAdLoadCallback(call, notifyListenersFunction));
+                        RewardedAd.load(contextSupplier.get(), id, adRequest, RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction));
                     }
                 );
         } catch (Exception ex) {
@@ -58,7 +55,7 @@ public class AdRewardExecutor extends Executor {
                 .get()
                 .runOnUiThread(
                     () -> {
-                        mRewardedAd.show(activitySupplier.get(), getOnUserEarnedRewardListener(call, notifyListenersFunction));
+                        mRewardedAd.show(activitySupplier.get(), RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction));
                     }
                 );
         } catch (Exception ex) {
@@ -66,44 +63,4 @@ public class AdRewardExecutor extends Executor {
         }
     }
 
-    /**
-     * Will return a {@link RewardedAdLoadCallback} ready to attach to a new created
-     * {@link RewardedAd}
-     */
-    static RewardedAdLoadCallback getRewardedAdLoadCallback(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        return new RewardedAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull RewardedAd ad) {
-                mRewardedAd = ad;
-                mRewardedAd.setFullScreenContentCallback(AdViewIdHelper.getFullScreenContentCallback(notifyListenersFunction));
-                call.resolve();
-                notifyListenersFunction.accept(FullScreenAdEventName.onAdLoaded.name(), new JSObject());
-            }
-
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                JSObject adMobError = new JSObject();
-                adMobError.put("code", adError.getCode());
-                adMobError.put("reason", adError.getMessage());
-
-                notifyListenersFunction.accept(FullScreenAdEventName.onAdFailedToLoad.name(), new JSObject());
-            }
-        };
-    }
-
-    /**
-     * Will return a {@link OnUserEarnedRewardListener} ready to attach to a new created
-     * {@link RewardedAd}
-     */
-    static OnUserEarnedRewardListener getOnUserEarnedRewardListener(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        return item -> {
-            final JSObject response = new JSObject();
-            response.put("type", item.getType())
-                    .put("amount", item.getAmount());
-
-//            notifyListenersFunction.accept(FullScreenAdEventName.onAdFailedToLoad.name(),response);
-            call.resolve(response);
-
-        };
-    }
 }

@@ -13,6 +13,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.FullScreenAdEventName;
+import com.getcapacitor.community.admob.models.RewardAdPluginEvents;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.ResponseInfo;
 import com.google.android.gms.ads.LoadAdError;
@@ -62,61 +63,5 @@ class AdRewardExecutorTest {
     @Nested
     class Listeners {
 
-        @Test
-        @DisplayName("onRewarded should emit the Reward Item info")
-        void onRewarded() throws JSONException {
-            ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
-            PluginCall pluginCall = mock(PluginCall.class);
-
-            OnUserEarnedRewardListener listener = AdRewardExecutor.getOnUserEarnedRewardListener(pluginCall, notifierMock);
-            String type = "My Type";
-            int amount = 69;
-            RewardItem rewardItem = new RewardItem() {
-                @Override
-                public String getType() {
-                    return type;
-                }
-
-                @Override
-                public int getAmount() {
-                    return amount;
-                }
-            };
-
-            // ACt
-            listener.onUserEarnedReward(rewardItem);
-
-            verify(notifierMock).accept(eq(FullScreenAdEventName.adDidDismissFullScreenContent.name()), argumentCaptor.capture());
-            final JSObject emittedItem = argumentCaptor.getValue();
-
-            assertEquals(emittedItem.getString("type"), type);
-            assertEquals(emittedItem.getInt("amount"), amount);
-        }
-
-        @Test
-        @DisplayName("onRewardedVideoAdFailedToLoad should emit the error code and description")
-        void onRewardedVideoAdFailedToLoad() throws JSONException {
-            try (MockedStatic<RequestHelper> requestHelperMockedStatic = Mockito.mockStatic(RequestHelper.class)) {
-                String reason = "This is the reason";
-                requestHelperMockedStatic.when(() -> RequestHelper.getRequestErrorReason(anyInt())).thenReturn(reason);
-                ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
-                PluginCall pluginCall = mock(PluginCall.class);
-                BiConsumer<String, JSObject> notifierMock = mock(BiConsumer.class);
-                RewardedAdLoadCallback listener = AdRewardExecutor.getRewardedAdLoadCallback(pluginCall, notifierMock);
-                int errorCode = 1;
-
-                class AdErrorClass { }
-                class ResponseInfoClass { }
-
-//                listener.onAdFailedToLoad(new LoadAdError(errorCode, reason, reason, new AdError(errorCode, reason, reason), new ResponseInfo()));
-//
-//                
-//                verify(notifierMock).accept(eq(FullScreenAdEventName.onAdFailedToLoad.name()), argumentCaptor.capture());
-//                final JSObject emittedError = argumentCaptor.getValue();
-//
-//                assertEquals(emittedError.getInt("code"), errorCode);
-//                assertEquals(emittedError.getString("reason"), reason);
-            }
-        }
     }
 }
