@@ -49,7 +49,7 @@ public final class AdViewIdHelper {
             public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                 notifyListenersFunction.accept(
                     FullScreenAdEventName.didFailToPresentFullScreenContentWithError.name(),
-                    new JSObject().put("code", 0).put("message", adError.getMessage())
+                    new JSObject().put("code", adError.getCode()).put("message", adError.getMessage())
                 );
             }
 

@@ -96,11 +96,14 @@ public class AdRewardExecutor extends Executor {
      * {@link RewardedAd}
      */
     static OnUserEarnedRewardListener getOnUserEarnedRewardListener(PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        return new OnUserEarnedRewardListener() {
-            @Override
-            public void onUserEarnedReward(@NonNull RewardItem item) {
-                call.resolve(new JSObject().put("type", item.getType()).put("amount", item.getAmount()));
-            }
+        return item -> {
+            final JSObject response = new JSObject();
+            response.put("type", item.getType())
+                    .put("amount", item.getAmount());
+
+//            notifyListenersFunction.accept(FullScreenAdEventName.onAdFailedToLoad.name(),response);
+            call.resolve(response);
+
         };
     }
 }

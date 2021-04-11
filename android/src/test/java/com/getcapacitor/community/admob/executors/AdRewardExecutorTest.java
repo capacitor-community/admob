@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -34,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.google.android.gms.ads.OnUserEarnedRewardListener;
 
 @ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class AdRewardExecutorTest {
 
     @Mock
@@ -54,6 +56,8 @@ class AdRewardExecutorTest {
         reset(context, activity, notifierMock);
         sut = new AdRewardExecutor(() -> context, () -> activity, notifierMock, LOG_TAG);
     }
+
+
 
     @Nested
     class Listeners {
