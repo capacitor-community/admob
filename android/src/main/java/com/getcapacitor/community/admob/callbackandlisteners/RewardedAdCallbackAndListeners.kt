@@ -30,8 +30,12 @@ object RewardedAdCallbackAndListeners {
             override fun onAdLoaded(ad: RewardedAd) {
                 AdRewardExecutor.mRewardedAd = ad
                 AdRewardExecutor.mRewardedAd.fullScreenContentCallback = AdViewIdHelper.getFullScreenContentCallback(notifyListenersFunction)
-                call.resolve()
-                notifyListenersFunction.accept(FullScreenAdEventName.onAdLoaded.name, JSObject())
+
+                val adInfo = JSObject()
+                adInfo.put("adUnitId", ad.adUnitId)
+                call.resolve(adInfo)
+
+                notifyListenersFunction.accept(RewardAdPluginEvents.Loaded.webEventName, adInfo)
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -40,6 +44,7 @@ object RewardedAdCallbackAndListeners {
                 adMobError.put("reason", adError.message)
 
                 notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad.webEventName, adMobError)
+                call.reject(adError.message)
             }
         }
     }

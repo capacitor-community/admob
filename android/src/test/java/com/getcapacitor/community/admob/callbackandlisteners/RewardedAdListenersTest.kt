@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Context
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
-import com.getcapacitor.community.admob.models.FullScreenAdEventName
 import com.getcapacitor.community.admob.models.RewardAdPluginEvents
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.common.util.BiConsumer
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -104,7 +104,7 @@ internal class RewardedAdListenersTest {
             }
 
             @Test
-            fun `onAdFailedToLoad should emit the the error code and reason`() {
+            fun `onAdFailedToLoad should emit the the error code and reason in a FailedToLoad event`() {
                 val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
                 val listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(pluginCall, notifierMock)
 
@@ -114,8 +114,49 @@ internal class RewardedAdListenersTest {
                 Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.FailedToLoad.webEventName), argumentCaptor.capture())
                 val emittedError = argumentCaptor.value
 
-                assertEquals(emittedError.getInt("code"), wantedErrorCode)
-                assertEquals(emittedError.getString("reason"), wantedReason)
+                assertEquals(wantedErrorCode, emittedError.getInt("code"))
+                assertEquals(wantedReason, emittedError.getString("reason"))
+            }
+
+            @Test
+            fun `onAdFailedToLoad should reject the error code and reason in a FailedToLoad event`() {
+                val argumentCaptor = ArgumentCaptor.forClass(String::class.java)
+                val listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(pluginCall, notifierMock)
+
+                // ACt
+                listener.onAdFailedToLoad(loadAdErrorMock)
+
+                Mockito.verify(pluginCall).reject(argumentCaptor.capture())
+                val resolvedError = argumentCaptor.value
+                assertEquals(wantedReason, resolvedError)
+            }
+
+        }
+
+        @Nested
+        inner class AdLoaded {
+            private val wantedAdUnitId = "My Unit Id"
+
+            @Mock
+            lateinit var rewardedAdMock: RewardedAd
+
+            @BeforeEach
+            fun beforeEach() {
+                Mockito.`when`(rewardedAdMock.adUnitId).thenReturn(wantedAdUnitId)
+            }
+
+            @Test
+            fun `onAdLoaded should emit an Loaded with the ad unit id`() {
+                val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
+                val listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(pluginCall, notifierMock)
+
+                // ACt
+                listener.onAdLoaded(rewardedAdMock)
+
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Loaded.webEventName), argumentCaptor.capture())
+                val emittedAdInfo = argumentCaptor.value
+
+                assertEquals(wantedAdUnitId, emittedAdInfo.getString("adUnitId"))
             }
         }
 

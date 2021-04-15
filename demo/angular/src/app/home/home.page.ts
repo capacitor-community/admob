@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdMob, AdOptions, AdSize, AdPosition, AdMobRewardItem, AdMobBannerSize } from '@capacitor-community/admob';
+import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPosition, BannerAdSize, RewardAdPluginEvents} from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-home',
@@ -26,17 +26,17 @@ export class HomePage implements OnInit, OnDestroy {
   /**
    * Setting of Ads
    */
-  private bannerTopOptions: AdOptions = {
+  private bannerTopOptions: BannerAdOptions = {
     adId: 'ca-app-pub-3940256099942544/2934735716',
-    adSize: AdSize.ADAPTIVE_BANNER,
-    position: AdPosition.TOP_CENTER,
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
+    position: BannerAdPosition.TOP_CENTER,
     // npa: false,
   };
 
-  private bannerBottomOptions: AdOptions = {
+  private bannerBottomOptions: BannerAdOptions = {
     adId: 'ca-app-pub-3940256099942544/2934735716',
-    adSize: AdSize.ADAPTIVE_BANNER,
-    position: AdPosition.BOTTOM_CENTER,
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
+    position: BannerAdPosition.BOTTOM_CENTER,
     npa: true,
   };
 
@@ -57,7 +57,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   constructor(
     private toastCtrl: ToastController,
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     /**
@@ -80,6 +81,9 @@ export class HomePage implements OnInit, OnDestroy {
         }
       }
     });
+
+    this.registerRewardListeners();
+
   }
 
   ngOnDestroy() {
@@ -182,6 +186,17 @@ export class HomePage implements OnInit, OnDestroy {
     await toast.present();
 
     this.isPrepareReward = false;
+  }
+
+  private registerRewardListeners(): void {
+    const eventKeys = Object.keys(RewardAdPluginEvents);
+
+    eventKeys.forEach(key => {
+      console.log(`registering ${RewardAdPluginEvents[key]}`);
+      AdMob.addListener(RewardAdPluginEvents[key], (info) => {
+        console.log(`Reward Event ${RewardAdPluginEvents[key]}`, info);
+      });
+    });
   }
   /**
    * ==================== /REWARD ====================
