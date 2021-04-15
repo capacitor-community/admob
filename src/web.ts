@@ -1,6 +1,8 @@
 import { WebPlugin } from '@capacitor/core';
+import { AdMobPlugin } from '.';
+import { AdMobRewardItem } from './reward';
+import { AdOptions } from './shared';
 
-import type { AdMobRewardItem, AdOptions, AdMobPlugin } from './definitions';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   constructor() {

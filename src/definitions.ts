@@ -2,6 +2,9 @@ import { BannerDefinitions } from './banner';
 import { InterstitialDefinitions } from './interstitial';
 import { RewardDefinitions } from './reward';
 
+
+
+
 type AdMobDefinitions = BannerDefinitions & RewardDefinitions & InterstitialDefinitions;
 
 export interface AdMobPlugin extends AdMobDefinitions {

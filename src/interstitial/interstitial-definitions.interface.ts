@@ -1,5 +1,6 @@
 import { AdOptions } from '../shared/ad-options.interface';
 import type { PluginListenerHandle } from '@capacitor/core';
+import { AdMobError } from '../shared';
 
 export interface InterstitialDefinitions {
   /**
