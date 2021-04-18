@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPosition, BannerAdSize, RewardAdPluginEvents} from '@capacitor-community/admob';
+import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, RewardAdPluginEvents} from '@capacitor-community/admob';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,13 @@ import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, Ba
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit, OnDestroy {
+  private readonly lastBannerEvent$$ = new ReplaySubject<{name: string, value: any}>(1);
+  public readonly lastBannerEvent$ = this.lastBannerEvent$$.asObservable()
+  
+  private readonly lastRewardEvent$$ = new ReplaySubject<{name: string, value: any}>(1);
+  public readonly lastRewardEvent$ = this.lastRewardEvent$$.asObservable()
+
+  private readonly listenerHandlers: PluginListenerHandle[] = [];
   /**
    * Height of AdSize
    */
@@ -48,15 +56,11 @@ export class HomePage implements OnInit, OnDestroy {
     adId: 'ca-app-pub-3940256099942544/1033173712',
   };
 
-  /**
-   * for EventListener
-   */
-  private eventOnAdSize: PluginListenerHandle;
-
   public isLoading = false;
 
   constructor(
-    private toastCtrl: ToastController,
+    private readonly toastCtrl: ToastController,
+    private readonly ngZone: NgZone
   ) {
   }
 
@@ -65,7 +69,7 @@ export class HomePage implements OnInit, OnDestroy {
      * Run every time the Ad height changes.
      * AdMob cannot be displayed above the content, so create margin for AdMob.
      */
-    this.eventOnAdSize = AdMob.addListener('bannerViewChangeSize', (info: AdMobBannerSize) => {
+    const resizeHandler = AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: AdMobBannerSize) => {
       console.log(['bannerViewChangeSize', info]);
       this.appMargin = info.height;
       if (this.appMargin > 0) {
@@ -82,14 +86,15 @@ export class HomePage implements OnInit, OnDestroy {
       }
     });
 
+    this.listenerHandlers.push(resizeHandler);
+
     this.registerRewardListeners();
+    this.registerBannerListeners();
 
   }
 
   ngOnDestroy() {
-    if (this.eventOnAdSize) {
-      this.eventOnAdSize.remove();
-    }
+    this.listenerHandlers.forEach(handler => handler.remove());
   }
 
   /**
@@ -193,11 +198,37 @@ export class HomePage implements OnInit, OnDestroy {
 
     eventKeys.forEach(key => {
       console.log(`registering ${RewardAdPluginEvents[key]}`);
-      AdMob.addListener(RewardAdPluginEvents[key], (info) => {
-        console.log(`Reward Event ${RewardAdPluginEvents[key]}`, info);
+      const handler = AdMob.addListener(RewardAdPluginEvents[key], (value) => {
+        console.log(`Reward Event "${key}"`, value);
+
+        this.ngZone.run(() => {
+          this.lastRewardEvent$$.next({name: key, value: value});
+        })
+        
+
       });
+      this.listenerHandlers.push(handler);
     });
   }
+
+  private registerBannerListeners(): void {
+    const eventKeys = Object.keys(BannerAdPluginEvents);
+
+    eventKeys.forEach(key => {
+      console.log(`registering ${BannerAdPluginEvents[key]}`);
+      const handler = AdMob.addListener(BannerAdPluginEvents[key], (value) => {
+        console.log(`Banner Event "${key}"`, value);
+
+        this.ngZone.run(() => {
+          this.lastBannerEvent$$.next({name: key, value: value});
+        })
+        
+      });
+      this.listenerHandlers.push(handler);
+
+    });
+  }
+
   /**
    * ==================== /REWARD ====================
    */

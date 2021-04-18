@@ -16,7 +16,11 @@
   </section>
 
   <ion-list>
-    <ion-list-header><ion-label>Banner</ion-label></ion-list-header>
+    <ion-list-header><ion-label>Banner 
+      <ng-container *ngIf="lastBannerEvent$ | async as lastBannerEvent">
+      (Last Event: {{lastBannerEvent.name }} | {{lastBannerEvent.value | json}})
+    </ng-container>
+    </ion-label></ion-list-header>
     <ion-item button="true" (click)="showTopBanner()">Show Top Banner</ion-item>
     <ion-item button="true" (click)="showBottomBanner()">Show Bottom Banner</ion-item>
     <ion-item button="true" (click)="hideBanner()">Hide Banner</ion-item>
@@ -31,7 +35,12 @@
   </ion-list>
 
   <ion-list>
-    <ion-list-header><ion-label>Reward</ion-label></ion-list-header>
+    <ion-list-header><ion-label>Reward
+      <ng-container *ngIf="lastRewardEvent$ | async as lastRewardEvent">
+        (Last Event: {{lastRewardEvent.name }} | {{lastRewardEvent.value | json}})
+      </ng-container>
+      
+    </ion-label></ion-list-header>
     <ion-item button="true" (click)="prepareReward()" [disabled]="isPrepareReward">Prepare Reward</ion-item>
     <ion-item button="true" lines="full" (click)="showReward()" [disabled]="!isPrepareReward">Show Reward</ion-item>
   </ion-list>
