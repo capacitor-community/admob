@@ -1,4 +1,4 @@
-package com.getcapacitor.community.admob.executors;
+package com.getcapacitor.community.admob.rewarded;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,7 +8,8 @@ import androidx.core.util.Supplier;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
-import com.getcapacitor.community.admob.callbackandlisteners.RewardedAdCallbackAndListeners;
+import com.getcapacitor.community.admob.executors.Executor;
+import com.getcapacitor.community.admob.rewarded.RewardedAdCallbackAndListeners;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;

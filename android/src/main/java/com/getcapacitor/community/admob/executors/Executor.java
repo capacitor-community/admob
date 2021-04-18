@@ -11,7 +11,7 @@ public abstract class Executor {
 
     protected final Supplier<Context> contextSupplier;
     protected final Supplier<Activity> activitySupplier;
-    BiConsumer<String, JSObject> notifyListenersFunction;
+    protected BiConsumer<String, JSObject> notifyListenersFunction;
     protected final String logTag;
 
     // Eventually we can change the notification directly here!
@@ -19,7 +19,7 @@ public abstract class Executor {
         notifyListenersFunction.accept(eventName, data);
     }
 
-    Executor(
+    public Executor(
         Supplier<Context> contextSupplier,
         Supplier<Activity> activitySupplier,
         BiConsumer<String, JSObject> notifyListenersFunction,

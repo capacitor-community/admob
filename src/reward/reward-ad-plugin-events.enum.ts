@@ -1,11 +1,17 @@
 // This enum should be keep in sync with their native equivalents with the same name
 export enum RewardAdPluginEvents {
-  Loaded= 'onRewardedVideoAdLoaded',
+  /**
+   * Emits after trying to prepare a RewardAd and the Video is loaded and ready to be show
+   */
+  Loaded = 'onRewardedVideoAdLoaded',
+  /**
+   * Emits after trying to prepare a RewardAd when it could not be loaded
+   */
   FailedToLoad = 'onRewardedVideoAdFailedToLoad',
   /**
    * Emits when the AdReward video is visible to the user
    */
-  Showed= 'onRewardedVideoAdShowed',
+  Showed = 'onRewardedVideoAdShowed',
   FailedToShow = 'onRewardedVideoAdFailedToShow',
   /**
    * Emits when the AdReward video is not visible to the user anymore.

@@ -1,4 +1,4 @@
-package com.getcapacitor.community.admob.callbackandlisteners
+package com.getcapacitor.community.admob.rewarded
 
 import android.app.Activity
 import android.content.Context
