@@ -55,7 +55,10 @@ public class AdRewardExecutor extends Executor {
                 .get()
                 .runOnUiThread(
                     () -> {
-                        mRewardedAd.show(activitySupplier.get(), RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction));
+                        mRewardedAd.show(
+                                activitySupplier.get(),
+                                RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
+                        );
                     }
                 );
         } catch (Exception ex) {

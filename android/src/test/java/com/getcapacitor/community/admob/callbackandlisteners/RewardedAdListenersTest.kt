@@ -6,6 +6,7 @@ import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.models.RewardAdPluginEvents
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.common.util.BiConsumer
@@ -43,7 +44,7 @@ internal class RewardedAdListenersTest {
     }
 
     @Nested
-    inner class GetOnUserEarnedRewardListener {
+    inner class OnUserEarnedRewardListener {
         private val wantedType = "My Type"
         private val wantedAmount = 69
         private val rewardItem: RewardItem = object : RewardItem {
@@ -161,5 +162,57 @@ internal class RewardedAdListenersTest {
         }
 
 
+    }
+
+    @Nested
+    inner class FullScreenContentCallback {
+        private lateinit var argumentCaptor: ArgumentCaptor<JSObject>
+        private lateinit var  listener: com.google.android.gms.ads.FullScreenContentCallback
+
+        @BeforeEach
+        fun beforeEach() {
+            argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
+            listener = RewardedAdCallbackAndListeners.getFullScreenContentCallback(notifierMock)
+        }
+
+        @Nested
+        inner class AdShowedFullScreenContent {
+
+            @Test
+            fun `onAdShowedFullScreenContent call Showed event listener `() {
+
+                // ACt
+                listener.onAdShowedFullScreenContent()
+
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Showed.webEventName), argumentCaptor.capture())
+            }
+
+            @Test
+            fun `onAdFailedToShowFullScreenContent call FailedToShow event listener `() {
+                 var wantedReason = "This is the reason"
+                 var wantedErrorCode = 1
+                var adErrorMock = Mockito.mock(AdError::class.java);
+                Mockito.`when`(adErrorMock.code).thenReturn(wantedErrorCode)
+                Mockito.`when`(adErrorMock.message).thenReturn(wantedReason)
+
+                // ACt
+                listener.onAdFailedToShowFullScreenContent(adErrorMock)
+
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.FailedToShow.webEventName), argumentCaptor.capture())
+                val emittedError = argumentCaptor.value
+
+                assertEquals(wantedErrorCode, emittedError.getInt("code"))
+                assertEquals(wantedReason, emittedError.getString("reason"))
+            }
+
+            @Test
+            fun `onAdDismissedFullScreenContent call Dismissed event listener `() {
+
+                // ACt
+                listener.onAdDismissedFullScreenContent()
+
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Dismissed.webEventName), argumentCaptor.capture())
+            }
+        }
     }
 }

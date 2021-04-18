@@ -4,6 +4,7 @@ import type { PluginListenerHandle } from '@capacitor/core';
 import { RewardAdPluginEvents } from './reward-ad-plugin-events.enum';
 import { ValidateAllEventsEnumAreImplemented} from '../private/validate-all-events-implemented.type'
 import { AdMobError } from '../shared';
+import { RewardAdLoadInfo } from './reward-ad-load-info.interface';
 
 // This is just to validate that we do not forget to implement any event name
 export type RewardDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<RewardAdPluginEvents, RewardDefinitions>;
@@ -16,7 +17,7 @@ export interface RewardDefinitions {
    * @param options AdOptions
    * @since 1.1.2
    */
-     prepareRewardVideoAd(options: AdOptions): Promise<void>;
+     prepareRewardVideoAd(options: AdOptions): Promise<RewardAdLoadInfo>;
 
      /**
       * Show a reward video ad
@@ -26,13 +27,6 @@ export interface RewardDefinitions {
       */
   showRewardVideoAd(): Promise<AdMobRewardItem>;
   
-    
-  addListener (
-    eventName: RewardAdPluginEvents.Rewarded,
-    listenerFunc: (reward: AdMobRewardItem) => void,
-  ): PluginListenerHandle;
-  
-  
   addListener(
     eventName: RewardAdPluginEvents.FailedToLoad,
     listenerFunc: (error: AdMobError) => void,
@@ -40,7 +34,12 @@ export interface RewardDefinitions {
 
   addListener (
     eventName: RewardAdPluginEvents.Loaded,
-    listenerFunc: (info: {adUnitId: string} ) => void,
+    listenerFunc: (info: RewardAdLoadInfo ) => void,
+  ): PluginListenerHandle;
+
+  addListener (
+    eventName: RewardAdPluginEvents.Rewarded,
+    listenerFunc: (reward: AdMobRewardItem) => void,
   ): PluginListenerHandle;
 
   addListener(
@@ -51,7 +50,7 @@ export interface RewardDefinitions {
   
   addListener(
     eventName: RewardAdPluginEvents.FailedToShow,
-    listenerFunc: () => void,
+    listenerFunc: (error: AdMobError) => void,
   ) : PluginListenerHandle;
 
 
