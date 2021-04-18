@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
-import com.getcapacitor.community.admob.models.RewardAdPluginEvents
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.rewarded.RewardItem

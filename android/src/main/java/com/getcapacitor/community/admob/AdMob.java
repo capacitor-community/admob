@@ -10,7 +10,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.community.admob.executors.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
-import com.getcapacitor.community.admob.executors.BannerExecutor;
+import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;

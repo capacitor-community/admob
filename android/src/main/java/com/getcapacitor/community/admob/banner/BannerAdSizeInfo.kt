@@ -1,15 +1,17 @@
-package com.getcapacitor.community.admob.models
+package com.getcapacitor.community.admob.banner
 
 import com.getcapacitor.JSObject
 import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdView
+import java.util.*
 
-data class AbMobPluginError(val code: Int, val reason: String) : JSObject() {
+data class BannerAdSizeInfo(val width: Int, val height: Int) : JSObject() {
     override fun put(key: String, value: Int): JSObject {
         throw Exception("Do not put elements directly here use the constructor")
     }
     init {
-        super.put("code", this.code)
-        super.put("reason", this.reason)
+        super.put("width", width)
+        super.put("height", height)
     }
-    constructor(adError: AdError): this(adError.code, adError.message)
+    constructor(mAdView: AdView): this(Objects.requireNonNull(mAdView.adSize).width, mAdView.height)
 }

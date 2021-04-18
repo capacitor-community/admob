@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.models;
 
 import androidx.annotation.VisibleForTesting;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.banner.BannerAdSizeEnum;
 
 /**
  * Holds the options for an Ad Request
@@ -20,7 +21,7 @@ public abstract class AdOptions {
      * IT can be: ADAPTIVE_BANNER, BANNER, MEDIUM_RECTANGLE,
      * FULL_BANNER, LEADERBOARD, SKYSCRAPER, or CUSTOM
      */
-    public final AdSizeEnum adSize;
+    public final BannerAdSizeEnum adSize;
 
     public static final String BANNER_TESTER_ID = "ca-app-pub-3940256099942544/6300978111";
     public static final String INTERSTITIAL_TESTER_ID = "ca-app-pub-3940256099942544/1033173712";
@@ -72,11 +73,11 @@ public abstract class AdOptions {
         this.margin = call.getInt("margin", 0);
         this.npa = call.getBoolean("npa", false);
 
-        String sizeString = call.getString("adSize", AdSizeEnum.ADAPTIVE_BANNER.name);
+        String sizeString = call.getString("adSize", BannerAdSizeEnum.ADAPTIVE_BANNER.name);
         this.adSize = AdOptions.adSizeStringToAdSizeEnum(sizeString);
     }
 
-    private AdOptions(String id, boolean isTesting, String position, int margin, boolean npa, AdSizeEnum adSize) {
+    private AdOptions(String id, boolean isTesting, String position, int margin, boolean npa, BannerAdSizeEnum adSize) {
         this.adId = id;
         this.isTesting = isTesting;
         this.position = position;
@@ -90,11 +91,11 @@ public abstract class AdOptions {
      */
     public abstract String getTestingId();
 
-    private static AdSizeEnum adSizeStringToAdSizeEnum(String sizeString) {
+    private static BannerAdSizeEnum adSizeStringToAdSizeEnum(String sizeString) {
         try {
-            return AdSizeEnum.valueOf(sizeString);
+            return BannerAdSizeEnum.valueOf(sizeString);
         } catch (IllegalArgumentException error) {
-            return AdSizeEnum.ADAPTIVE_BANNER;
+            return BannerAdSizeEnum.ADAPTIVE_BANNER;
         }
     }
 
@@ -161,7 +162,7 @@ public abstract class AdOptions {
         private String position = "TesterAdOptionsBuilder__position";
         private int margin = 1;
         private boolean npa = false;
-        private AdSizeEnum adSize = AdSizeEnum.ADAPTIVE_BANNER;
+        private BannerAdSizeEnum adSize = BannerAdSizeEnum.ADAPTIVE_BANNER;
 
         public TesterAdOptionsBuilder setIsTesting(boolean value) {
             isTesting = value;
@@ -193,7 +194,7 @@ public abstract class AdOptions {
             return this;
         }
 
-        public TesterAdOptionsBuilder setAdSize(AdSizeEnum value) {
+        public TesterAdOptionsBuilder setAdSize(BannerAdSizeEnum value) {
             adSize = value;
             return this;
         }

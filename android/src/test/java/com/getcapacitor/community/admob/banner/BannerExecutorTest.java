@@ -1,4 +1,4 @@
-package com.getcapacitor.community.admob.executors;
+package com.getcapacitor.community.admob.banner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

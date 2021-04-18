@@ -3,7 +3,6 @@ package com.getcapacitor.community.admob.rewarded
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.models.AbMobPluginError
-import com.getcapacitor.community.admob.models.RewardAdPluginEvents
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError

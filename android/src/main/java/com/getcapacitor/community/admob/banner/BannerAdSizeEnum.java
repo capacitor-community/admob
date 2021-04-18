@@ -1,4 +1,4 @@
-package com.getcapacitor.community.admob.models;
+package com.getcapacitor.community.admob.banner;
 
 import com.google.android.gms.ads.AdSize;
 
