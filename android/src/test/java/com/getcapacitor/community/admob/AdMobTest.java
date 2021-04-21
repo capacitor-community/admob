@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -42,6 +43,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 public class AdMobTest {
+
     @Mock
     Context mockedContext;
 
@@ -62,7 +64,6 @@ public class AdMobTest {
 
         sut =
             new AdMob() {
-
                 @Override
                 public Context getContext() {
                     return mockedContext;
@@ -88,6 +89,7 @@ public class AdMobTest {
     @Nested
     @DisplayName("Initialize()")
     class Initialize {
+
         MockedStatic<MobileAds> mobileAdsMockedStatic;
         JSArray testingDevices;
 
@@ -151,6 +153,7 @@ public class AdMobTest {
     @Nested
     @DisplayName("Ads Creation")
     class AdsCreation {
+
         AdOptions adOptionsWithNpaTrue = new AdOptions.TesterAdOptionsBuilder().setNpa(true).build();
 
         MockedStatic<MobileAds> mobileAdsMockedStatic;
@@ -215,6 +218,20 @@ public class AdMobTest {
                     uiThreadRunnable.run();
 
                     requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
+                }
+            }
+
+            @Test
+            @DisplayName("Interstitial does not initialize the same add two times")
+            void prepareInterstitialJustOneTime() {
+                try (MockedConstruction<InterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(InterstitialAd.class)) {
+                    when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
+
+                    sut.prepareInterstitial(pluginCallMock);
+                    sut.prepareInterstitial(pluginCallMock);
+                    sut.prepareInterstitial(pluginCallMock);
+                    sut.prepareInterstitial(pluginCallMock);
+                    verify(mockedActivity, atMostOnce()).runOnUiThread(runnableArgumentCaptor.capture());
                 }
             }
 
