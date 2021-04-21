@@ -1,4 +1,4 @@
-package com.getcapacitor.community.admob.executors;
+package com.getcapacitor.community.admob.models;
 
 import android.app.Activity;
 import android.content.Context;

@@ -1,6 +1,12 @@
 import { AdOptions } from '../shared/ad-options.interface';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { AdMobError } from '../shared';
+import { AdLoadInfo, AdMobError } from '../shared';
+import { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
+import { InterstitialAdPluginEvents } from './interstitial-ad-plugin-events.enum';
+
+
+// This is just to validate that we do not forget to implement any event name
+export type InterstitialDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<InterstitialAdPluginEvents, InterstitialDefinitions>;
 
 export interface InterstitialDefinitions {
   /**
@@ -10,7 +16,7 @@ export interface InterstitialDefinitions {
    * @param options AdOptions
    * @since 1.1.2
    */
-   prepareInterstitial(options: AdOptions): Promise<void>;
+   prepareInterstitial(options: AdOptions): Promise<AdLoadInfo>;
 
    /**
     * Show interstitial ad when it’s ready
@@ -20,42 +26,31 @@ export interface InterstitialDefinitions {
     */
   showInterstitial(): Promise<void>;
   
-    /**
-   * Notice: Interstitial ad opened
-   *
-   * @group fullscreen
-   * @param eventName adDidPresentFullScreenContent
-   * @param listenerFunc
-   * @since 3.0.0
-   */
-     addListener(
-      eventName: 'adDidPresentFullScreenContent',
-      listenerFunc: (info: any) => void,
-    ): PluginListenerHandle;
+  addListener(
+    eventName: InterstitialAdPluginEvents.FailedToLoad,
+    listenerFunc: (error: AdMobError) => void,
+  ): PluginListenerHandle;
+
+  addListener (
+    eventName: InterstitialAdPluginEvents.Loaded,
+    listenerFunc: (info: AdLoadInfo ) => void,
+  ): PluginListenerHandle;
+
+
+  addListener(
+    eventName: InterstitialAdPluginEvents.Dismissed,
+    listenerFunc: () => void,
+  ): PluginListenerHandle;
+
   
-    /**
-     * Notice: Dismiss Content
-     *
-     * @group fullscreen
-     * @param eventName adDidDismissFullScreenContent
-     * @param listenerFunc
-     * @since 3.0.0
-     */
-    addListener(
-      eventName: 'adDidDismissFullScreenContent',
-      listenerFunc: (info: any) => void,
-    ): PluginListenerHandle;
-  
-    /**
-     * Notice: Interstitial ad is be failed to open
-     *
-     * @group fullscreen
-     * @param eventName didFailToPresentFullScreenContentWithError
-     * @param listenerFunc
-     * @since 3.0.0
-     */
-    addListener(
-      eventName: 'didFailToPresentFullScreenContentWithError',
-      listenerFunc: (info: AdMobError) => void,
-    ): PluginListenerHandle;
+  addListener(
+    eventName: InterstitialAdPluginEvents.FailedToShow,
+    listenerFunc: (error: AdMobError) => void,
+  ) : PluginListenerHandle;
+
+
+  addListener (
+    eventName: InterstitialAdPluginEvents.Showed,
+    listenerFunc: () => void,
+  ): PluginListenerHandle;
 }

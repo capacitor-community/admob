@@ -1,7 +1,7 @@
 import { WebPlugin } from '@capacitor/core';
 import { AdMobPlugin } from '.';
-import { AdMobRewardItem, RewardAdLoadInfo } from './reward';
-import { AdOptions } from './shared';
+import { AdMobRewardItem } from './reward';
+import { AdOptions, AdLoadInfo } from './shared';
 
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
@@ -37,15 +37,18 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
 
   }
 
-  async prepareInterstitial(options: AdOptions): Promise<void> {
+  async prepareInterstitial(options: AdOptions): Promise<AdLoadInfo> {
     console.log('prepareInterstitial', options);
+    return {
+      adUnitId: options.adId
+    }
   }
 
   async showInterstitial(): Promise<void> {
     console.log('showInterstitial');
   }
 
-  async prepareRewardVideoAd(options: AdOptions): Promise<RewardAdLoadInfo> {
+  async prepareRewardVideoAd(options: AdOptions): Promise<AdLoadInfo> {
     console.log(options);
     return {
       adUnitId: options.adId
