@@ -130,7 +130,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                 }
             }
 
-            self.notifyListeners("bannerViewChangeSize", data: [
+            self.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
                 "width": 0,
                 "height": 0
             ])
@@ -146,7 +146,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                     NSLog("AdMob: find subView for resumeBanner")
                     subView.isHidden = false
 
-                    self.notifyListeners("bannerViewChangeSize", data: [
+                    self.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
                         "width": subView.frame.width,
                         "height": subView.frame.height
                     ])
@@ -221,11 +221,11 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
     /// Tells the delegate an ad request loaded an ad.
     public func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
         NSLog("bannerViewDidReceiveAd")
-        self.notifyListeners("bannerViewChangeSize", data: [
+        self.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
             "width": bannerView.frame.width,
             "height": bannerView.frame.height
         ])
-        self.bridge?.triggerJSEvent(eventName: "bannerViewDidReceiveAd", target: "window")
+        self.notifyListeners(BannerAdPluginEvents.Loaded.rawValue, data: [:])
     }
 
     /// Tells the delegate an ad request failed.
@@ -233,22 +233,31 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                            didFailToReceiveAdWithError error: Error) {
         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
-        self.notifyListeners("bannerViewChangeSize", data: [
+        self.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
             "width": 0,
             "height": 0
         ])
-        self.bridge?.triggerJSEvent(eventName: "bannerView:didFailToReceiveAdWithError", target: "window")
+        self.notifyListeners(BannerAdPluginEvents.FailedToLoad.rawValue, data: [
+            "code": 0,
+            "message": error.localizedDescription,
+            "cause": "",
+            "domain": "",
+        ])
+    }
+    
+    public func bannerViewDidRecordImpression(_ bannerView: GADBannerView) {
+        self.notifyListeners(BannerAdPluginEvents.AdImpression.rawValue, data: [:])
     }
 
     /// Tells the delegate that a full-screen view will be presented in response
     /// to the user clicking on an ad.
     public func bannerViewWillPresentScreen(_ bannerView: GADBannerView) {
-        self.bridge?.triggerJSEvent(eventName: "bannerViewWillPresentScreen", target: "window")
+        self.notifyListeners(BannerAdPluginEvents.Opened.rawValue, data: [:])
     }
 
     /// Tells the delegate that the full-screen view will be dismissed.
     public func bannerViewWillDismissScreen(_ bannerView: GADBannerView) {
-        self.bridge?.triggerJSEvent(eventName: "bannerViewWillDismissScreen", target: "window")
+        self.notifyListeners(BannerAdPluginEvents.Closed.rawValue, data: [:])
     }
 
     /**

@@ -1,10 +1,23 @@
 // This enum should be keep in sync with their native equivalents with the same name
 export enum BannerAdPluginEvents {
   SizeChanged = "bannerAdSizeChanged",
-  Closed = "bannerAdClosed",
-  FailedToLoad = "bannerAdFailedToLoad",
-  Opened = "bannerAdOpened",
   Loaded = "bannerAdLoaded",
-  Clicked = "bannerAdClicked",
+  FailedToLoad = "bannerAdFailedToLoad",
+
+  /**
+   * Open or close "Adsense" Event after user click banner
+   */
+  Opened = "bannerAdOpened",
+  Closed = "bannerAdClosed",
+
+  /**
+   * Similarly, this method should be called when an impression is recorded for the ad by the mediated SDK.
+   */
   AdImpression = "bannerAdImpression",
+
+  /**
+   * This method should be called when a user clicks on a native ad.
+   * Android Only, so suggest to remove
+   */
+  Clicked = "bannerAdClicked",
 }
