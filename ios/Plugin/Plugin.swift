@@ -167,20 +167,9 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
         if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
             NSLog("AdMob: rendering rootView")
 
-            var toItem = rootViewController.bottomLayoutGuide
-            var adMargin = Int(Margin)
+            let toItem = rootViewController.view.safeAreaLayoutGuide
+            let adMargin = Int(Margin) * -1
 
-            switch adPosition {
-            case "CENTER":
-                // todo: position center
-                toItem = rootViewController.bottomLayoutGuide
-                adMargin = adMargin * -1
-                break
-            default:
-                toItem = rootViewController.bottomLayoutGuide
-                adMargin = adMargin * -1
-                break
-            }
             bannerView.translatesAutoresizingMaskIntoConstraints = false
             bannerView.tag = 2743243288699 // rand
             rootViewController.view.addSubview(bannerView)
@@ -280,6 +269,8 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
                     self.interstitial = ad
                     self.interstitial.fullScreenContentDelegate = self
+                    
+                    self.notifyListeners(InterstitialAdPluginEvents.Loaded.rawValue, data: [:])
                     call.resolve([:])
                 }
             )
@@ -329,6 +320,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
                     self.rewardedAd = ad
                     self.rewardedAd?.fullScreenContentDelegate = self
+                    self.notifyListeners(RewardAdPluginEvents.Loaded.rawValue, data: [:])
                     call.resolve([:])
                 }
             )
@@ -356,12 +348,12 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
     public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("Ad did present full screen content.")
-        self.notifyListeners("adDidPresentFullScreenContent", data: [:])
+        self.notifyListeners(FullScreenAdEventName.adDidPresentFullScreenContent.rawValue, data: [:])
     }
 
     public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         NSLog("Ad failed to present full screen content with error \(error.localizedDescription).")
-        self.notifyListeners("didFailToPresentFullScreenContentWithError", data: [
+        self.notifyListeners(FullScreenAdEventName.didFailToPresentFullScreenContentWithError.rawValue, data: [
             "code": 0,
             "message": error.localizedDescription
         ])
@@ -369,7 +361,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
 
     public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("Ad did dismiss full screen content.")
-        self.notifyListeners("adDidDismissFullScreenContent", data: [:])
+        self.notifyListeners(FullScreenAdEventName.adDidDismissFullScreenContent.rawValue, data: [:])
     }
 
     private func GADRequestWithOption(_ npa: Bool) -> GADRequest {
