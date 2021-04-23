@@ -339,6 +339,7 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                     ad.present(fromRootViewController: rootViewController,
                                userDidEarnRewardHandler: {
                                 let reward = ad.adReward
+                                self.notifyListeners("onRewardedVideoAdReward", data: ["type": reward.type, "amount": reward.amount])
                                 call.resolve(["type": reward.type, "amount": reward.amount])
                                }
                     )
