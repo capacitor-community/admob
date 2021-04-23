@@ -106,14 +106,16 @@ export interface BannerDefinitions {
       eventName: BannerAdPluginEvents.Closed,
       listenerFunc: () => void,
     ): PluginListenerHandle;
-  
-  
-    addListener(
-      eventName: BannerAdPluginEvents.Clicked,
-      listenerFunc: () => void,
-    ): PluginListenerHandle;
-  
-    addListener(
+
+ /**
+  * Unimplemented
+  *
+  * @group Banner
+  * @param eventName AdImpression
+  * @param listenerFunc
+  * @since 3.0.0
+  */
+ addListener(
       eventName: BannerAdPluginEvents.AdImpression,
       listenerFunc: () => void,
     ): PluginListenerHandle;

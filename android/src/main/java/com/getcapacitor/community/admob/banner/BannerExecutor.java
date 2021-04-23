@@ -256,12 +256,6 @@ public class BannerExecutor extends Executor {
                             }
 
                             @Override
-                            public void onAdClicked() {
-                                notifyListeners(BannerAdPluginEvents.Clicked.getWebEventName(), emptyObject);
-                                super.onAdClicked();
-                            }
-
-                            @Override
                             public void onAdImpression() {
                                 notifyListeners(BannerAdPluginEvents.AdImpression.getWebEventName(), emptyObject);
                                 super.onAdImpression();
