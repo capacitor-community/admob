@@ -41,17 +41,7 @@
   MEDIUM_RECTANGLE = 'MEDIUM_RECTANGLE',
 
   /**
-   * deprecated: A dynamically sized banner that is full-width and auto-height.
-   */
-  SMART_BANNER = 'SMART_BANNER',
-
-  /**
    * A dynamically sized banner that is full-width and auto-height.
    */
   ADAPTIVE_BANNER = 'ADAPTIVE_BANNER',
-
-  /**
-   * To define a custom banner size, set your desired AdSize
-   */
-  CUSTOM = 'CUSTOM',
 }

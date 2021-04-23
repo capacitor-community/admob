@@ -72,23 +72,17 @@ public class AdMob: CAPPlugin, GADBannerViewDelegate, GADFullScreenContentDelega
                 case "BANNER":
                     bannerSize = kGADAdSizeBanner
                     break
-                case "FLUID":
-                    bannerSize = kGADAdSizeSmartBannerPortrait
+                case "LARGE_BANNER":
+                    bannerSize = kGADAdSizeLargeBanner
                     break
                 case "FULL_BANNER":
                     bannerSize = kGADAdSizeFullBanner
-                    break
-                case "LARGE_BANNER":
-                    bannerSize = kGADAdSizeLargeBanner
                     break
                 case "LEADERBOARD":
                     bannerSize = kGADAdSizeLeaderboard
                     break
                 case "MEDIUM_RECTANGLE":
                     bannerSize = kGADAdSizeMediumRectangle
-                    break
-                case "SMART_BANNER":
-                    bannerSize = kGADAdSizeSmartBannerPortrait
                     break
                 default: // ADAPTIVE_BANNER
                     let frame = { () -> CGRect in
