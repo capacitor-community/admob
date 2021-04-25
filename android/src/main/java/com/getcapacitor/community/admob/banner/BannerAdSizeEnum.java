@@ -2,15 +2,17 @@ package com.getcapacitor.community.admob.banner;
 
 import com.google.android.gms.ads.AdSize;
 
+/**
+ * https://developers.google.com/admob/android/banner#banner_sizes
+ */
 public enum BannerAdSizeEnum {
     BANNER("BANNER", AdSize.BANNER),
-    FULL_BANNER("FULL_BANNER", AdSize.FULL_BANNER),
     LARGE_BANNER("LARGE_BANNER", AdSize.LARGE_BANNER),
-    LEADERBOARD("LEADERBOARD", AdSize.LEADERBOARD),
     MEDIUM_RECTANGLE("MEDIUM_RECTANGLE", AdSize.MEDIUM_RECTANGLE),
-    WIDE_SKYSCRAPER("WIDE_SKYSCRAPER", AdSize.WIDE_SKYSCRAPER),
-    ADAPTIVE_BANNER("ADAPTIVE_BANNER", AdSize.zza),
-    FLUID("FLUID", AdSize.FLUID);
+    FULL_BANNER("FULL_BANNER", AdSize.FULL_BANNER),
+    LEADERBOARD("LEADERBOARD", AdSize.LEADERBOARD),
+    ADAPTIVE_BANNER("ADAPTIVE_BANNER", AdSize.INVALID),
+    SMART_BANNER("ADAPTIVE_BANNER", AdSize.zza);
 
     public final String name;
     public final AdSize size;

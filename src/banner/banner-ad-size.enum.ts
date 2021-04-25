@@ -2,6 +2,7 @@
  *  For more information:
  *  https://developers.google.com/admob/ios/banner#banner_sizes
  *  https://developers.google.com/android/reference/com/google/android/gms/ads/AdSize
+ * 
  * */
  export enum BannerAdSize {
   /**
@@ -9,13 +10,6 @@
    * banner ad size (320x50 density-independent pixels).
    */
   BANNER = 'BANNER',
-
-  /**
-   * A dynamically sized banner that matches its parent's
-   * width and expands/contracts its height to match the ad's
-   * content after loading completes.
-   */
-  FLUID = 'FLUID',
 
   /**
    * Interactive Advertising Bureau (IAB)
@@ -43,5 +37,11 @@
   /**
    * A dynamically sized banner that is full-width and auto-height.
    */
-  ADAPTIVE_BANNER = 'ADAPTIVE_BANNER',
+   ADAPTIVE_BANNER = 'ADAPTIVE_BANNER',
+  
+   /**
+    * Screen width x 32|50|90
+    */
+   SMART_BANNER = 'ADAPTIVE_BANNER',
+
 }
