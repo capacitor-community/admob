@@ -1,15 +1,9 @@
 package com.getcapacitor.community.admob.rewarded;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-
 import android.app.Activity;
 import android.content.Context;
+
 import com.getcapacitor.JSObject;
-import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.google.android.gms.common.util.BiConsumer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +12,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.Mockito.reset;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)

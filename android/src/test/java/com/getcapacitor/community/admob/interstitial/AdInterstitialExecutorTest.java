@@ -5,135 +5,170 @@ import android.content.Context;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
+import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.common.util.BiConsumer;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class AdInterstitialExecutorTest {
 
-    @Mock
+    @Mock()
     Context context;
 
-    @Mock
-    Activity activity;
+    @Mock()
+    Activity mockedActivity;
 
-    @Mock
+    @Mock()
     BiConsumer<String, JSObject> notifierMock;
-
 
     final String LOG_TAG = "AdInterstitialExecutorTest Log Tag";
 
     AdInterstitialExecutor sut;
 
+    ArgumentCaptor<Runnable> runnableArgumentCaptor;
+
     @BeforeEach
     void beforeEach() {
-        reset(context, activity, notifierMock);
-        sut = new AdInterstitialExecutor(() -> context, () -> activity, notifierMock, LOG_TAG);
+
+        runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
+
+
+        sut = new AdInterstitialExecutor(() -> context, () -> mockedActivity, notifierMock, LOG_TAG);
+    }
+
+    @AfterEach()
+    void afterEach() {
+        reset(context, mockedActivity, notifierMock);
     }
 
     @Nested
     class PrepareInterstitial {
+        @Mock
+        MockedStatic<AdOptions> adOptionsMockedStatic;
 
         @Mock
+        MockedStatic<RequestHelper> requestHelperMockedStatic;
+
+        @Mock
+        MockedStatic<AdViewIdHelper> adViewIdHelperMockedStatic;
+
+        @Mock
+        MockedStatic<InterstitialAd> interstitialAdMockedStatic;
+
+        @Mock
+        MockedStatic<InterstitialAdCallbackAndListeners> interstitialAdCallbackAndListenersMockedStatic;
+
+        @Mock
+        InterstitialAdLoadCallback interstitialAdLoadCallbackMock;
+
+        @Mock()
         AdOptions.AdOptionsFactory adOptionsFactoryMock;
 
-        @Mock
+        @Mock()
         PluginCall pluginCallMock;
 
-        @Mock
+        @Mock()
         AdOptions adOptionsMock;
+
+        AdRequest adRequestFromHelper = (new AdRequest.Builder()).build();
+
+        final String idFromViewHelper = "The Id From The View Helper";
+
+        @BeforeEach
+        void beforeEach() {
+
+            adOptionsMockedStatic.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
+            when(adOptionsFactoryMock.createInterstitialOptions(pluginCallMock)).thenReturn(adOptionsMock);
+            requestHelperMockedStatic.when(() -> RequestHelper.createRequest(adOptionsMock)).thenReturn(adRequestFromHelper);
+            adViewIdHelperMockedStatic.when(() -> AdViewIdHelper.getFinalAdId(any(), any(), any(), any())).thenReturn(idFromViewHelper);
+
+            interstitialAdCallbackAndListenersMockedStatic.when(() -> InterstitialAdCallbackAndListeners.INSTANCE.getInterstitialAdLoadCallback(any(), any())).thenReturn(interstitialAdLoadCallbackMock);
+        }
+
+        @AfterEach()
+        void afterEach() {
+            reset(adOptionsFactoryMock);
+            requestHelperMockedStatic.close();
+            adOptionsMockedStatic.close();
+            interstitialAdMockedStatic.close();
+            adViewIdHelperMockedStatic.close();
+            interstitialAdCallbackAndListenersMockedStatic.close();
+        }
 
         @Test
         @DisplayName("creates the options with the correct adOption factory")
-        void loadTheAd() {
-            when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsMock);
+        void createTheOptions() {
 
-//            sut.prepareInterstitial(pluginCallMock, notifierMock);
-//            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
-//            Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
-//            uiThreadRunnable.run();
-//
-//            requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsMock));
+            sut.prepareInterstitial(pluginCallMock, notifierMock);
+
+            verify(adOptionsFactoryMock).createInterstitialOptions(pluginCallMock);
+        }
+
+        @Test()
+        @DisplayName("loads the ad with the id and request of the helper")
+        void usesIdHelper() {
+            final ArgumentCaptor<String> idArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            final ArgumentCaptor<AdRequest> adRequestCaptor = ArgumentCaptor.forClass(AdRequest.class);
+
+            sut.prepareInterstitial(pluginCallMock, notifierMock);
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+            uiThreadRunnable.run();
+
+            interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(),
+                    idArgumentCaptor.capture(),
+                    adRequestCaptor.capture(),
+                    any()
+            ));
+
+
+            assertEquals(idFromViewHelper, idArgumentCaptor.getValue());
+            assertEquals(adRequestFromHelper, adRequestCaptor.getValue());
+        }
+
+        @Test()
+        @DisplayName("loads the ad with the InterstitialAdLoadCallback returned by the helper")
+        void usesCallbackHelper() {
+            final ArgumentCaptor<InterstitialAdLoadCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(InterstitialAdLoadCallback.class);
+
+            sut.prepareInterstitial(pluginCallMock, notifierMock);
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+            uiThreadRunnable.run();
+
+            interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(),
+                    any(),
+                    any(),
+                    callbackArgumentCaptor.capture()
+            ));
+
+
+            interstitialAdCallbackAndListenersMockedStatic.verify(() -> InterstitialAdCallbackAndListeners.INSTANCE.getInterstitialAdLoadCallback(any(), any()));
+
+// TODO: Inject callback creators on the constructor.
         }
     }
-/*
-    @Nested
-    class Listeners {
 
-        @Test
-        @DisplayName("onRewarded should emit the Reward Item info")
-        void onRewarded() throws JSONException {
-            ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
-            PluginCall pluginCall = mock(PluginCall.class);
-
-            OnUserEarnedRewardListener listener = AdRewardExecutor.getOnUserEarnedRewardListener(pluginCall, notifierMock);
-            String type = "My Type";
-            int amount = 69;
-            RewardItem rewardItem = new RewardItem() {
-                @Override
-                public String getType() {
-                    return type;
-                }
-
-                @Override
-                public int getAmount() {
-                    return amount;
-                }
-            };
-
-            // ACt
-            listener.onUserEarnedReward(rewardItem);
-
-            verify(notifierMock).accept(eq(FullScreenAdEventName.adDidDismissFullScreenContent.name()), argumentCaptor.capture());
-            final JSObject emittedItem = argumentCaptor.getValue();
-
-            assertEquals(emittedItem.getString("type"), type);
-            assertEquals(emittedItem.getInt("amount"), amount);
-        }
-
-        @Test
-        @DisplayName("onRewardedVideoAdFailedToLoad should emit the error code and description")
-        void onRewardedVideoAdFailedToLoad() throws JSONException {
-            try (MockedStatic<RequestHelper> requestHelperMockedStatic = Mockito.mockStatic(RequestHelper.class)) {
-                String reason = "This is the reason";
-                requestHelperMockedStatic.when(() -> RequestHelper.getRequestErrorReason(anyInt())).thenReturn(reason);
-                ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
-                PluginCall pluginCall = mock(PluginCall.class);
-                BiConsumer<String, JSObject> notifierMock = mock(BiConsumer.class);
-                RewardedAdLoadCallback listener = AdRewardExecutor.getRewardedAdLoadCallback(pluginCall, notifierMock);
-                int errorCode = 1;
-
-                class AdErrorClass { }
-                class ResponseInfoClass { }
-
-//                listener.onAdFailedToLoad(new LoadAdError(errorCode, reason, reason, new AdError(errorCode, reason, reason), new ResponseInfo()));
-//
-//                
-//                verify(notifierMock).accept(eq(FullScreenAdEventName.onAdFailedToLoad.name()), argumentCaptor.capture());
-//                final JSObject emittedError = argumentCaptor.getValue();
-//
-//                assertEquals(emittedError.getInt("code"), errorCode);
-//                assertEquals(emittedError.getString("reason"), reason);
-            }
-        }
-    }
-    */
 }

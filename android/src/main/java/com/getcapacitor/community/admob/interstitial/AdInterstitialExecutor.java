@@ -29,13 +29,15 @@ public class AdInterstitialExecutor extends Executor {
     }
 
     public void prepareInterstitial(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        final AdOptions adOptions = AdOptions.getFactory().createRewardVideoOptions(call);
+        final AdOptions.AdOptionsFactory factory = AdOptions.getFactory();
+        final AdOptions adOptions = factory.createInterstitialOptions(call);
 
         try {
             activitySupplier
                 .get()
                 .runOnUiThread(
                     () -> {
+
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
                         InterstitialAd.load(
