@@ -42,6 +42,6 @@
    /**
     * Screen width x 32|50|90
     */
-   SMART_BANNER = 'ADAPTIVE_BANNER',
+   SMART_BANNER = 'SMART_BANNER',
 
 }
