@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, RewardAdPluginEvents} from '@capacitor-community/admob';
+import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 @Component({
@@ -90,6 +90,7 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.registerRewardListeners();
     this.registerBannerListeners();
+    this.registerInterstitialListeners();
 
   }
 
@@ -191,6 +192,24 @@ export class HomePage implements OnInit, OnDestroy {
     await toast.present();
 
     this.isPrepareReward = false;
+  }
+
+  private registerInterstitialListeners(): void {
+    const eventKeys = Object.keys(InterstitialAdPluginEvents);
+
+    eventKeys.forEach(key => {
+      console.log(`registering ${InterstitialAdPluginEvents[key]}`);
+      const handler = AdMob.addListener(InterstitialAdPluginEvents[key], (value) => {
+        console.log(`Interstitial Event "${key}"`, value);
+
+        this.ngZone.run(() => {
+          this.lastRewardEvent$$.next({name: key, value: value});
+        })
+        
+
+      });
+      this.listenerHandlers.push(handler);
+    });
   }
 
   private registerRewardListeners(): void {
