@@ -27,7 +27,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
@@ -104,7 +106,6 @@ class AdInterstitialExecutorTest {
             requestHelperMockedStatic.when(() -> RequestHelper.createRequest(adOptionsMock)).thenReturn(adRequestFromHelper);
             adViewIdHelperMockedStatic.when(() -> AdViewIdHelper.getFinalAdId(any(), any(), any(), any())).thenReturn(idFromViewHelper);
 
-            interstitialAdCallbackAndListenersMockedStatic.when(() -> InterstitialAdCallbackAndListeners.INSTANCE.getInterstitialAdLoadCallback(any(), any())).thenReturn(interstitialAdLoadCallbackMock);
         }
 
         @AfterEach()
@@ -152,7 +153,7 @@ class AdInterstitialExecutorTest {
         @DisplayName("loads the ad with the InterstitialAdLoadCallback returned by the helper")
         void usesCallbackHelper() {
             final ArgumentCaptor<InterstitialAdLoadCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(InterstitialAdLoadCallback.class);
-
+            InterstitialAdCallbackAndListeners callbackSpy = spy(InterstitialAdCallbackAndListeners.INSTANCE);
             sut.prepareInterstitial(pluginCallMock, notifierMock);
             verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
             Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
@@ -164,8 +165,7 @@ class AdInterstitialExecutorTest {
                     callbackArgumentCaptor.capture()
             ));
 
-
-            interstitialAdCallbackAndListenersMockedStatic.verify(() -> InterstitialAdCallbackAndListeners.INSTANCE.getInterstitialAdLoadCallback(any(), any()));
+            verify(callbackSpy).getInterstitialAdLoadCallback(pluginCallMock, notifierMock);
 
 // TODO: Inject callback creators on the constructor.
         }

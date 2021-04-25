@@ -1,10 +1,12 @@
 package com.getcapacitor.community.admob.rewarded
 
-enum class RewardAdPluginEvents(val webEventName: String) {
-    Loaded("onRewardedVideoAdLoaded"),
-    FailedToLoad("onRewardedVideoAdFailedToLoad"),
-    Showed("onRewardedVideoAdShowed"),
-    FailedToShow("onRewardedVideoAdFailedToShow"),
-    Dismissed("onRewardedVideoAdDismissed"),
-    Rewarded("onRewardedVideoAdReward")
+import com.getcapacitor.community.admob.models.LoadPluginEventNames
+
+object RewardAdPluginEvents: LoadPluginEventNames {
+    const val Loaded = "onRewardedVideoAdLoaded"
+    const val FailedToLoad = "onRewardedVideoAdFailedToLoad"
+    const val Rewarded = "onRewardedVideoAdReward"
+    override val Showed = "onRewardedVideoAdShowed"
+    override val FailedToShow = "onRewardedVideoAdFailedToShow"
+    override val Dismissed = "onRewardedVideoAdDismissed"
 }

@@ -1,4 +1,7 @@
 package com.getcapacitor.community.admob.models
 
-object LoadEventNames {
+interface LoadPluginEventNames {
+    val Showed: String
+    val FailedToShow: String
+    val Dismissed: String
 }

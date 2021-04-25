@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
+import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.rewarded.RewardItem
@@ -64,7 +65,7 @@ internal class RewardedAdListenersTest {
             // ACt
             listener.onUserEarnedReward(rewardItem)
 
-            Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Rewarded.webEventName), argumentCaptor.capture())
+            Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Rewarded), argumentCaptor.capture())
             val emittedItem = argumentCaptor.value
             assertEquals(emittedItem.getString("type"), wantedType)
             assertEquals(emittedItem.getInt("amount"), wantedAmount)
@@ -111,7 +112,7 @@ internal class RewardedAdListenersTest {
                 // ACt
                 listener.onAdFailedToLoad(loadAdErrorMock)
 
-                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.FailedToLoad.webEventName), argumentCaptor.capture())
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.FailedToLoad), argumentCaptor.capture())
                 val emittedError = argumentCaptor.value
 
                 assertEquals(wantedErrorCode, emittedError.getInt("code"))
@@ -153,7 +154,7 @@ internal class RewardedAdListenersTest {
                 // ACt
                 listener.onAdLoaded(rewardedAdMock)
 
-                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Loaded.webEventName), argumentCaptor.capture())
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Loaded), argumentCaptor.capture())
                 val emittedAdInfo = argumentCaptor.value
 
                 assertEquals(wantedAdUnitId, emittedAdInfo.getString("adUnitId"))
@@ -163,6 +164,7 @@ internal class RewardedAdListenersTest {
 
     }
 
+    // TODO: JUST CHECK CALL CREATION
     @Nested
     inner class FullScreenContentCallback {
         private lateinit var argumentCaptor: ArgumentCaptor<JSObject>
@@ -171,7 +173,8 @@ internal class RewardedAdListenersTest {
         @BeforeEach
         fun beforeEach() {
             argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
-            listener = RewardedAdCallbackAndListeners.getFullScreenContentCallback(notifierMock)
+            listener = FullscreenPluginCallback(
+                    RewardAdPluginEvents, notifierMock)
         }
 
         @Nested
@@ -183,7 +186,7 @@ internal class RewardedAdListenersTest {
                 // ACt
                 listener.onAdShowedFullScreenContent()
 
-                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Showed.webEventName), argumentCaptor.capture())
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Showed), argumentCaptor.capture())
             }
 
             @Test
@@ -197,7 +200,7 @@ internal class RewardedAdListenersTest {
                 // ACt
                 listener.onAdFailedToShowFullScreenContent(adErrorMock)
 
-                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.FailedToShow.webEventName), argumentCaptor.capture())
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.FailedToShow), argumentCaptor.capture())
                 val emittedError = argumentCaptor.value
 
                 assertEquals(wantedErrorCode, emittedError.getInt("code"))
@@ -210,7 +213,7 @@ internal class RewardedAdListenersTest {
                 // ACt
                 listener.onAdDismissedFullScreenContent()
 
-                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Dismissed.webEventName), argumentCaptor.capture())
+                Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(RewardAdPluginEvents.Dismissed), argumentCaptor.capture())
             }
         }
     }

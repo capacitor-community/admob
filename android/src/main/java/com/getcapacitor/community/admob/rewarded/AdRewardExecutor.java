@@ -40,7 +40,10 @@ public class AdRewardExecutor extends Executor {
                     () -> {
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                        RewardedAd.load(contextSupplier.get(), id, adRequest, RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction));
+                        RewardedAd.load(contextSupplier.get(),
+                                id,
+                                adRequest,
+                                RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction));
                     }
                 );
         } catch (Exception ex) {
