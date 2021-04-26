@@ -1,16 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
-import {AdMob, BannerAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
-import {bannerBottomOptions, bannerTopOptions} from '../ad-options';
+import {AdMob, BannerAdPluginEvents} from '@capacitor-community/admob';
+import {bannerBottomOptions, bannerTopOptions} from '../ad.options';
 import {PluginListenerHandle} from '@capacitor/core';
+import {ITestItems} from '../interfaces';
 
-interface Items  {
-  type: 'method' | 'event'
-  name: string;
-  result?: boolean
-}
-
-const tryItems: Items[] = [
+const tryItems: ITestItems [] = [
   {
     type: 'method',
     name: 'showBanner',
@@ -52,8 +47,10 @@ const tryItems: Items[] = [
 })
 export class Tab1Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   private readonly listenerHandlers: PluginListenerHandle[] = [];
-  public eventItems: Items[] = [];
-  constructor() {}
+  public eventItems: ITestItems[] = [];
+  constructor(
+    private zone: NgZone,
+    ) {}
 
   ionViewWillEnter() {
     const eventKeys = Object.keys(BannerAdPluginEvents);
@@ -94,11 +91,13 @@ export class Tab1Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   }
 
   private async updateItem(name: string, result: boolean, time = 500) {
-    this.eventItems = this.eventItems.map((item) => {
-      if (item.name === name) {
-        item.result = result;
-      }
-      return item;
+    this.zone.run(() => {
+      this.eventItems = this.eventItems.map((item) => {
+        if (item.name === name) {
+          item.result = result;
+        }
+        return item;
+      });
     });
     await new Promise(resolve => setTimeout(() => resolve(), time));
   }

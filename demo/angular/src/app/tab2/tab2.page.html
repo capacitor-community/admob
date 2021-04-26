@@ -1,15 +1,16 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+    <ion-title>INTERSTITIAL</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-list>
+    <ion-list-header><ion-label>PROGRESS</ion-label></ion-list-header>
+    <ion-item *ngFor="let item of eventItems; let i = index" [lines]="eventItems.length - 1 === i ? 'full' : undefined ">
+      <ion-icon slot="start" [name]="item.type === 'method' ? 'play-outline' : 'notifications-circle-outline'"></ion-icon>
+      <ion-label>{{item.name}}</ion-label>
+      <ion-icon slot="end" name="checkmark-circle" *ngIf="item.result !== undefined" [color]="item.result ? 'success' : 'danger'"></ion-icon>
+    </ion-item>
+  </ion-list>
 </ion-content>
