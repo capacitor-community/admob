@@ -59,8 +59,8 @@ export class Tab3Page  implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
       const handler = AdMob.addListener(RewardAdPluginEvents[key], (value) => {
         if (key === 'Dismissed') {
           AdMob.prepareRewardVideoAd({ adId: 'failed' })
-            .then(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', true))
-            .catch(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', false));
+            .then(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', false))
+            .catch(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', true));
         }
         this.helper.updateItem(this.eventItems,RewardAdPluginEvents[key], true);
       });

@@ -56,8 +56,8 @@ export class Tab2Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
         this.helper.updateItem(this.eventItems,InterstitialAdPluginEvents[key], true);
         if (key === 'Dismissed') {
           AdMob.prepareInterstitial({ adId: 'failed' })
-            .then(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitialFailed', true))
-            .catch(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitialFailed', false));
+            .then(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitialFailed', false))
+            .catch(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitialFailed', true));
         }
       });
       this.listenerHandlers.push(handler);
