@@ -13,7 +13,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
             completionHandler: { (ad, error) in
                 if let error = error {
                     NSLog("Rewarded ad failed to load with error: \(error.localizedDescription)")
-                    self.plugin?.notifyListeners(InterstitialAdPluginEvents.FailedToLoad.rawValue, data: [
+                    self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToLoad.rawValue, data: [
                         "code": 0,
                         "message": error.localizedDescription
                     ])
@@ -46,12 +46,12 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
     }
 
     public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
-        NSLog("InterstitialFullScreenDelegate Ad did present full screen content.")
+        NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
     }
 
     public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        NSLog("InterstitialFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
+        NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
             "message": error.localizedDescription
@@ -59,7 +59,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
     }
 
     public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
-        NSLog("InterstitialFullScreenDelegate Ad did dismiss full screen content.")
+        NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Dismissed.rawValue, data: [:])
     }
 }

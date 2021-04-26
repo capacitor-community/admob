@@ -1,5 +1,5 @@
 import {Component, NgZone} from '@angular/core';
-import {AdMob, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
+import {AdMob, RewardAdPluginEvents} from '@capacitor-community/admob';
 import {ITestItems} from '../interfaces';
 import {ViewDidEnter, ViewWillEnter, ViewWillLeave} from '@ionic/angular';
 import {PluginListenerHandle} from '@capacitor/core';
@@ -53,15 +53,15 @@ export class Tab3Page  implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
     ) {}
 
   ionViewWillEnter() {
-    const eventKeys = Object.keys(InterstitialAdPluginEvents);
+    const eventKeys = Object.keys(RewardAdPluginEvents);
     eventKeys.forEach(key => {
-      const handler = AdMob.addListener(InterstitialAdPluginEvents[key], (value) => {
+      const handler = AdMob.addListener(RewardAdPluginEvents[key], (value) => {
         if (key === 'Dismissed') {
           AdMob.prepareRewardVideoAd({ adId: 'failed' })
-            .then(async () => await this.updateItem('prepareInterstitialFailed', true))
-            .catch(async () => await this.updateItem('prepareInterstitialFailed', false));
+            .then(async () => await this.updateItem('prepareRewardVideoAdFailed', true))
+            .catch(async () => await this.updateItem('prepareRewardVideoAdFailed', false));
         }
-        this.updateItem(InterstitialAdPluginEvents[key], true);
+        this.updateItem(RewardAdPluginEvents[key], true);
       });
       this.listenerHandlers.push(handler);
     });
@@ -73,7 +73,6 @@ export class Tab3Page  implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
     await AdMob.prepareRewardVideoAd(rewardOptions)
       .then(async () => await this.updateItem('prepareRewardVideoAd', true))
       .catch(async () => await this.updateItem('prepareRewardVideoAd', false));
-
     await AdMob.showRewardVideoAd()
       .then(async () => await this.updateItem('showRewardVideoAd', true))
       .catch(async () => await this.updateItem('showRewardVideoAd', false));
