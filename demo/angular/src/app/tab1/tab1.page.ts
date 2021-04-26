@@ -64,7 +64,7 @@ export class Tab1Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
       this.listenerHandlers.push(handler);
     });
 
-    this.eventItems = tryItems.concat();
+    this.eventItems = JSON.parse(JSON.stringify(tryItems));
   }
 
   async ionViewDidEnter() {
