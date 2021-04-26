@@ -121,11 +121,10 @@ public class AdMob: CAPPlugin {
     }
     
     private func getAdId(_ call: CAPPluginCall, _ testingID: String) -> String {
-        
-        var adUnitID = call.getString("adId") ?? testingID
+        let adUnitID = call.getString("adId") ?? testingID
         let isTest = call.getBool("isTesting") ?? false
         if isTest {
-            adUnitID = testingID
+            return testingID
         }
         return adUnitID
     }

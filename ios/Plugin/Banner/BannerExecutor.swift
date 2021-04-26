@@ -13,7 +13,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
             let adPosition = call.getString("position") ?? "BOTTOM_CENTER"
             let adMargin = call.getInt("margin") ?? 0
 
-            var bannerSize
+            var bannerSize: GADAdSize
 
             switch adSize {
             case "BANNER":
