@@ -5,7 +5,7 @@ import { ToastController } from '@ionic/angular';
 
 import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
-import { bannerTopOptions, bannerBottomOptions, rewardOptions, interstitialOptions } from '../ad.options';
+import { bannerTopOptions, bannerBottomOptions, rewardOptions, interstitialOptions } from '../shared/ad.options';
 
 @Component({
   selector: 'app-home',

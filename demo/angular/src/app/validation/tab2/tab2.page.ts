@@ -1,9 +1,10 @@
-import { Component, NgZone } from '@angular/core';
+import { Component } from '@angular/core';
 import {AdMob, InterstitialAdPluginEvents} from '@capacitor-community/admob';
-import {ITestItems} from '../interfaces';
+import {ITestItems} from '../../shared/interfaces';
 import {PluginListenerHandle} from '@capacitor/core';
 import {ViewDidEnter, ViewWillEnter, ViewWillLeave} from '@ionic/angular';
-import {interstitialOptions} from '../ad.options';
+import {interstitialOptions} from '../../shared/ad.options';
+import { HelperService } from '../../shared/helper.service';
 
 const tryItems: ITestItems [] = [
   {
@@ -45,18 +46,18 @@ export class Tab2Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   private readonly listenerHandlers: PluginListenerHandle[] = [];
   public eventItems: ITestItems[] = [];
   constructor(
-    private zone: NgZone,
+    private helper: HelperService,
   ) {}
 
   ionViewWillEnter() {
     const eventKeys = Object.keys(InterstitialAdPluginEvents);
     eventKeys.forEach(key => {
       const handler = AdMob.addListener(InterstitialAdPluginEvents[key], (value) => {
-        this.updateItem(InterstitialAdPluginEvents[key], true);
+        this.helper.updateItem(this.eventItems,InterstitialAdPluginEvents[key], true);
         if (key === 'Dismissed') {
           AdMob.prepareInterstitial({ adId: 'failed' })
-            .then(async () => await this.updateItem('prepareInterstitialFailed', true))
-            .catch(async () => await this.updateItem('prepareInterstitialFailed', false));
+            .then(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitialFailed', true))
+            .catch(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitialFailed', false));
         }
       });
       this.listenerHandlers.push(handler);
@@ -67,28 +68,16 @@ export class Tab2Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
 
   async ionViewDidEnter() {
     await AdMob.prepareInterstitial(interstitialOptions)
-      .then(async () => await this.updateItem('prepareInterstitial', true))
-      .catch(async () => await this.updateItem('prepareInterstitial', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitial', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitial', false));
 
     await AdMob.showInterstitial()
-      .then(async () => await this.updateItem('showInterstitial', true))
-      .catch(async () => await this.updateItem('showInterstitial', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'showInterstitial', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'showInterstitial', false));
   }
 
   ionViewWillLeave() {
     this.listenerHandlers.forEach(handler => handler.remove());
-  }
-
-  private async updateItem(name: string, result: boolean, time = 500) {
-    this.zone.run(() => {
-      this.eventItems = this.eventItems.map((item) => {
-        if (item.name === name) {
-          item.result = result;
-        }
-        return item;
-      });
-    });
-    await new Promise(resolve => setTimeout(() => resolve(), time));
   }
 }
 

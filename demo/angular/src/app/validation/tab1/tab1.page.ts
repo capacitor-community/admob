@@ -1,9 +1,10 @@
 import {Component, OnInit, OnDestroy, NgZone} from '@angular/core';
 import { ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import {AdMob, BannerAdPluginEvents} from '@capacitor-community/admob';
-import {bannerBottomOptions, bannerTopOptions} from '../ad.options';
+import {bannerBottomOptions, bannerTopOptions} from '../../shared/ad.options';
 import {PluginListenerHandle} from '@capacitor/core';
-import {ITestItems} from '../interfaces';
+import {ITestItems} from '../../shared/interfaces';
+import {HelperService} from '../../shared/helper.service';
 
 const tryItems: ITestItems [] = [
   {
@@ -49,14 +50,14 @@ export class Tab1Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   private readonly listenerHandlers: PluginListenerHandle[] = [];
   public eventItems: ITestItems[] = [];
   constructor(
-    private zone: NgZone,
+    private helper: HelperService,
     ) {}
 
   ionViewWillEnter() {
     const eventKeys = Object.keys(BannerAdPluginEvents);
     eventKeys.forEach(key => {
       const handler = AdMob.addListener(BannerAdPluginEvents[key], (value) => {
-        this.updateItem(BannerAdPluginEvents[key], true);
+        this.helper.updateItem(this.eventItems,BannerAdPluginEvents[key], true);
       });
       this.listenerHandlers.push(handler);
     });
@@ -66,39 +67,27 @@ export class Tab1Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
 
   async ionViewDidEnter() {
     await AdMob.showBanner(bannerBottomOptions)
-      .then(async () => await this.updateItem('showBanner', true))
-      .catch(async () => await this.updateItem('showBanner', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'showBanner', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'showBanner', false));
 
     await AdMob.hideBanner()
-      .then(async () => await this.updateItem('hideBanner', true))
-      .catch(async () => await this.updateItem('hideBanner', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'hideBanner', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'hideBanner', false));
 
     await AdMob.resumeBanner()
-      .then(async () => await this.updateItem('resumeBanner', true))
-      .catch(async () => await this.updateItem('resumeBanner', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'resumeBanner', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'resumeBanner', false));
 
     await AdMob.removeBanner()
-      .then(async () => await this.updateItem('removeBanner', true))
-      .catch(async () => await this.updateItem('removeBanner', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'removeBanner', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'removeBanner', false));
 
     await AdMob.showBanner({ adId: 'showBannerFailed' })
-      .then(async () => await this.updateItem('showBannerFailed', true))
-      .catch(async () => await this.updateItem('showBannerFailed', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'showBannerFailed', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'showBannerFailed', false));
   }
 
   ionViewWillLeave() {
     this.listenerHandlers.forEach(handler => handler.remove());
-  }
-
-  private async updateItem(name: string, result: boolean, time = 500) {
-    this.zone.run(() => {
-      this.eventItems = this.eventItems.map((item) => {
-        if (item.name === name) {
-          item.result = result;
-        }
-        return item;
-      });
-    });
-    await new Promise(resolve => setTimeout(() => resolve(), time));
   }
 }

@@ -1,9 +1,10 @@
 import {Component, NgZone} from '@angular/core';
 import {AdMob, RewardAdPluginEvents} from '@capacitor-community/admob';
-import {ITestItems} from '../interfaces';
+import {ITestItems} from '../../shared/interfaces';
 import {ViewDidEnter, ViewWillEnter, ViewWillLeave} from '@ionic/angular';
 import {PluginListenerHandle} from '@capacitor/core';
-import {rewardOptions} from '../ad.options';
+import {rewardOptions} from '../../shared/ad.options';
+import {HelperService} from '../../shared/helper.service';
 
 const tryItems: ITestItems [] = [
   {
@@ -49,7 +50,7 @@ export class Tab3Page  implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   private readonly listenerHandlers: PluginListenerHandle[] = [];
   public eventItems: ITestItems[] = [];
   constructor(
-    private zone: NgZone,
+    private helper: HelperService,
     ) {}
 
   ionViewWillEnter() {
@@ -58,10 +59,10 @@ export class Tab3Page  implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
       const handler = AdMob.addListener(RewardAdPluginEvents[key], (value) => {
         if (key === 'Dismissed') {
           AdMob.prepareRewardVideoAd({ adId: 'failed' })
-            .then(async () => await this.updateItem('prepareRewardVideoAdFailed', true))
-            .catch(async () => await this.updateItem('prepareRewardVideoAdFailed', false));
+            .then(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', true))
+            .catch(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', false));
         }
-        this.updateItem(RewardAdPluginEvents[key], true);
+        this.helper.updateItem(this.eventItems,RewardAdPluginEvents[key], true);
       });
       this.listenerHandlers.push(handler);
     });
@@ -71,26 +72,14 @@ export class Tab3Page  implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
 
   async ionViewDidEnter() {
     await AdMob.prepareRewardVideoAd(rewardOptions)
-      .then(async () => await this.updateItem('prepareRewardVideoAd', true))
-      .catch(async () => await this.updateItem('prepareRewardVideoAd', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAd', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAd', false));
     await AdMob.showRewardVideoAd()
-      .then(async () => await this.updateItem('showRewardVideoAd', true))
-      .catch(async () => await this.updateItem('showRewardVideoAd', false));
+      .then(async () => await this.helper.updateItem(this.eventItems,'showRewardVideoAd', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'showRewardVideoAd', false));
   }
 
   ionViewWillLeave() {
     this.listenerHandlers.forEach(handler => handler.remove());
-  }
-
-  private async updateItem(name: string, result: boolean, time = 500) {
-    this.zone.run(() => {
-      this.eventItems = this.eventItems.map((item) => {
-        if (item.name === name) {
-          item.result = result;
-        }
-        return item;
-      });
-    });
-    await new Promise(resolve => setTimeout(() => resolve(), time));
   }
 }
