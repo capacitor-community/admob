@@ -1,19 +1,21 @@
-import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
+import { ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
 import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { bannerTopOptions, bannerBottomOptions, rewardOptions, interstitialOptions } from '../ad-options';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit, OnDestroy {
+export class HomePage implements ViewWillEnter, ViewWillLeave {
   private readonly lastBannerEvent$$ = new ReplaySubject<{name: string, value: any}>(1);
   public readonly lastBannerEvent$ = this.lastBannerEvent$$.asObservable()
-  
+
   private readonly lastRewardEvent$$ = new ReplaySubject<{name: string, value: any}>(1);
   public readonly lastRewardEvent$ = this.lastRewardEvent$$.asObservable()
 
@@ -31,31 +33,6 @@ export class HomePage implements OnInit, OnDestroy {
   public isPrepareReward = false;
   public isPrepareInterstitial = false;
 
-  /**
-   * Setting of Ads
-   */
-  private bannerTopOptions: BannerAdOptions = {
-    adId: 'ca-app-pub-3940256099942544/2934735716',
-    adSize: BannerAdSize.ADAPTIVE_BANNER,
-    position: BannerAdPosition.TOP_CENTER,
-    // npa: false,
-  };
-
-  private bannerBottomOptions: BannerAdOptions = {
-    adId: 'ca-app-pub-3940256099942544/2934735716',
-    adSize: BannerAdSize.ADAPTIVE_BANNER,
-    position: BannerAdPosition.BOTTOM_CENTER,
-    npa: true,
-  };
-
-  private rewardOptions: AdOptions = {
-    adId: 'ca-app-pub-3940256099942544/5224354917',
-  };
-
-  private interstitialOptions: AdOptions = {
-    adId: 'ca-app-pub-3940256099942544/1033173712',
-  };
-
   public isLoading = false;
 
   constructor(
@@ -64,7 +41,7 @@ export class HomePage implements OnInit, OnDestroy {
   ) {
   }
 
-  ngOnInit() {
+  ionViewWillEnter() {
     /**
      * Run every time the Ad height changes.
      * AdMob cannot be displayed above the content, so create margin for AdMob.
@@ -94,7 +71,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy() {
+  ionViewWillLeave() {
     this.listenerHandlers.forEach(handler => handler.remove());
   }
 
@@ -103,7 +80,7 @@ export class HomePage implements OnInit, OnDestroy {
    */
   async showTopBanner() {
     this.bannerPosition = 'top';
-    const result = await AdMob.showBanner(this.bannerTopOptions)
+    const result = await AdMob.showBanner(bannerTopOptions)
       .catch(e => console.log(e));
     if (result === undefined) {
       return;
@@ -114,7 +91,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   async showBottomBanner() {
     this.bannerPosition = 'bottom';
-    const result = await AdMob.showBanner(this.bannerBottomOptions)
+    const result = await AdMob.showBanner(bannerBottomOptions)
       .catch(e => console.log(e));
     if (result === undefined) {
       return;
@@ -170,7 +147,7 @@ export class HomePage implements OnInit, OnDestroy {
    */
   async prepareReward() {
     this.isLoading = true;
-    const result = await AdMob.prepareRewardVideoAd(this.rewardOptions)
+    const result = await AdMob.prepareRewardVideoAd(rewardOptions)
       .catch(e => console.log(e))
       .finally(() => this.isLoading = false);
     if (result === undefined) {
@@ -205,7 +182,7 @@ export class HomePage implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.lastRewardEvent$$.next({name: key, value: value});
         })
-        
+
 
       });
       this.listenerHandlers.push(handler);
@@ -223,7 +200,7 @@ export class HomePage implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.lastRewardEvent$$.next({name: key, value: value});
         })
-        
+
 
       });
       this.listenerHandlers.push(handler);
@@ -241,7 +218,7 @@ export class HomePage implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.lastBannerEvent$$.next({name: key, value: value});
         })
-        
+
       });
       this.listenerHandlers.push(handler);
 
@@ -257,7 +234,7 @@ export class HomePage implements OnInit, OnDestroy {
    */
   async prepareInterstitial() {
     this.isLoading = true;
-    const result = AdMob.prepareInterstitial(this.interstitialOptions)
+    const result = AdMob.prepareInterstitial(interstitialOptions)
       .catch(e => console.log(e))
       .finally(() => this.isLoading = false);
     if (result === undefined) {
