@@ -37,7 +37,8 @@ const tryItems: ITestItems [] = [
   },
   {
     type: 'event',
-    name: RewardAdPluginEvents.FailedToLoad
+    name: RewardAdPluginEvents.FailedToLoad,
+    expect: 'error',
   },
 ];
 
@@ -62,7 +63,7 @@ export class Tab3Page  implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
             .then(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', false))
             .catch(async () => await this.helper.updateItem(this.eventItems,'prepareRewardVideoAdFailed', true));
         }
-        this.helper.updateItem(this.eventItems,RewardAdPluginEvents[key], true);
+        this.helper.updateItem(this.eventItems,RewardAdPluginEvents[key], true, value);
       });
       this.listenerHandlers.push(handler);
     });

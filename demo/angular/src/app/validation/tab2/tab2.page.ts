@@ -33,7 +33,8 @@ const tryItems: ITestItems [] = [
   },
   {
     type: 'event',
-    name: InterstitialAdPluginEvents.FailedToLoad
+    name: InterstitialAdPluginEvents.FailedToLoad,
+    expect: 'error',
   },
 ];
 
@@ -53,7 +54,7 @@ export class Tab2Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
     const eventKeys = Object.keys(InterstitialAdPluginEvents);
     eventKeys.forEach(key => {
       const handler = AdMob.addListener(InterstitialAdPluginEvents[key], (value) => {
-        this.helper.updateItem(this.eventItems,InterstitialAdPluginEvents[key], true);
+        this.helper.updateItem(this.eventItems,InterstitialAdPluginEvents[key], true, value);
         if (key === 'Dismissed') {
           AdMob.prepareInterstitial({ adId: 'failed' })
             .then(async () => await this.helper.updateItem(this.eventItems,'prepareInterstitialFailed', false))

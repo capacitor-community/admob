@@ -14,6 +14,7 @@ const tryItems: ITestItems [] = [
   {
     type: 'event',
     name: BannerAdPluginEvents.SizeChanged,
+    expect: 1,
   },
   {
     type: 'event',
@@ -24,12 +25,27 @@ const tryItems: ITestItems [] = [
     name: 'hideBanner',
   },
   {
+    type: 'event',
+    name: BannerAdPluginEvents.SizeChanged,
+    expect: 0,
+  },
+  {
     type: 'method',
     name: 'resumeBanner',
   },
   {
+    type: 'event',
+    name: BannerAdPluginEvents.SizeChanged,
+    expect: 1,
+  },
+  {
     type: 'method',
     name: 'removeBanner',
+  },
+  {
+    type: 'event',
+    name: BannerAdPluginEvents.SizeChanged,
+    expect: 0,
   },
   {
     type: 'method',
@@ -38,6 +54,7 @@ const tryItems: ITestItems [] = [
   {
     type: 'event',
     name: BannerAdPluginEvents.FailedToLoad,
+    expect: 'error',
   },
 ];
 
@@ -57,7 +74,7 @@ export class Tab1Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
     const eventKeys = Object.keys(BannerAdPluginEvents);
     eventKeys.forEach(key => {
       const handler = AdMob.addListener(BannerAdPluginEvents[key], (value) => {
-        this.helper.updateItem(this.eventItems,BannerAdPluginEvents[key], true);
+        this.helper.updateItem(this.eventItems, BannerAdPluginEvents[key], true, value);
       });
       this.listenerHandlers.push(handler);
     });
