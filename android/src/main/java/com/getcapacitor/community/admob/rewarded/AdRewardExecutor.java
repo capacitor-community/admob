@@ -62,6 +62,7 @@ public class AdRewardExecutor extends Executor {
                                 activitySupplier.get(),
                                 RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
                         );
+                        call.resolve();
                     }
                 );
         } catch (Exception ex) {

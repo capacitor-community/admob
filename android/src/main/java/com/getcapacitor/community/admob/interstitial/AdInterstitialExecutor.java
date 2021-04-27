@@ -61,6 +61,7 @@ public class AdInterstitialExecutor extends Executor {
                 .runOnUiThread(
                     () -> {
                         interstitialAd.show(activitySupplier.get());
+                        call.resolve();
                     }
                 );
         } catch (Exception ex) {

@@ -12,15 +12,4 @@
    * Gets the message describing the error.
    */
   message: string;
-
-  /**
-   * Gets the cause of this error or null if the cause is nonexistent or unknown.
-   */
-  cause: string;
-
-  /**
-   * Gets the domain of the error.
-   * MobileAds.ERROR_DOMAIN for Google Mobile Ads SDK errors, or a domain defined by mediation networks for mediation errors.
-   */
-  domain: string;
 }
