@@ -150,7 +150,7 @@ public class BannerExecutor extends Executor {
                             mAdViewLayout.setVisibility(View.VISIBLE);
                             mAdView.resume();
 
-                            final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0,0);
+                            final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
                             notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
 
                             Log.d(logTag, "Banner AD Resumed");
@@ -228,12 +228,19 @@ public class BannerExecutor extends Executor {
                                 final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
 
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
-                                notifyListeners(BannerAdPluginEvents.Loaded.getWebEventName(), sizeInfo);
+                                notifyListeners(BannerAdPluginEvents.Loaded.getWebEventName(), emptyObject);
                                 super.onAdLoaded();
                             }
 
                             @Override
                             public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                                if (mAdView != null) {
+                                    mViewGroup.removeView(mAdViewLayout);
+                                    mAdViewLayout.removeView(mAdView);
+                                    mAdView.destroy();
+                                    mAdView = null;
+                                }
+
                                 final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0,0);
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
 
