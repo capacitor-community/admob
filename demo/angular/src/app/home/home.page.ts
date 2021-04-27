@@ -3,8 +3,8 @@ import { ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdMob, AdMobBannerSize, AdMobRewardItem, AdOptions, BannerAdOptions, BannerAdPluginEvents, BannerAdPosition, BannerAdSize, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { AdMob, AdMobBannerSize, AdMobRewardItem, BannerAdPluginEvents, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
+import { ReplaySubject } from 'rxjs';
 import { bannerTopOptions, bannerBottomOptions, rewardOptions, interstitialOptions } from '../shared/ad.options';
 
 @Component({
@@ -47,7 +47,6 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
      * AdMob cannot be displayed above the content, so create margin for AdMob.
      */
     const resizeHandler = AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: AdMobBannerSize) => {
-      console.log(['bannerViewChangeSize', info]);
       this.appMargin = info.height;
       if (this.appMargin > 0) {
         const body = document.querySelector('body');
