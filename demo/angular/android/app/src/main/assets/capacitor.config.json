@@ -4,9 +4,5 @@
 	"bundledWebRuntime": false,
 	"npmClient": "npm",
 	"webDir": "www",
-	"cordova": {},
-	"server": {
-		"url": "http://192.168.0.17:8100",
-		"cleartext": true
-	}
+	"cordova": {}
 }
