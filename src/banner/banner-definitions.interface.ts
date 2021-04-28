@@ -1,9 +1,11 @@
-import { BannerAdOptions } from './banner-ad-options.interface';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { AdMobBannerSize } from './banner-size.interface';
-import { AdMobError } from '../shared';
-import { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import { BannerAdPluginEvents } from './banner-ad-plugin-events.enum';
+
+import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
+import type { AdMobError } from '../shared';
+
+import type { BannerAdOptions } from './banner-ad-options.interface';
+import type { BannerAdPluginEvents } from './banner-ad-plugin-events.enum';
+import type { AdMobBannerSize } from './banner-size.interface';
 
 // This is just to validate that we do not forget to implement any event name
 export type BannerDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<BannerAdPluginEvents, BannerDefinitions>;

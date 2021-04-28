@@ -1,9 +1,11 @@
-import { AdOptions } from '../shared/ad-options.interface';
-import { AdMobRewardItem } from './reward-item.interface';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { RewardAdPluginEvents } from './reward-ad-plugin-events.enum';
-import { ValidateAllEventsEnumAreImplemented} from '../private/validate-all-events-implemented.type'
-import { AdLoadInfo, AdMobError } from '../shared';
+
+import type { ValidateAllEventsEnumAreImplemented} from '../private/validate-all-events-implemented.type'
+import type { AdLoadInfo, AdMobError } from '../shared';
+import type { AdOptions } from '../shared/ad-options.interface';
+
+import type { RewardAdPluginEvents } from './reward-ad-plugin-events.enum';
+import type { AdMobRewardItem } from './reward-item.interface';
 
 // This is just to validate that we do not forget to implement any event name
 export type RewardDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<RewardAdPluginEvents, RewardDefinitions>;

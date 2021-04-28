@@ -7,13 +7,13 @@ import AppTrackingTransparency
 
 @objc(AdMob)
 public class AdMob: CAPPlugin {
-    
+
     var testingDevices: [String] = []
-    
+
     private let bannerExecutor = BannerExecutor()
     private let adInterstitialExecutor = AdInterstitialExecutor()
     private let adRewardExecutor = AdRewardExecutor()
-    
+
     /**
      * Enable SKAdNetwork to track conversions
      * https://developers.google.com/admob/ios/ios14
@@ -24,11 +24,11 @@ public class AdMob: CAPPlugin {
         self.adRewardExecutor.plugin = self
 
         let isTrack = call.getBool("requestTrackingAuthorization") ?? true
-        
+
         if call.getBool("initializeForTesting") ?? false {
             GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
         }
-        
+
         if !isTrack {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.resolve([:])
@@ -38,7 +38,7 @@ public class AdMob: CAPPlugin {
                 // iOS >= 14
                 GADMobileAds.sharedInstance().start(completionHandler: nil)
                 call.resolve([:])
-                
+
             })
             #else
             GADMobileAds.sharedInstance().start(completionHandler: nil)
@@ -50,57 +50,57 @@ public class AdMob: CAPPlugin {
             call.resolve([:])
         }
     }
-    
+
     /**
      *  AdMob: Banner
      *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/banner?hl=ja
      */
     @objc func showBanner(_ call: CAPPluginCall) {
         let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/6300978111")
-        let request = self.GADRequestWithOption(call.getBool("npa") ?? false);
-        
+        let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
+
         DispatchQueue.main.async {
             self.bannerExecutor.showBanner(call, request, adUnitID)
         }
     }
-    
+
     @objc func hideBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.bannerExecutor.hideBanner(call)
         }
     }
-    
+
     @objc func resumeBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.bannerExecutor.resumeBanner(call)
         }
     }
-    
+
     @objc func removeBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.bannerExecutor.removeBanner(call)
         }
     }
-    
+
     /**
      *  AdMob: Intertitial
      *  https://developers.google.com/admob/ios/interstitial?hl=ja
      */
     @objc func prepareInterstitial(_ call: CAPPluginCall) {
         let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/1033173712")
-        let request = self.GADRequestWithOption(call.getBool("npa") ?? false);
-        
+        let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
+
         DispatchQueue.main.async {
             self.adInterstitialExecutor.prepareInterstitial(call, request, adUnitID)
         }
     }
-    
+
     @objc func showInterstitial(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.adInterstitialExecutor.showInterstitial(call)
         }
     }
-    
+
     /**
      *  AdMob: Rewarded Ads
      *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-ads?hl=ja
@@ -108,18 +108,18 @@ public class AdMob: CAPPlugin {
     @objc func prepareRewardVideoAd(_ call: CAPPluginCall) {
         let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/1712485313")
         let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
-        
+
         DispatchQueue.main.async {
             self.adRewardExecutor.prepareRewardVideoAd(call, request, adUnitID)
         }
     }
-    
+
     @objc func showRewardVideoAd(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.adRewardExecutor.showRewardVideoAd(call)
         }
     }
-    
+
     private func getAdId(_ call: CAPPluginCall, _ testingID: String) -> String {
         let adUnitID = call.getString("adId") ?? testingID
         let isTest = call.getBool("isTesting") ?? false
@@ -128,16 +128,16 @@ public class AdMob: CAPPlugin {
         }
         return adUnitID
     }
-    
+
     private func GADRequestWithOption(_ npa: Bool) -> GADRequest {
         let request = GADRequest()
-        
+
         if npa {
             let extras = GADExtras()
             extras.additionalParameters = ["npa": "1"]
             request.register(extras)
         }
-        
+
         return request
     }
 }

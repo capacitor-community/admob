@@ -163,7 +163,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
         ])
         self.plugin?.notifyListeners(BannerAdPluginEvents.FailedToLoad.rawValue, data: [
             "code": 0,
-            "message": error.localizedDescription,
+            "message": error.localizedDescription
         ])
     }
 

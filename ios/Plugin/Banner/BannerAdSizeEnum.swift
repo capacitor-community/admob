@@ -6,6 +6,5 @@ public enum BannerAdSizeEnum: String {
     case MEDIUM_RECTANGLE = "MEDIUM_RECTANGLE"
     case WIDE_SKYSCRAPER = "WIDE_SKYSCRAPER"
     case ADAPTIVE_BANNER = "ADAPTIVE_BANNER"
-//    case FLUID = "FLUID"
+    //    case FLUID = "FLUID"
 }
-

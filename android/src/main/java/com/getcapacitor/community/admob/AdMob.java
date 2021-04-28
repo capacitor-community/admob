@@ -1,16 +1,15 @@
 package com.getcapacitor.community.admob;
 
 import android.Manifest;
-
 import com.getcapacitor.JSArray;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
-import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -24,7 +23,12 @@ public class AdMob extends Plugin {
 
     public static final JSArray EMPTY_TESTING_DEVICES = new JSArray();
 
-    private final BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
+    private final BannerExecutor bannerExecutor = new BannerExecutor(
+        this::getContext,
+        this::getActivity,
+        this::notifyListeners,
+        getLogTag()
+    );
     private final AdRewardExecutor adRewardExecutor = new AdRewardExecutor(
         this::getContext,
         this::getActivity,

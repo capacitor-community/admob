@@ -1,11 +1,10 @@
-import { BannerDefinitions } from './banner';
-import { InterstitialDefinitions } from './interstitial';
-import { RewardDefinitions } from './reward';
+import type { BannerDefinitions } from './banner';
+import type { InterstitialDefinitions } from './interstitial';
+import type { RewardDefinitions } from './reward';
 
-
-
-
-type AdMobDefinitions = BannerDefinitions & RewardDefinitions & InterstitialDefinitions;
+type AdMobDefinitions = BannerDefinitions &
+  RewardDefinitions &
+  InterstitialDefinitions;
 
 export interface AdMobPlugin extends AdMobDefinitions {
   /**
@@ -16,8 +15,6 @@ export interface AdMobPlugin extends AdMobDefinitions {
    * @since 1.1.2
    */
   initialize(options: AdMobInitializationOptions): Promise<void>;
-
- 
 }
 
 export interface AdMobInitializationOptions {

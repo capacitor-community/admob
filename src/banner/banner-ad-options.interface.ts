@@ -1,6 +1,7 @@
-import { AdOptions } from '../shared/ad-options.interface';
-import { BannerAdPosition } from './banner-ad-position.enum';
-import { BannerAdSize } from './banner-ad-size.enum';
+import type { AdOptions } from '../shared/ad-options.interface';
+
+import type { BannerAdPosition } from './banner-ad-position.enum';
+import type { BannerAdSize } from './banner-ad-size.enum';
 
 export interface BannerAdOptions extends AdOptions {
   /**

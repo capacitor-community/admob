@@ -2,16 +2,14 @@ package com.getcapacitor.community.admob.rewarded;
 
 import android.app.Activity;
 import android.content.Context;
-
 import androidx.core.util.Supplier;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
-import com.getcapacitor.community.admob.models.Executor;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
+import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.common.util.BiConsumer;
@@ -40,10 +38,12 @@ public class AdRewardExecutor extends Executor {
                     () -> {
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                        RewardedAd.load(contextSupplier.get(),
-                                id,
-                                adRequest,
-                                RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction));
+                        RewardedAd.load(
+                            contextSupplier.get(),
+                            id,
+                            adRequest,
+                            RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction)
+                        );
                     }
                 );
         } catch (Exception ex) {
@@ -59,8 +59,8 @@ public class AdRewardExecutor extends Executor {
                 .runOnUiThread(
                     () -> {
                         mRewardedAd.show(
-                                activitySupplier.get(),
-                                RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
+                            activitySupplier.get(),
+                            RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
                         );
                         call.resolve();
                     }
@@ -69,5 +69,4 @@ public class AdRewardExecutor extends Executor {
             call.reject(ex.getLocalizedMessage(), ex);
         }
     }
-
 }

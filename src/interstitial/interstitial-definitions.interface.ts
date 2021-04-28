@@ -1,8 +1,10 @@
-import { AdOptions } from '../shared/ad-options.interface';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { AdLoadInfo, AdMobError } from '../shared';
-import { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import { InterstitialAdPluginEvents } from './interstitial-ad-plugin-events.enum';
+
+import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
+import type { AdLoadInfo, AdMobError } from '../shared';
+import type { AdOptions } from '../shared/ad-options.interface';
+
+import type { InterstitialAdPluginEvents } from './interstitial-ad-plugin-events.enum';
 
 
 // This is just to validate that we do not forget to implement any event name

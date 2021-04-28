@@ -7,24 +7,22 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.community.admob.models.Executor;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AbMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
+import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.common.util.BiConsumer;
-
-import com.google.android.gms.ads.AdSize;
 
 public class BannerExecutor extends Executor {
 
@@ -48,7 +46,7 @@ public class BannerExecutor extends Executor {
 
     public void showBanner(final PluginCall call) {
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
-        float widthPixels = (int)contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
+        float widthPixels = (int) contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
         float density = contextSupplier.get().getResources().getDisplayMetrics().density;
 
         if (mAdView != null) {
@@ -64,7 +62,9 @@ public class BannerExecutor extends Executor {
                 mAdView.setAdSize(adOptions.adSize.size);
             } else {
                 // ADAPTIVE BANNER
-                mAdView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (widthPixels / density)));
+                mAdView.setAdSize(
+                    AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (widthPixels / density))
+                );
             }
 
             // Setup AdView Layout
@@ -127,7 +127,7 @@ public class BannerExecutor extends Executor {
                             mAdViewLayout.setVisibility(View.GONE);
                             mAdView.pause();
 
-                            final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0,0);
+                            final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
 
                             notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
 
@@ -177,9 +177,8 @@ public class BannerExecutor extends Executor {
                                 mAdView.destroy();
                                 mAdView = null;
                                 Log.d(logTag, "Banner AD Removed");
-                                final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0,0);
+                                final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
-
                             }
                         }
                     );
@@ -202,7 +201,6 @@ public class BannerExecutor extends Executor {
             );
     }
 
-
     /**
      * Follow iOS method Name:
      * https://developers.google.com/admob/ios/banner?hl=ja
@@ -224,7 +222,6 @@ public class BannerExecutor extends Executor {
                         new AdListener() {
                             @Override
                             public void onAdLoaded() {
-
                                 final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
 
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
@@ -241,7 +238,7 @@ public class BannerExecutor extends Executor {
                                     mAdView = null;
                                 }
 
-                                final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0,0);
+                                final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
 
                                 final AbMobPluginError adMobPluginError = new AbMobPluginError(adError);

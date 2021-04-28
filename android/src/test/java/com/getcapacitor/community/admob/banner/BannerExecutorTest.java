@@ -63,20 +63,22 @@ class BannerExecutorTest {
 
     BannerExecutor sut;
 
-
     MockedStatic<AdSize> AdSizeStaticMock;
 
     @BeforeEach
     void beforeEach() {
         AdSizeStaticMock = Mockito.mockStatic(AdSize.class);
         reset(contextMock, activityMock, notifierMock);
-        adViewMockedConstruction = Mockito.mockConstruction(AdView.class, (mock, context)-> {
-//            when(mock.setAdSize(any(AdSize.cl))).thenReturn(null);
-        });
+        adViewMockedConstruction =
+            Mockito.mockConstruction(
+                AdView.class,
+                (mock, context) -> {
+                    //            when(mock.setAdSize(any(AdSize.cl))).thenReturn(null);
+                }
+            );
 
         when(activityMock.findViewById(anyInt())).thenReturn(viewGroupMock);
         when(viewGroupMock.getChildAt(anyInt())).thenReturn(viewGroupMock);
-
 
         sut = new BannerExecutor(() -> contextMock, () -> activityMock, notifierMock, LOG_TAG);
     }

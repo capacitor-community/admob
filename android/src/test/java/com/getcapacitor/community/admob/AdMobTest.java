@@ -22,7 +22,6 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
-
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -208,7 +207,11 @@ public class AdMobTest {
             @Test
             @DisplayName("Interstitial constructs the request using the RequestHelper")
             void prepareInterstitial() {
-                try (MockedConstruction<RewardedInterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(RewardedInterstitialAd.class)) {
+                try (
+                    MockedConstruction<RewardedInterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(
+                        RewardedInterstitialAd.class
+                    )
+                ) {
                     when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
 
                     sut.prepareInterstitial(pluginCallMock);
@@ -219,20 +222,19 @@ public class AdMobTest {
                     requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
                 }
             }
-
-//            @Test
-//            @DisplayName("Rewarded Video Ad constructs the request using the RequestHelper")
-//            void prepareRewardVideo() {
-//                mobileAdsMockedStatic.when(() -> MobileAds.getRewardedVideoAdInstance(any())).thenReturn(mock(RewardedAd.class));
-//                when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
-//
-//                sut.prepareRewardVideoAd(pluginCallMock);
-//                verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
-//                Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
-//                uiThreadRunnable.run();
-//
-//                requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
-//            }
+            //            @Test
+            //            @DisplayName("Rewarded Video Ad constructs the request using the RequestHelper")
+            //            void prepareRewardVideo() {
+            //                mobileAdsMockedStatic.when(() -> MobileAds.getRewardedVideoAdInstance(any())).thenReturn(mock(RewardedAd.class));
+            //                when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
+            //
+            //                sut.prepareRewardVideoAd(pluginCallMock);
+            //                verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            //                Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+            //                uiThreadRunnable.run();
+            //
+            //                requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
+            //            }
         }
     }
 }

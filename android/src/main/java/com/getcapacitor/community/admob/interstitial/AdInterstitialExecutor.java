@@ -2,9 +2,7 @@ package com.getcapacitor.community.admob.interstitial;
 
 import android.app.Activity;
 import android.content.Context;
-
 import androidx.core.util.Supplier;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
@@ -37,14 +35,13 @@ public class AdInterstitialExecutor extends Executor {
                 .get()
                 .runOnUiThread(
                     () -> {
-
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
                         InterstitialAd.load(
                             activitySupplier.get(),
                             id,
                             adRequest,
-                                InterstitialAdCallbackAndListeners.INSTANCE.getInterstitialAdLoadCallback(call, notifyListenersFunction)
+                            InterstitialAdCallbackAndListeners.INSTANCE.getInterstitialAdLoadCallback(call, notifyListenersFunction)
                         );
                     }
                 );
@@ -52,7 +49,6 @@ public class AdInterstitialExecutor extends Executor {
             call.reject(ex.getLocalizedMessage(), ex);
         }
     }
-
 
     public void showInterstitial(final PluginCall call) {
         try {
@@ -68,8 +64,4 @@ public class AdInterstitialExecutor extends Executor {
             call.reject(ex.getLocalizedMessage(), ex);
         }
     }
-
-
-
-
 }

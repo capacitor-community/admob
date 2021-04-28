@@ -1,8 +1,8 @@
 import { WebPlugin } from '@capacitor/core';
-import { AdMobPlugin } from '.';
-import { AdMobRewardItem } from './reward';
-import { AdOptions, AdLoadInfo } from './shared';
 
+import type { AdMobPlugin } from '.';
+import type { AdMobRewardItem } from './reward';
+import type { AdOptions, AdLoadInfo } from './shared';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   constructor() {
@@ -22,8 +22,7 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
 
   // Hide the banner, remove it from screen, but can show it later
   async hideBanner(): Promise<void> {
-        console.log('hideBanner');
-
+    console.log('hideBanner');
   }
 
   // Resume the banner, show it after hide
@@ -33,15 +32,14 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
 
   // Destroy the banner, remove it from screen.
   async removeBanner(): Promise<void> {
-        console.log('removeBanner');
-
+    console.log('removeBanner');
   }
 
   async prepareInterstitial(options: AdOptions): Promise<AdLoadInfo> {
     console.log('prepareInterstitial', options);
     return {
-      adUnitId: options.adId
-    }
+      adUnitId: options.adId,
+    };
   }
 
   async showInterstitial(): Promise<void> {
@@ -51,8 +49,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   async prepareRewardVideoAd(options: AdOptions): Promise<AdLoadInfo> {
     console.log(options);
     return {
-      adUnitId: options.adId
-    }
+      adUnitId: options.adId,
+    };
   }
 
   async showRewardVideoAd(): Promise<AdMobRewardItem> {

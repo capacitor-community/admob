@@ -36,9 +36,7 @@ public final class AdViewIdHelper {
         Log.d(logTag, "Ad ID: " + finalId);
     }
 
-    public static FullScreenContentCallback getFullScreenContentCallback(
-        BiConsumer<String, JSObject> notifyListenersFunction
-    ) {
+    public static FullScreenContentCallback getFullScreenContentCallback(BiConsumer<String, JSObject> notifyListenersFunction) {
         return new FullScreenContentCallback() {
             @Override
             public void onAdShowedFullScreenContent() {

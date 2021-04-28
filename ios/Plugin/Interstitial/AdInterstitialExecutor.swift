@@ -59,4 +59,3 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Dismissed.rawValue, data: [:])
     }
 }
-
