@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob.interstitial;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -28,7 +29,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.mockito.internal.MockedConstructionImpl;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +47,9 @@ class AdInterstitialExecutorTest {
     @Mock
     BiConsumer<String, JSObject> notifierMock;
 
+    @Mock
+    InterstitialAdCallbackAndListeners interstitialAdCallbackAndListenersMock;
+
     final String LOG_TAG = "AdInterstitialExecutorTest Log Tag";
 
     AdInterstitialExecutor sut;
@@ -54,7 +60,7 @@ class AdInterstitialExecutorTest {
     void beforeEach() {
         runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
 
-        sut = new AdInterstitialExecutor(() -> context, () -> mockedActivity, notifierMock, LOG_TAG);
+        sut = new AdInterstitialExecutor(() -> context, () -> mockedActivity, notifierMock, LOG_TAG, interstitialAdCallbackAndListenersMock);
     }
 
     @AfterEach
@@ -78,9 +84,6 @@ class AdInterstitialExecutorTest {
         MockedStatic<InterstitialAd> interstitialAdMockedStatic;
 
         @Mock
-        MockedStatic<InterstitialAdCallbackAndListeners> interstitialAdCallbackAndListenersMockedStatic;
-
-        @Mock
         InterstitialAdLoadCallback interstitialAdLoadCallbackMock;
 
         @Mock
@@ -102,6 +105,7 @@ class AdInterstitialExecutorTest {
             when(adOptionsFactoryMock.createInterstitialOptions(pluginCallMock)).thenReturn(adOptionsMock);
             requestHelperMockedStatic.when(() -> RequestHelper.createRequest(adOptionsMock)).thenReturn(adRequestFromHelper);
             adViewIdHelperMockedStatic.when(() -> AdViewIdHelper.getFinalAdId(any(), any(), any(), any())).thenReturn(idFromViewHelper);
+
         }
 
         @AfterEach
@@ -111,7 +115,6 @@ class AdInterstitialExecutorTest {
             adOptionsMockedStatic.close();
             interstitialAdMockedStatic.close();
             adViewIdHelperMockedStatic.close();
-            interstitialAdCallbackAndListenersMockedStatic.close();
         }
 
         @Test
@@ -142,12 +145,13 @@ class AdInterstitialExecutorTest {
         }
 
         @Test
-        @DisplayName("loads the ad with the InterstitialAdLoadCallback returned by the helper")
+        @DisplayName("loads the ad with the InterstitialAdLoadCallback returned by the getInterstitialAdLoadCallback singleton")
         void usesCallbackHelper() {
+            when(interstitialAdCallbackAndListenersMock.getInterstitialAdLoadCallback(pluginCallMock, notifierMock)).thenReturn(interstitialAdLoadCallbackMock);
             final ArgumentCaptor<InterstitialAdLoadCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(
                 InterstitialAdLoadCallback.class
             );
-            InterstitialAdCallbackAndListeners callbackSpy = spy(InterstitialAdCallbackAndListeners.INSTANCE);
+
             sut.prepareInterstitial(pluginCallMock, notifierMock);
             verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
             Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
@@ -155,8 +159,10 @@ class AdInterstitialExecutorTest {
 
             interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(), any(), any(), callbackArgumentCaptor.capture()));
 
-            verify(callbackSpy).getInterstitialAdLoadCallback(pluginCallMock, notifierMock);
-            // TODO: Inject callback creators on the constructor.
+
+            final InterstitialAdLoadCallback callback = callbackArgumentCaptor.getValue();
+
+            assertEquals(interstitialAdLoadCallbackMock, callback);
         }
     }
 }

@@ -23,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-internal class RewardedAdListenersTest {
+internal class RewardedAdCallbackAndListenersTest {
 
     @Mock
     lateinit var context: Context

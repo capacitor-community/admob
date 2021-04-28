@@ -9,6 +9,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
+import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndListeners;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
@@ -39,7 +40,8 @@ public class AdMob extends Plugin {
         this::getContext,
         this::getActivity,
         this::notifyListeners,
-        getLogTag()
+        getLogTag(),
+        InterstitialAdCallbackAndListeners.INSTANCE
     );
 
     // Initialize AdMob with appId

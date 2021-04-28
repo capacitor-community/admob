@@ -17,13 +17,17 @@ public class AdInterstitialExecutor extends Executor {
 
     public static InterstitialAd interstitialAd;
 
+    InterstitialAdCallbackAndListeners adCallbackAndListeners;
     public AdInterstitialExecutor(
         Supplier<Context> contextSupplier,
         Supplier<Activity> activitySupplier,
         BiConsumer<String, JSObject> notifyListenersFunction,
-        String pluginLogTag
+        String pluginLogTag,
+        InterstitialAdCallbackAndListeners adCallbackAndListeners
     ) {
         super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "AdRewardExecutor");
+
+        this.adCallbackAndListeners = adCallbackAndListeners;
     }
 
     public void prepareInterstitial(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
@@ -41,7 +45,7 @@ public class AdInterstitialExecutor extends Executor {
                             activitySupplier.get(),
                             id,
                             adRequest,
-                            InterstitialAdCallbackAndListeners.INSTANCE.getInterstitialAdLoadCallback(call, notifyListenersFunction)
+                                adCallbackAndListeners.getInterstitialAdLoadCallback(call, notifyListenersFunction)
                         );
                     }
                 );

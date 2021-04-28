@@ -13,8 +13,9 @@ import com.google.android.gms.common.util.BiConsumer
 
 object InterstitialAdCallbackAndListeners {
 
-
-    fun getInterstitialAdLoadCallback(call: PluginCall, notifyListenersFunction: BiConsumer<String, JSObject>): InterstitialAdLoadCallback {
+    fun getInterstitialAdLoadCallback(call: PluginCall,
+                                      notifyListenersFunction: BiConsumer<String, JSObject>,
+    ): InterstitialAdLoadCallback {
         return object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(ad: InterstitialAd) {
                 AdInterstitialExecutor.interstitialAd = ad
