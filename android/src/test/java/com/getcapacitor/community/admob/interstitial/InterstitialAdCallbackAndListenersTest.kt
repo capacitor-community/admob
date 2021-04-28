@@ -4,10 +4,13 @@ import android.app.Activity
 import android.content.Context
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
+import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnPaidEventListener
+import com.google.android.gms.ads.ResponseInfo
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.common.util.BiConsumer
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -19,11 +22,14 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.never
+import org.mockito.Mockito.spy
 import org.mockito.junit.jupiter.MockitoExtension
 
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 internal class InterstitialAdCallbackAndListenersTest {
+
+
 
     @Mock
     lateinit var context: Context
@@ -93,14 +99,12 @@ internal class InterstitialAdCallbackAndListenersTest {
 
         @Nested
         inner class AdLoaded {
-            private val wantedAdUnitId = "My Unit Id"
-
             @Mock
-            lateinit var interstitialAdMock: InterstitialAd
+            lateinit var interstitialAdStub: InterstitialAdStub
 
             @BeforeEach
             fun beforeEach() {
-                Mockito.`when`(interstitialAdMock.adUnitId).thenReturn(wantedAdUnitId)
+                interstitialAdStub = InterstitialAdStub()
             }
 
             @Test
@@ -109,12 +113,12 @@ internal class InterstitialAdCallbackAndListenersTest {
                 val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
 
                 // ACt
-                listener.onAdLoaded(interstitialAdMock)
+                listener.onAdLoaded(interstitialAdStub)
 
                 Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(InterstitialAdPluginPluginEvent.Loaded), argumentCaptor.capture())
                 val emittedAdInfo = argumentCaptor.value
 
-                assertEquals(wantedAdUnitId, emittedAdInfo.getString("adUnitId"))
+                assertEquals(interstitialAdStub.adUnitId, emittedAdInfo.getString("adUnitId"))
             }
 
             @Test
@@ -123,12 +127,35 @@ internal class InterstitialAdCallbackAndListenersTest {
                 val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
 
                 // ACt
-                listener.onAdLoaded(interstitialAdMock)
+                listener.onAdLoaded(interstitialAdStub)
 
                 Mockito.verify(pluginCall).resolve(argumentCaptor.capture())
                 val resolvedInfo = argumentCaptor.value
+                assertEquals(interstitialAdStub.adUnitId, resolvedInfo.getString("adUnitId"))
+            }
 
-                assertEquals(wantedAdUnitId, resolvedInfo.getString("adUnitId"))
+            @Test
+            fun `onAdLoaded should store the ad on the static reference`() {
+                AdInterstitialExecutor.interstitialAd = null;
+                val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+
+                // ACt
+                listener.onAdLoaded(interstitialAdStub)
+                Mockito.verify(pluginCall).resolve(argumentCaptor.capture())
+                assertEquals(AdInterstitialExecutor.interstitialAd, interstitialAdStub);
+            }
+
+            @Test
+            fun `onAdLoaded should assign the content callback`() {
+                val interstitialStub = InterstitialAdStub()
+                assertNull(interstitialStub.fullScreenContentCallback)
+
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+                // ACt
+                listener.onAdLoaded(interstitialStub)
+
+                assertNotNull(interstitialStub.fullScreenContentCallback)
             }
         }
 

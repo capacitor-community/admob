@@ -18,8 +18,9 @@ object InterstitialAdCallbackAndListeners {
     ): InterstitialAdLoadCallback {
         return object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(ad: InterstitialAd) {
+                ad.fullScreenContentCallback = FullscreenPluginCallback(InterstitialAdPluginPluginEvent, notifyListenersFunction)
+
                 AdInterstitialExecutor.interstitialAd = ad
-                AdInterstitialExecutor.interstitialAd.fullScreenContentCallback = FullscreenPluginCallback(InterstitialAdPluginPluginEvent, notifyListenersFunction)
 
                 val adInfo = JSObject()
                 adInfo.put("adUnitId", ad.adUnitId)

@@ -1,28 +1,15 @@
 package com.getcapacitor.community.admob;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atMostOnce;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import android.content.Context;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
 import com.getcapacitor.JSArray;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
-import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
-import com.getcapacitor.community.admob.helpers.RequestHelper;
-import com.getcapacitor.community.admob.models.AdOptions;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
+
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,9 +24,13 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * TODO: Move Interestial to their own executor and move all tests!
- */
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+
 @ExtendWith(MockitoExtension.class)
 public class AdMobTest {
 
@@ -149,123 +140,4 @@ public class AdMobTest {
         }
     }
 
-    @Nested
-    @DisplayName("Ads Creation")
-    class AdsCreation {
-
-        AdOptions adOptionsWithNpaTrue = new AdOptions.TesterAdOptionsBuilder().setNpa(true).build();
-
-        MockedStatic<MobileAds> mobileAdsMockedStatic;
-        MockedConstruction<AdView> adViewMockedConstruction;
-        MockedStatic<AdOptions> adOptionsStaticMocked;
-        MockedStatic<AdViewIdHelper> adViewIdHelperMockedStatic;
-        MockedConstruction<CoordinatorLayout.LayoutParams> layoutParamsMockedConstruction;
-        MockedStatic<RequestHelper> requestHelperMockedStatic;
-
-        @Mock
-        AdOptions.AdOptionsFactory adOptionsFactoryMock;
-
-        ArgumentCaptor<Runnable> runnableArgumentCaptor;
-
-        @BeforeEach
-        void beforeEachAdCreation() {
-            reset(pluginCallMock, adOptionsFactoryMock);
-            runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
-
-            mobileAdsMockedStatic = Mockito.mockStatic(MobileAds.class);
-            adViewMockedConstruction = Mockito.mockConstruction(AdView.class);
-
-            layoutParamsMockedConstruction = Mockito.mockConstruction(CoordinatorLayout.LayoutParams.class);
-            adViewIdHelperMockedStatic = Mockito.mockStatic(AdViewIdHelper.class);
-
-            adOptionsStaticMocked = Mockito.mockStatic(AdOptions.class);
-            adOptionsStaticMocked.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
-
-            requestHelperMockedStatic = Mockito.mockStatic(RequestHelper.class);
-        }
-
-        @AfterEach
-        void afterEachAdCreation() {
-            mobileAdsMockedStatic.close();
-            adViewMockedConstruction.close();
-            adOptionsStaticMocked.close();
-            layoutParamsMockedConstruction.close();
-            adViewIdHelperMockedStatic.close();
-            requestHelperMockedStatic.close();
-        }
-
-        @Nested
-        @DisplayName("Build request in the same way for all ad types")
-        class RequestBuilding {
-
-            @BeforeEach
-            public void beforeEach() {
-                sut.initialize(pluginCallMock);
-
-                lenient().when(pluginCallMock.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES)).thenReturn(new JSArray());
-            }
-
-            @Test
-            @DisplayName("Interstitial constructs the request using the RequestHelper")
-            void prepareInterstitial() {
-                try (
-                    MockedConstruction<RewardedInterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(
-                        RewardedInterstitialAd.class
-                    )
-                ) {
-                    when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
-
-                    sut.prepareInterstitial(pluginCallMock);
-                    verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
-                    Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
-                    uiThreadRunnable.run();
-
-                    requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
-                }
-            }
-
-            //            @Test
-            //            @DisplayName("Rewarded Video Ad constructs the request using the RequestHelper")
-            //            void prepareRewardVideo() {
-            //                mobileAdsMockedStatic.when(() -> MobileAds.getRewardedVideoAdInstance(any())).thenReturn(mock(RewardedAd.class));
-            //                when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
-            //
-            //                sut.prepareRewardVideoAd(pluginCallMock);
-            //                verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
-            //                Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
-            //                uiThreadRunnable.run();
-            //
-            //                requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
-            //            }
-
-
-//            @Test
-//            @DisplayName("Interstitial does not initialize the same add two times")
-//            void prepareInterstitialJustOneTime() {
-//                try (MockedConstruction<InterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(InterstitialAd.class)) {
-//                    when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
-//
-//                    sut.prepareInterstitial(pluginCallMock);
-//                    sut.prepareInterstitial(pluginCallMock);
-//                    sut.prepareInterstitial(pluginCallMock);
-//                    sut.prepareInterstitial(pluginCallMock);
-//                    verify(mockedActivity, atMostOnce()).runOnUiThread(runnableArgumentCaptor.capture());
-//                }
-//            }
-//
-//            @Test
-//            @DisplayName("Rewarded Video Ad constructs the request using the RequestHelper")
-//            void prepareRewardVideo() {
-//                mobileAdsMockedStatic.when(() -> MobileAds.getRewardedVideoAdInstance(any())).thenReturn(mock(RewardedVideoAd.class));
-//                when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
-//
-//                sut.prepareRewardVideoAd(pluginCallMock);
-//                verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
-//                Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
-//                uiThreadRunnable.run();
-//
-//                requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
-//            }
-        }
-    }
 }

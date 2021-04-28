@@ -65,7 +65,7 @@ internal class FullscreenPluginCallbackTest {
             val emittedError = argumentCaptor.value
 
             Assertions.assertEquals(wantedErrorCode, emittedError.getInt("code"))
-            Assertions.assertEquals(wantedReason, emittedError.getString("reason"))
+            Assertions.assertEquals(wantedReason, emittedError.getString("message"))
         }
 
         @Test

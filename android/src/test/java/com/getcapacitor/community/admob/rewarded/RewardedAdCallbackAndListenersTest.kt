@@ -116,7 +116,7 @@ internal class RewardedAdCallbackAndListenersTest {
                 val emittedError = argumentCaptor.value
 
                 assertEquals(wantedErrorCode, emittedError.getInt("code"))
-                assertEquals(wantedReason, emittedError.getString("reason"))
+                assertEquals(wantedReason, emittedError.getString("message"))
             }
 
             @Test
@@ -204,7 +204,7 @@ internal class RewardedAdCallbackAndListenersTest {
                 val emittedError = argumentCaptor.value
 
                 assertEquals(wantedErrorCode, emittedError.getInt("code"))
-                assertEquals(wantedReason, emittedError.getString("reason"))
+                assertEquals(wantedReason, emittedError.getString("message"))
             }
 
             @Test
