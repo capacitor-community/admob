@@ -205,7 +205,7 @@ export default App;
 ### INTERSTITIAL
 
 ```ts
-import { AdMob, AdOptions } from '@capacitor-community/admob';
+import { AdMob, AdOptions, AdLoadInfo, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 
 @Component({
   selector: 'admob',
@@ -219,7 +219,7 @@ export class AppComponent {
 
   constructor() {
     // Subscribe interstitial Event Listener
-    AdMob.addListener('adDidPresentFullScreenContent', (info: boolean) => {
+    AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
       AdMob.showInterstitial();
     });
 
