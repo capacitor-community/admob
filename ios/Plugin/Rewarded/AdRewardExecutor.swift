@@ -23,7 +23,9 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
 
                 self.rewardedAd = ad
                 self.rewardedAd?.fullScreenContentDelegate = self
-                self.plugin?.notifyListeners(RewardAdPluginEvents.Loaded.rawValue, data: [:])
+                self.plugin?.notifyListeners(RewardAdPluginEvents.Loaded.rawValue, data: [
+                  "adUnitId": adUnitID
+                ])
                 call.resolve([:])
             }
         )
