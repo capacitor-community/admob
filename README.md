@@ -44,7 +44,7 @@ Maintenance Status: Actively Maintained
 % npx cap update
 ```
 
-## Android configuration
+### Android configuration
 
 In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to the initialization list:
 
@@ -74,7 +74,7 @@ In file `android/app/src/main/res/values/strings.xml` add the following lines :
 
 Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
-## iOS configuration
+### iOS configuration
 
 Add the following in the `ios/App/App/info.plist` file inside of the outermost `<dict>`:
 
@@ -169,10 +169,10 @@ export async function interstitial(): Promise<void> {
 ### Show RewardVideo
 
 ```ts
-import { AdMob, AdOptions, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
+import { AdMob, AdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
 
 export async function rewardVideo(): Promise<void> {
-  AdMob.addListener(RewardAdPluginEvents.Loaded, () => {
+  AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
     // Subscribe prepared rewardVideo
   });
 
