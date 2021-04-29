@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -222,6 +223,7 @@ public class AdMobTest {
                     requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
                 }
             }
+
             //            @Test
             //            @DisplayName("Rewarded Video Ad constructs the request using the RequestHelper")
             //            void prepareRewardVideo() {
@@ -235,6 +237,35 @@ public class AdMobTest {
             //
             //                requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
             //            }
+
+
+//            @Test
+//            @DisplayName("Interstitial does not initialize the same add two times")
+//            void prepareInterstitialJustOneTime() {
+//                try (MockedConstruction<InterstitialAd> interstitialAdMockedConstruction = Mockito.mockConstruction(InterstitialAd.class)) {
+//                    when(adOptionsFactoryMock.createInterstitialOptions(any())).thenReturn(adOptionsWithNpaTrue);
+//
+//                    sut.prepareInterstitial(pluginCallMock);
+//                    sut.prepareInterstitial(pluginCallMock);
+//                    sut.prepareInterstitial(pluginCallMock);
+//                    sut.prepareInterstitial(pluginCallMock);
+//                    verify(mockedActivity, atMostOnce()).runOnUiThread(runnableArgumentCaptor.capture());
+//                }
+//            }
+//
+//            @Test
+//            @DisplayName("Rewarded Video Ad constructs the request using the RequestHelper")
+//            void prepareRewardVideo() {
+//                mobileAdsMockedStatic.when(() -> MobileAds.getRewardedVideoAdInstance(any())).thenReturn(mock(RewardedVideoAd.class));
+//                when(adOptionsFactoryMock.createRewardVideoOptions(any())).thenReturn(adOptionsWithNpaTrue);
+//
+//                sut.prepareRewardVideoAd(pluginCallMock);
+//                verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+//                Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+//                uiThreadRunnable.run();
+//
+//                requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(adOptionsWithNpaTrue));
+//            }
         }
     }
 }

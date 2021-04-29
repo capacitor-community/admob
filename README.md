@@ -22,6 +22,7 @@
 | Maintainer          | GitHub                              | Social                                | Sponsoring Company                             |
 | ------------------- | ----------------------------------- | ------------------------------------- | ---------------------------------------------- |
 | Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo) | [@rdlabo](https://twitter.com/rdlabo) | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
+| Saninn Salas Diaz | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) | |
 
 Maintenance Status: Actively Maintained
 
@@ -80,10 +81,15 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
 ```xml
 <key>GADIsAdManagerApp</key>
 <true/>
-
 <key>GADApplicationIdentifier</key>
 <string>[APP_ID]</string>
-
+<key>SKAdNetworkItems</key>
+<array>
+  <dict>
+    <key>SKAdNetworkIdentifier</key>
+    <string>cstr6suwn9.skadnetwork</string>
+  </dict>
+</array>
 <key>NSUserTrackingUsageDescription</key>
 <string>[Why you use NSUserTracking. ex: This identifier will be used to deliver personalized ads to you.]</string>
 ```
