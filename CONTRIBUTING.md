@@ -2,21 +2,6 @@
 
 This guide provides instructions for contributing to this Capacitor plugin.
 
-## Temporary docgen
-`docgen` don't support this repository until. So If you use docgen, you should prepare here:
-
-```
-% git clone https://github.com/rdlabo/capacitor-docgen.git
-$ cd capacitor-docgen && npm i && npm run build
-% npm link
-```
-
-And do in this repository:
-
-```
-% npm link @capacitor/docgen
-```
-
 ## Developing
 
 ### Local Setup
@@ -24,15 +9,15 @@ And do in this repository:
 1. Fork and clone the repo.
 1. Install the dependencies.
 
-    ```shell
-    npm install
-    ```
+```shell
+npm install
+```
 
 1. Install SwiftLint if you're on macOS.
 
-    ```shell
-    brew install swiftlint
-    ```
+```shell
+brew install swiftlint
+```
 
 ### Scripts
 
@@ -55,13 +40,3 @@ This is useful to run in CI to verify that the plugin builds for all platforms.
 Check formatting and code quality, autoformat/autofix if possible.
 
 This template is integrated with ESLint, Prettier, and SwiftLint. Using these tools is completely optional, but the [Capacitor Community](https://github.com/capacitor-community/) strives to have consistent code style and structure for easier cooperation.
-
-## Publishing
-
-There is a `prepublishOnly` hook in `package.json` which prepares the plugin before publishing, so all you need to do is run:
-
-```shell
-npm publish
-```
-
-> **Note**: The [`files`](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files) array in `package.json` specifies which files get published. If you rename files/directories or add files elsewhere, you may need to update it.
