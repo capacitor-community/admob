@@ -27,7 +27,7 @@ export interface BannerDefinitions {
      * @since 1.1.2
      */
     hideBanner(): Promise<void>;
-  
+
     /**
      * Resume the banner, show it after hide
      *
@@ -35,7 +35,7 @@ export interface BannerDefinitions {
      * @since 1.1.2
      */
     resumeBanner(): Promise<void>;
-  
+
     /**
      * Destroy the banner, remove it from screen.
      *
@@ -43,7 +43,7 @@ export interface BannerDefinitions {
      * @since 1.1.2
      */
   removeBanner(): Promise<void>;
-  
+
    /**
    *
    * @group Banner
@@ -55,7 +55,7 @@ export interface BannerDefinitions {
       eventName: BannerAdPluginEvents.SizeChanged,
       listenerFunc: (info: AdMobBannerSize) => void,
     ): PluginListenerHandle;
-  
+
     /**
      * Notice: request loaded Banner ad
      *
@@ -66,9 +66,9 @@ export interface BannerDefinitions {
      */
     addListener(
       eventName: BannerAdPluginEvents.Loaded,
-      listenerFunc: (info: AdMobBannerSize) => void,
+      listenerFunc: () => void,
     ): PluginListenerHandle;
-  
+
     /**
      * Notice: request failed Banner ad
      *
@@ -81,7 +81,7 @@ export interface BannerDefinitions {
       eventName: BannerAdPluginEvents.FailedToLoad,
       listenerFunc: (info: AdMobError) => void,
     ): PluginListenerHandle;
-  
+
     /**
      * Notice: full-screen banner view will be presented in response to the user clicking on an ad.
      *
@@ -94,8 +94,8 @@ export interface BannerDefinitions {
       eventName: BannerAdPluginEvents.Opened,
       listenerFunc: () => void,
     ): PluginListenerHandle;
-  
-  
+
+
     /**
      * Notice: The full-screen banner view will been dismissed.
      *

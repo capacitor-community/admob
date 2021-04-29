@@ -323,15 +323,15 @@ addListener(eventName: BannerAdPluginEvents.SizeChanged, listenerFunc: (info: Ad
 ### addListener(BannerAdPluginEvents.Loaded, ...)
 
 ```typescript
-addListener(eventName: BannerAdPluginEvents.Loaded, listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
+addListener(eventName: BannerAdPluginEvents.Loaded, listenerFunc: () => void) => PluginListenerHandle
 ```
 
 Notice: request loaded Banner ad
 
-| Param              | Type                                                                           | Description    |
-| ------------------ | ------------------------------------------------------------------------------ | -------------- |
-| **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Loaded</a></code>   | bannerAdLoaded |
-| **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |                |
+| Param              | Type                                                                         | Description    |
+| ------------------ | ---------------------------------------------------------------------------- | -------------- |
+| **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Loaded</a></code> | bannerAdLoaded |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                   |                |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
