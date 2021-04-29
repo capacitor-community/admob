@@ -96,10 +96,20 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
 
 Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
-## Initialize
+## Example
+
+### Initialize AdMob
 
 ```ts
-initialize(options: { requestTrackingAuthorization?: boolean , testingDevices?: string[]}): Promise<{ value: boolean }>
+import { AdMob } from '@capacitor-community/admob';
+
+export async function initialize(): Promise<void> {
+  AdMob.initialize({
+    requestTrackingAuthorization: true,
+    testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
+    initializeForTesting: true,
+  });
+}
 ```
 
 You can use option `requestTrackingAuthorization`. This change permission to require `AppTrackingTransparency` in iOS >= 14:
@@ -109,153 +119,75 @@ Default value is `true`. If you don't want to track, set requestTrackingAuthoriz
 
 Send and array of device Ids in `testingDevices? to use production like ads on your specified devices -> https://developers.google.com/admob/android/test-ads#enable_test_devices
 
-## APIs
 
-### BANNER
-
-#### Angular
+### Show Banner
 
 ```ts
-import { AdMob, AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
+import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, BannerAdPluginEvents, AdMobBannerSize } from '@capacitor-community/admob';
 
-@Component({
-  selector: 'admob',
-  templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss'],
-})
-export class AdMobComponent {
-  private options: AdOptions = {
-    adId: 'YOUR ADID',
-    adSize: AdSize.BANNER,
-    position: AdPosition.BOTTOM_CENTER,
-    margin: 0,
-    // isTesting: true
-    // npa: true
-  };
-
-  constructor() {
-    // Subscribe Banner Event Listener
-    AdMob.addListener('bannerViewDidReceiveAd', (info: boolean) => {
-      console.log('Banner Ad Loaded');
+export async function banner(): Promise<void> {
+    AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
+      // Subscribe Banner Event Listener
     });
-
-    // Get Banner Size
-    AdMob.addListener('bannerViewChangeSize', (info: boolean) => {
-      console.log(info);
+    
+    AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size: AdMobBannerSize) => {
+      // Subscribe Change Banner Size
     });
-
-    // Show Banner Ad
-    AdMob.showBanner(this.options);
-  }
+    
+    const options: BannerAdOptions = {
+      adId: 'YOUR ADID',
+      adSize: BannerAdSize.BANNER,
+      position: BannerAdPosition.BOTTOM_CENTER,
+      margin: 0,
+      // isTesting: true
+      // npa: true
+    };
+    AdMob.showBanner(options);
 }
 ```
 
-#### React
-This is implements simple sample from https://github.com/DavidFrahm . Thanks!
-
-```ts
-import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, isPlatform } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
-
-import { AdMob, AdOptions, AdSize, AdPosition } from '@capacitor-community/admob';
-
-const App: React.FC = () => {
-  AdMob.initialize();
-
-  const adId = {
-    ios: 'ios-value-here',
-    android: 'android-value-here',
-  };
-
-  const platformAdId = isPlatform('android') ? adId.android : adId.ios;
-
-  const options: AdOptions = {
-    adId: platformAdId,
-    adSize: AdSize.BANNER,
-    position: AdPosition.BOTTOM_CENTER,
-    margin: 0,
-    // isTesting: true
-    // npa: true
-  };
-
-  AdMob.showBanner(options);
-
-  // Subscribe Banner Event Listener
-  AdMob.addListener('bannerViewDidReceiveAd', (info: boolean) => {
-    console.log('Banner ad loaded');
-  });
-
-  // Get Banner Size
-  AdMob.addListener('bannerViewChangeSize', (info: boolean) => {
-    console.log(info);
-  });
-
-  return (
-    <IonApp>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route path="/home" component={Home} exact={true} />
-          <Route exact path="/" render={() => <Redirect to="/home" />} />
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </IonApp>
-  );
-};
-
-export default App;
-```
-
-### INTERSTITIAL
+### Show Interstitial
 
 ```ts
 import { AdMob, AdOptions, AdLoadInfo, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 
-@Component({
-  selector: 'admob',
-  templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss'],
-})
-export class AppComponent {
-  options: AdOptions = {
+export async function interstitial(): Promise<void> {
+  AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
+    // Subscribe prepared interstitial
+  });
+
+  const options: AdOptions = {
     adId: 'YOUR ADID',
+    // isTesting: true
+    // npa: true
   };
-
-  constructor() {
-    // Subscribe interstitial Event Listener
-    AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
-      AdMob.showInterstitial();
-    });
-
-    // Prepare interstitial banner
-    AdMob.prepareInterstitial(this.options);
-  }
+  await AdMob.prepareInterstitial(options);
+  await AdMob.showInterstitial();
 }
 ```
 
-### RewardVideo
+### Show RewardVideo
 
 ```ts
-import { AdMob, AdOptions } from '@capacitor-community/admob';
+import { AdMob, AdOptions, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
 
-@Component({
-  selector: 'admob',
-  templateUrl: 'admob.component.html',
-  styleUrls: ['admob.component.scss'],
-})
-export class AdMobComponent {
-  options: AdOptions = {
+export async function rewardVideo(): Promise<void> {
+  AdMob.addListener(RewardAdPluginEvents.Loaded, () => {
+    // Subscribe prepared rewardVideo
+  });
+
+  AdMob.addListener(RewardAdPluginEvents.Rewarded, (rewardItem: AdMobRewardItem) => {
+    // Subscribe user rewarded
+    console.log(rewardItem);
+  });
+
+  const options: AdOptions = {
     adId: 'YOUR ADID',
+    // isTesting: true
+    // npa: true
   };
-
-  constructor() {
-    AdMob.addListener('adDidPresentFullScreenContent', () => {
-      AdMob.showRewardVideoAd();
-    });
-    AdMob.prepareRewardVideoAd(this.options);
-  }
+  await AdMob.prepareRewardVideoAd(options);
+  const rewardItem = await AdMob.showRewardVideoAd();
 }
 ```
 
