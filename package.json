@@ -42,7 +42,7 @@
   "devDependencies": {
     "@capacitor/android": "^3.0.0-rc.0",
     "@capacitor/cli": "^3.0.0-rc.0",
-    "@capacitor/docgen": "git+https://github.com/rdlabo/capacitor-docgen.git",
+    "@capacitor/docgen": "0.0.16",
     "@capacitor/ios": "^3.0.0-rc.0",
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "^1.0.1",

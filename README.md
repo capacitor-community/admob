@@ -375,7 +375,7 @@ addListener(eventName: BannerAdPluginEvents.SizeChanged, listenerFunc: (info: Ad
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.SizeChanged</a></code> | bannerAdSizeChanged |
 | **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code>    |                     |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 **Since:** 3.0.0
 
@@ -395,7 +395,7 @@ Notice: request loaded Banner ad
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Loaded</a></code>   | bannerAdLoaded |
 | **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code> |                |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 **Since:** 3.0.0
 
@@ -415,7 +415,7 @@ Notice: request failed Banner ad
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.FailedToLoad</a></code> | bannerAdFailedToLoad |
 | **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code>               |                      |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 **Since:** 3.0.0
 
@@ -435,7 +435,7 @@ Notice: full-screen banner view will be presented in response to the user clicki
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Opened</a></code> | bannerAdOpened |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |                |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 **Since:** 3.0.0
 
@@ -455,7 +455,7 @@ Notice: The full-screen banner view will been dismissed.
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Closed</a></code> | bannerAdClosed |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |                |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 **Since:** 3.0.0
 
@@ -475,7 +475,7 @@ Unimplemented
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.AdImpression</a></code> | AdImpression |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                         |              |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 **Since:** 3.0.0
 
@@ -525,7 +525,7 @@ addListener(eventName: InterstitialAdPluginEvents.FailedToLoad, listenerFunc: (e
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.FailedToLoad</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                          |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -541,7 +541,7 @@ addListener(eventName: InterstitialAdPluginEvents.Loaded, listenerFunc: (info: A
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.Loaded</a></code> |
 | **`listenerFunc`** | <code>(info: <a href="#adloadinfo">AdLoadInfo</a>) =&gt; void</code>                     |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -557,7 +557,7 @@ addListener(eventName: InterstitialAdPluginEvents.Dismissed, listenerFunc: () =>
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.Dismissed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                                  |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -573,7 +573,7 @@ addListener(eventName: InterstitialAdPluginEvents.FailedToShow, listenerFunc: (e
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.FailedToShow</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                          |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -589,7 +589,7 @@ addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => vo
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.Showed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                               |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -639,7 +639,7 @@ addListener(eventName: RewardAdPluginEvents.FailedToLoad, listenerFunc: (error: 
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.FailedToLoad</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>              |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -655,7 +655,7 @@ addListener(eventName: RewardAdPluginEvents.Loaded, listenerFunc: (info: AdLoadI
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Loaded</a></code> |
 | **`listenerFunc`** | <code>(info: <a href="#adloadinfo">AdLoadInfo</a>) =&gt; void</code>         |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -671,7 +671,7 @@ addListener(eventName: RewardAdPluginEvents.Rewarded, listenerFunc: (reward: AdM
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Rewarded</a></code>   |
 | **`listenerFunc`** | <code>(reward: <a href="#admobrewarditem">AdMobRewardItem</a>) =&gt; void</code> |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -687,7 +687,7 @@ addListener(eventName: RewardAdPluginEvents.Dismissed, listenerFunc: () => void)
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Dismissed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                      |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -703,7 +703,7 @@ addListener(eventName: RewardAdPluginEvents.FailedToShow, listenerFunc: (error: 
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.FailedToShow</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>              |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -719,7 +719,7 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Showed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |
 
-**Returns:** <code>PluginListenerHandle</code>
+**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
 --------------------
 
@@ -742,6 +742,13 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 | -------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ----- |
 | **`adSize`**   | <code><a href="#banneradsize">BannerAdSize</a></code>         | Banner Ad Size, defaults to SMART_BANNER. IT can be: SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD, SKYSCRAPER, or CUSTOM | <code>SMART_BANNER</code> | 1.1.2 |
 | **`position`** | <code><a href="#banneradposition">BannerAdPosition</a></code> | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                                | <code>TOP_CENTER</code>   | 1.1.2 |
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
 #### AdMobBannerSize
