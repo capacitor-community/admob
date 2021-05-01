@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 @NativePlugin(permissions = { Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET })
 public class AdMob extends Plugin {
+
     public static final JSArray EMPTY_TESTING_DEVICES = new JSArray();
 
     private AdRewardExecutor adRewardExecutor = new AdRewardExecutor(
@@ -41,7 +42,7 @@ public class AdMob extends Plugin {
     );
     private BannerExecutor bannerExecutor = new BannerExecutor(this::getContext, this::getActivity, this::notifyListeners, getLogTag());
     private PluginCall call;
-    private InterstitialAd mInterstitialAd=null;
+    private InterstitialAd mInterstitialAd = null;
 
     // Initialize AdMob with appId
     @PluginMethod
@@ -59,7 +60,6 @@ public class AdMob extends Plugin {
             MobileAds.initialize(
                 getContext(),
                 new OnInitializationCompleteListener() {
-
                     @Override
                     public void onInitializationComplete(InitializationStatus initializationStatus) {}
                 }
@@ -103,17 +103,16 @@ public class AdMob extends Plugin {
         this.call = call;
 
         // If this method already been called, then skip it.
-        if(mInterstitialAd!=null) {
+        if (mInterstitialAd != null) {
             return;
         }
-        
+
         try {
             mInterstitialAd = new InterstitialAd(getContext());
 
             getActivity()
                 .runOnUiThread(
                     new Runnable() {
-
                         @Override
                         public void run() {
                             final AdRequest adRequest = RequestHelper.createRequest(adOptions);
@@ -123,7 +122,6 @@ public class AdMob extends Plugin {
 
                             mInterstitialAd.setAdListener(
                                 new AdListener() {
-
                                     @Override
                                     public void onAdLoaded() {
                                         // Code to be executed when an ad finishes loading.
@@ -173,7 +171,6 @@ public class AdMob extends Plugin {
         } catch (Exception ex) {
             call.error(ex.getLocalizedMessage(), ex);
         }
-        
     }
 
     // Show interstitial Ad
@@ -183,16 +180,23 @@ public class AdMob extends Plugin {
             getActivity()
                 .runOnUiThread(
                     new Runnable() {
-
                         @Override
                         public void run() {
                             if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
                                 getActivity()
                                     .runOnUiThread(
                                         new Runnable() {
-
                                             @Override
                                             public void run() {
+                                                mInterstitialAd.setAdListener(
+                                                    new AdListener() {
+                                                        @Override
+                                                        public void onAdClosed() {
+                                                            super.onAdLoaded();
+                                                            mInterstitialAd = null;
+                                                        }
+                                                    }
+                                                );
                                                 mInterstitialAd.show();
                                             }
                                         }
