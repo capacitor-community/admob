@@ -49,6 +49,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "vanessag",
+      "name": "vanessag",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4007550?v=4",
+      "profile": "https://github.com/vanessag",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
