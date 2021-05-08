@@ -40,10 +40,10 @@
     "release": "np --any-branch"
   },
   "devDependencies": {
-    "@capacitor/android": "^3.0.0-rc.0",
-    "@capacitor/cli": "^3.0.0-rc.0",
+    "@capacitor/android": "^3.0.0-rc.2",
+    "@capacitor/cli": "^3.0.0-rc.2",
     "@capacitor/docgen": "git+https://github.com/rdlabo/capacitor-docgen.git#feat/support_extends_build",
-    "@capacitor/ios": "^3.0.0-rc.0",
+    "@capacitor/ios": "^3.0.0-rc.2",
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
@@ -57,7 +57,7 @@
     "typescript": "~4.0.3"
   },
   "dependencies": {
-    "@capacitor/core": "3.0.0-rc.0"
+    "@capacitor/core": "3.0.0-rc.2"
   },
   "prettier": "@ionic/prettier-config",
   "eslintConfig": {
