@@ -1,8 +1,7 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented} from '../private/validate-all-events-implemented.type'
-import type { AdLoadInfo, AdMobError } from '../shared';
-import type { AdOptions } from '../shared';
+import type { AdLoadInfo, AdMobError, AdOptions } from '../shared';
 
 import type { RewardAdPluginEvents } from './reward-ad-plugin-events.enum';
 import type { AdMobRewardItem } from './reward-item.interface';

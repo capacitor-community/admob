@@ -1,15 +1,18 @@
 package com.getcapacitor.community.admob;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.content.Context;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.getcapacitor.JSArray;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
-
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +26,6 @@ import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class AdMobTest {
@@ -139,5 +135,4 @@ public class AdMobTest {
             verify(bannerExecutor).initialize();
         }
     }
-
 }

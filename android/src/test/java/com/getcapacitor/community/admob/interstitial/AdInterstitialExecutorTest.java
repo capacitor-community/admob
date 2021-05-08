@@ -60,7 +60,8 @@ class AdInterstitialExecutorTest {
     void beforeEach() {
         runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
 
-        sut = new AdInterstitialExecutor(() -> context, () -> mockedActivity, notifierMock, LOG_TAG, interstitialAdCallbackAndListenersMock);
+        sut =
+            new AdInterstitialExecutor(() -> context, () -> mockedActivity, notifierMock, LOG_TAG, interstitialAdCallbackAndListenersMock);
     }
 
     @AfterEach
@@ -105,7 +106,6 @@ class AdInterstitialExecutorTest {
             when(adOptionsFactoryMock.createInterstitialOptions(pluginCallMock)).thenReturn(adOptionsMock);
             requestHelperMockedStatic.when(() -> RequestHelper.createRequest(adOptionsMock)).thenReturn(adRequestFromHelper);
             adViewIdHelperMockedStatic.when(() -> AdViewIdHelper.getFinalAdId(any(), any(), any(), any())).thenReturn(idFromViewHelper);
-
         }
 
         @AfterEach
@@ -147,7 +147,8 @@ class AdInterstitialExecutorTest {
         @Test
         @DisplayName("loads the ad with the InterstitialAdLoadCallback returned by the getInterstitialAdLoadCallback singleton")
         void usesCallbackHelper() {
-            when(interstitialAdCallbackAndListenersMock.getInterstitialAdLoadCallback(pluginCallMock, notifierMock)).thenReturn(interstitialAdLoadCallbackMock);
+            when(interstitialAdCallbackAndListenersMock.getInterstitialAdLoadCallback(pluginCallMock, notifierMock))
+                .thenReturn(interstitialAdLoadCallbackMock);
             final ArgumentCaptor<InterstitialAdLoadCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(
                 InterstitialAdLoadCallback.class
             );
@@ -158,7 +159,6 @@ class AdInterstitialExecutorTest {
             uiThreadRunnable.run();
 
             interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(), any(), any(), callbackArgumentCaptor.capture()));
-
 
             final InterstitialAdLoadCallback callback = callbackArgumentCaptor.getValue();
 

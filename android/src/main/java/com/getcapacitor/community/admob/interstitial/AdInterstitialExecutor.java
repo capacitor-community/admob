@@ -18,6 +18,7 @@ public class AdInterstitialExecutor extends Executor {
     public static InterstitialAd interstitialAd;
 
     InterstitialAdCallbackAndListeners adCallbackAndListeners;
+
     public AdInterstitialExecutor(
         Supplier<Context> contextSupplier,
         Supplier<Activity> activitySupplier,
@@ -26,7 +27,6 @@ public class AdInterstitialExecutor extends Executor {
         InterstitialAdCallbackAndListeners adCallbackAndListeners
     ) {
         super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "AdRewardExecutor");
-
         this.adCallbackAndListeners = adCallbackAndListeners;
     }
 
@@ -45,7 +45,7 @@ public class AdInterstitialExecutor extends Executor {
                             activitySupplier.get(),
                             id,
                             adRequest,
-                                adCallbackAndListeners.getInterstitialAdLoadCallback(call, notifyListenersFunction)
+                            adCallbackAndListeners.getInterstitialAdLoadCallback(call, notifyListenersFunction)
                         );
                     }
                 );
