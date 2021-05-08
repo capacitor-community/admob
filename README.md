@@ -129,11 +129,11 @@ export async function banner(): Promise<void> {
     AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
       // Subscribe Banner Event Listener
     });
-    
+
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size: AdMobBannerSize) => {
       // Subscribe Change Banner Size
     });
-    
+
     const options: BannerAdOptions = {
       adId: 'YOUR ADID',
       adSize: BannerAdSize.BANNER,
@@ -827,6 +827,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/gant02"><img src="https://avatars1.githubusercontent.com/u/6771123?v=4?s=100" width="100px;" alt=""/><br /><sub><b>gant02</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=gant02" title="Code">💻</a></td>
     <td align="center"><a href="https://www.saninnsalas.com"><img src="https://avatars1.githubusercontent.com/u/5490201?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Saninn Salas Diaz</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=distante" title="Code">💻</a></td>
     <td align="center"><a href="https://www.nicolueg.com"><img src="https://avatars.githubusercontent.com/u/48101693?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nico Lueg</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=NLueg" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/ghonche-yqr-21774b114/"><img src="https://avatars.githubusercontent.com/u/25591295?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ghonche Yqr</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=ghonche-yqr" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/vanessag"><img src="https://avatars.githubusercontent.com/u/4007550?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vanessag</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=vanessag" title="Code">💻</a></td>
   </tr>
 </table>
 

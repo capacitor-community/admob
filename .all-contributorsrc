@@ -40,6 +40,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ghonche-yqr",
+      "name": "Ghonche Yqr",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25591295?v=4",
+      "profile": "https://www.linkedin.com/in/ghonche-yqr-21774b114/",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "vanessag",
+      "name": "vanessag",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4007550?v=4",
+      "profile": "https://github.com/vanessag",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
