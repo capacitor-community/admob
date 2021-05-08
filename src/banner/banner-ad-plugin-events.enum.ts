@@ -5,9 +5,13 @@ export enum BannerAdPluginEvents {
   FailedToLoad = "bannerAdFailedToLoad",
 
   /**
-   * Open or close "Adsense" Event after user click banner
+   * Open "Adsense" Event after user click banner
    */
   Opened = "bannerAdOpened",
+
+  /**
+   * Close "Adsense" Event after user click banner
+   */
   Closed = "bannerAdClosed",
 
   /**

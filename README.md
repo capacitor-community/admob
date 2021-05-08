@@ -676,10 +676,12 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 
 #### BannerAdOptions
 
-| Prop           | Type                                                          | Description                                                                                                                                  | Default                   | Since |
-| -------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ----- |
-| **`adSize`**   | <code><a href="#banneradsize">BannerAdSize</a></code>         | Banner Ad Size, defaults to SMART_BANNER. IT can be: SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD, SKYSCRAPER, or CUSTOM | <code>SMART_BANNER</code> | 1.1.2 |
-| **`position`** | <code><a href="#banneradposition">BannerAdPosition</a></code> | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                                | <code>TOP_CENTER</code>   | 1.1.2 |
+This interface extends <a href="#adoptions">AdOptions</a>
+
+| Prop           | Type                                                          | Description                                                                                                                               | Default                      | Since |
+| -------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ----- |
+| **`adSize`**   | <code><a href="#banneradsize">BannerAdSize</a></code>         | Banner Ad Size, defaults to ADAPTIVE_BANNER. IT can be: ADAPTIVE_BANNER, SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD | <code>ADAPTIVE_BANNER</code> | 3.0.0 |
+| **`position`** | <code><a href="#banneradposition">BannerAdPosition</a></code> | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                             | <code>TOP_CENTER</code>      | 1.1.2 |
 
 
 #### PluginListenerHandle
@@ -770,8 +772,8 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`SizeChanged`**  | <code>"bannerAdSizeChanged"</code>  |                                                                                                        |
 | **`Loaded`**       | <code>"bannerAdLoaded"</code>       |                                                                                                        |
 | **`FailedToLoad`** | <code>"bannerAdFailedToLoad"</code> |                                                                                                        |
-| **`Opened`**       | <code>"bannerAdOpened"</code>       | Open or close "Adsense" Event after user click banner                                                  |
-| **`Closed`**       | <code>"bannerAdClosed"</code>       |                                                                                                        |
+| **`Opened`**       | <code>"bannerAdOpened"</code>       | Open "Adsense" Event after user click banner                                                           |
+| **`Closed`**       | <code>"bannerAdClosed"</code>       | Close "Adsense" Event after user click banner                                                          |
 | **`AdImpression`** | <code>"bannerAdImpression"</code>   | Similarly, this method should be called when an impression is recorded for the ad by the mediated SDK. |
 
 
@@ -782,7 +784,7 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`Loaded`**       | <code>'interstitialAdLoaded'</code>       | Emits after trying to prepare and Interstitial, when it is loaded and ready to be show |
 | **`FailedToLoad`** | <code>'interstitialAdFailedToLoad'</code> | Emits after trying to prepare and Interstitial, when it could not be loaded            |
 | **`Showed`**       | <code>'interstitialAdShowed'</code>       | Emits when the Interstitial ad is visible to the user                                  |
-| **`FailedToShow`** | <code>'interstitialAdFailedToShow'</code> |                                                                                        |
+| **`FailedToShow`** | <code>'interstitialAdFailedToShow'</code> | Emits when the Interstitial ad is failed to show                                       |
 | **`Dismissed`**    | <code>'interstitialAdDismissed'</code>    | Emits when the Interstitial ad is not visible to the user anymore.                     |
 
 
@@ -793,9 +795,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`Loaded`**       | <code>'onRewardedVideoAdLoaded'</code>       | Emits after trying to prepare a RewardAd and the Video is loaded and ready to be show                                                                                                                                                                                                                                                                  |
 | **`FailedToLoad`** | <code>'onRewardedVideoAdFailedToLoad'</code> | Emits after trying to prepare a RewardAd when it could not be loaded                                                                                                                                                                                                                                                                                   |
 | **`Showed`**       | <code>'onRewardedVideoAdShowed'</code>       | Emits when the AdReward video is visible to the user                                                                                                                                                                                                                                                                                                   |
-| **`FailedToShow`** | <code>'onRewardedVideoAdFailedToShow'</code> |                                                                                                                                                                                                                                                                                                                                                        |
+| **`FailedToShow`** | <code>'onRewardedVideoAdFailedToShow'</code> | Emits when the AdReward video is failed to show                                                                                                                                                                                                                                                                                                        |
 | **`Dismissed`**    | <code>'onRewardedVideoAdDismissed'</code>    | Emits when the AdReward video is not visible to the user anymore. **Important**: This has nothing to do with the reward it self. This event will emits in this two cases: 1. The user starts the video ad but close it before the reward emit. 2. The user start the video and see it until end, then gets the reward and after that the ad is closed. |
-| **`Rewarded`**     | <code>'onRewardedVideoAdReward'</code>       |                                                                                                                                                                                                                                                                                                                                                        |
+| **`Rewarded`**     | <code>'onRewardedVideoAdReward'</code>       | Emits when user get rewarded from AdReward                                                                                                                                                                                                                                                                                                             |
 
 </docgen-api>
 

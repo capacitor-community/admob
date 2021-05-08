@@ -2,7 +2,7 @@ import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented} from '../private/validate-all-events-implemented.type'
 import type { AdLoadInfo, AdMobError } from '../shared';
-import type { AdOptions } from '../shared/ad-options.interface';
+import type { AdOptions } from '../shared';
 
 import type { RewardAdPluginEvents } from './reward-ad-plugin-events.enum';
 import type { AdMobRewardItem } from './reward-item.interface';
@@ -27,7 +27,7 @@ export interface RewardDefinitions {
       * @since 1.1.2
       */
   showRewardVideoAd(): Promise<AdMobRewardItem>;
-  
+
   addListener(
     eventName: RewardAdPluginEvents.FailedToLoad,
     listenerFunc: (error: AdMobError) => void,
@@ -48,7 +48,7 @@ export interface RewardDefinitions {
     listenerFunc: () => void,
   ): PluginListenerHandle;
 
-  
+
   addListener(
     eventName: RewardAdPluginEvents.FailedToShow,
     listenerFunc: (error: AdMobError) => void,

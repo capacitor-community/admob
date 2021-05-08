@@ -12,10 +12,13 @@ export enum RewardAdPluginEvents {
    * Emits when the AdReward video is visible to the user
    */
   Showed = 'onRewardedVideoAdShowed',
+  /**
+   * Emits when the AdReward video is failed to show
+   */
   FailedToShow = 'onRewardedVideoAdFailedToShow',
   /**
    * Emits when the AdReward video is not visible to the user anymore.
-   * 
+   *
    * **Important**: This has nothing to do with the reward it self. This event
    * will emits in this two cases:
    * 1. The user starts the video ad but close it before the reward emit.
@@ -23,5 +26,8 @@ export enum RewardAdPluginEvents {
    * and after that the ad is closed.
    */
   Dismissed= 'onRewardedVideoAdDismissed',
+  /**
+   * Emits when user get rewarded from AdReward
+   */
   Rewarded= 'onRewardedVideoAdReward',
 }
