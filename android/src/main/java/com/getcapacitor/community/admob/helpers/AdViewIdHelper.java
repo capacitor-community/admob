@@ -2,16 +2,10 @@ package com.getcapacitor.community.admob.helpers;
 
 import android.content.Context;
 import android.util.Log;
-import androidx.annotation.NonNull;
-import com.getcapacitor.JSObject;
-import com.getcapacitor.PluginCall;
+
 import com.getcapacitor.community.admob.models.AdOptions;
-import com.getcapacitor.community.admob.models.FullScreenAdEventName;
-import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.common.util.BiConsumer;
 
 public final class AdViewIdHelper {
 
@@ -36,25 +30,4 @@ public final class AdViewIdHelper {
         Log.d(logTag, "Ad ID: " + finalId);
     }
 
-    public static FullScreenContentCallback getFullScreenContentCallback(BiConsumer<String, JSObject> notifyListenersFunction) {
-        return new FullScreenContentCallback() {
-            @Override
-            public void onAdShowedFullScreenContent() {
-                notifyListenersFunction.accept(FullScreenAdEventName.adDidPresentFullScreenContent.name(), new JSObject());
-            }
-
-            @Override
-            public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
-                notifyListenersFunction.accept(
-                    FullScreenAdEventName.didFailToPresentFullScreenContentWithError.name(),
-                    new JSObject().put("code", adError.getCode()).put("message", adError.getMessage())
-                );
-            }
-
-            @Override
-            public void onAdDismissedFullScreenContent() {
-                notifyListenersFunction.accept(FullScreenAdEventName.adDidDismissFullScreenContent.name(), new JSObject());
-            }
-        };
-    }
 }
