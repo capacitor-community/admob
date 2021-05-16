@@ -1,11 +1,15 @@
 package com.getcapacitor.community.admob.interstitial;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,11 +31,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.commons.util.StringUtils;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
-import org.mockito.internal.MockedConstructionImpl;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -163,6 +168,74 @@ class AdInterstitialExecutorTest {
             final InterstitialAdLoadCallback callback = callbackArgumentCaptor.getValue();
 
             assertEquals(interstitialAdLoadCallbackMock, callback);
+        }
+    }
+
+    @Nested
+    class ShowInterstitial {
+        @Mock
+        PluginCall pluginCallMock;
+
+        @AfterEach
+        void afterEach(){
+            AdInterstitialExecutor.interstitialAd = null;
+        }
+
+        @Test
+        @DisplayName("Should reject the call when no Interstitial was prepared")
+        void rejectsWhenNoInterstitialWasLoaded() {
+            final ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+
+
+            Mockito.verify(pluginCallMock).reject(argumentCaptor.capture());
+            String resolvedError = argumentCaptor.getValue();
+
+            assertThat(resolvedError, containsString("not prepared"));
+
+        }
+
+        @Test
+        @DisplayName("Should emit a Fail to show when no Interstitial was prepared")
+        void emitsFailToShowWhenNoInterstitialWasLoaded() {
+            final ArgumentCaptor<JSObject> argumentCaptor = ArgumentCaptor.forClass(JSObject.class);
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+
+            Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(InterstitialAdPluginPluginEvent.FailedToLoad), argumentCaptor.capture());
+
+            JSObject emittedError = argumentCaptor.getValue();
+
+            assertThat(emittedError.getString("message"), containsString("not prepared"));
+
+        }
+
+        @Test
+        @DisplayName("Should not try to call show when no Interstitial was prepared")
+        void shouldNotCallShowWhenNotPrepared() {
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+
+            verify(mockedActivity, times(0)).runOnUiThread(any());
+
+        }
+
+        @Test
+        @DisplayName("Should call show when Interstitial was prepared")
+        void shouldCallShowWhenPrepared() {
+            InterstitialAd mockedInterstitialAd = mock(InterstitialAd.class);
+            AdInterstitialExecutor.interstitialAd = mockedInterstitialAd;
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
+            uiThreadRunnable.run();
+
+            Mockito.verify(pluginCallMock, times(0)).reject(any());
+            verify(mockedInterstitialAd).show(any());
+
         }
     }
 }

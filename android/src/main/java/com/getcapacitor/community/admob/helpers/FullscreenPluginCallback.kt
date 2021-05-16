@@ -1,7 +1,7 @@
 package com.getcapacitor.community.admob.helpers
 
 import com.getcapacitor.JSObject
-import com.getcapacitor.community.admob.models.AbMobPluginError
+import com.getcapacitor.community.admob.models.AdMobPluginError
 import com.getcapacitor.community.admob.models.LoadPluginEventNames
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -15,7 +15,7 @@ class FullscreenPluginCallback(private val loadPluginObject: LoadPluginEventName
     }
 
     override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-        val adMobError = AbMobPluginError(adError)
+        val adMobError = AdMobPluginError(adError)
         notifyListenersFunction.accept(
                 loadPluginObject.FailedToShow, adMobError
         )

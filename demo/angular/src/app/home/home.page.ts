@@ -19,6 +19,9 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   private readonly lastRewardEvent$$ = new ReplaySubject<{name: string, value: any}>(1);
   public readonly lastRewardEvent$ = this.lastRewardEvent$$.asObservable()
 
+  private readonly lastInterstitialEvent$$ = new ReplaySubject<{name: string, value: any}>(1);
+  public readonly lastInterstitialEvent$ = this.lastInterstitialEvent$$.asObservable()
+
   private readonly listenerHandlers: PluginListenerHandle[] = [];
   /**
    * Height of AdSize
@@ -145,14 +148,15 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
    * ==================== REWARD ====================
    */
   async prepareReward() {
-    this.isLoading = true;
-    const result = await AdMob.prepareRewardVideoAd(rewardOptions)
-      .catch(e => console.log(e))
-      .finally(() => this.isLoading = false);
-    if (result === undefined) {
-      return;
+    try {
+      const result = await AdMob.prepareRewardVideoAd(rewardOptions);
+      console.log('Reward prepared', result);
+      this.isPrepareReward = true;
+    } catch (e) {
+      console.error('There was a problem preparing the reward', e);
+    } finally {
+      this.isLoading = false;
     }
-    this.isPrepareReward = true;
   }
 
   async showReward() {
@@ -179,7 +183,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
         console.log(`Interstitial Event "${key}"`, value);
 
         this.ngZone.run(() => {
-          this.lastRewardEvent$$.next({name: key, value: value});
+          this.lastInterstitialEvent$$.next({name: key, value: value});
         })
 
 
@@ -233,22 +237,24 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
    */
   async prepareInterstitial() {
     this.isLoading = true;
-    const result = AdMob.prepareInterstitial(interstitialOptions)
-      .catch(e => console.log(e))
-      .finally(() => this.isLoading = false);
-    if (result === undefined) {
-      return;
+
+    try {
+      const result = await AdMob.prepareInterstitial(interstitialOptions);
+      console.log('Interstitial Prepared', result);
+      this.isPrepareInterstitial = true;
+      
+    } catch (e) {
+      console.error('There was a problem preparing the Interstitial', e);
+    } finally {
+      this.isLoading = false;
     }
-    this.isPrepareInterstitial = true;
   }
 
 
   async showInterstitial() {
-    const result = await AdMob.showInterstitial()
+   await AdMob.showInterstitial()
       .catch(e => console.log(e));
-    if (result === undefined) {
-      return;
-    }
+
     this.isPrepareInterstitial = false;
   }
 

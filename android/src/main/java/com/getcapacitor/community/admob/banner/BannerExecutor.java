@@ -14,7 +14,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
-import com.getcapacitor.community.admob.models.AbMobPluginError;
+import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdListener;
@@ -241,7 +241,7 @@ public class BannerExecutor extends Executor {
                                 final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
 
-                                final AbMobPluginError adMobPluginError = new AbMobPluginError(adError);
+                                final AdMobPluginError adMobPluginError = new AdMobPluginError(adError);
                                 notifyListeners(BannerAdPluginEvents.FailedToLoad.getWebEventName(), adMobPluginError);
 
                                 super.onAdFailedToLoad(adError);

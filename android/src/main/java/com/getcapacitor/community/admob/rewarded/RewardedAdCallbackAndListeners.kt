@@ -3,7 +3,7 @@ package com.getcapacitor.community.admob.rewarded
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
-import com.getcapacitor.community.admob.models.AbMobPluginError
+import com.getcapacitor.community.admob.models.AdMobPluginError
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.rewarded.RewardItem
@@ -39,7 +39,7 @@ object RewardedAdCallbackAndListeners {
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
-                val adMobError = AbMobPluginError(adError)
+                val adMobError = AdMobPluginError(adError)
 
                 notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad, adMobError)
                 call.reject(adError.message)

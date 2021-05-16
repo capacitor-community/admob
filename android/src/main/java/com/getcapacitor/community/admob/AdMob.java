@@ -103,7 +103,7 @@ public class AdMob extends Plugin {
     // Show interstitial Ad
     @PluginMethod
     public void showInterstitial(final PluginCall call) {
-        adInterstitialExecutor.showInterstitial(call);
+        adInterstitialExecutor.showInterstitial(call, this::notifyListeners);
     }
 
     @PluginMethod

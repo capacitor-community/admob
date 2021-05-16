@@ -7,6 +7,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
+import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdRequest;
@@ -54,18 +55,27 @@ public class AdInterstitialExecutor extends Executor {
         }
     }
 
-    public void showInterstitial(final PluginCall call) {
-        try {
+    public void showInterstitial(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
+
+        if(interstitialAd == null){
+            String errorMessage = "No Interstitial can be show. It was not prepared or maybe it failed to be prepared.";
+            call.reject(errorMessage);
+            AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
+            notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.FailedToLoad, errorObject);
+            return;
+        }
+
             activitySupplier
                 .get()
                 .runOnUiThread(
                     () -> {
+                        try {
                         interstitialAd.show(activitySupplier.get());
                         call.resolve();
+                        } catch (Exception ex) {
+                            call.reject(ex.getLocalizedMessage(), ex);
+                        }
                     }
                 );
-        } catch (Exception ex) {
-            call.reject(ex.getLocalizedMessage(), ex);
-        }
     }
 }
