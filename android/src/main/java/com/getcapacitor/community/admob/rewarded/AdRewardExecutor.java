@@ -2,12 +2,15 @@ package com.getcapacitor.community.admob.rewarded;
 
 import android.app.Activity;
 import android.content.Context;
+
 import androidx.core.util.Supplier;
+
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
+import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdRequest;
@@ -31,12 +34,13 @@ public class AdRewardExecutor extends Executor {
     public void prepareRewardVideoAd(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         final AdOptions adOptions = AdOptions.getFactory().createRewardVideoOptions(call);
 
-        try {
             activitySupplier
                 .get()
                 .runOnUiThread(
                     () -> {
-                        final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                        try {
+
+                            final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
                         RewardedAd.load(
                             contextSupplier.get(),
@@ -44,15 +48,25 @@ public class AdRewardExecutor extends Executor {
                             adRequest,
                             RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction)
                         );
+                        } catch (Exception ex) {
+                            call.reject(ex.getLocalizedMessage(), ex);
+                        }
                     }
                 );
-        } catch (Exception ex) {
-            call.reject(ex.getLocalizedMessage(), ex);
-        }
+
     }
 
     @PluginMethod
-    public void showRewardVideoAd(final PluginCall call) {
+    public void showRewardVideoAd(final PluginCall call,  BiConsumer<String, JSObject> notifyListenersFunction) {
+
+        if(mRewardedAd == null){
+            String errorMessage = "No Reward Video Ad can be show. It was not prepared or maybe it failed to be prepared.";
+            call.reject(errorMessage);
+            AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
+            notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad, errorObject);
+            return;
+        }
+
         try {
             activitySupplier
                 .get()

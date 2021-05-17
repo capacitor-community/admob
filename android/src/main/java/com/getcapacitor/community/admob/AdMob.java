@@ -113,7 +113,7 @@ public class AdMob extends Plugin {
 
     @PluginMethod
     public void showRewardVideoAd(final PluginCall call) {
-        adRewardExecutor.showRewardVideoAd(call);
+        adRewardExecutor.showRewardVideoAd(call, this::notifyListeners);
     }
 
     /**
