@@ -23,7 +23,7 @@
     "url": "git@github.com:capacitor-community/admob.git/issues"
   },
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
+    "test": "npm run verify:ios && npm run verify:android && npm run verify:web",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -sdk iphoneos && cd ..",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "npm run build",
@@ -37,7 +37,7 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "release": "np --any-branch"
+    "release": "np"
   },
   "devDependencies": {
     "@capacitor/android": "^3.0.0",

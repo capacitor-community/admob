@@ -28,7 +28,7 @@ Maintenance Status: Actively Maintained
 
 ## Demo
 
-[Demo code is here.](https://github.com/capacitor-community/admob/tree/feat/v3/demo)
+[Demo code is here.](https://github.com/capacitor-community/admob/tree/feat/demo)
 
 ### Screenshots
 
@@ -40,7 +40,7 @@ Maintenance Status: Actively Maintained
 ## Installation
 
 ```
-% npm install --save @capacitor-community/admob@next
+% npm install --save @capacitor-community/admob
 % npx cap update
 ```
 
