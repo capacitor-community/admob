@@ -34,7 +34,7 @@ Maintenance Status: Actively Maintained
 **Supporting iOS14 is be since @1.1.0.**
 
 ```
-% npm install --save @capacitor-community/admob
+% npm install --save @capacitor-community/admob@^1.0.0
 % npx cap update
 ```
 
