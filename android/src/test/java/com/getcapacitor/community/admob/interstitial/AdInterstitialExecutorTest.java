@@ -173,11 +173,12 @@ class AdInterstitialExecutorTest {
 
     @Nested
     class ShowInterstitial {
+
         @Mock
         PluginCall pluginCallMock;
 
         @AfterEach
-        void afterEach(){
+        void afterEach() {
             AdInterstitialExecutor.interstitialAd = null;
         }
 
@@ -188,12 +189,10 @@ class AdInterstitialExecutorTest {
 
             sut.showInterstitial(pluginCallMock, notifierMock);
 
-
             Mockito.verify(pluginCallMock).reject(argumentCaptor.capture());
             String resolvedError = argumentCaptor.getValue();
 
             assertThat(resolvedError, containsString("not prepared"));
-
         }
 
         @Test
@@ -203,22 +202,21 @@ class AdInterstitialExecutorTest {
 
             sut.showInterstitial(pluginCallMock, notifierMock);
 
-            Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(InterstitialAdPluginPluginEvent.FailedToLoad), argumentCaptor.capture());
+            Mockito
+                .verify(notifierMock)
+                .accept(ArgumentMatchers.eq(InterstitialAdPluginPluginEvent.FailedToLoad), argumentCaptor.capture());
 
             JSObject emittedError = argumentCaptor.getValue();
 
             assertThat(emittedError.getString("message"), containsString("not prepared"));
-
         }
 
         @Test
         @DisplayName("Should not try to call show when no Interstitial was prepared")
         void shouldNotCallShowWhenNotPrepared() {
-
             sut.showInterstitial(pluginCallMock, notifierMock);
 
             verify(mockedActivity, times(0)).runOnUiThread(any());
-
         }
 
         @Test
@@ -235,7 +233,6 @@ class AdInterstitialExecutorTest {
 
             Mockito.verify(pluginCallMock, times(0)).reject(any());
             verify(mockedInterstitialAd).show(any());
-
         }
     }
 }

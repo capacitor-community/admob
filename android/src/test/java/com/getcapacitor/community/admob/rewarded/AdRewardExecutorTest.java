@@ -1,13 +1,19 @@
 package com.getcapacitor.community.admob.rewarded;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import android.app.Activity;
 import android.content.Context;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.common.util.BiConsumer;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,14 +26,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -54,6 +52,7 @@ class AdRewardExecutorTest {
 
     @Nested
     class ShowRewardVideoAd {
+
         @Mock
         PluginCall pluginCallMock;
 
@@ -65,7 +64,7 @@ class AdRewardExecutorTest {
         }
 
         @AfterEach
-        void afterEach(){
+        void afterEach() {
             AdRewardExecutor.mRewardedAd = null;
         }
 
@@ -76,12 +75,10 @@ class AdRewardExecutorTest {
 
             sut.showRewardVideoAd(pluginCallMock, notifierMock);
 
-
             Mockito.verify(pluginCallMock).reject(argumentCaptor.capture());
             String resolvedError = argumentCaptor.getValue();
 
             assertThat(resolvedError, containsString("not prepared"));
-
         }
 
         @Test
@@ -96,17 +93,14 @@ class AdRewardExecutorTest {
             JSObject emittedError = argumentCaptor.getValue();
 
             assertThat(emittedError.getString("message"), containsString("not prepared"));
-
         }
 
         @Test
         @DisplayName("Should not try to call show when no Reward was prepared")
         void shouldNotCallShowWhenNotPrepared() {
-
             sut.showRewardVideoAd(pluginCallMock, notifierMock);
 
             verify(mockedActivity, times(0)).runOnUiThread(any());
-
         }
 
         @Test
@@ -123,7 +117,6 @@ class AdRewardExecutorTest {
 
             Mockito.verify(pluginCallMock, times(0)).reject(any());
             verify(mockedInterstitialAd).show(any(), any());
-
         }
     }
 }

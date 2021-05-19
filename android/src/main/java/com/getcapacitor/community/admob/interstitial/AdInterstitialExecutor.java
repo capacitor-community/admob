@@ -56,8 +56,7 @@ public class AdInterstitialExecutor extends Executor {
     }
 
     public void showInterstitial(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-
-        if(interstitialAd == null){
+        if (interstitialAd == null) {
             String errorMessage = "No Interstitial can be show. It was not prepared or maybe it failed to be prepared.";
             call.reject(errorMessage);
             AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
@@ -65,17 +64,17 @@ public class AdInterstitialExecutor extends Executor {
             return;
         }
 
-            activitySupplier
-                .get()
-                .runOnUiThread(
-                    () -> {
-                        try {
+        activitySupplier
+            .get()
+            .runOnUiThread(
+                () -> {
+                    try {
                         interstitialAd.show(activitySupplier.get());
                         call.resolve();
-                        } catch (Exception ex) {
-                            call.reject(ex.getLocalizedMessage(), ex);
-                        }
+                    } catch (Exception ex) {
+                        call.reject(ex.getLocalizedMessage(), ex);
                     }
-                );
+                }
+            );
     }
 }

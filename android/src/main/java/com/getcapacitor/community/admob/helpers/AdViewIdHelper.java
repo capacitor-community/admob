@@ -2,7 +2,6 @@ package com.getcapacitor.community.admob.helpers;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -29,5 +28,4 @@ public final class AdViewIdHelper {
         adView.setAdUnitId(finalId);
         Log.d(logTag, "Ad ID: " + finalId);
     }
-
 }
