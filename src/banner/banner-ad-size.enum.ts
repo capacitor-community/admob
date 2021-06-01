@@ -24,15 +24,15 @@
 
   /**
    * Interactive Advertising Bureau (IAB)
-   * leaderboard ad size (728x90 density-independent pixels).
+   * medium rectangle ad size (300x250 density-independent pixels).
    */
-  LEADERBOARD = 'LEADERBOARD',
+   MEDIUM_RECTANGLE = 'MEDIUM_RECTANGLE',
 
   /**
    * Interactive Advertising Bureau (IAB)
-   * medium rectangle ad size (300x250 density-independent pixels).
+   * leaderboard ad size (728x90 density-independent pixels).
    */
-  MEDIUM_RECTANGLE = 'MEDIUM_RECTANGLE',
+  LEADERBOARD = 'LEADERBOARD',
 
   /**
    * A dynamically sized banner that is full-width and auto-height.
@@ -40,6 +40,8 @@
    ADAPTIVE_BANNER = 'ADAPTIVE_BANNER',
   
    /**
+    * @deprecated 
+    * Will be removed in next AdMob versions use `ADAPTIVE_BANNER`
     * Screen width x 32|50|90
     */
    SMART_BANNER = 'SMART_BANNER',
