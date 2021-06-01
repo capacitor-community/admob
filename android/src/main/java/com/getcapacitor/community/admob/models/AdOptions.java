@@ -73,7 +73,7 @@ public abstract class AdOptions {
         this.margin = call.getInt("margin", 0);
         this.npa = call.getBoolean("npa", false);
 
-        String sizeString = call.getString("adSize", BannerAdSizeEnum.ADAPTIVE_BANNER.name);
+        String sizeString = call.getString("adSize", BannerAdSizeEnum.ADAPTIVE_BANNER.name());
         this.adSize = AdOptions.adSizeStringToAdSizeEnum(sizeString);
     }
 

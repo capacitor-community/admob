@@ -59,7 +59,7 @@ public class BannerExecutor extends Executor {
             mAdView = new AdView(contextSupplier.get());
 
             if (!adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
-                mAdView.setAdSize(adOptions.adSize.size);
+                mAdView.setAdSize(adOptions.adSize.getSize());
             } else {
                 // ADAPTIVE BANNER
                 mAdView.setAdSize(
@@ -95,7 +95,7 @@ public class BannerExecutor extends Executor {
             int densityMargin = (int) (adOptions.margin * density);
 
             // Center Banner Ads
-            int adWidth = (int) (adOptions.adSize.size.getWidth() * density);
+            int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
             int sideMargin = ((int) widthPixels - adWidth) / 2;
 
             if (adWidth <= 0 || adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
