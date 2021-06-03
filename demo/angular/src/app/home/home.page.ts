@@ -3,7 +3,7 @@ import { ViewWillEnter, ViewWillLeave } from '@ionic/angular';
 import { PluginListenerHandle } from '@capacitor/core';
 import { ToastController } from '@ionic/angular';
 
-import { AdMob, AdMobBannerSize, AdMobRewardItem, BannerAdPluginEvents, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
+import { AdMob, AdMobBannerSize, AdMobRewardItem, BannerAdOptions, BannerAdPluginEvents, BannerAdSize, InterstitialAdPluginEvents, RewardAdPluginEvents} from '@capacitor-community/admob';
 import { ReplaySubject } from 'rxjs';
 import { bannerTopOptions, bannerBottomOptions, rewardOptions, interstitialOptions } from '../shared/ad.options';
 
@@ -13,6 +13,9 @@ import { bannerTopOptions, bannerBottomOptions, rewardOptions, interstitialOptio
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements ViewWillEnter, ViewWillLeave {
+  public readonly bannerSizes: BannerAdSize[] = Object.keys(BannerAdSize) as BannerAdSize[];
+  public currentBannerSize?: BannerAdSize;
+
   private readonly lastBannerEvent$$ = new ReplaySubject<{name: string, value: any}>(1);
   public readonly lastBannerEvent$ = this.lastBannerEvent$$.asObservable()
 
@@ -51,12 +54,19 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
      */
     const resizeHandler = AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: AdMobBannerSize) => {
       this.appMargin = info.height;
+      const app: HTMLElement = document.querySelector('ion-router-outlet');
+
+      if (this.appMargin === 0) {
+        app.style.marginTop = '';
+        return;
+      }
+
       if (this.appMargin > 0) {
         const body = document.querySelector('body');
         const bodyStyles = window.getComputedStyle(body);
         const safeAreaBottom = bodyStyles.getPropertyValue("--ion-safe-area-bottom");
 
-        const app: HTMLElement = document.querySelector('ion-router-outlet');
+        
         if (this.bannerPosition === 'top') {
           app.style.marginTop = this.appMargin + 'px';
         } else {
@@ -82,19 +92,21 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
    */
   async showTopBanner() {
     this.bannerPosition = 'top';
-    const result = await AdMob.showBanner(bannerTopOptions)
-      .catch(e => console.log(e));
-    if (result === undefined) {
-      return;
-    }
-
-    this.isPrepareBanner = true;
+    await this.showBanner(bannerTopOptions);
   }
 
   async showBottomBanner() {
     this.bannerPosition = 'bottom';
-    const result = await AdMob.showBanner(bannerBottomOptions)
-      .catch(e => console.log(e));
+    await this.showBanner(bannerBottomOptions);
+  }
+
+  private async showBanner(options: BannerAdOptions): Promise<void> {
+    const bannerOptions: BannerAdOptions = { ...options, adSize: this.currentBannerSize };
+    console.log('Requesting banner with this options', bannerOptions);
+
+    const result = await AdMob.showBanner(bannerOptions).
+      catch(e => console.error(e));
+    
     if (result === undefined) {
       return;
     }
