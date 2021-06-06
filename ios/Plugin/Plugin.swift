@@ -51,6 +51,10 @@ public class AdMob: CAPPlugin {
         }
     }
 
+    @objc func targetSettings(_ call: CAPPluginCall) {
+
+    }
+
     /**
      *  AdMob: Banner
      *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/banner?hl=ja

@@ -17,13 +17,13 @@ export interface AdMobPlugin extends AdMobDefinitions {
   initialize(options: AdMobInitializationOptions): Promise<void>;
 
   /**
-   * Initialize AdMob with AdMobInitializationOptions
+   * targetSettings with AdMobTargetSettings
    *
    * @group target
-   * @param options AdMobInitializationOptions
+   * @param options AdMobTargetSettings
    * @since 3.1.0
    */
-  target(options: AdMobTargetOptions): Promise<void>;
+  targetSettings(options: AdMobTargetSettings): Promise<void>;
 }
 
 export interface AdMobInitializationOptions {
@@ -55,7 +55,7 @@ export interface AdMobInitializationOptions {
   initializeForTesting?: boolean;
 }
 
-export interface AdMobTargetOptions {
+export interface AdMobTargetSettings {
   /**
    * GADRequestConfiguration is an object that collects targeting information
    * to be applied globally via the GADMobileAds shared instance.

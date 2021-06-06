@@ -16,8 +16,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log('initialize');
   }
 
-  async target(): Promise<void> {
-    console.log('target');
+  async targetSettings(): Promise<void> {
+    console.log('targetSettings');
   }
 
   async showBanner(options: AdOptions): Promise<void> {
