@@ -90,7 +90,11 @@ export interface AdMobTargetOptions {
    * @see https://developers.google.com/admob/android/targeting#child-directed_setting
    * @since 3.1.0
    */
-  maxAdContentRating?: 'MAX_AD_CONTENT_RATING_G' | 'MAX_AD_CONTENT_RATING_PG' | 'MAX_AD_CONTENT_RATING_T' | 'MAX_AD_CONTENT_RATING_MA';
+  maxAdContentRating?:
+    | 'MAX_AD_CONTENT_RATING_G'
+    | 'MAX_AD_CONTENT_RATING_PG'
+    | 'MAX_AD_CONTENT_RATING_T'
+    | 'MAX_AD_CONTENT_RATING_MA';
 
   /**
    * When requesting an ad, apps may pass the URL of the content they are serving.
