@@ -20,23 +20,21 @@ export class AppComponent {
     this.initializeApp();
   }
 
-  initializeApp() {
-    this.platform.ready().then(async () => {
-      this.statusBar.styleDefault();
-      this.splashScreen.hide();
+  async initializeApp() {
+    this.statusBar.styleDefault();
+    this.splashScreen.hide();
 
-      /**
-       * initialize() require after platform.ready();
-       */
-      await AdMob.initialize({
-        requestTrackingAuthorization: true,
-        testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
-        initializeForTesting: true,
-      });
+    /**
+     * initialize() require after platform.ready();
+     */
+    await AdMob.initialize({
+      requestTrackingAuthorization: true,
+      testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
+      initializeForTesting: true,
+    });
 
-      AdMob.globalSettings({
-        volume: 0.1,
-      })
+    AdMob.globalSettings({
+      volume: 0.1,
     });
   }
 }
