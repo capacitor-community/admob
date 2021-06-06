@@ -4,7 +4,7 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
-import { AdMob, AdMobInitializationOptions } from '@capacitor-community/admob';
+import { AdMob } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-root',
@@ -21,18 +21,22 @@ export class AppComponent {
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
+    this.platform.ready().then(async () => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
 
       /**
        * initialize() require after platform.ready();
        */
-      AdMob.initialize({
+      await AdMob.initialize({
         requestTrackingAuthorization: true,
         testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
         initializeForTesting: true,
       });
+
+      AdMob.globalSettings({
+        volume: 0.1,
+      })
     });
   }
 }

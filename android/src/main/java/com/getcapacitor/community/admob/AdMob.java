@@ -65,10 +65,24 @@ public class AdMob extends Plugin {
                 }
             );
             bannerExecutor.initialize();
+
             call.resolve();
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
+    }
+
+    @PluginMethod
+    public void globalSettings(final PluginCall call) {
+        if (call.getFloat("volume") != null) {
+            MobileAds.setAppVolume(call.getFloat("volume"));
+        }
+
+        if (call.getFloat("muted") != null) {
+            MobileAds.setAppMuted(call.getBoolean("muted"));
+        }
+
+        call.resolve();
     }
 
     // Show a banner Ad

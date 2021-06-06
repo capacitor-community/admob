@@ -195,6 +195,7 @@ export async function rewardVideo(): Promise<void> {
 <docgen-index>
 
 * [`initialize(...)`](#initialize)
+* [`globalSettings(...)`](#globalsettings)
 * [`showBanner(...)`](#showbanner)
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
@@ -242,6 +243,23 @@ Initialize AdMob with <a href="#admobinitializationoptions">AdMobInitializationO
 | **`options`** | <code><a href="#admobinitializationoptions">AdMobInitializationOptions</a></code> | <a href="#admobinitializationoptions">AdMobInitializationOptions</a> |
 
 **Since:** 1.1.2
+
+--------------------
+
+
+### globalSettings(...)
+
+```typescript
+globalSettings(options: AdMobGlobalSettings) => Promise<void>
+```
+
+Set AdMob Global Settings in anywhere
+
+| Param         | Type                                                                |
+| ------------- | ------------------------------------------------------------------- |
+| **`options`** | <code><a href="#admobglobalsettings">AdMobGlobalSettings</a></code> |
+
+**Since:** 3.1.0
 
 --------------------
 
@@ -672,6 +690,14 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 | **`requestTrackingAuthorization`** | <code>boolean</code>  | Use or not requestTrackingAuthorization in iOS(&gt;14)                                                                                                                                                                                                     |                    | 1.1.2 |
 | **`testingDevices`**               | <code>string[]</code> | An Array of devices IDs that will be marked as tested devices if {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.initializeForTesting</a>} is true (Real Ads will be served to Testing devices but they will not count as 'real'). |                    | 1.2.0 |
 | **`initializeForTesting`**         | <code>boolean</code>  | If set to true, the devices on {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.testingDevices</a>} will be registered to receive test production ads.                                                                              | <code>false</code> | 1.2.0 |
+
+
+#### AdMobGlobalSettings
+
+| Prop         | Type                 | Description                                                                                                                                                                                                      | Since |
+| ------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`volume`** | <code>number</code>  | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. enable set 0.0 - 1.0 | 3.1.0 |
+| **`muted`**  | <code>boolean</code> | To inform the SDK that the app volume has been muted                                                                                                                                                             | 3.1.0 |
 
 
 #### BannerAdOptions

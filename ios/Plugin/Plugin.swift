@@ -31,24 +31,33 @@ public class AdMob: CAPPlugin {
 
         if !isTrack {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
-            call.resolve([:])
         } else if #available(iOS 14, *) {
             #if canImport(AppTrackingTransparency)
             ATTrackingManager.requestTrackingAuthorization(completionHandler: { _ in
                 // iOS >= 14
                 GADMobileAds.sharedInstance().start(completionHandler: nil)
-                call.resolve([:])
-
             })
             #else
             GADMobileAds.sharedInstance().start(completionHandler: nil)
-            call.resolve([:])
             #endif
         } else {
             // iOS < 14
             GADMobileAds.sharedInstance().start(completionHandler: nil)
-            call.resolve([:])
         }
+
+        call.resolve([:])
+    }
+
+    @objc func globalSettings(_ call: CAPPluginCall) {
+
+        if call.getFloat("volume") != nil {
+            GADMobileAds.sharedInstance().applicationVolume = call.getFloat("volume")!
+        }
+
+        if call.getFloat("muted") != nil {
+            GADMobileAds.sharedInstance().applicationMuted = call.getBool("muted")!
+        }
+
     }
 
     /**
