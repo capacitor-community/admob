@@ -67,7 +67,9 @@ export interface AdMobGlobalSettings {
   volume?: number;
 
   /**
-   * To inform the SDK that the app volume has been muted
+   * To inform the SDK that the app volume has been muted.
+   * Note: Video ads that are ineligible to be shown with muted audio are not returned for ad requests made,
+   * when the app volume is reported as muted or set to a value of 0. This may restrict a subset of the broader video ads pool from serving.
    *
    * @see https://developers.google.com/admob/android/global-settings
    * @since 3.1.0
