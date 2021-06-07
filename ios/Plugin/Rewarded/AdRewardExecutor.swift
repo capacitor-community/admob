@@ -23,7 +23,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
 
                 self.rewardedAd = ad
                 
-                if (call.getString("userId") != "" || call.getString("customData") !== "") {
+                if (call.getString("userId") != "" || call.getString("customData") != "") {
                     let ssvOptions = GADServerSideVerificationOptions()
                     
                     if (call.getString("userId") != "") {
