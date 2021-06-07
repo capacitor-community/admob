@@ -35,4 +35,19 @@ export interface AdOptions {
    * @since 1.2.0
    */
   npa?: boolean;
+
+  /**
+   * For rewarded Ads SSV only.
+   * Set this value to send a user identifier to your rewarded Ads SSV call.
+   * 
+   * @default undefined
+   * @since 3.0.1
+   */
+  userId?: string;
+
+  /**
+   * For rewarded ads SSV only.
+   * Set this value to send custom data to your rewarded ads SSV call.
+   */
+  customData?: string;
 }

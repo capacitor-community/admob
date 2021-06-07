@@ -22,6 +22,23 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
                 }
 
                 self.rewardedAd = ad
+                
+                if (call.getString("userId") != "" || call.getString("customData") !== "") {
+                    let ssvOptions = GADServerSideVerificationOptions()
+                    
+                    if (call.getString("userId") != "") {
+                        NSLog("Enabling SSV Options for userId value: \(call.getString("userId"))")
+                        ssvOptions.userIdentifier = call.getString("userId")
+                    }
+                    
+                    if (call.getString("customData") != "") {
+                        NSLog("Enabling SSV Options for customData value: \(call.getString("customData"))")
+                        ssvOptions.customRewardString = call.getString("customData")
+                    }
+                    
+                    self.rewardedAd?.serverSideVerificationOptions = ssvOptions
+                }
+                
                 self.rewardedAd?.fullScreenContentDelegate = self
                 self.plugin?.notifyListeners(RewardAdPluginEvents.Loaded.rawValue, data: [
                     "adUnitId": adUnitID
