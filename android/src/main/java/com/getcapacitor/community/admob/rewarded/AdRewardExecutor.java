@@ -13,6 +13,7 @@ import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions;
 import com.google.android.gms.common.util.BiConsumer;
 
 public class AdRewardExecutor extends Executor {
@@ -39,6 +40,16 @@ public class AdRewardExecutor extends Executor {
                     try {
                         final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                         final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+
+                        if (call.getString("userId", "") != "" || call.getString("customData", "") != "") {
+                            final ServerSideVerificationOptions ssvOptions = new ServerSideVerificationOptions.Builder()
+                                    .setUserId(call.getString("userId", ""))
+                                    .setCustomData(call.getString("customData", ""))
+                                    .build();
+
+                            mRewardedAd.setServerSideVerificationOptions(ssvOptions);
+                        }
+
                         RewardedAd.load(
                             contextSupplier.get(),
                             id,
