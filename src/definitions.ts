@@ -106,7 +106,7 @@ export enum TargetMaxAdContentRating {
   /**
    * Content suitable for general audiences, including families.
    */
-  G =  'MAX_AD_CONTENT_RATING_G',
+  G = 'MAX_AD_CONTENT_RATING_G',
 
   /**
    * Content suitable for most audiences with parental guidance.

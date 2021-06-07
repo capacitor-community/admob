@@ -72,8 +72,7 @@ public class AdMob extends Plugin {
     }
 
     @PluginMethod
-    public void targetSettings(final PluginCall call) {
-    }
+    public void targetSettings(final PluginCall call) {}
 
     // Show a banner Ad
     @PluginMethod
