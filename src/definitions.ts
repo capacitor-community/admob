@@ -90,11 +90,7 @@ export interface AdMobTargetSettings {
    * @see https://developers.google.com/admob/android/targeting#child-directed_setting
    * @since 3.1.0
    */
-  maxAdContentRating?:
-    | 'MAX_AD_CONTENT_RATING_G'
-    | 'MAX_AD_CONTENT_RATING_PG'
-    | 'MAX_AD_CONTENT_RATING_T'
-    | 'MAX_AD_CONTENT_RATING_MA';
+  maxAdContentRating?: TargetMaxAdContentRating;
 
   /**
    * When requesting an ad, apps may pass the URL of the content they are serving.
@@ -104,4 +100,26 @@ export interface AdMobTargetSettings {
    * @since 3.1.0
    */
   contentURL?: string;
+}
+
+export enum TargetMaxAdContentRating {
+  /**
+   * Content suitable for general audiences, including families.
+   */
+  G =  'MAX_AD_CONTENT_RATING_G',
+
+  /**
+   * Content suitable for most audiences with parental guidance.
+   */
+  PG = 'MAX_AD_CONTENT_RATING_PG',
+
+  /**
+   * Content suitable for teen and older audiences.
+   */
+  T = 'MAX_AD_CONTENT_RATING_T',
+
+  /**
+   * Content suitable only for mature audiences.
+   */
+  MA = 'MAX_AD_CONTENT_RATING_MA',
 }
