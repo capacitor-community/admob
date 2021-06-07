@@ -74,8 +74,9 @@ public class AdMob extends Plugin {
     @PluginMethod
     public void targetSettings(final PluginCall call) {
         RequestConfiguration requestConfiguration;
-        if (call.getString("tagForChildDirectedTreatment") != null) {
-            switch (call.getString("tagForChildDirectedTreatment")) {
+        final String tagForChildDirectedTreatment = call.getString("tagForChildDirectedTreatment");
+        if (tagForChildDirectedTreatment != null) {
+            switch (tagForChildDirectedTreatment) {
                 case "TRUE":
                     requestConfiguration =
                         MobileAds
@@ -102,8 +103,9 @@ public class AdMob extends Plugin {
             }
         }
 
-        if (call.getString("tagForUnderAgeOfConsent") != null) {
-            switch (call.getString("tagForUnderAgeOfConsent")) {
+        final String tagForUnderAgeOfConsent = call.getString("tagForUnderAgeOfConsent");
+        if (tagForUnderAgeOfConsent != null) {
+            switch (tagForUnderAgeOfConsent) {
                 case "TRUE":
                     requestConfiguration =
                         MobileAds
@@ -130,8 +132,9 @@ public class AdMob extends Plugin {
             }
         }
 
-        if (call.getString("maxAdContentRating") != null) {
-            switch (call.getString("maxAdContentRating")) {
+        final String maxAdContentRating = call.getString("maxAdContentRating");
+        if (maxAdContentRating != null) {
+            switch (maxAdContentRating) {
                 case "General":
                     requestConfiguration =
                         MobileAds
