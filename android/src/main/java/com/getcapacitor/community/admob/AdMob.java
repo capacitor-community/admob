@@ -56,7 +56,7 @@ public class AdMob extends Plugin {
             this.setTestingDevicesTo(call, EMPTY_TESTING_DEVICES);
         }
 
-        targetSettings(call);
+        this.targetSettings(call);
 
         try {
             MobileAds.initialize(
@@ -143,22 +143,22 @@ public class AdMob extends Plugin {
     private void targetSettings(final PluginCall call) {
         RequestConfiguration.Builder requestConfigurationBuilder = MobileAds.getRequestConfiguration().toBuilder();
 
-        final boolean tagForChildDirectedTreatment = call.getBoolean("tagForChildDirectedTreatment");
-        if (Boolean.TRUE.equals(tagForChildDirectedTreatment)) {
-            requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE);
-        } else if (Boolean.FALSE.equals(tagForChildDirectedTreatment)) {
-            requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE);
-        } else {
+        final Boolean tagForChildDirectedTreatment = call.getBoolean("tagForChildDirectedTreatment");
+        if (tagForChildDirectedTreatment == null) {
             requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED);
+        } else if (tagForChildDirectedTreatment) {
+            requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE);
+        } else {
+            requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE);
         }
 
-        final boolean tagForUnderAgeOfConsent = call.getBoolean("tagForUnderAgeOfConsent");
-        if (Boolean.TRUE.equals(tagForUnderAgeOfConsent)) {
-            requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE);
-        } else if (Boolean.FALSE.equals(tagForUnderAgeOfConsent)) {
-            requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE);
-        } else {
+        final Boolean tagForUnderAgeOfConsent = call.getBoolean("tagForUnderAgeOfConsent");
+        if (tagForUnderAgeOfConsent == null) {
             requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED);
+        } else if (tagForUnderAgeOfConsent) {
+            requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE);
+        } else {
+            requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE);
         }
 
         final String maxAdContentRating = call.getString("maxAdContentRating");
