@@ -15,6 +15,15 @@ export interface AdMobPlugin extends AdMobDefinitions {
    * @since 1.1.2
    */
   initialize(options: AdMobInitializationOptions): Promise<void>;
+
+  /**
+   * Set AdMob Global Settings in anywhere
+   *
+   * @group Initialize
+   * @param options
+   * @since 3.1.0
+   */
+  globalSettings(options: AdMobGlobalSettings): Promise<void>;
 }
 
 export interface AdMobInitializationOptions {
@@ -44,4 +53,26 @@ export interface AdMobInitializationOptions {
    * @since 1.2.0
    */
   initializeForTesting?: boolean;
+}
+
+export interface AdMobGlobalSettings {
+  /**
+   * If your app has its own volume controls (such as custom music or sound effect volumes),
+   * disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings.
+   * enable set 0.0 - 1.0
+   *
+   * @see https://developers.google.com/admob/android/global-settings
+   * @since 3.1.0
+   */
+  volume?: 0.0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0;
+
+  /**
+   * To inform the SDK that the app volume has been muted.
+   * Note: Video ads that are ineligible to be shown with muted audio are not returned for ad requests made,
+   * when the app volume is reported as muted or set to a value of 0. This may restrict a subset of the broader video ads pool from serving.
+   *
+   * @see https://developers.google.com/admob/android/global-settings
+   * @since 3.1.0
+   */
+  muted?: boolean;
 }
