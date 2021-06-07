@@ -694,10 +694,10 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 
 #### AdMobGlobalSettings
 
-| Prop         | Type                 | Description                                                                                                                                                                                                      | Since |
-| ------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **`volume`** | <code>number</code>  | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. enable set 0.0 - 1.0 | 3.1.0 |
-| **`muted`**  | <code>boolean</code> | To inform the SDK that the app volume has been muted                                                                                                                                                             | 3.1.0 |
+| Prop         | Type                                                                               | Description                                                                                                                                                                                                                                                                                           | Since |
+| ------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **`volume`** | <code>0 \| 1 \| 0.1 \| 0.2 \| 0.3 \| 0.4 \| 0.5 \| 0.6 \| 0.7 \| 0.8 \| 0.9</code> | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. enable set 0.0 - 1.0                                                                                      | 3.1.0 |
+| **`muted`**  | <code>boolean</code>                                                               | To inform the SDK that the app volume has been muted. Note: Video ads that are ineligible to be shown with muted audio are not returned for ad requests made, when the app volume is reported as muted or set to a value of 0. This may restrict a subset of the broader video ads pool from serving. | 3.1.0 |
 
 
 #### BannerAdOptions

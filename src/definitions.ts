@@ -64,7 +64,7 @@ export interface AdMobGlobalSettings {
    * @see https://developers.google.com/admob/android/global-settings
    * @since 3.1.0
    */
-  volume?: number;
+  volume?: 0.0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0;
 
   /**
    * To inform the SDK that the app volume has been muted.
