@@ -696,8 +696,8 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 
 | Prop                               | Type                                                                          | Description                                                                                                                              | Since |
 | ---------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **`tagForChildDirectedTreatment`** | <code><a href="#targettag">TargetTag</a></code>                               | For purposes of the Children's Online Privacy Protection Act (COPPA), there is a setting called tagForChildDirectedTreatment.            | 3.1.0 |
-| **`tagForUnderAgeOfConsent`**      | <code><a href="#targettag">TargetTag</a></code>                               | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests. | 3.1.0 |
+| **`tagForChildDirectedTreatment`** | <code>boolean</code>                                                          | For purposes of the Children's Online Privacy Protection Act (COPPA), there is a setting called tagForChildDirectedTreatment.            | 3.1.0 |
+| **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                                          | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests. | 3.1.0 |
 | **`maxAdContentRating`**           | <code><a href="#targetmaxadcontentrating">TargetMaxAdContentRating</a></code> | WAs an app developer, you can indicate whether you want Google to treat your content as child-directed when you make an ad request.      | 3.1.0 |
 
 
@@ -768,15 +768,6 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 
 ### Enums
-
-
-#### TargetTag
-
-| Members             | Value                      |
-| ------------------- | -------------------------- |
-| **`'TRUE'`**        | <code>'TRUE'</code>        |
-| **`'FALSE'`**       | <code>'FALSE'</code>       |
-| **`'UNSPECIFIED'`** | <code>'UNSPECIFIED'</code> |
 
 
 #### TargetMaxAdContentRating

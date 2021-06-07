@@ -63,7 +63,7 @@ export interface AdMobTargetSettings {
    * @see https://developers.google.com/admob/android/targeting#child-directed_setting
    * @since 3.1.0
    */
-  tagForChildDirectedTreatment?: TargetTag;
+  tagForChildDirectedTreatment?: boolean;
 
   /**
    * When using this feature,
@@ -72,7 +72,7 @@ export interface AdMobTargetSettings {
    * @see https://developers.google.com/admob/android/targeting#users_under_the_age_of_consent
    * @since 3.1.0
    */
-  tagForUnderAgeOfConsent?: TargetTag;
+  tagForUnderAgeOfConsent?: boolean;
 
   /**
    * WAs an app developer,
@@ -82,12 +82,6 @@ export interface AdMobTargetSettings {
    * @since 3.1.0
    */
   maxAdContentRating?: TargetMaxAdContentRating;
-}
-
-export enum TargetTag {
-  'TRUE' = 'TRUE',
-  'FALSE' = 'FALSE',
-  'UNSPECIFIED' = 'UNSPECIFIED',
 }
 
 export enum TargetMaxAdContentRating {

@@ -53,30 +53,12 @@ public class AdMob: CAPPlugin {
 
     @objc func targetSettings(_ call: CAPPluginCall) {
 
-        if call.getString("tagForChildDirectedTreatment") != nil {
-            switch call.getString("tagForChildDirectedTreatment") {
-            case "TRUE":
-                GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: true)
-            case "FALSE":
-                GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: false)
-            case "UNSPECIFIED":
-                print("tagForChildDirectedTreatment is UNSPECIFIED.")
-            default:
-                print("tagForChildDirectedTreatment can't find value")
-            }
+        if call.getBool("tagForChildDirectedTreatment") != nil {
+            GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: call.getBool("tagForChildDirectedTreatment")!)
         }
 
-        if call.getString("tagForUnderAgeOfConsent") != nil {
-            switch call.getString("tagForUnderAgeOfConsent") {
-            case "TRUE":
-                GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAge(ofConsent: true)
-            case "FALSE":
-                GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAge(ofConsent: false)
-            case "UNSPECIFIED":
-                print("tagForUnderAgeOfConsent is UNSPECIFIED.")
-            default:
-                print("tagForUnderAgeOfConsent can't find value")
-            }
+        if call.getBool("tagForUnderAgeOfConsent") != nil {
+            GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAge(ofConsent: call.getBool("tagForUnderAgeOfConsent")!)
         }
 
         if call.getString("maxAdContentRating") != nil {
