@@ -53,6 +53,51 @@ public class AdMob: CAPPlugin {
 
     @objc func targetSettings(_ call: CAPPluginCall) {
 
+        if call.getString("tagForChildDirectedTreatment") != nil {
+            switch call.getString("tagForChildDirectedTreatment") {
+            case "TRUE":
+                GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: true)
+            case "FALSE":
+                GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: false)
+            case "UNSPECIFIED":
+                print("tagForChildDirectedTreatment is UNSPECIFIED.")
+            default:
+                print("tagForChildDirectedTreatment can't find value")
+            }
+        }
+
+        if call.getString("tagForUnderAgeOfConsent") != nil {
+            switch call.getString("tagForUnderAgeOfConsent") {
+            case "TRUE":
+                GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAge(ofConsent: true)
+            case "FALSE":
+                GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAge(ofConsent: false)
+            case "UNSPECIFIED":
+                print("tagForUnderAgeOfConsent is UNSPECIFIED.")
+            default:
+                print("tagForUnderAgeOfConsent can't find value")
+            }
+        }
+
+        if call.getString("maxAdContentRating") != nil {
+            switch call.getString("maxAdContentRating") {
+            case "General":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.general
+            case "ParentalGuidance":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.parentalGuidance
+            case "Teen":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.teen
+            case "MatureAudience":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.matureAudience
+            default:
+                print("maxAdContentRating can't find value")
+            }
+        }
+
     }
 
     /**

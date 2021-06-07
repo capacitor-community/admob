@@ -57,22 +57,13 @@ export interface AdMobInitializationOptions {
 
 export interface AdMobTargetSettings {
   /**
-   * GADRequestConfiguration is an object that collects targeting information
-   * to be applied globally via the GADMobileAds shared instance.
-   *
-   * @see https://developers.google.com/admob/android/targeting#requestconfiguration
-   * @since 3.1.0
-   */
-  requestConfiguration?: boolean;
-
-  /**
    * For purposes of the Children's Online Privacy Protection Act (COPPA),
    * there is a setting called tagForChildDirectedTreatment.
    *
    * @see https://developers.google.com/admob/android/targeting#child-directed_setting
    * @since 3.1.0
    */
-  tagForChildDirectedTreatment?: boolean;
+  tagForChildDirectedTreatment?: TargetTag;
 
   /**
    * When using this feature,
@@ -81,7 +72,7 @@ export interface AdMobTargetSettings {
    * @see https://developers.google.com/admob/android/targeting#users_under_the_age_of_consent
    * @since 3.1.0
    */
-  tagForUnderAgeOfConsent?: boolean;
+  tagForUnderAgeOfConsent?: TargetTag;
 
   /**
    * WAs an app developer,
@@ -91,35 +82,32 @@ export interface AdMobTargetSettings {
    * @since 3.1.0
    */
   maxAdContentRating?: TargetMaxAdContentRating;
+}
 
-  /**
-   * When requesting an ad, apps may pass the URL of the content they are serving.
-   * This enables keyword targeting to match the ad with the content.
-   *
-   * @see https://developers.google.com/admob/android/targeting#content_url
-   * @since 3.1.0
-   */
-  contentURL?: string;
+export enum TargetTag {
+  'TRUE' = 'TRUE',
+  'FALSE' = 'FALSE',
+  'UNSPECIFIED' = 'UNSPECIFIED',
 }
 
 export enum TargetMaxAdContentRating {
   /**
    * Content suitable for general audiences, including families.
    */
-  G = 'MAX_AD_CONTENT_RATING_G',
+  General = 'General',
 
   /**
    * Content suitable for most audiences with parental guidance.
    */
-  PG = 'MAX_AD_CONTENT_RATING_PG',
+  ParentalGuidance = 'ParentalGuidance',
 
   /**
    * Content suitable for teen and older audiences.
    */
-  T = 'MAX_AD_CONTENT_RATING_T',
+  Teen = 'Teen',
 
   /**
    * Content suitable only for mature audiences.
    */
-  MA = 'MAX_AD_CONTENT_RATING_MA',
+  MatureAudience = 'MatureAudience',
 }

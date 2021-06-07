@@ -72,7 +72,101 @@ public class AdMob extends Plugin {
     }
 
     @PluginMethod
-    public void targetSettings(final PluginCall call) {}
+    public void targetSettings(final PluginCall call) {
+        RequestConfiguration requestConfiguration;
+        if (call.getString("tagForChildDirectedTreatment") != null) {
+            switch (call.getString("tagForChildDirectedTreatment")) {
+                case "TRUE":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
+                            .build();
+                case "FALSE":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE)
+                            .build();
+                    break;
+                case "UNSPECIFIED":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED)
+                            .build();
+                    break;
+            }
+        }
+
+        if (call.getString("tagForUnderAgeOfConsent") != null) {
+            switch (call.getString("tagForUnderAgeOfConsent")) {
+                case "TRUE":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE)
+                            .build();
+                case "FALSE":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE)
+                            .build();
+                    break;
+                case "UNSPECIFIED":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED)
+                            .build();
+                    break;
+            }
+        }
+
+        if (call.getString("maxAdContentRating") != null) {
+            switch (call.getString("maxAdContentRating")) {
+                case "General":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+                            .build();
+                    break;
+                case "ParentalGuidance":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_PG)
+                            .build();
+                    break;
+                case "Teen":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_T)
+                            .build();
+                    break;
+                case "MatureAudience":
+                    requestConfiguration =
+                        MobileAds
+                            .getRequestConfiguration()
+                            .toBuilder()
+                            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_MA)
+                            .build();
+                    break;
+            }
+        }
+    }
 
     // Show a banner Ad
     @PluginMethod
