@@ -59,6 +59,22 @@ public abstract class AdOptions {
      */
     public final boolean npa;
 
+    /**
+     * The user identifier to be passed to an SSV callback.
+     * 
+     * @see <a href="https://developers.google.com/android/reference/com/google/android/gms/ads/rewarded/ServerSideVerificationOptions#public-string-getuserid">SSV User Identifier</a>
+     * Default is an empty string ("")
+     */
+    public final String userId;
+
+    /**
+     * The custom data to be passed to an SSV callback.
+     * 
+     * @see <a href="https://developers.google.com/android/reference/com/google/android/gms/ads/rewarded/ServerSideVerificationOptions#public-string-getcustomdata">SSV Custom Data</a>
+     * Default is an empty string ("")
+     */
+    public final String customData;
+
     private AdOptions(PluginCall call) {
         /*
          * TODO: Since the Id in the Typescript AdOptions interface is not optional
@@ -72,6 +88,8 @@ public abstract class AdOptions {
         this.position = call.getString("position", "BOTTOM_CENTER");
         this.margin = call.getInt("margin", 0);
         this.npa = call.getBoolean("npa", false);
+        this.userId = call.getString("userId", "");
+        this.customData = call.getString("customData", "");
 
         String sizeString = call.getString("adSize", BannerAdSizeEnum.ADAPTIVE_BANNER.name());
         this.adSize = AdOptions.adSizeStringToAdSizeEnum(sizeString);

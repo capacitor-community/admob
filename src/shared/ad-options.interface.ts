@@ -48,6 +48,9 @@ export interface AdOptions {
   /**
    * For rewarded ads SSV only.
    * Set this value to send custom data to your rewarded ads SSV call.
+   * 
+   * @default undefined
+   * @since 3.0.1
    */
   customData?: string;
 }
