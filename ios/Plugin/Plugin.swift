@@ -25,11 +25,7 @@ public class AdMob: CAPPlugin {
 
         let isTrack = call.getBool("requestTrackingAuthorization") ?? true
 
-        if call.getBool("initializeForTesting") ?? false {
-            GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
-        }
-
-        targetSettings(call)
+        self.setRequestConfiguration(call)
 
         if !isTrack {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
@@ -146,7 +142,11 @@ public class AdMob: CAPPlugin {
     /**
      * https://developers.google.com/admob/ios/targeting?hl=ja
      */
-    private func targetSettings(_ call: CAPPluginCall) {
+    private func setRequestConfiguration(_ call: CAPPluginCall) {
+
+        if call.getBool("initializeForTesting") ?? false {
+            GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
+        }
 
         if call.getBool("tagForChildDirectedTreatment") != nil {
             GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: call.getBool("tagForChildDirectedTreatment")!)

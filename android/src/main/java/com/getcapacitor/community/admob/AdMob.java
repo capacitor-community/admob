@@ -47,16 +47,7 @@ public class AdMob extends Plugin {
     // Initialize AdMob with appId
     @PluginMethod
     public void initialize(final PluginCall call) {
-        final boolean initializeForTesting = call.getBoolean("initializeForTesting", false);
-
-        if (initializeForTesting) {
-            JSArray testingDevices = call.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES);
-            this.setTestingDevicesTo(call, testingDevices);
-        } else {
-            this.setTestingDevicesTo(call, EMPTY_TESTING_DEVICES);
-        }
-
-        this.targetSettings(call);
+        this.setRequestConfiguration(call);
 
         try {
             MobileAds.initialize(
@@ -119,67 +110,71 @@ public class AdMob extends Plugin {
     }
 
     /**
-     * An Array of devices IDs that will be marked as tested devices.
-     *
      * @see <a href="https://developers.google.com/admob/android/test-ads#enable_test_devices">Test Devices</a>
-     */
-    private void setTestingDevicesTo(final PluginCall call, JSArray testingDevices) {
-        // TODO: create a function to automatically get the device ID when isTesting is true? https://stackoverflow.com/a/36242494/1255819
-        try {
-            final RequestConfiguration configuration = new RequestConfiguration.Builder()
-                .setTestDeviceIds(testingDevices.<String>toList())
-                .build();
-
-            MobileAds.setRequestConfiguration(configuration);
-        } catch (JSONException error) {
-            call.reject(error.toString());
-        }
-    }
-
-    /**
-     *
      * @see <a href="https://developers.google.com/admob/android/targeting">Target Settings</a>
      */
-    private void targetSettings(final PluginCall call) {
-        RequestConfiguration.Builder requestConfigurationBuilder = MobileAds.getRequestConfiguration().toBuilder();
+    private void setRequestConfiguration(final PluginCall call) {
+        // Testing Devices
+        final boolean initializeForTesting = call.getBoolean("initializeForTesting", false);
+        final JSArray testingDevices = initializeForTesting
+            ? call.getArray("testingDevices", AdMob.EMPTY_TESTING_DEVICES)
+            : EMPTY_TESTING_DEVICES;
 
+        // tagForChildDirectedTreatment
         final Boolean tagForChildDirectedTreatment = call.getBoolean("tagForChildDirectedTreatment");
+        int TAG_FOR_CHILD_DIRECTED_TREATMENT;
+
         if (tagForChildDirectedTreatment == null) {
-            requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED);
+            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED;
         } else if (tagForChildDirectedTreatment) {
-            requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE);
+            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE;
         } else {
-            requestConfigurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE);
+            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE;
         }
 
+        // tagForUnderAgeOfConsent
         final Boolean tagForUnderAgeOfConsent = call.getBoolean("tagForUnderAgeOfConsent");
+        int TAG_FOR_UNDER_AGE_OF_CONSENT;
+
         if (tagForUnderAgeOfConsent == null) {
-            requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED);
+            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED;
         } else if (tagForUnderAgeOfConsent) {
-            requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE);
+            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE;
         } else {
-            requestConfigurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE);
+            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE;
         }
 
+        // maxAdContentRating
         final String maxAdContentRating = call.getString("maxAdContentRating");
+        String MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_UNSPECIFIED;
+
         if (maxAdContentRating != null) {
             switch (maxAdContentRating) {
                 case "General":
-                    requestConfigurationBuilder.setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G);
+                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_G;
                     break;
                 case "ParentalGuidance":
-                    requestConfigurationBuilder.setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_PG);
+                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_PG;
                     break;
                 case "Teen":
-                    requestConfigurationBuilder.setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_T);
+                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_T;
                     break;
                 case "MatureAudience":
-                    requestConfigurationBuilder.setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_MA);
+                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_MA;
                     break;
             }
         }
 
-        RequestConfiguration requestConfiguration = requestConfigurationBuilder.build();
-        MobileAds.setRequestConfiguration(requestConfiguration);
+        try {
+            RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
+                .setTestDeviceIds(testingDevices.<String>toList())
+                .setTagForChildDirectedTreatment(TAG_FOR_CHILD_DIRECTED_TREATMENT)
+                .setTagForUnderAgeOfConsent(TAG_FOR_UNDER_AGE_OF_CONSENT)
+                .setMaxAdContentRating(MAX_AD_CONTENT_RATING)
+                .build();
+            MobileAds.setRequestConfiguration(requestConfiguration);
+        } catch (JSONException error) {
+            call.reject(error.toString());
+        }
     }
 }
