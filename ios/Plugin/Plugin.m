@@ -5,7 +5,6 @@
 // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
 CAP_PLUGIN(AdMob, "AdMob",
            CAP_PLUGIN_METHOD(initialize, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(targetSettings, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(showBanner, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(resumeBanner, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(hideBanner, CAPPluginReturnPromise);

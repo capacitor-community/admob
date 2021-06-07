@@ -15,15 +15,6 @@ export interface AdMobPlugin extends AdMobDefinitions {
    * @since 1.1.2
    */
   initialize(options: AdMobInitializationOptions): Promise<void>;
-
-  /**
-   * targetSettings with AdMobTargetSettings
-   *
-   * @group target
-   * @param options AdMobTargetSettings
-   * @since 3.1.0
-   */
-  targetSettings(options: AdMobTargetSettings): Promise<void>;
 }
 
 export interface AdMobInitializationOptions {
@@ -53,9 +44,7 @@ export interface AdMobInitializationOptions {
    * @since 1.2.0
    */
   initializeForTesting?: boolean;
-}
 
-export interface AdMobTargetSettings {
   /**
    * For purposes of the Children's Online Privacy Protection Act (COPPA),
    * there is a setting called tagForChildDirectedTreatment.
@@ -81,10 +70,10 @@ export interface AdMobTargetSettings {
    * @see https://developers.google.com/admob/android/targeting#child-directed_setting
    * @since 3.1.0
    */
-  maxAdContentRating?: TargetMaxAdContentRating;
+  maxAdContentRating?: MaxAdContentRating;
 }
 
-export enum TargetMaxAdContentRating {
+export enum MaxAdContentRating {
   /**
    * Content suitable for general audiences, including families.
    */

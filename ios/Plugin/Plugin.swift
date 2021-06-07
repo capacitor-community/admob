@@ -29,6 +29,8 @@ public class AdMob: CAPPlugin {
             GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
         }
 
+        targetSettings(call)
+
         if !isTrack {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.resolve([:])
@@ -49,37 +51,6 @@ public class AdMob: CAPPlugin {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.resolve([:])
         }
-    }
-
-    @objc func targetSettings(_ call: CAPPluginCall) {
-
-        if call.getBool("tagForChildDirectedTreatment") != nil {
-            GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: call.getBool("tagForChildDirectedTreatment")!)
-        }
-
-        if call.getBool("tagForUnderAgeOfConsent") != nil {
-            GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAge(ofConsent: call.getBool("tagForUnderAgeOfConsent")!)
-        }
-
-        if call.getString("maxAdContentRating") != nil {
-            switch call.getString("maxAdContentRating") {
-            case "General":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
-                    GADMaxAdContentRating.general
-            case "ParentalGuidance":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
-                    GADMaxAdContentRating.parentalGuidance
-            case "Teen":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
-                    GADMaxAdContentRating.teen
-            case "MatureAudience":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
-                    GADMaxAdContentRating.matureAudience
-            default:
-                print("maxAdContentRating can't find value")
-            }
-        }
-
     }
 
     /**
@@ -170,5 +141,39 @@ public class AdMob: CAPPlugin {
         }
 
         return request
+    }
+
+    /**
+     * https://developers.google.com/admob/ios/targeting?hl=ja
+     */
+    private func targetSettings(_ call: CAPPluginCall) {
+
+        if call.getBool("tagForChildDirectedTreatment") != nil {
+            GADMobileAds.sharedInstance().requestConfiguration.tag(forChildDirectedTreatment: call.getBool("tagForChildDirectedTreatment")!)
+        }
+
+        if call.getBool("tagForUnderAgeOfConsent") != nil {
+            GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAge(ofConsent: call.getBool("tagForUnderAgeOfConsent")!)
+        }
+
+        if call.getString("maxAdContentRating") != nil {
+            switch call.getString("maxAdContentRating") {
+            case "General":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.general
+            case "ParentalGuidance":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.parentalGuidance
+            case "Teen":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.teen
+            case "MatureAudience":
+                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                    GADMaxAdContentRating.matureAudience
+            default:
+                print("maxAdContentRating can't find value")
+            }
+        }
+
     }
 }
