@@ -44,4 +44,53 @@ export interface AdMobInitializationOptions {
    * @since 1.2.0
    */
   initializeForTesting?: boolean;
+
+  /**
+   * For purposes of the Children's Online Privacy Protection Act (COPPA),
+   * there is a setting called tagForChildDirectedTreatment.
+   *
+   * @see https://developers.google.com/admob/android/targeting#child-directed_setting
+   * @since 3.1.0
+   */
+  tagForChildDirectedTreatment?: boolean;
+
+  /**
+   * When using this feature,
+   * a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.
+   *
+   * @see https://developers.google.com/admob/android/targeting#users_under_the_age_of_consent
+   * @since 3.1.0
+   */
+  tagForUnderAgeOfConsent?: boolean;
+
+  /**
+   * WAs an app developer,
+   * you can indicate whether you want Google to treat your content as child-directed when you make an ad request.
+   *
+   * @see https://developers.google.com/admob/android/targeting#child-directed_setting
+   * @since 3.1.0
+   */
+  maxAdContentRating?: MaxAdContentRating;
+}
+
+export enum MaxAdContentRating {
+  /**
+   * Content suitable for general audiences, including families.
+   */
+  General = 'General',
+
+  /**
+   * Content suitable for most audiences with parental guidance.
+   */
+  ParentalGuidance = 'ParentalGuidance',
+
+  /**
+   * Content suitable for teen and older audiences.
+   */
+  Teen = 'Teen',
+
+  /**
+   * Content suitable only for mature audiences.
+   */
+  MatureAudience = 'MatureAudience',
 }
