@@ -1,7 +1,6 @@
 package com.getcapacitor.community.admob;
 
 import android.Manifest;
-import android.util.Log;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
