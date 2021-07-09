@@ -20,9 +20,12 @@ export class HelperService {
           isChanged = true;
           if (item.expect === undefined) {
             item.result = result;
+          } else if (Array.isArray(item.expect) && value) {
+            // @ts-ignore
+            item.result = item.expect.includes(value.toString());
           } else {
             if (item.name === BannerAdPluginEvents.SizeChanged) {
-              item.result = this.bannerAdPluginEventsSizeChanged(item.expect, value);
+              item.result = this.bannerAdPluginEventsSizeChanged(item.expect as number, value);
             } else if (item.expect === 'error') {
               item.result = this.receiveErrorValue(value)
             }

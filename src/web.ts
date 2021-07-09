@@ -3,6 +3,7 @@ import { WebPlugin } from '@capacitor/core';
 import type { AdMobPlugin } from '.';
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
+import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   constructor() {
@@ -18,6 +19,12 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
 
   async targetSettings(): Promise<void> {
     console.log('targetSettings');
+  }
+
+  async trackingAuthorizationStatus(): Promise<TrackingAuthorizationStatusInterface> {
+    return {
+      status: 'authorized',
+    };
   }
 
   async showBanner(options: AdOptions): Promise<void> {

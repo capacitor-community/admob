@@ -1,13 +1,16 @@
 package com.getcapacitor.community.admob;
 
 import android.Manifest;
+import android.util.Log;
 import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
+import com.getcapacitor.community.admob.helpers.AuthorizationStatusEnum;
 import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndListeners;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
@@ -62,6 +65,13 @@ public class AdMob extends Plugin {
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
+    }
+
+    @PluginMethod
+    public void trackingAuthorizationStatus(final PluginCall call) {
+        JSObject response = new JSObject();
+        response.put("status", AuthorizationStatusEnum.AUTHORIZED.getStatus());
+        call.resolve(response);
     }
 
     // Show a banner Ad
