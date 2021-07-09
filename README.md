@@ -242,8 +242,6 @@ Initialize AdMob with <a href="#admobinitializationoptions">AdMobInitializationO
 | ------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | **`options`** | <code><a href="#admobinitializationoptions">AdMobInitializationOptions</a></code> | <a href="#admobinitializationoptions">AdMobInitializationOptions</a> |
 
-**Since:** 1.1.2
-
 --------------------
 
 
@@ -256,8 +254,6 @@ trackingAuthorizationStatus() => Promise<TrackingAuthorizationStatusInterface>
 Confirm requestTrackingAuthorization status (iOS &gt;14)
 
 **Returns:** <code>Promise&lt;<a href="#trackingauthorizationstatusinterface">TrackingAuthorizationStatusInterface</a>&gt;</code>
-
-**Since:** 3.1.0
 
 --------------------
 
@@ -274,8 +270,6 @@ Show a banner Ad
 | ------------- | ----------------------------------------------------------- | ---------------------------------- |
 | **`options`** | <code><a href="#banneradoptions">BannerAdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
 
-**Since:** 1.1.2
-
 --------------------
 
 
@@ -286,8 +280,6 @@ hideBanner() => Promise<void>
 ```
 
 Hide the banner, remove it from screen, but can show it later
-
-**Since:** 1.1.2
 
 --------------------
 
@@ -300,8 +292,6 @@ resumeBanner() => Promise<void>
 
 Resume the banner, show it after hide
 
-**Since:** 1.1.2
-
 --------------------
 
 
@@ -312,8 +302,6 @@ removeBanner() => Promise<void>
 ```
 
 Destroy the banner, remove it from screen.
-
-**Since:** 1.1.2
 
 --------------------
 
@@ -330,8 +318,6 @@ addListener(eventName: BannerAdPluginEvents.SizeChanged, listenerFunc: (info: Ad
 | **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code>    |                     |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 3.0.0
 
 --------------------
 
@@ -351,8 +337,6 @@ Notice: request loaded Banner ad
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 3.0.0
-
 --------------------
 
 
@@ -370,8 +354,6 @@ Notice: request failed Banner ad
 | **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code>               |                      |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 3.0.0
 
 --------------------
 
@@ -391,8 +373,6 @@ Notice: full-screen banner view will be presented in response to the user clicki
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 3.0.0
-
 --------------------
 
 
@@ -410,8 +390,6 @@ Notice: The full-screen banner view will been dismissed.
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |                |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
-**Since:** 3.0.0
 
 --------------------
 
@@ -431,8 +409,6 @@ Unimplemented
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
-**Since:** 3.0.0
-
 --------------------
 
 
@@ -450,8 +426,6 @@ Prepare interstitial banner
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
-**Since:** 1.1.2
-
 --------------------
 
 
@@ -462,8 +436,6 @@ showInterstitial() => Promise<void>
 ```
 
 Show interstitial ad when it’s ready
-
-**Since:** 1.1.2
 
 --------------------
 
@@ -562,8 +534,6 @@ Prepare a reward video ad
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
-**Since:** 1.1.2
-
 --------------------
 
 
@@ -576,8 +546,6 @@ showRewardVideoAd() => Promise<AdMobRewardItem>
 Show a reward video ad
 
 **Returns:** <code>Promise&lt;<a href="#admobrewarditem">AdMobRewardItem</a>&gt;</code>
-
-**Since:** 1.1.2
 
 --------------------
 
@@ -683,14 +651,14 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 
 #### AdMobInitializationOptions
 
-| Prop                               | Type                                                              | Description                                                                                                                                                                                                                                                | Default            | Since |
-| ---------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----- |
-| **`requestTrackingAuthorization`** | <code>boolean</code>                                              | Use or not requestTrackingAuthorization in iOS(&gt;14)                                                                                                                                                                                                     |                    | 1.1.2 |
-| **`testingDevices`**               | <code>string[]</code>                                             | An Array of devices IDs that will be marked as tested devices if {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.initializeForTesting</a>} is true (Real Ads will be served to Testing devices but they will not count as 'real'). |                    | 1.2.0 |
-| **`initializeForTesting`**         | <code>boolean</code>                                              | If set to true, the devices on {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.testingDevices</a>} will be registered to receive test production ads.                                                                              | <code>false</code> | 1.2.0 |
-| **`tagForChildDirectedTreatment`** | <code>boolean</code>                                              | For purposes of the Children's Online Privacy Protection Act (COPPA), there is a setting called tagForChildDirectedTreatment.                                                                                                                              |                    | 3.1.0 |
-| **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                              | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.                                                                                                                   |                    | 3.1.0 |
-| **`maxAdContentRating`**           | <code><a href="#maxadcontentrating">MaxAdContentRating</a></code> | WAs an app developer, you can indicate whether you want Google to treat your content as child-directed when you make an ad request.                                                                                                                        |                    | 3.1.0 |
+| Prop                               | Type                                                              | Description                                                                                                                                                                                                                                                |
+| ---------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`requestTrackingAuthorization`** | <code>boolean</code>                                              | Use or not requestTrackingAuthorization in iOS(&gt;14)                                                                                                                                                                                                     |
+| **`testingDevices`**               | <code>string[]</code>                                             | An Array of devices IDs that will be marked as tested devices if {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.initializeForTesting</a>} is true (Real Ads will be served to Testing devices but they will not count as 'real'). |
+| **`initializeForTesting`**         | <code>boolean</code>                                              | If set to true, the devices on {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.testingDevices</a>} will be registered to receive test production ads.                                                                              |
+| **`tagForChildDirectedTreatment`** | <code>boolean</code>                                              | For purposes of the Children's Online Privacy Protection Act (COPPA), there is a setting called tagForChildDirectedTreatment.                                                                                                                              |
+| **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                              | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.                                                                                                                   |
+| **`maxAdContentRating`**           | <code><a href="#maxadcontentrating">MaxAdContentRating</a></code> | WAs an app developer, you can indicate whether you want Google to treat your content as child-directed when you make an ad request.                                                                                                                        |
 
 
 #### TrackingAuthorizationStatusInterface
@@ -704,10 +672,10 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 
 This interface extends <a href="#adoptions">AdOptions</a>
 
-| Prop           | Type                                                          | Description                                                                                                                               | Default                      | Since |
-| -------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ----- |
-| **`adSize`**   | <code><a href="#banneradsize">BannerAdSize</a></code>         | Banner Ad Size, defaults to ADAPTIVE_BANNER. IT can be: ADAPTIVE_BANNER, SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD | <code>ADAPTIVE_BANNER</code> | 3.0.0 |
-| **`position`** | <code><a href="#banneradposition">BannerAdPosition</a></code> | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                             | <code>TOP_CENTER</code>      | 1.1.2 |
+| Prop           | Type                                                          | Description                                                                                                                               |
+| -------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **`adSize`**   | <code><a href="#banneradsize">BannerAdSize</a></code>         | Banner Ad Size, defaults to ADAPTIVE_BANNER. IT can be: ADAPTIVE_BANNER, SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD |
+| **`position`** | <code><a href="#banneradposition">BannerAdPosition</a></code> | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                             |
 
 
 #### PluginListenerHandle
@@ -747,12 +715,12 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 
 #### AdOptions
 
-| Prop            | Type                 | Description                                                                                                                                  | Default            | Since |
-| --------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----- |
-| **`adId`**      | <code>string</code>  | The ad unit ID that you want to request                                                                                                      |                    | 1.1.2 |
-| **`isTesting`** | <code>boolean</code> | You can use test mode of ad.                                                                                                                 | <code>false</code> | 1.1.2 |
-| **`margin`**    | <code>number</code>  | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. | <code>0</code>     | 1.1.2 |
-| **`npa`**       | <code>boolean</code> | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             | <code>false</code> | 1.2.0 |
+| Prop            | Type                 | Description                                                                                                                                  |
+| --------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`adId`**      | <code>string</code>  | The ad unit ID that you want to request                                                                                                      |
+| **`isTesting`** | <code>boolean</code> | You can use test mode of ad.                                                                                                                 |
+| **`margin`**    | <code>number</code>  | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. |
+| **`npa`**       | <code>boolean</code> | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             |
 
 
 #### AdMobRewardItem
