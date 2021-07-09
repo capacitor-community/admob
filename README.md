@@ -195,6 +195,7 @@ export async function rewardVideo(): Promise<void> {
 <docgen-index>
 
 * [`initialize(...)`](#initialize)
+* [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
 * [`showBanner(...)`](#showbanner)
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
@@ -242,6 +243,21 @@ Initialize AdMob with <a href="#admobinitializationoptions">AdMobInitializationO
 | **`options`** | <code><a href="#admobinitializationoptions">AdMobInitializationOptions</a></code> | <a href="#admobinitializationoptions">AdMobInitializationOptions</a> |
 
 **Since:** 1.1.2
+
+--------------------
+
+
+### trackingAuthorizationStatus()
+
+```typescript
+trackingAuthorizationStatus() => Promise<TrackingAuthorizationStatusInterface>
+```
+
+Confirm requestTrackingAuthorization status (iOS &gt;14)
+
+**Returns:** <code>Promise&lt;<a href="#trackingauthorizationstatusinterface">TrackingAuthorizationStatusInterface</a>&gt;</code>
+
+**Since:** 3.1.0
 
 --------------------
 
@@ -675,6 +691,13 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 | **`tagForChildDirectedTreatment`** | <code>boolean</code>                                              | For purposes of the Children's Online Privacy Protection Act (COPPA), there is a setting called tagForChildDirectedTreatment.                                                                                                                              |                    | 3.1.0 |
 | **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                              | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.                                                                                                                   |                    | 3.1.0 |
 | **`maxAdContentRating`**           | <code><a href="#maxadcontentrating">MaxAdContentRating</a></code> | WAs an app developer, you can indicate whether you want Google to treat your content as child-directed when you make an ad request.                                                                                                                        |                    | 3.1.0 |
+
+
+#### TrackingAuthorizationStatusInterface
+
+| Prop         | Type                                                                     |
+| ------------ | ------------------------------------------------------------------------ |
+| **`status`** | <code>'authorized' \| 'denied' \| 'notDetermined' \| 'restricted'</code> |
 
 
 #### BannerAdOptions

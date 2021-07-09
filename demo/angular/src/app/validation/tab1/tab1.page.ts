@@ -9,6 +9,11 @@ import {HelperService} from '../../shared/helper.service';
 const tryItems: ITestItems [] = [
   {
     type: 'method',
+    name: 'trackingAuthorizationStatus',
+    expect: ['authorized', 'denied', 'notDetermined', 'restricted']
+  },
+  {
+    type: 'method',
     name: 'showBanner',
   },
   {
@@ -83,6 +88,10 @@ export class Tab1Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   }
 
   async ionViewDidEnter() {
+    await AdMob.trackingAuthorizationStatus()
+      .then(async (d) => await this.helper.updateItem(this.eventItems,'trackingAuthorizationStatus', undefined, d.status ))
+      .catch(async () => await this.helper.updateItem(this.eventItems,'trackingAuthorizationStatus', false));
+
     await AdMob.showBanner(bannerBottomOptions)
       .then(async () => await this.helper.updateItem(this.eventItems,'showBanner', true))
       .catch(async () => await this.helper.updateItem(this.eventItems,'showBanner', false));

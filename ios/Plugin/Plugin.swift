@@ -118,6 +118,31 @@ public class AdMob: CAPPlugin {
         }
     }
 
+    @objc func trackingAuthorizationStatus(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            if #available(iOS 14, *) {
+                switch ATTrackingManager.trackingAuthorizationStatus {
+                case .authorized:
+                    call.resolve(["status": AuthorizationStatusEnum.Authorized.rawValue])
+                    break
+                case .denied:
+                    call.resolve(["status": AuthorizationStatusEnum.Denied.rawValue])
+                    break
+                case .restricted:
+                    call.resolve(["status": AuthorizationStatusEnum.Restricted.rawValue])
+                    break
+                case .notDetermined:
+                    call.resolve(["status": AuthorizationStatusEnum.NotDetermined.rawValue])
+                    break
+                @unknown default:
+                    call.reject("trackingAuthorizationStatus can't get status")
+                }
+            } else {
+                call.resolve(["status": AuthorizationStatusEnum.Authorized])
+            }
+        }
+    }
+
     private func getAdId(_ call: CAPPluginCall, _ testingID: String) -> String {
         let adUnitID = call.getString("adId") ?? testingID
         let isTest = call.getBool("isTesting") ?? false
