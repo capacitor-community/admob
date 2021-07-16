@@ -28,7 +28,7 @@ Maintenance Status: Actively Maintained
 
 ## Demo
 
-[Demo code is here.](https://github.com/capacitor-community/admob/tree/feat/demo)
+[Demo code is here.](https://github.com/capacitor-community/admob/tree/master/demo)
 
 ### Screenshots
 
