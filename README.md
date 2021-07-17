@@ -169,7 +169,7 @@ export async function interstitial(): Promise<void> {
 ### Show RewardVideo
 
 ```ts
-import { AdMob, AdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
+import { AdMob, RewardAdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
 
 export async function rewardVideo(): Promise<void> {
   AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
@@ -181,10 +181,14 @@ export async function rewardVideo(): Promise<void> {
     console.log(rewardItem);
   });
 
-  const options: AdOptions = {
+  const options: RewardAdOptions = {
     adId: 'YOUR ADID',
     // isTesting: true
     // npa: true
+    // ssv: {
+    //   userId: "A user ID to send to your SSV"
+    //   customData: JSON.stringify({ ...MyCustomData })
+    //}
   };
   await AdMob.prepareRewardVideoAd(options);
   const rewardItem = await AdMob.showRewardVideoAd();
@@ -194,35 +198,68 @@ export async function rewardVideo(): Promise<void> {
 ## Index
 <docgen-index>
 
-* [`initialize(...)`](#initialize)
-* [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
-* [`showBanner(...)`](#showbanner)
-* [`hideBanner()`](#hidebanner)
-* [`resumeBanner()`](#resumebanner)
-* [`removeBanner()`](#removebanner)
-* [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
-* [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
-* [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
-* [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
-* [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
-* [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
-* [`prepareInterstitial(...)`](#prepareinterstitial)
-* [`showInterstitial()`](#showinterstitial)
-* [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
-* [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
-* [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
-* [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
-* [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
-* [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
-* [`showRewardVideoAd()`](#showrewardvideoad)
-* [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
-* [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
-* [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
-* [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
-* [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
-* [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
-* [Interfaces](#interfaces)
-* [Enums](#enums)
+- [Maintainers](#maintainers)
+- [Demo](#demo)
+  - [Screenshots](#screenshots)
+- [Installation](#installation)
+  - [Android configuration](#android-configuration)
+  - [iOS configuration](#ios-configuration)
+- [Example](#example)
+  - [Initialize AdMob](#initialize-admob)
+  - [Show Banner](#show-banner)
+  - [Show Interstitial](#show-interstitial)
+  - [Show RewardVideo](#show-rewardvideo)
+- [Index](#index)
+- [API](#api)
+  - [initialize(...)](#initialize)
+  - [trackingAuthorizationStatus()](#trackingauthorizationstatus)
+  - [showBanner(...)](#showbanner)
+  - [hideBanner()](#hidebanner)
+  - [resumeBanner()](#resumebanner)
+  - [removeBanner()](#removebanner)
+  - [addListener(BannerAdPluginEvents.SizeChanged, ...)](#addlistenerbanneradplugineventssizechanged-)
+  - [addListener(BannerAdPluginEvents.Loaded, ...)](#addlistenerbanneradplugineventsloaded-)
+  - [addListener(BannerAdPluginEvents.FailedToLoad, ...)](#addlistenerbanneradplugineventsfailedtoload-)
+  - [addListener(BannerAdPluginEvents.Opened, ...)](#addlistenerbanneradplugineventsopened-)
+  - [addListener(BannerAdPluginEvents.Closed, ...)](#addlistenerbanneradplugineventsclosed-)
+  - [addListener(BannerAdPluginEvents.AdImpression, ...)](#addlistenerbanneradplugineventsadimpression-)
+  - [prepareInterstitial(...)](#prepareinterstitial)
+  - [showInterstitial()](#showinterstitial)
+  - [addListener(InterstitialAdPluginEvents.FailedToLoad, ...)](#addlistenerinterstitialadplugineventsfailedtoload-)
+  - [addListener(InterstitialAdPluginEvents.Loaded, ...)](#addlistenerinterstitialadplugineventsloaded-)
+  - [addListener(InterstitialAdPluginEvents.Dismissed, ...)](#addlistenerinterstitialadplugineventsdismissed-)
+  - [addListener(InterstitialAdPluginEvents.FailedToShow, ...)](#addlistenerinterstitialadplugineventsfailedtoshow-)
+  - [addListener(InterstitialAdPluginEvents.Showed, ...)](#addlistenerinterstitialadplugineventsshowed-)
+  - [prepareRewardVideoAd(...)](#preparerewardvideoad)
+  - [showRewardVideoAd()](#showrewardvideoad)
+  - [addListener(RewardAdPluginEvents.FailedToLoad, ...)](#addlistenerrewardadplugineventsfailedtoload-)
+  - [addListener(RewardAdPluginEvents.Loaded, ...)](#addlistenerrewardadplugineventsloaded-)
+  - [addListener(RewardAdPluginEvents.Rewarded, ...)](#addlistenerrewardadplugineventsrewarded-)
+  - [addListener(RewardAdPluginEvents.Dismissed, ...)](#addlistenerrewardadplugineventsdismissed-)
+  - [addListener(RewardAdPluginEvents.FailedToShow, ...)](#addlistenerrewardadplugineventsfailedtoshow-)
+  - [addListener(RewardAdPluginEvents.Showed, ...)](#addlistenerrewardadplugineventsshowed-)
+  - [Interfaces](#interfaces)
+    - [AdMobInitializationOptions](#admobinitializationoptions)
+    - [TrackingAuthorizationStatusInterface](#trackingauthorizationstatusinterface)
+    - [BannerAdOptions](#banneradoptions)
+    - [PluginListenerHandle](#pluginlistenerhandle)
+    - [AdMobBannerSize](#admobbannersize)
+    - [AdMobError](#admoberror)
+    - [AdLoadInfo](#adloadinfo)
+    - [AdOptions](#adoptions)
+    - [RewardAdOptions](#rewardadoptions)
+    - [AdMobRewardItem](#admobrewarditem)
+  - [Enums](#enums)
+    - [MaxAdContentRating](#maxadcontentrating)
+    - [BannerAdSize](#banneradsize)
+    - [BannerAdPosition](#banneradposition)
+    - [BannerAdPluginEvents](#banneradpluginevents)
+    - [InterstitialAdPluginEvents](#interstitialadpluginevents)
+    - [RewardAdPluginEvents](#rewardadpluginevents)
+- [TROUBLE SHOOTING](#trouble-shooting)
+  - [If you have error:](#if-you-have-error)
+- [License](#license)
+- [Contributors ✨](#contributors-)
 
 </docgen-index>
 
@@ -523,14 +560,14 @@ addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => vo
 ### prepareRewardVideoAd(...)
 
 ```typescript
-prepareRewardVideoAd(options: AdOptions) => Promise<AdLoadInfo>
+prepareRewardVideoAd(options: RewardAdOptions) => Promise<AdLoadInfo>
 ```
 
 Prepare a reward video ad
 
 | Param         | Type                                            | Description                        |
 | ------------- | ----------------------------------------------- | ---------------------------------- |
-| **`options`** | <code><a href="#adoptions">AdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
+| **`options`** | <code><a href="#rewardadoptions">RewardAdOptions</a></code> | <a href="#rewardadoptions">RewardAdOptions</a> |
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
@@ -722,7 +759,15 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`margin`**    | <code>number</code>  | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. |
 | **`npa`**       | <code>boolean</code> | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             |
 
+#### RewardAdOptions
 
+| Prop            | Type                 | Description                                                                                                                                  |
+| --------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`adId`**      | <code>string</code>  | The ad unit ID that you want to request                                                                                                      |
+| **`isTesting`** | <code>boolean</code> | You can use test mode of ad.                                                                                                                 |
+| **`margin`**    | <code>number</code>  | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. |
+| **`npa`**       | <code>boolean</code> | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             |
+| **`ssv`**       | <code>{userId: string customData: string}</code>           | If you have enabled SSV in Admob for your rewarded Ads, this allows you to pass a userId and/or customData to your SSV Callback Function.
 #### AdMobRewardItem
 
 For more information
