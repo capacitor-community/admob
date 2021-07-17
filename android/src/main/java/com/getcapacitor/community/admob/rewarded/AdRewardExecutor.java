@@ -62,6 +62,25 @@ public class AdRewardExecutor extends Executor {
             return;
         }
 
+        JSObject providedOptions = call.getObject("ssv");
+        if (providedOptions.length() != 0) {
+            ServerSideVerificationOptions.Builder ssvOptions = new ServerSideVerificationOptions.Builder();
+
+            if (providedOptions.has("customData")) {
+                String customData = providedOptions.getString("customData");
+                assert customData != null;
+                ssvOptions.setCustomData(customData);
+            }
+
+            if (providedOptions.has("userId")) {
+                String userId = providedOptions.getString("userId");
+                assert userId != null;
+                ssvOptions.setUserId(userId);
+            }
+
+            mRewardedAd.setServerSideVerificationOptions(ssvOptions.build());
+        }
+
         try {
             activitySupplier
                 .get()
