@@ -195,6 +195,38 @@ export async function rewardVideo(): Promise<void> {
 }
 ```
 
+## Server-side Verification Notice
+SSV's are only processed on Production Adverts, therefore test Ads will not fire off your SSV callback.
+
+For E2E tests or just for validating the data in your `RewardAdOptions` work as expected, you can add a custom GET
+request to your mock endpoint after the `RewardAdPluginEvents.Rewarded` similar to this:
+```ts
+AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
+  // ...
+  if (ENVIRONMENT_IS_DEVELOPMENT) {
+    try {
+      const url = `https://your-staging-ssv-endpoint` + new URLSearchParams({
+        'ad_network': 'TEST',
+        'ad_unit': 'TEST',
+        'custom_data': customData, // <-- passed CustomData
+        'reward_amount': 'TEST',
+        'reward_item': 'TEST',
+        'timestamp': 'TEST',
+        'transaction_id': 'TEST',
+        'user_id': userId, // <-- Passed UserID
+        'signature': 'TEST',
+        'key_id': 'TEST'
+      });
+      await fetch(url);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  // ...
+});
+```
+
+
 ## Index
 <docgen-index>
 
@@ -209,6 +241,7 @@ export async function rewardVideo(): Promise<void> {
   - [Show Banner](#show-banner)
   - [Show Interstitial](#show-interstitial)
   - [Show RewardVideo](#show-rewardvideo)
+- [Server-side Verification Notice](#server-side-verification-notice)
 - [Index](#index)
 - [API](#api)
   - [initialize(...)](#initialize)
