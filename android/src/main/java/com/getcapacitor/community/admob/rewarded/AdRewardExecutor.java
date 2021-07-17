@@ -13,6 +13,7 @@ import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions;
 import com.google.android.gms.common.util.BiConsumer;
 
 public class AdRewardExecutor extends Executor {
@@ -60,6 +61,25 @@ public class AdRewardExecutor extends Executor {
             AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
             notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad, errorObject);
             return;
+        }
+
+        JSObject providedOptions = call.getObject("ssv");
+        if (providedOptions.length() != 0) {
+            ServerSideVerificationOptions.Builder ssvOptions = new ServerSideVerificationOptions.Builder();
+
+            if (providedOptions.has("customData")) {
+                String customData = providedOptions.getString("customData");
+                assert customData != null;
+                ssvOptions.setCustomData(customData);
+            }
+
+            if (providedOptions.has("userId")) {
+                String userId = providedOptions.getString("userId");
+                assert userId != null;
+                ssvOptions.setUserId(userId);
+            }
+
+            mRewardedAd.setServerSideVerificationOptions(ssvOptions.build());
         }
 
         try {
