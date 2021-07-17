@@ -196,7 +196,7 @@ export async function rewardVideo(): Promise<void> {
 ```
 
 ## Server-side Verification Notice
-SSV's are only processed on Production Adverts, therefore test Ads will not fire off your SSV callback.
+SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
 
 For E2E tests or just for validating the data in your `RewardAdOptions` work as expected, you can add a custom GET
 request to your mock endpoint after the `RewardAdPluginEvents.Rewarded` similar to this:
