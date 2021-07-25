@@ -2,9 +2,7 @@ package com.getcapacitor.community.admob.rewarded;
 
 import android.app.Activity;
 import android.content.Context;
-
 import androidx.core.util.Supplier;
-
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
@@ -22,10 +20,10 @@ public class AdRewardExecutor extends Executor {
     public static RewardedAd mRewardedAd;
 
     public AdRewardExecutor(
-            Supplier<Context> contextSupplier,
-            Supplier<Activity> activitySupplier,
-            BiConsumer<String, JSObject> notifyListenersFunction,
-            String pluginLogTag
+        Supplier<Context> contextSupplier,
+        Supplier<Activity> activitySupplier,
+        BiConsumer<String, JSObject> notifyListenersFunction,
+        String pluginLogTag
     ) {
         super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "AdRewardExecutor");
     }
@@ -35,23 +33,23 @@ public class AdRewardExecutor extends Executor {
         final AdOptions adOptions = AdOptions.getFactory().createRewardVideoOptions(call);
 
         activitySupplier
-                .get()
-                .runOnUiThread(
-                        () -> {
-                            try {
-                                final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                                final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                                RewardedAd.load(
-                                        contextSupplier.get(),
-                                        id,
-                                        adRequest,
-                                        RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
-                                );
-                            } catch (Exception ex) {
-                                call.reject(ex.getLocalizedMessage(), ex);
-                            }
-                        }
-                );
+            .get()
+            .runOnUiThread(
+                () -> {
+                    try {
+                        final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                        final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+                        RewardedAd.load(
+                            contextSupplier.get(),
+                            id,
+                            adRequest,
+                            RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
+                        );
+                    } catch (Exception ex) {
+                        call.reject(ex.getLocalizedMessage(), ex);
+                    }
+                }
+            );
     }
 
     @PluginMethod
@@ -66,16 +64,16 @@ public class AdRewardExecutor extends Executor {
 
         try {
             activitySupplier
-                    .get()
-                    .runOnUiThread(
-                            () -> {
-                                mRewardedAd.show(
-                                        activitySupplier.get(),
-                                        RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
-                                );
-                                call.resolve();
-                            }
-                    );
+                .get()
+                .runOnUiThread(
+                    () -> {
+                        mRewardedAd.show(
+                            activitySupplier.get(),
+                            RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
+                        );
+                        call.resolve();
+                    }
+                );
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }

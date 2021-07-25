@@ -171,12 +171,13 @@ public abstract class AdOptions {
         private int margin = 1;
         private boolean npa = false;
         private BannerAdSizeEnum adSize = BannerAdSizeEnum.ADAPTIVE_BANNER;
-        private  SsvInfo ssvInfo = new SsvInfo();
+        private SsvInfo ssvInfo = new SsvInfo();
 
         public TesterAdOptionsBuilder setSsvInfo(SsvInfo info) {
             ssvInfo = info;
             return this;
         }
+
         public TesterAdOptionsBuilder setIsTesting(boolean value) {
             isTesting = value;
             return this;

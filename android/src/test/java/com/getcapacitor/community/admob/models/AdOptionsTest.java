@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -13,7 +14,6 @@ import static org.mockito.Mockito.when;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.rewarded.models.SsvInfo;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -114,7 +114,7 @@ public class AdOptionsTest {
 
             final AdOptions adOptions = AdOptions.getFactory().createGenericOptions(pluginCallMock, "");
 
-            verify(pluginCallMock).getObject(wantedProperty);
+            verify(pluginCallMock, atLeastOnce()).getObject(wantedProperty);
             assertEquals(userId, adOptions.ssvInfo.getUserId());
             assertEquals(customData, adOptions.ssvInfo.getCustomData());
         }

@@ -4,12 +4,11 @@ import com.getcapacitor.PluginCall
 
 class SsvInfo(
     val customData: String? = null,
-    val userId: String? = null
-) {
+    val userId: String? = null) {
 
-    constructor(pluginCall: PluginCall) : this(
-        pluginCall.getObject("ssv").getString("customData"),
-        pluginCall.getObject("userId").getString("userId")
+    constructor(pluginCall: PluginCall?) : this(
+        pluginCall?.getObject("ssv")?.getString("customData"),
+        pluginCall?.getObject("ssv")?.getString("userId")
     )
 
     constructor() : this(null, null)
