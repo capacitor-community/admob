@@ -9,6 +9,8 @@ export interface RewardAdOptions extends AdOptions {
    * If you have enabled SSV in your AdMob Application. You can provide customData or
    * a userId be passed to your callback to do further processing on.
    * 
+   * *Important* You *HAVE* to define one of them.
+   * 
    * @see https://support.google.com/admob/answer/9603226?hl=en-GB
    */
   ssv?: AtLeastOne<{
