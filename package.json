@@ -48,7 +48,7 @@
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
     "eslint": "^7.11.0",
-    "husky": "^4.0.0",
+    "husky": "^4.3.8",
     "lint-staged": "^11.0.0",
     "np": "^7.4.0",
     "pre-commit": "^1.2.2",
