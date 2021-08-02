@@ -5,12 +5,15 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.rewarded.models.SsvInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -98,24 +101,22 @@ public class AdOptionsTest {
             verify(pluginCallMock).getBoolean(wantedProperty, defaultValue);
             assertEquals(expected, adOptions.npa);
         }
-        //    @Test
-        //    public void testingDevices() {
-        //      final String wantedProperty = "testingDevices";
-        //      final JSArray expected = new JSArray();
-        //      expected.put("one").put("two");
-        //      when(
-        //          pluginCallMock.getArray(
-        //            eq(wantedProperty),
-        //            Mockito.any(JSArray.class)
-        //          )
-        //        )
-        //        .thenReturn(expected);
-        //
-        //      final AdOptions adOptions = AdOptions.getFactory().createGenericOptions(pluginCallMock, "");
-        //
-        //      verify(pluginCallMock)
-        //        .getArray(wantedProperty, AdOptions.getFactory().EMPTY_TESTING_DEVICES);
-        //      assertEquals(expected, adOptions.testingDevices);
-        //    }
+
+        @Test
+        public void ssv() {
+            final String customData = "customData";
+            final String userId = "userId";
+            final String wantedProperty = "ssv";
+            final JSObject expected = new JSObject();
+            expected.put(customData, customData);
+            expected.put(userId, userId);
+            lenient().when(pluginCallMock.getObject(eq(wantedProperty))).thenReturn(expected);
+
+            final AdOptions adOptions = AdOptions.getFactory().createGenericOptions(pluginCallMock, "");
+
+            verify(pluginCallMock, atLeastOnce()).getObject(wantedProperty);
+            assertEquals(userId, adOptions.ssvInfo.getUserId());
+            assertEquals(customData, adOptions.ssvInfo.getCustomData());
+        }
     }
 }

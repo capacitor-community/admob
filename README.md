@@ -13,7 +13,7 @@
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/dw/@capacitor-community/admob?style=flat-square" /></a>
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/v/@capacitor-community/admob?style=flat-square" /></a>
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<a href="#contributors-"><img src="https://img.shields.io/badge/all%20contributors-4-orange?style=flat-square" /></a>
+<a href="#contributors-"><img src="https://img.shields.io/badge/all%20contributors-7-orange?style=flat-square" /></a>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -169,7 +169,7 @@ export async function interstitial(): Promise<void> {
 ### Show RewardVideo
 
 ```ts
-import { AdMob, AdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
+import { AdMob, RewardAdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
 
 export async function rewardVideo(): Promise<void> {
   AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
@@ -181,15 +181,51 @@ export async function rewardVideo(): Promise<void> {
     console.log(rewardItem);
   });
 
-  const options: AdOptions = {
+  const options: RewardAdOptions = {
     adId: 'YOUR ADID',
     // isTesting: true
     // npa: true
+    // ssv: {
+    //   userId: "A user ID to send to your SSV"
+    //   customData: JSON.stringify({ ...MyCustomData })
+    //}
   };
   await AdMob.prepareRewardVideoAd(options);
   const rewardItem = await AdMob.showRewardVideoAd();
 }
 ```
+
+## Server-side Verification Notice
+SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
+
+For E2E tests or just for validating the data in your `RewardAdOptions` work as expected, you can add a custom GET
+request to your mock endpoint after the `RewardAdPluginEvents.Rewarded` similar to this:
+```ts
+AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
+  // ...
+  if (ENVIRONMENT_IS_DEVELOPMENT) {
+    try {
+      const url = `https://your-staging-ssv-endpoint` + new URLSearchParams({
+        'ad_network': 'TEST',
+        'ad_unit': 'TEST',
+        'custom_data': customData, // <-- passed CustomData
+        'reward_amount': 'TEST',
+        'reward_item': 'TEST',
+        'timestamp': 'TEST',
+        'transaction_id': 'TEST',
+        'user_id': userId, // <-- Passed UserID
+        'signature': 'TEST',
+        'key_id': 'TEST'
+      });
+      await fetch(url);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  // ...
+});
+```
+
 
 ## Index
 <docgen-index>
@@ -222,6 +258,7 @@ export async function rewardVideo(): Promise<void> {
 * [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
 * [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
 * [Interfaces](#interfaces)
+* [Type Aliases](#type-aliases)
 * [Enums](#enums)
 
 </docgen-index>
@@ -523,14 +560,14 @@ addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => vo
 ### prepareRewardVideoAd(...)
 
 ```typescript
-prepareRewardVideoAd(options: AdOptions) => Promise<AdLoadInfo>
+prepareRewardVideoAd(options: RewardAdOptions) => Promise<AdLoadInfo>
 ```
 
 Prepare a reward video ad
 
-| Param         | Type                                            | Description                        |
-| ------------- | ----------------------------------------------- | ---------------------------------- |
-| **`options`** | <code><a href="#adoptions">AdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
+| Param         | Type                                                        | Description                                    |
+| ------------- | ----------------------------------------------------------- | ---------------------------------------------- |
+| **`options`** | <code><a href="#rewardadoptions">RewardAdOptions</a></code> | <a href="#rewardadoptions">RewardAdOptions</a> |
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
@@ -723,6 +760,13 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`npa`**       | <code>boolean</code> | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             |
 
 
+#### RewardAdOptions
+
+| Prop      | Type                                                                                                                                                                                                                                               | Description                                                                                                                                                                                     |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`ssv`** | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** * An optional UserId to pass to your SSV callback function. */ userId: string; /** * An optional custom set of data to pass to your SSV callback function. */ customData: string; }&gt;</code> | If you have enabled SSV in your AdMob Application. You can provide customData or a userId be passed to your callback to do further processing on. *Important* You *HAVE* to define one of them. |
+
+
 #### AdMobRewardItem
 
 For more information
@@ -732,6 +776,23 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | ------------ | ------------------- | ------------------------ |
 | **`type`**   | <code>string</code> | Rewarded type user got   |
 | **`amount`** | <code>number</code> | Rewarded amount user got |
+
+
+### Type Aliases
+
+
+#### AtLeastOne
+
+<code>{[K in keyof T]: <a href="#pick">Pick</a>&lt;T, K&gt;}[keyof T]</code>
+
+
+#### Pick
+
+From T, pick a set of properties whose keys are in the union K
+
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
@@ -833,6 +894,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.nicolueg.com"><img src="https://avatars.githubusercontent.com/u/48101693?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nico Lueg</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=NLueg" title="Code">💻</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/ghonche-yqr-21774b114/"><img src="https://avatars.githubusercontent.com/u/25591295?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ghonche Yqr</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=ghonche-yqr" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/vanessag"><img src="https://avatars.githubusercontent.com/u/4007550?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vanessag</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=vanessag" title="Code">💻</a></td>
+    <td align="center"><a href="https://mattmilan.dev/"><img src="https://avatars.githubusercontent.com/u/49694881?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matt Milan</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=mattmilan-dev" title="Code">💻</a></td>
   </tr>
 </table>
 

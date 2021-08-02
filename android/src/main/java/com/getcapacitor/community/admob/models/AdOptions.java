@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob.models;
 import androidx.annotation.VisibleForTesting;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerAdSizeEnum;
+import com.getcapacitor.community.admob.rewarded.models.SsvInfo;
 
 /**
  * Holds the options for an Ad Request
@@ -59,6 +60,11 @@ public abstract class AdOptions {
      */
     public final boolean npa;
 
+    /**
+     * Used for Server side verification of Reward Ads
+     */
+    public final SsvInfo ssvInfo;
+
     private AdOptions(PluginCall call) {
         /*
          * TODO: Since the Id in the Typescript AdOptions interface is not optional
@@ -72,18 +78,20 @@ public abstract class AdOptions {
         this.position = call.getString("position", "BOTTOM_CENTER");
         this.margin = call.getInt("margin", 0);
         this.npa = call.getBoolean("npa", false);
+        this.ssvInfo = new SsvInfo(call);
 
         String sizeString = call.getString("adSize", BannerAdSizeEnum.ADAPTIVE_BANNER.name());
         this.adSize = AdOptions.adSizeStringToAdSizeEnum(sizeString);
     }
 
-    private AdOptions(String id, boolean isTesting, String position, int margin, boolean npa, BannerAdSizeEnum adSize) {
+    private AdOptions(String id, boolean isTesting, String position, int margin, boolean npa, BannerAdSizeEnum adSize, SsvInfo ssvInfo) {
         this.adId = id;
         this.isTesting = isTesting;
         this.position = position;
         this.margin = margin;
         this.npa = npa;
         this.adSize = adSize;
+        this.ssvInfo = ssvInfo;
     }
 
     /**
@@ -163,6 +171,12 @@ public abstract class AdOptions {
         private int margin = 1;
         private boolean npa = false;
         private BannerAdSizeEnum adSize = BannerAdSizeEnum.ADAPTIVE_BANNER;
+        private SsvInfo ssvInfo = new SsvInfo();
+
+        public TesterAdOptionsBuilder setSsvInfo(SsvInfo info) {
+            ssvInfo = info;
+            return this;
+        }
 
         public TesterAdOptionsBuilder setIsTesting(boolean value) {
             isTesting = value;
@@ -200,7 +214,7 @@ public abstract class AdOptions {
         }
 
         public AdOptions build() {
-            return new AdOptions(id, isTesting, position, margin, npa, adSize) {
+            return new AdOptions(id, isTesting, position, margin, npa, adSize, ssvInfo) {
                 @Override
                 public String getTestingId() {
                     return testingID;

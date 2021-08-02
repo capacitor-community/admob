@@ -43,7 +43,7 @@ public class AdRewardExecutor extends Executor {
                             contextSupplier.get(),
                             id,
                             adRequest,
-                            RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction)
+                            RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
                         );
                     } catch (Exception ex) {
                         call.reject(ex.getLocalizedMessage(), ex);

@@ -58,6 +58,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mattmilan-dev",
+      "name": "Matt Milan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49694881?v=4",
+      "profile": "https://mattmilan.dev/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

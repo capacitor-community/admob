@@ -1,8 +1,9 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented} from '../private/validate-all-events-implemented.type'
-import type { AdLoadInfo, AdMobError, AdOptions } from '../shared';
+import type { AdLoadInfo, AdMobError } from '../shared';
 
+import type { RewardAdOptions } from './reward-ad-options.interface';
 import type { RewardAdPluginEvents } from './reward-ad-plugin-events.enum';
 import type { AdMobRewardItem } from './reward-item.interface';
 
@@ -14,10 +15,10 @@ export interface RewardDefinitions {
    * Prepare a reward video ad
    *
    * @group RewardVideo
-   * @param options AdOptions
+   * @param options RewardAdOptions
    * @since 1.1.2
    */
-     prepareRewardVideoAd(options: AdOptions): Promise<AdLoadInfo>;
+     prepareRewardVideoAd(options: RewardAdOptions): Promise<AdLoadInfo>;
 
      /**
       * Show a reward video ad
