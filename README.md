@@ -13,7 +13,7 @@
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/dw/@capacitor-community/admob?style=flat-square" /></a>
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/v/@capacitor-community/admob?style=flat-square" /></a>
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<a href="#contributors-"><img src="https://img.shields.io/badge/all%20contributors-4-orange?style=flat-square" /></a>
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -911,6 +911,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.nicolueg.com"><img src="https://avatars.githubusercontent.com/u/48101693?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nico Lueg</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=NLueg" title="Code">💻</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/ghonche-yqr-21774b114/"><img src="https://avatars.githubusercontent.com/u/25591295?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ghonche Yqr</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=ghonche-yqr" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/vanessag"><img src="https://avatars.githubusercontent.com/u/4007550?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vanessag</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=vanessag" title="Code">💻</a></td>
+    <td align="center"><a href="https://mattmilan.dev/"><img src="https://avatars.githubusercontent.com/u/49694881?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matt Milan</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=mattmilan-dev" title="Code">💻</a></td>
   </tr>
 </table>
 
