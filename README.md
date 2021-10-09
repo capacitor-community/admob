@@ -12,9 +12,6 @@
 <br>
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/dw/@capacitor-community/admob?style=flat-square" /></a>
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/v/@capacitor-community/admob?style=flat-square" /></a>
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<a href="#contributors-"><img src="https://img.shields.io/badge/all%20contributors-7-orange?style=flat-square" /></a>
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
 ## Maintainers
@@ -25,6 +22,13 @@
 | Saninn Salas Diaz | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) | |
 
 Maintenance Status: Actively Maintained
+
+## Contributors ✨
+<a href="https://github.com/capacitor-community/admob/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=capacitor-community/admob" />
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
 
 ## Demo
 
@@ -893,29 +897,3 @@ You should run `pod repo update` ;
 ## License
 
 Capacitor AdMob is [MIT licensed](./LICENSE).
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://wako.app"><img src="https://avatars1.githubusercontent.com/u/216573?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jean-Baptiste Malatrasi</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=JumBay" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/gant02"><img src="https://avatars1.githubusercontent.com/u/6771123?v=4?s=100" width="100px;" alt=""/><br /><sub><b>gant02</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=gant02" title="Code">💻</a></td>
-    <td align="center"><a href="https://www.saninnsalas.com"><img src="https://avatars1.githubusercontent.com/u/5490201?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Saninn Salas Diaz</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=distante" title="Code">💻</a></td>
-    <td align="center"><a href="https://www.nicolueg.com"><img src="https://avatars.githubusercontent.com/u/48101693?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nico Lueg</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=NLueg" title="Code">💻</a></td>
-    <td align="center"><a href="https://www.linkedin.com/in/ghonche-yqr-21774b114/"><img src="https://avatars.githubusercontent.com/u/25591295?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ghonche Yqr</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=ghonche-yqr" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/vanessag"><img src="https://avatars.githubusercontent.com/u/4007550?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vanessag</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=vanessag" title="Code">💻</a></td>
-    <td align="center"><a href="https://mattmilan.dev/"><img src="https://avatars.githubusercontent.com/u/49694881?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matt Milan</b></sub></a><br /><a href="https://github.com/capacitor-community/admob/commits?author=mattmilan-dev" title="Code">💻</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
