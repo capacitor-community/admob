@@ -136,6 +136,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     private func removeBannerViewToView() {
         if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
             if let subView = rootViewController.view.viewWithTag(2743243288699) {
+                bannerView.delegate = nil
                 NSLog("AdMob: find subView")
                 subView.removeFromSuperview()
             }
