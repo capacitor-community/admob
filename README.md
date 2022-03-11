@@ -53,6 +53,8 @@ Made with [contributors-img](https://contrib.rocks).
 In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to the initialization list:
 
 ```java
+import android.os.Bundle;
+
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
