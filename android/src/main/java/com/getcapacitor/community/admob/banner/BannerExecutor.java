@@ -195,6 +195,9 @@ public class BannerExecutor extends Executor {
                                 mAdViewLayout.removeView(mAdView);
                                 mAdView.destroy();
                                 mAdView = null;
+
+                                setBottomMarginToWebView(0);
+
                                 Log.d(logTag, "Banner AD Removed");
                                 final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
@@ -243,6 +246,9 @@ public class BannerExecutor extends Executor {
                             public void onAdLoaded() {
                                 final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
 
+                                int heightInPixels = mAdView.getAdSize().getHeightInPixels(contextSupplier.get());
+                                setBottomMarginToWebView(heightInPixels);
+
                                 notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
                                 notifyListeners(BannerAdPluginEvents.Loaded.getWebEventName(), emptyObject);
                                 super.onAdLoaded();
@@ -255,6 +261,8 @@ public class BannerExecutor extends Executor {
                                     mAdViewLayout.removeView(mAdView);
                                     mAdView.destroy();
                                     mAdView = null;
+
+                                    setBottomMarginToWebView(0);
                                 }
 
                                 final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
@@ -290,5 +298,17 @@ public class BannerExecutor extends Executor {
                     mViewGroup.addView(mAdViewLayout);
                 }
             );
+    }
+
+    private void setBottomMarginToWebView(int bottomMargin){
+        getWebViewLayoutParams().setMargins(0,0,0,bottomMargin);
+    }
+
+    private CoordinatorLayout.LayoutParams getWebViewLayoutParams(){
+        return (CoordinatorLayout.LayoutParams)getWebView().getLayoutParams();
+    }
+
+    private View getWebView(){
+        return mViewGroup.getChildAt(0);
     }
 }
