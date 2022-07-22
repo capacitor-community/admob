@@ -5,14 +5,13 @@ def capacitor_pods
   use_frameworks!
   pod 'Capacitor', :path => '../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
+  pod 'Google-Mobile-Ads-SDK', '9.7.0'
 end
 
 target 'Plugin' do
   capacitor_pods
-  pod 'Google-Mobile-Ads-SDK', '~> 8.12'
 end
 
 target 'PluginTests' do
   capacitor_pods
-  pod 'Google-Mobile-Ads-SDK', '~> 8.12'
 end

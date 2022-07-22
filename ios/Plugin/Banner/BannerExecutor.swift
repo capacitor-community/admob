@@ -17,19 +17,19 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
 
             switch adSize {
             case "BANNER":
-                bannerSize = kGADAdSizeBanner
+                bannerSize = GADAdSizeBanner
                 break
             case "LARGE_BANNER":
-                bannerSize = kGADAdSizeLargeBanner
+                bannerSize = GADAdSizeLargeBanner
                 break
             case "FULL_BANNER":
-                bannerSize = kGADAdSizeFullBanner
+                bannerSize = GADAdSizeFullBanner
                 break
             case "LEADERBOARD":
-                bannerSize = kGADAdSizeLeaderboard
+                bannerSize = GADAdSizeLeaderboard
                 break
             case "MEDIUM_RECTANGLE":
-                bannerSize = kGADAdSizeMediumRectangle
+                bannerSize = GADAdSizeMediumRectangle
                 break
             case "SMART_BANNER":
                 bannerSize = kGADAdSizeSmartBannerPortrait

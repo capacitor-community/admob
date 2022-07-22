@@ -43,17 +43,17 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
         }
     }
 
-    public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
-        NSLog("InterstitialFullScreenDelegate Ad did present full screen content.")
-        self.plugin?.notifyListeners(InterstitialAdPluginEvents.Showed.rawValue, data: [:])
-    }
-
     public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         NSLog("InterstitialFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
             "message": error.localizedDescription
         ])
+    }
+    
+    public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        NSLog("InterstitialFullScreenDelegate Ad did present full screen content.")
+        self.plugin?.notifyListeners(InterstitialAdPluginEvents.Showed.rawValue, data: [:])
     }
 
     public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {

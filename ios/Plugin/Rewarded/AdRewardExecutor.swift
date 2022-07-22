@@ -64,17 +64,17 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
         }
     }
 
-    public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
-        NSLog("RewardFullScreenDelegate Ad did present full screen content.")
-        self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
-    }
-
     public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
             "message": error.localizedDescription
         ])
+    }
+    
+    public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        NSLog("RewardFullScreenDelegate Ad did present full screen content.")
+        self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
     }
 
     public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
