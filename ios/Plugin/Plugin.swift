@@ -201,4 +201,17 @@ public class AdMob: CAPPlugin {
         }
 
     }
+
+    func getRootVC() -> UIViewController? {
+        var window: UIWindow? = UIApplication.shared.delegate?.window ?? nil
+
+        if window == nil {
+            let scene: UIWindowScene? = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            window = scene?.windows.filter({$0.isKeyWindow}).first
+            if window == nil {
+                window = scene?.windows.first
+            }
+        }
+        return window?.rootViewController
+    }
 }

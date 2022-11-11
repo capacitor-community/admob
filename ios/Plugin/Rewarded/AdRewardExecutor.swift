@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
-    public weak var plugin: CAPPlugin?
+    public weak var plugin: AdMob?
     var rewardedAd: GADRewardedAd!
 
     func prepareRewardVideoAd(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
@@ -49,7 +49,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
     }
 
     func showRewardVideoAd(_ call: CAPPluginCall) {
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+        if let rootViewController = plugin?.getRootVC() {
             if let ad = self.rewardedAd {
                 ad.present(fromRootViewController: rootViewController,
                            userDidEarnRewardHandler: {
@@ -71,7 +71,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
             "message": error.localizedDescription
         ])
     }
-    
+
     public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
