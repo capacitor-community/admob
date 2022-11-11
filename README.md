@@ -59,20 +59,6 @@ capacitor 3:
 
 ### Android configuration
 
-In file `android/app/src/main/java/**/**/MainActivity.java`, add the plugin to the initialization list:
-
-```java
-import android.os.Bundle;
-
-public class MainActivity extends BridgeActivity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        registerPlugin(com.getcapacitor.community.admob.AdMob.class);
-        super.onCreate(savedInstanceState);
-    }
-}
-```
-
 In file `android/app/src/main/AndroidManifest.xml`, add the following XML elements under `<manifest><application>` :
 
 ```xml
@@ -820,7 +806,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
