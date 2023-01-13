@@ -75,6 +75,12 @@ In file `android/app/src/main/res/values/strings.xml` add the following lines :
 
 Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
+#### Variables
+
+This plugin will use the following project variables (defined in your app's `variables.gradle` file):
+
+- `$playServicesAdsVersion` version of `com.google.android.gms:play-services-ads` (default: `21.1.0`)
+
 ### iOS configuration
 
 Add the following in the `ios/App/App/info.plist` file inside of the outermost `<dict>`:
