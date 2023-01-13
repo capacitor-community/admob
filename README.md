@@ -46,14 +46,14 @@ Made with [contributors-img](https://contrib.rocks).
 If you use capacitor 4:
 
 ```
-% npm install --save @capacitor-community/admob@next
+% npm install --save @capacitor-community/admob@latest
 % npx cap update
 ```
 
 capacitor 3:
 
 ```
-% npm install --save @capacitor-community/admob
+% npm install --save @capacitor-community/admob@3.3.0
 % npx cap update
 ```
 
