@@ -55,7 +55,6 @@ export class HelperService {
   }
 
   private receiveErrorValue(value: any): boolean {
-    console.log(['これ', value]);
     return value.hasOwnProperty('code') && value.hasOwnProperty('message');
   }
 }
