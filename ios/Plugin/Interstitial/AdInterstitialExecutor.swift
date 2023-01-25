@@ -32,7 +32,7 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
     }
 
     func showInterstitial(_ call: CAPPluginCall) {
-        if let rootViewController = plugin?.bridge?.viewController {
+        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
             if let ad = self.interstitial {
                 ad.present(fromRootViewController: rootViewController)
                 call.resolve([:])
@@ -50,7 +50,7 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
             "message": error.localizedDescription
         ])
     }
-
+    
     public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("InterstitialFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Showed.rawValue, data: [:])
