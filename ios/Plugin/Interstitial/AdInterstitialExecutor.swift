@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
-    public weak var plugin: CAPPlugin?
+    public weak var plugin: AdMob?
     var interstitial: GADInterstitialAd!
 
     func prepareInterstitial(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
@@ -32,7 +32,7 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
     }
 
     func showInterstitial(_ call: CAPPluginCall) {
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+        if let rootViewController = plugin?.getRootVC() {
             if let ad = self.interstitial {
                 ad.present(fromRootViewController: rootViewController)
                 call.resolve([:])
@@ -50,7 +50,7 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
             "message": error.localizedDescription
         ])
     }
-    
+
     public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("InterstitialFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Showed.rawValue, data: [:])
