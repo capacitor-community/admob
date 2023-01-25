@@ -49,7 +49,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
     }
 
     func showRewardVideoAd(_ call: CAPPluginCall) {
-        if let rootViewController = plugin?.bridge?.viewController {
+        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
             if let ad = self.rewardedAd {
                 ad.present(fromRootViewController: rootViewController,
                            userDidEarnRewardHandler: {
@@ -71,7 +71,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
             "message": error.localizedDescription
         ])
     }
-
+    
     public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
