@@ -7,7 +7,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     var bannerView: GADBannerView!
 
     func showBanner(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+        if let rootViewController = plugin?.bridge?.viewController {
 
             let adSize = call.getString("adSize") ?? "ADAPTIVE_BANNER"
             let adPosition = call.getString("position") ?? "BOTTOM_CENTER"
@@ -53,7 +53,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
             self.addBannerViewToView(self.bannerView, adPosition, adMargin)
             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
             self.bannerView.adUnitID = adUnitID
-            self.bannerView.rootViewController = UIApplication.shared.keyWindow?.rootViewController
+            self.bannerView.rootViewController = plugin?.bridge?.viewController
 
             self.bannerView.load(request)
             self.bannerView.delegate = self
@@ -64,7 +64,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
 
     func hideBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+            if let rootViewController = self.plugin?.bridge?.viewController {
                 if let subView = rootViewController.view.viewWithTag(2743243288699) {
                     NSLog("AdMob: find subView for hideBanner")
                     subView.isHidden = true
@@ -83,7 +83,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     }
 
     func resumeBanner(_ call: CAPPluginCall) {
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+        if let rootViewController = plugin?.bridge?.viewController {
             if let subView = rootViewController.view.viewWithTag(2743243288699) {
                 NSLog("AdMob: find subView for resumeBanner")
                 subView.isHidden = false
@@ -109,7 +109,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
 
     private func addBannerViewToView(_ bannerView: GADBannerView, _ adPosition: String, _ Margin: Int) {
         removeBannerViewToView()
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+        if let rootViewController = plugin?.bridge?.viewController {
 
             bannerView.translatesAutoresizingMaskIntoConstraints = false
             bannerView.tag = 2743243288699 // rand
@@ -134,7 +134,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     }
 
     private func removeBannerViewToView() {
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+        if let rootViewController = plugin?.bridge?.viewController {
             if let subView = rootViewController.view.viewWithTag(2743243288699) {
                 bannerView.delegate = nil
                 NSLog("AdMob: find subView")
