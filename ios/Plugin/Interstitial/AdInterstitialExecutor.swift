@@ -26,7 +26,9 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
                 self.plugin?.notifyListeners(InterstitialAdPluginEvents.Loaded.rawValue, data: [
                     "adUnitId": adUnitID
                 ])
-                call.resolve([:])
+                call.resolve([
+                    "adUnitId": adUnitID
+                ])
             }
         )
     }
