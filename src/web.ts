@@ -27,6 +27,16 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
+  //TODO: setApplicationMuted takes an options object that should probably be logged as well.
+  async setApplicationMuted(): Promise<void> {
+    console.log('setApplicationMuted');
+  }
+
+  //TODO: setApplicationVolume takes an options object that should probably be logged as well.
+  async setApplicationVolume(): Promise<void> {
+    console.log('setApplicationMuted');
+  }
+
   async showBanner(options: AdOptions): Promise<void> {
     console.log('showBanner', options);
   }

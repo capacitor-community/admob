@@ -48,6 +48,25 @@ public class AdMob: CAPPlugin {
             call.resolve([:])
         }
     }
+    
+    @objc func setApplicationMuted(_ call: CAPPluginCall) {
+        var shouldMute = call.getBool("muted") ?? false
+        GADMobileAds.sharedInstance().applicationMuted = shouldMute
+        
+        call.resolve([:])
+    }
+    
+    @objc func setApplicationVolume(_ call: CAPPluginCall) {
+        var volume = call.getFloat("volume") ?? 1
+        
+        //Clamp volumes. 
+        if (volume < 0.0) {volume = 0.0}
+        else if (volume > 1.0) {volume = 1.0}
+        
+        GADMobileAds.sharedInstance().applicationVolume = volume
+
+        call.resolve([:])
+    }
 
     /**
      *  AdMob: Banner

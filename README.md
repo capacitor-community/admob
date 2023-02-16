@@ -254,6 +254,8 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 
 * [`initialize(...)`](#initialize)
 * [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
+* [`setApplicationMuted(...)`](#setapplicationmuted)
+* [`setApplicationVolume(...)`](#setapplicationvolume)
 * [`showBanner(...)`](#showbanner)
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
@@ -313,6 +315,36 @@ trackingAuthorizationStatus() => Promise<TrackingAuthorizationStatusInterface>
 Confirm requestTrackingAuthorization status (iOS &gt;14)
 
 **Returns:** <code>Promise&lt;<a href="#trackingauthorizationstatusinterface">TrackingAuthorizationStatusInterface</a>&gt;</code>
+
+--------------------
+
+
+### setApplicationMuted(...)
+
+```typescript
+setApplicationMuted(options: ApplicationMutedOptions) => Promise<void>
+```
+
+Report application mute state to AdMob SDK
+
+| Param         | Type                                                                        |
+| ------------- | --------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#applicationmutedoptions">ApplicationMutedOptions</a></code> |
+
+--------------------
+
+
+### setApplicationVolume(...)
+
+```typescript
+setApplicationVolume(options: ApplicationVolumeOptions) => Promise<void>
+```
+
+Report application volume to AdMob SDK
+
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#applicationvolumeoptions">ApplicationVolumeOptions</a></code> |
 
 --------------------
 
@@ -727,6 +759,20 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 | **`status`** | <code>'authorized' \| 'denied' \| 'notDetermined' \| 'restricted'</code> |
 
 
+#### ApplicationMutedOptions
+
+| Prop        | Type                 | Description                                                                                                                                                                                                                                                                                           |
+| ----------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`muted`** | <code>boolean</code> | To inform the SDK that the app volume has been muted. Note: Video ads that are ineligible to be shown with muted audio are not returned for ad requests made, when the app volume is reported as muted or set to a value of 0. This may restrict a subset of the broader video ads pool from serving. |
+
+
+#### ApplicationVolumeOptions
+
+| Prop         | Type                                                                               | Description                                                                                                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`volume`** | <code>0 \| 1 \| 0.1 \| 0.2 \| 0.3 \| 0.4 \| 0.5 \| 0.6 \| 0.7 \| 0.8 \| 0.9</code> | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. enable set 0.0 - 1.0, any float allowed. |
+
+
 #### BannerAdOptions
 
 This interface extends <a href="#adoptions">AdOptions</a>
@@ -812,9 +858,7 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{
- [P in K]: T[P];
- }</code>
+<code>{ [P in K]: T[P]; }</code>
 
 
 ### Enums

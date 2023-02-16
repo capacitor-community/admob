@@ -73,6 +73,20 @@ public class AdMob extends Plugin {
         call.resolve(response);
     }
 
+    @PluginMethod
+    public void setApplicationMuted(final PluginCall call) {
+        boolean muted = call.getBoolean("muted");
+        MobileAds.setAppMuted(muted);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void setApplicationVolume(final PluginCall call) {
+        float volume = call.getFloat("volume");
+        MobileAds.setAppVolume(volume);
+        call.resolve();
+    }
+
     // Show a banner Ad
     @PluginMethod
     public void showBanner(final PluginCall call) {
