@@ -75,14 +75,22 @@ public class AdMob extends Plugin {
 
     @PluginMethod
     public void setApplicationMuted(final PluginCall call) {
-        boolean muted = call.getBoolean("muted");
+        Boolean muted = call.getBoolean("muted");
+        if (muted == null) {
+            call.reject("muted property cannot be null");
+            return;
+        }
         MobileAds.setAppMuted(muted);
         call.resolve();
     }
 
     @PluginMethod
     public void setApplicationVolume(final PluginCall call) {
-        float volume = call.getFloat("volume");
+        Float volume = call.getFloat("volume");
+        if (volume == null) {
+            call.reject("volume property cannot be null");
+            return;
+        }
         MobileAds.setAppVolume(volume);
         call.resolve();
     }
