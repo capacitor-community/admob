@@ -4,6 +4,7 @@ import type { AdMobPlugin } from '.';
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
+import type { ApplicationMutedOptions, ApplicationVolumeOptions } from '.';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   constructor() {
@@ -27,14 +28,12 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
-  //TODO: setApplicationMuted takes an options object that should probably be logged as well.
-  async setApplicationMuted(): Promise<void> {
-    console.log('setApplicationMuted');
+  async setApplicationMuted(options: ApplicationMutedOptions): Promise<void> {
+    console.log('setApplicationMuted', options);
   }
 
-  //TODO: setApplicationVolume takes an options object that should probably be logged as well.
-  async setApplicationVolume(): Promise<void> {
-    console.log('setApplicationMuted');
+  async setApplicationVolume(options: ApplicationVolumeOptions): Promise<void> {
+    console.log('setApplicationVolume', options);
   }
 
   async showBanner(options: AdOptions): Promise<void> {
