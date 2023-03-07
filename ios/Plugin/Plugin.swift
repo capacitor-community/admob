@@ -50,22 +50,28 @@ public class AdMob: CAPPlugin {
     }
     
     @objc func setApplicationMuted(_ call: CAPPluginCall) {
-        var shouldMute = call.getBool("muted") ?? false
-        GADMobileAds.sharedInstance().applicationMuted = shouldMute
-        
-        call.resolve([:])
+        if let shouldMute = call.getBool("muted") {
+            GADMobileAds.sharedInstance().applicationMuted = shouldMute
+            call.resolve([:])
+        } else {
+            call.reject("muted property cannot be null");
+            return;
+        }
     }
     
     @objc func setApplicationVolume(_ call: CAPPluginCall) {
-        var volume = call.getFloat("volume") ?? 1
-        
-        //Clamp volumes. 
-        if (volume < 0.0) {volume = 0.0}
-        else if (volume > 1.0) {volume = 1.0}
-        
-        GADMobileAds.sharedInstance().applicationVolume = volume
+        if var volume = call.getFloat("volume") {
+            //Clamp volumes. 
+            if (volume < 0.0) {volume = 0.0}
+            else if (volume > 1.0) {volume = 1.0}
+            
+            GADMobileAds.sharedInstance().applicationVolume = volume
 
-        call.resolve([:])
+            call.resolve([:])
+        } else {
+            call.reject("volume property cannot be null");
+            return;
+        }
     }
 
     /**
