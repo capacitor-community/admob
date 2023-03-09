@@ -48,6 +48,31 @@ public class AdMob: CAPPlugin {
             call.resolve([:])
         }
     }
+    
+    @objc func setApplicationMuted(_ call: CAPPluginCall) {
+        if let shouldMute = call.getBool("muted") {
+            GADMobileAds.sharedInstance().applicationMuted = shouldMute
+            call.resolve([:])
+        } else {
+            call.reject("muted property cannot be null");
+            return;
+        }
+    }
+    
+    @objc func setApplicationVolume(_ call: CAPPluginCall) {
+        if var volume = call.getFloat("volume") {
+            //Clamp volumes. 
+            if (volume < 0.0) {volume = 0.0}
+            else if (volume > 1.0) {volume = 1.0}
+            
+            GADMobileAds.sharedInstance().applicationVolume = volume
+
+            call.resolve([:])
+        } else {
+            call.reject("volume property cannot be null");
+            return;
+        }
+    }
 
     /**
      *  AdMob: Banner

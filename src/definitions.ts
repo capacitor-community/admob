@@ -24,6 +24,22 @@ export interface AdMobPlugin extends AdMobDefinitions {
    * @since 3.1.0
    */
   trackingAuthorizationStatus(): Promise<TrackingAuthorizationStatusInterface>;
+
+  /**
+   * Report application mute state to AdMob SDK
+   *
+   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
+   * @since 4.1.1
+   */
+  setApplicationMuted(options: ApplicationMutedOptions): Promise<void>;
+
+  /**
+   * Report application volume to AdMob SDK
+   *
+   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
+   * @since 4.1.1
+   */
+  setApplicationVolume(options: ApplicationVolumeOptions): Promise<void>;
 }
 
 export interface AdMobInitializationOptions {
@@ -102,4 +118,28 @@ export enum MaxAdContentRating {
    * Content suitable only for mature audiences.
    */
   MatureAudience = 'MatureAudience',
+}
+
+export interface ApplicationMutedOptions {
+  /**
+   * To inform the SDK that the app volume has been muted.
+   * Note: Video ads that are ineligible to be shown with muted audio are not returned for ad requests made,
+   * when the app volume is reported as muted or set to a value of 0. This may restrict a subset of the broader video ads pool from serving.
+   *
+   * @see https://developers.google.com/admob/android/global-settings
+   * @since 4.1.1
+   */
+  muted?: boolean;
+}
+
+export interface ApplicationVolumeOptions {
+  /**
+   * If your app has its own volume controls (such as custom music or sound effect volumes),
+   * disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings.
+   * enable set 0.0 - 1.0, any float allowed.
+   *
+   * @see https://developers.google.com/admob/android/global-settings
+   * @since 4.1.1
+   */
+  volume?: 0.0 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 1.0;
 }
