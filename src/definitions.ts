@@ -89,7 +89,7 @@ export interface AdMobInitializationOptions {
   tagForUnderAgeOfConsent?: boolean;
 
   /**
-   * WAs an app developer,
+   * As an app developer,
    * you can indicate whether you want Google to treat your content as child-directed when you make an ad request.
    *
    * @see https://developers.google.com/admob/android/targeting#child-directed_setting
