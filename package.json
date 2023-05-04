@@ -1,6 +1,6 @@
 {
   "name": "@capacitor-community/admob",
-  "version": "5.0.0",
+  "version": "4.2.0",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -40,9 +40,9 @@
     "release": "np --no-tests"
   },
   "devDependencies": {
-    "@capacitor/android": "next",
-    "@capacitor/core": "next",
-    "@capacitor/cli": "next",
+    "@capacitor/android": "5.0.0",
+    "@capacitor/core": "5.0.0",
+    "@capacitor/cli": "5.0.0",
     "@capacitor/docgen": "git+https://github.com/rdlabo/capacitor-docgen.git#feat/support_extends_build",
     "@capacitor/ios": "next",
     "@ionic/eslint-config": "^0.3.0",
