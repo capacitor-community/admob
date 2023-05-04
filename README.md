@@ -79,7 +79,8 @@ Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
 This plugin will use the following project variables (defined in your app's `variables.gradle` file):
 
-- `$playServicesAdsVersion` version of `com.google.android.gms:play-services-ads` (default: `21.1.0`)
+- `playServicesAdsVersion` version of `com.google.android.gms:play-services-ads` (default: `22.0.0`)
+- `androidxCoreKTXVersion`: version of `androidx.core:core-ktx` (default: `1.10.0`)
 
 ### iOS configuration
 

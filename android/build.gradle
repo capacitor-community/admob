@@ -4,8 +4,8 @@ ext {
     androidxCoordinatorLayoutVersion = project.hasProperty('androidxCoordinatorLayoutVersion') ? rootProject.ext.androidxCoordinatorLayoutVersion : '1.2.0'
     androidxJunitVersion = project.hasProperty('androidxJunitVersion') ? rootProject.ext.androidxJunitVersion : '1.1.5'
     androidxEspressoCoreVersion = project.hasProperty('androidxEspressoCoreVersion') ? rootProject.ext.androidxEspressoCoreVersion : '3.5.1'
-    playServicesAdsVersion = project.hasProperty('playServicesAdsVersion') ? rootProject.ext.playServicesAdsVersion : '21.5.0'
-
+    playServicesAdsVersion = project.hasProperty('playServicesAdsVersion') ? rootProject.ext.playServicesAdsVersion : '22.0.0'
+    androidxCoreKTXVersion = project.hasProperty('androidxCoreKTXVersion') ? rootProject.ext.androidxCoreKTXVersion : '1.10.0'
 }
 
 buildscript {
@@ -79,7 +79,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-ads:$playServicesAdsVersion"
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
-    implementation "androidx.core:core-ktx:1.6.0"
+    implementation "androidx.core:core-ktx:$androidxCoreKTXVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
