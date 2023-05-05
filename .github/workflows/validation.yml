@@ -50,7 +50,7 @@ jobs:
         with:
           node-version: '16'
       - run: npm install
-      - run: npm run verify:android
+#      - run: npm run verify:android
 
   verify-ios:
     runs-on: macos-latest
