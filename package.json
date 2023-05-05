@@ -41,8 +41,8 @@
   },
   "devDependencies": {
     "@capacitor/android": "5.0.0",
-    "@capacitor/core": "5.0.0",
     "@capacitor/cli": "5.0.0",
+    "@capacitor/core": "5.0.0",
     "@capacitor/docgen": "git+https://github.com/rdlabo/capacitor-docgen.git#feat/support_extends_build",
     "@capacitor/ios": "next",
     "@ionic/eslint-config": "^0.3.0",
@@ -51,7 +51,7 @@
     "eslint": "^7.11.0",
     "husky": "^4.3.8",
     "lint-staged": "^11.0.0",
-    "np": "^7.4.0",
+    "np": "^7.7.0",
     "pre-commit": "^1.2.2",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
