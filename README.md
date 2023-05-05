@@ -42,11 +42,17 @@ Made with [contributors-img](https://contrib.rocks).
 | **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  |
 
 ## Installation
+If you use capacitor 5:
+
+```
+% npm install --save @capacitor-community/admob@5.0.0
+% npx cap update
+```
 
 If you use capacitor 4:
 
 ```
-% npm install --save @capacitor-community/admob@latest
+% npm install --save @capacitor-community/admob@4.0.0
 % npx cap update
 ```
 
@@ -859,7 +865,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
