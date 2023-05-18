@@ -88,9 +88,17 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
                 NSLog("AdMob: find subView for resumeBanner")
                 subView.isHidden = false
 
+                let width = subView.frame.width
+                var height = subView.frame.height
+                // For fixing issue 160 iOs banner overlapping content on iPhone with rounded corners                                
+                if let window = UIApplication.shared.keyWindow {
+                    let safeAreaBottom = window.safeAreaInsets.bottom
+                    height = height + safeAreaBottom
+                }
+
                 self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
-                    "width": subView.frame.width,
-                    "height": subView.frame.height
+                    "width": width,
+                    "height": height
                 ])
 
                 call.resolve([:])
@@ -146,9 +154,18 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     /// Tells the delegate an ad request loaded an ad.
     public func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
         NSLog("bannerViewDidReceiveAd")
+
+        let width = bannerView.frame.width
+        var height = bannerView.frame.height
+        // For fixing issue 160 iOs banner overlapping content on iPhone with rounded corners                                
+        if let window = UIApplication.shared.keyWindow {
+            let safeAreaBottom = window.safeAreaInsets.bottom
+            height = height + safeAreaBottom
+        }
+
         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
-            "width": bannerView.frame.width,
-            "height": bannerView.frame.height
+            "width": width,
+            "height": height
         ])
         self.plugin?.notifyListeners(BannerAdPluginEvents.Loaded.rawValue, data: [:])
     }
