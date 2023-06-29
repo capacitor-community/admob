@@ -9,6 +9,7 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
+import com.getcapacitor.community.admob.consent.AdConsentExecutor;
 import com.getcapacitor.community.admob.helpers.AuthorizationStatusEnum;
 import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndListeners;
@@ -46,6 +47,13 @@ public class AdMob extends Plugin {
         InterstitialAdCallbackAndListeners.INSTANCE
     );
 
+    private final AdConsentExecutor adConsentExecutor = new AdConsentExecutor(
+        this::getContext,
+        this::getActivity,
+        this::notifyListeners,
+        getLogTag()
+    );
+
     // Initialize AdMob with appId
     @PluginMethod
     public void initialize(final PluginCall call) {
@@ -71,6 +79,22 @@ public class AdMob extends Plugin {
         JSObject response = new JSObject();
         response.put("status", AuthorizationStatusEnum.AUTHORIZED.getStatus());
         call.resolve(response);
+    }
+
+    // User Consent
+    @PluginMethod
+    public void requestConsentInfo(final PluginCall call) {
+        adConsentExecutor.requestConsentInfo(call, this::notifyListeners);
+    }
+
+    @PluginMethod
+    public void showConsentForm(final PluginCall call) {
+        adConsentExecutor.showConsentForm(call, this::notifyListeners);
+    }
+
+    @PluginMethod
+    public void resetConsentInfo(final PluginCall call) {
+        adConsentExecutor.resetConsentInfo(call, this::notifyListeners);
     }
 
     @PluginMethod
