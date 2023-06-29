@@ -4,7 +4,10 @@ import type {
   AdMobPlugin,
   ApplicationMutedOptions,
   ApplicationVolumeOptions,
+  ConsentInfo,
+  ConsentRequestOptions,
 } from '.';
+import { ConsentStatus } from './consent/consent-status.enum';
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
@@ -29,6 +32,27 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     return {
       status: 'authorized',
     };
+  }
+
+  async requestConsentInfo(
+    options?: ConsentRequestOptions,
+  ): Promise<ConsentInfo> {
+    console.log('requestConsentInfo', options);
+    return {
+      status: ConsentStatus.UNKNOWN,
+      isConsentFormAvailable: false,
+    };
+  }
+
+  async showConsentForm(): Promise<ConsentInfo> {
+    console.log('showConsentForm');
+    return {
+      status: ConsentStatus.UNKNOWN,
+    };
+  }
+
+  async resetConsentInfo(): Promise<void> {
+    console.log('resetConsentInfo');
   }
 
   async setApplicationMuted(options: ApplicationMutedOptions): Promise<void> {
