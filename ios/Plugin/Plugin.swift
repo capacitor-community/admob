@@ -13,6 +13,7 @@ public class AdMob: CAPPlugin {
     private let bannerExecutor = BannerExecutor()
     private let adInterstitialExecutor = AdInterstitialExecutor()
     private let adRewardExecutor = AdRewardExecutor()
+    private let consentExecutor = ConsentExecutor()
 
     /**
      * Enable SKAdNetwork to track conversions
@@ -22,10 +23,18 @@ public class AdMob: CAPPlugin {
         self.bannerExecutor.plugin = self
         self.adInterstitialExecutor.plugin = self
         self.adRewardExecutor.plugin = self
-
-        let isTrack = call.getBool("requestTrackingAuthorization") ?? true
-
+        self.consentExecutor.plugin = self
         self.setRequestConfiguration(call)
+
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
+        call.resolve([:])
+    }
+    
+    /**
+     * DEPRECATED: It's now ship with Admob UMP Consent
+     */
+    @objc func requestTrackingAuthorization(_ call: CAPPluginCall) {
+        let isTrack = call.getBool("requestTrackingAuthorization") ?? true
 
         if !isTrack {
             GADMobileAds.sharedInstance().start(completionHandler: nil)
@@ -165,6 +174,42 @@ public class AdMob: CAPPlugin {
             } else {
                 call.resolve(["status": AuthorizationStatusEnum.Authorized])
             }
+        }
+    }
+    
+    /**
+     * Admob: User Message Platform
+     * https://support.google.com/admob/answer/10113005?hl=en
+     */
+    @objc func requestConsentInfo(_ call: CAPPluginCall) {
+        let debugGeography = call.getInt("debugGeography", 0)
+        
+        let testDeviceJSArray = call.getArray("testDeviceIdentifiers") ?? []
+        var testDeviceIdentifiers: [String] = []
+        if testDeviceJSArray.count > 0 {
+            for deviceId in testDeviceJSArray {
+                if let name = deviceId as? String {
+                    testDeviceIdentifiers.append(name)
+                }
+            }
+        }
+        
+        let tagForUnderAgeOfConsent = call.getBool("tagForUnderAgeOfConsent", false)
+
+        DispatchQueue.main.async {
+            self.consentExecutor.requestConsentInfo(call, debugGeography, testDeviceIdentifiers, tagForUnderAgeOfConsent)
+        }
+    }
+    
+    @objc func showConsentForm(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            self.consentExecutor.showConsentForm(call)
+        }
+    }
+    
+    @objc func resetConsentInfo(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            self.consentExecutor.resetConsentInfo(call)
         }
     }
 

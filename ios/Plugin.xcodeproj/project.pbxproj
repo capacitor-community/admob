@@ -15,6 +15,7 @@
 		50ADFFA82020EE4F00D50D53 /* Plugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 50ADFFA72020EE4F00D50D53 /* Plugin.m */; };
 		50E1A94820377CB70090CE1A /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1A94720377CB70090CE1A /* Plugin.swift */; };
 		6B8F36778FA862CD784898F9 /* Pods_Plugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B3E6CBE27310D870AAB306 /* Pods_Plugin.framework */; };
+		BD7969382A4EA78C00B13412 /* ConsentExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7969372A4EA78C00B13412 /* ConsentExecutor.swift */; };
 		DB061C43263949D800538D26 /* BannerExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB061C40263949D800538D26 /* BannerExecutor.swift */; };
 		DB061C44263949D800538D26 /* BannerAdPluginEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB061C41263949D800538D26 /* BannerAdPluginEvents.swift */; };
 		DB061C45263949D800538D26 /* BannerAdSizeEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB061C42263949D800538D26 /* BannerAdSizeEnum.swift */; };
@@ -50,6 +51,7 @@
 		5B6E901548355A965349CB08 /* Pods-Plugin.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plugin.release.xcconfig"; path = "Target Support Files/Pods-Plugin/Pods-Plugin.release.xcconfig"; sourceTree = "<group>"; };
 		85733EA4771EE2A613A26981 /* Pods-PluginTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PluginTests.release.xcconfig"; path = "Target Support Files/Pods-PluginTests/Pods-PluginTests.release.xcconfig"; sourceTree = "<group>"; };
 		8CD030B4B8C10E265DB85A12 /* Pods-PluginTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PluginTests.debug.xcconfig"; path = "Target Support Files/Pods-PluginTests/Pods-PluginTests.debug.xcconfig"; sourceTree = "<group>"; };
+		BD7969372A4EA78C00B13412 /* ConsentExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentExecutor.swift; sourceTree = "<group>"; };
 		DB061C40263949D800538D26 /* BannerExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerExecutor.swift; sourceTree = "<group>"; };
 		DB061C41263949D800538D26 /* BannerAdPluginEvents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerAdPluginEvents.swift; sourceTree = "<group>"; };
 		DB061C42263949D800538D26 /* BannerAdSizeEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerAdSizeEnum.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 		50ADFF8A201F53D600D50D53 /* Plugin */ = {
 			isa = PBXGroup;
 			children = (
+				BD7969362A4EA77900B13412 /* Consent */,
 				DBBC90F32697F26000F2A663 /* Helper */,
 				DB061C4926394B0400538D26 /* Rewarded */,
 				DB061C4826394AF700538D26 /* Models */,
@@ -149,6 +152,14 @@
 				FB011FA1245A5805FBC629D9 /* Pods_PluginTests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BD7969362A4EA77900B13412 /* Consent */ = {
+			isa = PBXGroup;
+			children = (
+				BD7969372A4EA78C00B13412 /* ConsentExecutor.swift */,
+			);
+			path = Consent;
 			sourceTree = "<group>";
 		};
 		DB061C4626394A0C00538D26 /* Banner */ = {
@@ -384,6 +395,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB061C5426394B5800538D26 /* InterstitialAdPluginEvents.swift in Sources */,
+				BD7969382A4EA78C00B13412 /* ConsentExecutor.swift in Sources */,
 				DB061C5526394B5800538D26 /* AdInterstitialExecutor.swift in Sources */,
 				DB061C5126394B4100538D26 /* AdRewardExecutor.swift in Sources */,
 				DBBC90F22697F1F400F2A663 /* AuthorizationStatusEnum.swift in Sources */,
