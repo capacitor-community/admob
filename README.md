@@ -134,20 +134,48 @@ export async function initialize(): Promise<void> {
   }
  
   AdMob.initialize({
-    requestTrackingAuthorization: true,
     testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
     initializeForTesting: true,
   });
 }
 ```
 
-You can use option `requestTrackingAuthorization`. This change permission to require `AppTrackingTransparency` in iOS >= 14:
-https://developers.google.com/admob/ios/ios14
-
-Default value is `true`. If you don't want to track, set requestTrackingAuthorization `false`.
-
 Send and array of device Ids in `testingDevices? to use production like ads on your specified devices -> https://developers.google.com/admob/android/test-ads#enable_test_devices
 
+### User Message Platform (UMP)
+
+Later this year, Google will require all publishers serving ads to EEA and UK users to use a Google-certified Consent Management Platform (CMP)
+
+Currently we just support Google's consent management solution.
+
+To use UMP, you must [create your GDPR messages](https://support.google.com/admob/answer/10113207?hl=en&ref_topic=10105230&sjid=6731900490614517032-AP)
+
+You may need to [setup IDFA messages](https://support.google.com/admob/answer/10115027?hl=en), it will work along with GDPR messages and will show when users are not in EEA and UK.
+
+Example of how to use UMP
+
+```ts
+import { AdMob, ConsentStatus, ConsentDebugGeography } from '@capacitor-community/admob';
+
+async showConsent() {
+  const consentInfo = await AdMob.requestConsentInfo();
+
+  if (consentInfo.isConsentFormAvailable && consentInfo.status === ConsentStatus.REQUIRED) {
+    const {status} = await AdMob.showConsentForm();
+  }
+}
+```
+
+If you testing on real device, you have to set `debugGeography` and add your device ID to `testDeviceIdentifiers`. You can find your device ID with logcat (Android) or XCode (iOS).
+
+```ts
+  const consentInfo = await AdMob.requestConsentInfo({
+    debugGeography: ConsentDebugGeography.EEA,
+    testDeviceIdentifiers: ['YOUR_DEVICE_ID']
+  });
+```
+
+**Note**: When testing, if you choose not consent (Manage -> Confirm Choices). The ads may not load/show. Even on testing enviroment. This is normal. It will work on Production so don't worry.
 
 ### Show Banner
 
@@ -259,41 +287,85 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 ## Index
 <docgen-index>
 
-* [`initialize(...)`](#initialize)
-* [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
-* [`setApplicationMuted(...)`](#setapplicationmuted)
-* [`setApplicationVolume(...)`](#setapplicationvolume)
-* [`showBanner(...)`](#showbanner)
-* [`hideBanner()`](#hidebanner)
-* [`resumeBanner()`](#resumebanner)
-* [`removeBanner()`](#removebanner)
-* [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
-* [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
-* [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
-* [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
-* [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
-* [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
-* [`prepareInterstitial(...)`](#prepareinterstitial)
-* [`showInterstitial()`](#showinterstitial)
-* [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
-* [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
-* [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
-* [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
-* [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
-* [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
-* [`showRewardVideoAd()`](#showrewardvideoad)
-* [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
-* [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
-* [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
-* [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
-* [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
-* [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
-* [`requestConsentInfo(...)`](#requestconsentinfo)
-* [`showConsentForm()`](#showconsentform)
-* [`resetConsentInfo()`](#resetconsentinfo)
-* [Interfaces](#interfaces)
-* [Type Aliases](#type-aliases)
-* [Enums](#enums)
+- [Maintainers](#maintainers)
+- [Contributors ✨](#contributors-)
+- [Demo](#demo)
+  - [Screenshots](#screenshots)
+- [Installation](#installation)
+  - [Android configuration](#android-configuration)
+    - [Variables](#variables)
+  - [iOS configuration](#ios-configuration)
+- [Example](#example)
+  - [Initialize AdMob](#initialize-admob)
+  - [User Message Platform (UMP)](#user-message-platform-ump)
+  - [Show Banner](#show-banner)
+  - [Show Interstitial](#show-interstitial)
+  - [Show RewardVideo](#show-rewardvideo)
+- [Server-side Verification Notice](#server-side-verification-notice)
+- [Index](#index)
+- [API](#api)
+  - [initialize(...)](#initialize)
+  - [trackingAuthorizationStatus()](#trackingauthorizationstatus)
+  - [setApplicationMuted(...)](#setapplicationmuted)
+  - [setApplicationVolume(...)](#setapplicationvolume)
+  - [showBanner(...)](#showbanner)
+  - [hideBanner()](#hidebanner)
+  - [resumeBanner()](#resumebanner)
+  - [removeBanner()](#removebanner)
+  - [addListener(BannerAdPluginEvents.SizeChanged, ...)](#addlistenerbanneradplugineventssizechanged-)
+  - [addListener(BannerAdPluginEvents.Loaded, ...)](#addlistenerbanneradplugineventsloaded-)
+  - [addListener(BannerAdPluginEvents.FailedToLoad, ...)](#addlistenerbanneradplugineventsfailedtoload-)
+  - [addListener(BannerAdPluginEvents.Opened, ...)](#addlistenerbanneradplugineventsopened-)
+  - [addListener(BannerAdPluginEvents.Closed, ...)](#addlistenerbanneradplugineventsclosed-)
+  - [addListener(BannerAdPluginEvents.AdImpression, ...)](#addlistenerbanneradplugineventsadimpression-)
+  - [prepareInterstitial(...)](#prepareinterstitial)
+  - [showInterstitial()](#showinterstitial)
+  - [addListener(InterstitialAdPluginEvents.FailedToLoad, ...)](#addlistenerinterstitialadplugineventsfailedtoload-)
+  - [addListener(InterstitialAdPluginEvents.Loaded, ...)](#addlistenerinterstitialadplugineventsloaded-)
+  - [addListener(InterstitialAdPluginEvents.Dismissed, ...)](#addlistenerinterstitialadplugineventsdismissed-)
+  - [addListener(InterstitialAdPluginEvents.FailedToShow, ...)](#addlistenerinterstitialadplugineventsfailedtoshow-)
+  - [addListener(InterstitialAdPluginEvents.Showed, ...)](#addlistenerinterstitialadplugineventsshowed-)
+  - [prepareRewardVideoAd(...)](#preparerewardvideoad)
+  - [showRewardVideoAd()](#showrewardvideoad)
+  - [addListener(RewardAdPluginEvents.FailedToLoad, ...)](#addlistenerrewardadplugineventsfailedtoload-)
+  - [addListener(RewardAdPluginEvents.Loaded, ...)](#addlistenerrewardadplugineventsloaded-)
+  - [addListener(RewardAdPluginEvents.Rewarded, ...)](#addlistenerrewardadplugineventsrewarded-)
+  - [addListener(RewardAdPluginEvents.Dismissed, ...)](#addlistenerrewardadplugineventsdismissed-)
+  - [addListener(RewardAdPluginEvents.FailedToShow, ...)](#addlistenerrewardadplugineventsfailedtoshow-)
+  - [addListener(RewardAdPluginEvents.Showed, ...)](#addlistenerrewardadplugineventsshowed-)
+  - [requestConsentInfo(...)](#requestconsentinfo)
+  - [showConsentForm()](#showconsentform)
+  - [resetConsentInfo()](#resetconsentinfo)
+  - [Interfaces](#interfaces)
+    - [AdMobInitializationOptions](#admobinitializationoptions)
+    - [TrackingAuthorizationStatusInterface](#trackingauthorizationstatusinterface)
+    - [ApplicationMutedOptions](#applicationmutedoptions)
+    - [ApplicationVolumeOptions](#applicationvolumeoptions)
+    - [BannerAdOptions](#banneradoptions)
+    - [PluginListenerHandle](#pluginlistenerhandle)
+    - [AdMobBannerSize](#admobbannersize)
+    - [AdMobError](#admoberror)
+    - [AdLoadInfo](#adloadinfo)
+    - [AdOptions](#adoptions)
+    - [RewardAdOptions](#rewardadoptions)
+    - [AdMobRewardItem](#admobrewarditem)
+    - [ConsentInfo](#consentinfo)
+    - [ConsentRequestOptions](#consentrequestoptions)
+  - [Type Aliases](#type-aliases)
+    - [AtLeastOne](#atleastone)
+    - [Pick](#pick)
+  - [Enums](#enums)
+    - [MaxAdContentRating](#maxadcontentrating)
+    - [BannerAdSize](#banneradsize)
+    - [BannerAdPosition](#banneradposition)
+    - [BannerAdPluginEvents](#banneradpluginevents)
+    - [InterstitialAdPluginEvents](#interstitialadpluginevents)
+    - [RewardAdPluginEvents](#rewardadpluginevents)
+    - [ConsentStatus](#consentstatus)
+    - [ConsentDebugGeography](#consentdebuggeography)
+- [TROUBLE SHOOTING](#trouble-shooting)
+  - [If you have error:](#if-you-have-error)
+- [License](#license)
 
 </docgen-index>
 
@@ -926,7 +998,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
