@@ -34,7 +34,9 @@ public class AdConsentExecutor extends Executor {
     @PluginMethod
     public void requestConsentInfo(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         try {
-            if (consentInformation == null) consentInformation = UserMessagingPlatform.getConsentInformation(contextSupplier.get());
+            if (consentInformation == null) {
+                consentInformation = UserMessagingPlatform.getConsentInformation(contextSupplier.get());
+            }
 
             ConsentRequestParameters.Builder paramsBuilder = new ConsentRequestParameters.Builder();
             ConsentDebugSettings.Builder debugSettingsBuilder = new ConsentDebugSettings.Builder(contextSupplier.get());

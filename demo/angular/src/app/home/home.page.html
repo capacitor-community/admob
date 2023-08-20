@@ -16,6 +16,15 @@
   </section>
 
   <ion-list>
+    <ion-list-header>
+      <ion-label>Consent</ion-label>
+    </ion-list-header>
+    <ion-item button="true" (click)="requestConsentInfo()">Request Consent Info</ion-item>
+    <ion-item button="true" [disabled]="!isConsentAvailable" (click)="showConsentForm()">Show Consent Form</ion-item>
+    <ion-item button="true" [disabled]="!isConsentAvailable" (click)="resetConsentInfo()">Reset Consent Info</ion-item>
+  </ion-list>
+
+  <ion-list>
     <ion-list-header><ion-label>Banner 
       <ng-container *ngIf="lastBannerEvent$ | async as lastBannerEvent">
       <br>(Last Event: {{lastBannerEvent.name }} | {{lastBannerEvent.value | json}})

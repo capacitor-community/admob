@@ -1,11 +1,11 @@
-import { ConsentDebugGeography } from './consent-debug-geography.enum';
+import { AdmobConsentDebugGeography } from './consent-debug-geography.enum';
 
-export interface ConsentRequestOptions {
+export interface AdmobConsentRequestOptions {
   /**
    * Sets the debug geography to test the consent locally.
    * @since 5.0.0
    */
-  debugGeography?: ConsentDebugGeography;
+  debugGeography?: AdmobConsentDebugGeography;
 
   /**
    * An array of test device IDs to allow.
