@@ -1,11 +1,11 @@
-import { ConsentStatus } from './consent-status.enum';
+import { AdmobConsentStatus } from './consent-status.enum';
 
-export interface ConsentInfo {
+export interface AdmobConsentInfo {
   /**
    * The consent status of the user.
    * @since 5.0.0
    */
-  status: ConsentStatus;
+  status: AdmobConsentStatus;
 
   /**
    * If `true` a consent form is available and vice versa.

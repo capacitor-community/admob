@@ -1,7 +1,7 @@
-import type { ConsentInfo } from './consent-info.interface';
-import type { ConsentRequestOptions } from './consent-request-options.interface';
+import type { AdmobConsentInfo } from './consent-info.interface';
+import type { AdmobConsentRequestOptions } from './consent-request-options.interface';
 
-export interface ConsentDefinitions {
+export interface AdmobConsentDefinitions {
   /**
    * Request user consent information
    *
@@ -9,7 +9,9 @@ export interface ConsentDefinitions {
    * @param options ConsentRequestOptions
    * @since 5.0.0
    */
-  requestConsentInfo(options?: ConsentRequestOptions): Promise<ConsentInfo>;
+  requestConsentInfo(
+    options?: AdmobConsentRequestOptions,
+  ): Promise<AdmobConsentInfo>;
 
   /**
    * Shows a google user consent form (rendered from your GDPR message config).
@@ -17,7 +19,7 @@ export interface ConsentDefinitions {
    * @group Consent
    * @since 5.0.0
    */
-  showConsentForm(): Promise<ConsentInfo>;
+  showConsentForm(): Promise<AdmobConsentInfo>;
 
   /**
    * Resets the UMP SDK state. Call requestConsentInfo function again to allow user modify their consent

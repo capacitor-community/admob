@@ -155,12 +155,12 @@ You may need to [setup IDFA messages](https://support.google.com/admob/answer/10
 Example of how to use UMP
 
 ```ts
-import { AdMob, ConsentStatus, ConsentDebugGeography } from '@capacitor-community/admob';
+import { AdMob, AdmobConsentStatus, AdmobConsentDebugGeography } from '@capacitor-community/admob';
 
 async showConsent() {
   const consentInfo = await AdMob.requestConsentInfo();
 
-  if (consentInfo.isConsentFormAvailable && consentInfo.status === ConsentStatus.REQUIRED) {
+  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
     const {status} = await AdMob.showConsentForm();
   }
 }
@@ -170,7 +170,7 @@ If you testing on real device, you have to set `debugGeography` and add your dev
 
 ```ts
   const consentInfo = await AdMob.requestConsentInfo({
-    debugGeography: ConsentDebugGeography.EEA,
+    debugGeography: AdmobConsentDebugGeography.EEA,
     testDeviceIdentifiers: ['YOUR_DEVICE_ID']
   });
 ```
@@ -287,85 +287,41 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 ## Index
 <docgen-index>
 
-- [Maintainers](#maintainers)
-- [Contributors ✨](#contributors-)
-- [Demo](#demo)
-  - [Screenshots](#screenshots)
-- [Installation](#installation)
-  - [Android configuration](#android-configuration)
-    - [Variables](#variables)
-  - [iOS configuration](#ios-configuration)
-- [Example](#example)
-  - [Initialize AdMob](#initialize-admob)
-  - [User Message Platform (UMP)](#user-message-platform-ump)
-  - [Show Banner](#show-banner)
-  - [Show Interstitial](#show-interstitial)
-  - [Show RewardVideo](#show-rewardvideo)
-- [Server-side Verification Notice](#server-side-verification-notice)
-- [Index](#index)
-- [API](#api)
-  - [initialize(...)](#initialize)
-  - [trackingAuthorizationStatus()](#trackingauthorizationstatus)
-  - [setApplicationMuted(...)](#setapplicationmuted)
-  - [setApplicationVolume(...)](#setapplicationvolume)
-  - [showBanner(...)](#showbanner)
-  - [hideBanner()](#hidebanner)
-  - [resumeBanner()](#resumebanner)
-  - [removeBanner()](#removebanner)
-  - [addListener(BannerAdPluginEvents.SizeChanged, ...)](#addlistenerbanneradplugineventssizechanged-)
-  - [addListener(BannerAdPluginEvents.Loaded, ...)](#addlistenerbanneradplugineventsloaded-)
-  - [addListener(BannerAdPluginEvents.FailedToLoad, ...)](#addlistenerbanneradplugineventsfailedtoload-)
-  - [addListener(BannerAdPluginEvents.Opened, ...)](#addlistenerbanneradplugineventsopened-)
-  - [addListener(BannerAdPluginEvents.Closed, ...)](#addlistenerbanneradplugineventsclosed-)
-  - [addListener(BannerAdPluginEvents.AdImpression, ...)](#addlistenerbanneradplugineventsadimpression-)
-  - [prepareInterstitial(...)](#prepareinterstitial)
-  - [showInterstitial()](#showinterstitial)
-  - [addListener(InterstitialAdPluginEvents.FailedToLoad, ...)](#addlistenerinterstitialadplugineventsfailedtoload-)
-  - [addListener(InterstitialAdPluginEvents.Loaded, ...)](#addlistenerinterstitialadplugineventsloaded-)
-  - [addListener(InterstitialAdPluginEvents.Dismissed, ...)](#addlistenerinterstitialadplugineventsdismissed-)
-  - [addListener(InterstitialAdPluginEvents.FailedToShow, ...)](#addlistenerinterstitialadplugineventsfailedtoshow-)
-  - [addListener(InterstitialAdPluginEvents.Showed, ...)](#addlistenerinterstitialadplugineventsshowed-)
-  - [prepareRewardVideoAd(...)](#preparerewardvideoad)
-  - [showRewardVideoAd()](#showrewardvideoad)
-  - [addListener(RewardAdPluginEvents.FailedToLoad, ...)](#addlistenerrewardadplugineventsfailedtoload-)
-  - [addListener(RewardAdPluginEvents.Loaded, ...)](#addlistenerrewardadplugineventsloaded-)
-  - [addListener(RewardAdPluginEvents.Rewarded, ...)](#addlistenerrewardadplugineventsrewarded-)
-  - [addListener(RewardAdPluginEvents.Dismissed, ...)](#addlistenerrewardadplugineventsdismissed-)
-  - [addListener(RewardAdPluginEvents.FailedToShow, ...)](#addlistenerrewardadplugineventsfailedtoshow-)
-  - [addListener(RewardAdPluginEvents.Showed, ...)](#addlistenerrewardadplugineventsshowed-)
-  - [requestConsentInfo(...)](#requestconsentinfo)
-  - [showConsentForm()](#showconsentform)
-  - [resetConsentInfo()](#resetconsentinfo)
-  - [Interfaces](#interfaces)
-    - [AdMobInitializationOptions](#admobinitializationoptions)
-    - [TrackingAuthorizationStatusInterface](#trackingauthorizationstatusinterface)
-    - [ApplicationMutedOptions](#applicationmutedoptions)
-    - [ApplicationVolumeOptions](#applicationvolumeoptions)
-    - [BannerAdOptions](#banneradoptions)
-    - [PluginListenerHandle](#pluginlistenerhandle)
-    - [AdMobBannerSize](#admobbannersize)
-    - [AdMobError](#admoberror)
-    - [AdLoadInfo](#adloadinfo)
-    - [AdOptions](#adoptions)
-    - [RewardAdOptions](#rewardadoptions)
-    - [AdMobRewardItem](#admobrewarditem)
-    - [ConsentInfo](#consentinfo)
-    - [ConsentRequestOptions](#consentrequestoptions)
-  - [Type Aliases](#type-aliases)
-    - [AtLeastOne](#atleastone)
-    - [Pick](#pick)
-  - [Enums](#enums)
-    - [MaxAdContentRating](#maxadcontentrating)
-    - [BannerAdSize](#banneradsize)
-    - [BannerAdPosition](#banneradposition)
-    - [BannerAdPluginEvents](#banneradpluginevents)
-    - [InterstitialAdPluginEvents](#interstitialadpluginevents)
-    - [RewardAdPluginEvents](#rewardadpluginevents)
-    - [ConsentStatus](#consentstatus)
-    - [ConsentDebugGeography](#consentdebuggeography)
-- [TROUBLE SHOOTING](#trouble-shooting)
-  - [If you have error:](#if-you-have-error)
-- [License](#license)
+* [`initialize(...)`](#initialize)
+* [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
+* [`setApplicationMuted(...)`](#setapplicationmuted)
+* [`setApplicationVolume(...)`](#setapplicationvolume)
+* [`showBanner(...)`](#showbanner)
+* [`hideBanner()`](#hidebanner)
+* [`resumeBanner()`](#resumebanner)
+* [`removeBanner()`](#removebanner)
+* [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
+* [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
+* [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
+* [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
+* [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
+* [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
+* [`prepareInterstitial(...)`](#prepareinterstitial)
+* [`showInterstitial()`](#showinterstitial)
+* [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
+* [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
+* [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
+* [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
+* [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
+* [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
+* [`showRewardVideoAd()`](#showrewardvideoad)
+* [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
+* [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
+* [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
+* [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
+* [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
+* [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
+* [`requestConsentInfo(...)`](#requestconsentinfo)
+* [`showConsentForm()`](#showconsentform)
+* [`resetConsentInfo()`](#resetconsentinfo)
+* [Interfaces](#interfaces)
+* [Type Aliases](#type-aliases)
+* [Enums](#enums)
 
 </docgen-index>
 
@@ -822,16 +778,16 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 ### requestConsentInfo(...)
 
 ```typescript
-requestConsentInfo(options?: ConsentRequestOptions) => Promise<ConsentInfo>
+requestConsentInfo(options?: AdmobConsentRequestOptions) => Promise<AdmobConsentInfo>
 ```
 
 Request user consent information
 
-| Param         | Type                                                                    | Description                                                |
-| ------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`** | <code><a href="#consentrequestoptions">ConsentRequestOptions</a></code> | <a href="#consentrequestoptions">ConsentRequestOptions</a> |
+| Param         | Type                                                                              | Description           |
+| ------------- | --------------------------------------------------------------------------------- | --------------------- |
+| **`options`** | <code><a href="#admobconsentrequestoptions">AdmobConsentRequestOptions</a></code> | ConsentRequestOptions |
 
-**Returns:** <code>Promise&lt;<a href="#consentinfo">ConsentInfo</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
 
 --------------------
 
@@ -839,12 +795,12 @@ Request user consent information
 ### showConsentForm()
 
 ```typescript
-showConsentForm() => Promise<ConsentInfo>
+showConsentForm() => Promise<AdmobConsentInfo>
 ```
 
 Shows a google user consent form (rendered from your GDPR message config).
 
-**Returns:** <code>Promise&lt;<a href="#consentinfo">ConsentInfo</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
 
 --------------------
 
@@ -969,21 +925,21 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`amount`** | <code>number</code> | Rewarded amount user got |
 
 
-#### ConsentInfo
+#### AdmobConsentInfo
 
-| Prop                         | Type                                                    | Description                                           |
-| ---------------------------- | ------------------------------------------------------- | ----------------------------------------------------- |
-| **`status`**                 | <code><a href="#consentstatus">ConsentStatus</a></code> | The consent status of the user.                       |
-| **`isConsentFormAvailable`** | <code>boolean</code>                                    | If `true` a consent form is available and vice versa. |
+| Prop                         | Type                                                              | Description                                           |
+| ---------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
+| **`status`**                 | <code><a href="#admobconsentstatus">AdmobConsentStatus</a></code> | The consent status of the user.                       |
+| **`isConsentFormAvailable`** | <code>boolean</code>                                              | If `true` a consent form is available and vice versa. |
 
 
-#### ConsentRequestOptions
+#### AdmobConsentRequestOptions
 
-| Prop                          | Type                                                                    | Description                                                                                                  |
-| ----------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **`debugGeography`**          | <code><a href="#consentdebuggeography">ConsentDebugGeography</a></code> | Sets the debug geography to test the consent locally.                                                        |
-| **`testDeviceIdentifiers`**   | <code>string[]</code>                                                   | An array of test device IDs to allow. Note: On iOS, the ID may renew if you uninstall and reinstall the app. |
-| **`tagForUnderAgeOfConsent`** | <code>boolean</code>                                                    | Set to `true` to provide the option for the user to accept being shown personalized ads.                     |
+| Prop                          | Type                                                                              | Description                                                                                                  |
+| ----------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **`debugGeography`**          | <code><a href="#admobconsentdebuggeography">AdmobConsentDebugGeography</a></code> | Sets the debug geography to test the consent locally.                                                        |
+| **`testDeviceIdentifiers`**   | <code>string[]</code>                                                             | An array of test device IDs to allow. Note: On iOS, the ID may renew if you uninstall and reinstall the app. |
+| **`tagForUnderAgeOfConsent`** | <code>boolean</code>                                                              | Set to `true` to provide the option for the user to accept being shown personalized ads.                     |
 
 
 ### Type Aliases
@@ -998,9 +954,7 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{
- [P in K]: T[P];
- }</code>
+<code>{ [P in K]: T[P]; }</code>
 
 
 ### Enums
@@ -1073,7 +1027,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`Rewarded`**     | <code>'onRewardedVideoAdReward'</code>       | Emits when user get rewarded from AdReward                                                                                                                                                                                                                                                                                                             |
 
 
-#### ConsentStatus
+#### AdmobConsentStatus
 
 | Members            | Value                       | Description                                                                           |
 | ------------------ | --------------------------- | ------------------------------------------------------------------------------------- |
@@ -1083,7 +1037,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Unknown consent status, AdsConsent.requestInfoUpdate needs to be called to update it. |
 
 
-#### ConsentDebugGeography
+#### AdmobConsentDebugGeography
 
 | Members        | Value          | Description                                        |
 | -------------- | -------------- | -------------------------------------------------- |

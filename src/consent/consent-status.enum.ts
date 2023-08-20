@@ -4,7 +4,7 @@
  *
  * */
 
-export enum ConsentStatus {
+export enum AdmobConsentStatus {
   /**
    * User consent not required.
    */

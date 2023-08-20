@@ -4,7 +4,7 @@
  *
  * */
 
-export enum ConsentDebugGeography {
+export enum AdmobConsentDebugGeography {
   /**
    * Debug geography disabled.
    */
