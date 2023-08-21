@@ -1,4 +1,4 @@
-import { AdmobConsentDebugGeography } from './consent-debug-geography.enum';
+import type { AdmobConsentDebugGeography } from './consent-debug-geography.enum';
 
 export interface AdmobConsentRequestOptions {
   /**

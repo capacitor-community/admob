@@ -1,4 +1,4 @@
-import { AdmobConsentStatus } from './consent-status.enum';
+import type { AdmobConsentStatus } from './consent-status.enum';
 
 export interface AdmobConsentInfo {
   /**
