@@ -34,9 +34,7 @@ public class AdConsentExecutor extends Executor {
     @PluginMethod
     public void requestConsentInfo(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         try {
-            if (consentInformation == null) {
-                consentInformation = UserMessagingPlatform.getConsentInformation(contextSupplier.get());
-            }
+            ensureConsentInfo();
 
             ConsentRequestParameters.Builder paramsBuilder = new ConsentRequestParameters.Builder();
             ConsentDebugSettings.Builder debugSettingsBuilder = new ConsentDebugSettings.Builder(contextSupplier.get());
@@ -89,6 +87,7 @@ public class AdConsentExecutor extends Executor {
                 call.reject("Trying to show the consent form but the Activity is null");
                 return;
             }
+            ensureConsentInfo();
             activitySupplier
                 .get()
                 .runOnUiThread(
@@ -119,6 +118,7 @@ public class AdConsentExecutor extends Executor {
 
     @PluginMethod
     public void resetConsentInfo(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
+        ensureConsentInfo();
         consentInformation.reset();
         call.resolve();
     }
@@ -134,6 +134,12 @@ public class AdConsentExecutor extends Executor {
             case ConsentInformation.ConsentStatus.UNKNOWN:
             default:
                 return "UNKNOWN";
+        }
+    }
+
+    private void ensureConsentInfo() {
+        if (consentInformation == null) {
+            consentInformation = UserMessagingPlatform.getConsentInformation(contextSupplier.get());
         }
     }
 }

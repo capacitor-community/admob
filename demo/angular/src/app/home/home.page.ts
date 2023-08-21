@@ -14,6 +14,7 @@ import {
   RewardAdPluginEvents,
   AdmobConsentInfo,
   AdmobConsentStatus,
+  AdmobConsentDebugGeography,
 } from '@capacitor-community/admob';
 import { ReplaySubject } from 'rxjs';
 import {
@@ -123,7 +124,10 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
    */
 
   async requestConsentInfo() {
-    let consentInfo: AdmobConsentInfo = await AdMob.requestConsentInfo();
+    let consentInfo: AdmobConsentInfo = await AdMob.requestConsentInfo({
+      debugGeography: AdmobConsentDebugGeography.EEA,
+      testDeviceIdentifiers: ['163FB114BEF1FC09FF772E930677A8D5'],
+    });
 
     if (
       consentInfo.status === AdmobConsentStatus.REQUIRED ||
@@ -146,21 +150,41 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   }
 
   async showConsentForm() {
-    const { status } = await AdMob.showConsentForm();
-    const toast = await this.toastCtrl.create({
-      message: `Consent form showed with status: ${status}`,
-      duration: 3000,
-    });
-    await toast.present();
+    try {
+      const { status } = await AdMob.showConsentForm();
+      const toast = await this.toastCtrl.create({
+        message: `Consent form showed with status: ${status}`,
+        duration: 3000,
+      });
+      await toast.present();
+    } catch (e) {
+      const toast = await this.toastCtrl.create({
+        message: `'Error on showConsentForm. See Logs`,
+        duration: 3000,
+        color: 'danger',
+      });
+      await toast.present();
+      console.error('Error on showConsentForm', e);
+    }
   }
 
   async resetConsentInfo() {
-    await AdMob.resetConsentInfo();
-    const toast = await this.toastCtrl.create({
-      message: `Consent info have been reset. You can show new consent form now.`,
-      duration: 3000,
-    });
-    await toast.present();
+    try {
+      await AdMob.resetConsentInfo();
+      const toast = await this.toastCtrl.create({
+        message: `Consent info have been reset. You can show new consent form now.`,
+        duration: 3000,
+      });
+      await toast.present();
+    } catch (e) {
+      const toast = await this.toastCtrl.create({
+        message: `Error on resetConsentInfo. See Logs`,
+        duration: 3000,
+        color: 'danger',
+      });
+      await toast.present();
+      console.error('Error on resetConsentInfo', e);
+    }
   }
 
   /**
