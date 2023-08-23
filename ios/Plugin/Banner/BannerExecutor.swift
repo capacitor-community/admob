@@ -91,10 +91,8 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
                 let width = subView.frame.width
                 var height = subView.frame.height
                 // For fixing issue 160 iOs banner overlapping content on iPhone with rounded corners                                
-                if let window = UIApplication.shared.keyWindow {
-                    let safeAreaBottom = window.safeAreaInsets.bottom
-                    height = height + safeAreaBottom
-                }
+                let safeAreaBottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+                height += safeAreaBottom
 
                 self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
                     "width": width,
@@ -158,10 +156,8 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
         let width = bannerView.frame.width
         var height = bannerView.frame.height
         // For fixing issue 160 iOs banner overlapping content on iPhone with rounded corners                                
-        if let window = UIApplication.shared.keyWindow {
-            let safeAreaBottom = window.safeAreaInsets.bottom
-            height = height + safeAreaBottom
-        }
+        let safeAreaBottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+        height += safeAreaBottom
 
         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
             "width": width,
