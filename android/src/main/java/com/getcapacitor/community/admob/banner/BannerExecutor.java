@@ -114,10 +114,10 @@ public class BannerExecutor extends Executor {
                 }
                 mAdViewLayoutParams.setMargins(margin, densityMargin, margin, densityMargin);
             } else {
-				int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
-				if (fullscreen) {
-					sideMargin = (realWidthPixels - adWidth) / 2;
-				}
+                int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
+                if (fullscreen) {
+                    sideMargin = (realWidthPixels - adWidth) / 2;
+                }
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
             }
 
