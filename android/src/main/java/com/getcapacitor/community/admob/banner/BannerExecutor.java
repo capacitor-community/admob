@@ -46,8 +46,18 @@ public class BannerExecutor extends Executor {
 
     public void showBanner(final PluginCall call) {
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
-        float widthPixels = (int) contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
         float density = contextSupplier.get().getResources().getDisplayMetrics().density;
+
+        int defaultWidthPixels = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        activitySupplier.get().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        int realWidthPixels = metrics.widthPixels;
+
+        boolean fullscreen = false;
+        if ((activitySupplier.get().getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
+            fullscreen = true;
+        }
 
         if (mAdView != null) {
             updateExistingAdView(adOptions);
@@ -63,7 +73,7 @@ public class BannerExecutor extends Executor {
             } else {
                 // ADAPTIVE BANNER
                 mAdView.setAdSize(
-                    AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (widthPixels / density))
+                    AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (defaultWidthPixels / density))
                 );
             }
 
@@ -96,11 +106,18 @@ public class BannerExecutor extends Executor {
 
             // Center Banner Ads
             int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
-            int sideMargin = ((int) widthPixels - adWidth) / 2;
 
             if (adWidth <= 0 || adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
-                mAdViewLayoutParams.setMargins(0, densityMargin, 0, densityMargin);
+                int margin = 0;
+                if (fullscreen) {
+                    margin = (realWidthPixels - defaultWidthPixels) / 2;
+                }
+                mAdViewLayoutParams.setMargins(margin, densityMargin, margin, densityMargin);
             } else {
+				int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
+				if (fullscreen) {
+					sideMargin = (realWidthPixels - adWidth) / 2;
+				}
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
             }
 
