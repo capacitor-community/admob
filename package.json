@@ -6,6 +6,9 @@
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "unpkg": "dist/plugin.js",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "files": [
     "android/src/main/",
     "android/build.gradle",
