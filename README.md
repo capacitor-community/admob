@@ -301,6 +301,9 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
 * [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
 * [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
+* [`requestConsentInfo(...)`](#requestconsentinfo)
+* [`showConsentForm()`](#showconsentform)
+* [`resetConsentInfo()`](#resetconsentinfo)
 * [`prepareInterstitial(...)`](#prepareinterstitial)
 * [`showInterstitial()`](#showinterstitial)
 * [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
@@ -316,9 +319,6 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
 * [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
 * [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
-* [`requestConsentInfo(...)`](#requestconsentinfo)
-* [`showConsentForm()`](#showconsentform)
-* [`resetConsentInfo()`](#resetconsentinfo)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -537,6 +537,47 @@ Unimplemented
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                         |              |
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+--------------------
+
+
+### requestConsentInfo(...)
+
+```typescript
+requestConsentInfo(options?: AdmobConsentRequestOptions) => Promise<AdmobConsentInfo>
+```
+
+Request user consent information
+
+| Param         | Type                                                                              | Description           |
+| ------------- | --------------------------------------------------------------------------------- | --------------------- |
+| **`options`** | <code><a href="#admobconsentrequestoptions">AdmobConsentRequestOptions</a></code> | ConsentRequestOptions |
+
+**Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
+
+--------------------
+
+
+### showConsentForm()
+
+```typescript
+showConsentForm() => Promise<AdmobConsentInfo>
+```
+
+Shows a google user consent form (rendered from your GDPR message config).
+
+**Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
+
+--------------------
+
+
+### resetConsentInfo()
+
+```typescript
+resetConsentInfo() => Promise<void>
+```
+
+Resets the UMP SDK state. Call requestConsentInfo function again to allow user modify their consent
 
 --------------------
 
@@ -775,47 +816,6 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 --------------------
 
 
-### requestConsentInfo(...)
-
-```typescript
-requestConsentInfo(options?: AdmobConsentRequestOptions) => Promise<AdmobConsentInfo>
-```
-
-Request user consent information
-
-| Param         | Type                                                                              | Description           |
-| ------------- | --------------------------------------------------------------------------------- | --------------------- |
-| **`options`** | <code><a href="#admobconsentrequestoptions">AdmobConsentRequestOptions</a></code> | ConsentRequestOptions |
-
-**Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
-
---------------------
-
-
-### showConsentForm()
-
-```typescript
-showConsentForm() => Promise<AdmobConsentInfo>
-```
-
-Shows a google user consent form (rendered from your GDPR message config).
-
-**Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
-
---------------------
-
-
-### resetConsentInfo()
-
-```typescript
-resetConsentInfo() => Promise<void>
-```
-
-Resets the UMP SDK state. Call requestConsentInfo function again to allow user modify their consent
-
---------------------
-
-
 ### Interfaces
 
 
@@ -890,6 +890,23 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`message`** | <code>string</code> | Gets the message describing the error. |
 
 
+#### AdmobConsentInfo
+
+| Prop                         | Type                                                              | Description                                           |
+| ---------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
+| **`status`**                 | <code><a href="#admobconsentstatus">AdmobConsentStatus</a></code> | The consent status of the user.                       |
+| **`isConsentFormAvailable`** | <code>boolean</code>                                              | If `true` a consent form is available and vice versa. |
+
+
+#### AdmobConsentRequestOptions
+
+| Prop                          | Type                                                                              | Description                                                                                                  |
+| ----------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **`debugGeography`**          | <code><a href="#admobconsentdebuggeography">AdmobConsentDebugGeography</a></code> | Sets the debug geography to test the consent locally.                                                        |
+| **`testDeviceIdentifiers`**   | <code>string[]</code>                                                             | An array of test device IDs to allow. Note: On iOS, the ID may renew if you uninstall and reinstall the app. |
+| **`tagForUnderAgeOfConsent`** | <code>boolean</code>                                                              | Set to `true` to provide the option for the user to accept being shown personalized ads.                     |
+
+
 #### AdLoadInfo
 
 | Prop           | Type                |
@@ -923,23 +940,6 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | ------------ | ------------------- | ------------------------ |
 | **`type`**   | <code>string</code> | Rewarded type user got   |
 | **`amount`** | <code>number</code> | Rewarded amount user got |
-
-
-#### AdmobConsentInfo
-
-| Prop                         | Type                                                              | Description                                           |
-| ---------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
-| **`status`**                 | <code><a href="#admobconsentstatus">AdmobConsentStatus</a></code> | The consent status of the user.                       |
-| **`isConsentFormAvailable`** | <code>boolean</code>                                              | If `true` a consent form is available and vice versa. |
-
-
-#### AdmobConsentRequestOptions
-
-| Prop                          | Type                                                                              | Description                                                                                                  |
-| ----------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **`debugGeography`**          | <code><a href="#admobconsentdebuggeography">AdmobConsentDebugGeography</a></code> | Sets the debug geography to test the consent locally.                                                        |
-| **`testDeviceIdentifiers`**   | <code>string[]</code>                                                             | An array of test device IDs to allow. Note: On iOS, the ID may renew if you uninstall and reinstall the app. |
-| **`tagForUnderAgeOfConsent`** | <code>boolean</code>                                                              | Set to `true` to provide the option for the user to accept being shown personalized ads.                     |
 
 
 ### Type Aliases
@@ -1004,6 +1004,25 @@ From T, pick a set of properties whose keys are in the union K
 | **`AdImpression`** | <code>"bannerAdImpression"</code>   | Similarly, this method should be called when an impression is recorded for the ad by the mediated SDK. |
 
 
+#### AdmobConsentStatus
+
+| Members            | Value                       | Description                                                                           |
+| ------------------ | --------------------------- | ------------------------------------------------------------------------------------- |
+| **`NOT_REQUIRED`** | <code>'NOT_REQUIRED'</code> | User consent not required.                                                            |
+| **`OBTAINED`**     | <code>'OBTAINED'</code>     | User consent already obtained.                                                        |
+| **`REQUIRED`**     | <code>'REQUIRED'</code>     | User consent required but not yet obtained.                                           |
+| **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Unknown consent status, AdsConsent.requestInfoUpdate needs to be called to update it. |
+
+
+#### AdmobConsentDebugGeography
+
+| Members        | Value          | Description                                        |
+| -------------- | -------------- | -------------------------------------------------- |
+| **`DISABLED`** | <code>0</code> | Debug geography disabled.                          |
+| **`EEA`**      | <code>1</code> | Geography appears as in EEA for debug devices.     |
+| **`NOT_EEA`**  | <code>2</code> | Geography appears as not in EEA for debug devices. |
+
+
 #### InterstitialAdPluginEvents
 
 | Members            | Value                                     | Description                                                                            |
@@ -1025,25 +1044,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`FailedToShow`** | <code>'onRewardedVideoAdFailedToShow'</code> | Emits when the AdReward video is failed to show                                                                                                                                                                                                                                                                                                        |
 | **`Dismissed`**    | <code>'onRewardedVideoAdDismissed'</code>    | Emits when the AdReward video is not visible to the user anymore. **Important**: This has nothing to do with the reward it self. This event will emits in this two cases: 1. The user starts the video ad but close it before the reward emit. 2. The user start the video and see it until end, then gets the reward and after that the ad is closed. |
 | **`Rewarded`**     | <code>'onRewardedVideoAdReward'</code>       | Emits when user get rewarded from AdReward                                                                                                                                                                                                                                                                                                             |
-
-
-#### AdmobConsentStatus
-
-| Members            | Value                       | Description                                                                           |
-| ------------------ | --------------------------- | ------------------------------------------------------------------------------------- |
-| **`NOT_REQUIRED`** | <code>'NOT_REQUIRED'</code> | User consent not required.                                                            |
-| **`OBTAINED`**     | <code>'OBTAINED'</code>     | User consent already obtained.                                                        |
-| **`REQUIRED`**     | <code>'REQUIRED'</code>     | User consent required but not yet obtained.                                           |
-| **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Unknown consent status, AdsConsent.requestInfoUpdate needs to be called to update it. |
-
-
-#### AdmobConsentDebugGeography
-
-| Members        | Value          | Description                                        |
-| -------------- | -------------- | -------------------------------------------------- |
-| **`DISABLED`** | <code>0</code> | Debug geography disabled.                          |
-| **`EEA`**      | <code>1</code> | Geography appears as in EEA for debug devices.     |
-| **`NOT_EEA`**  | <code>2</code> | Geography appears as not in EEA for debug devices. |
 
 </docgen-api>
 
