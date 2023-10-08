@@ -1,28 +1,28 @@
 PODS:
   - Capacitor (5.0.0):
     - CapacitorCordova
-  - CapacitorCommunityAdmob (5.0.0):
+  - CapacitorCommunityAdmob (5.1.1):
     - Capacitor
-    - Google-Mobile-Ads-SDK (= 10.1.0)
+    - Google-Mobile-Ads-SDK (= 10.12.0)
   - CapacitorCordova (5.0.0)
-  - Google-Mobile-Ads-SDK (10.1.0):
+  - Google-Mobile-Ads-SDK (10.12.0):
     - GoogleAppMeasurement (< 11.0, >= 7.0)
     - GoogleUserMessagingPlatform (>= 1.1)
-  - GoogleAppMeasurement (10.14.0):
-    - GoogleAppMeasurement/AdIdSupport (= 10.14.0)
+  - GoogleAppMeasurement (10.16.0):
+    - GoogleAppMeasurement/AdIdSupport (= 10.16.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
     - GoogleUtilities/MethodSwizzler (~> 7.11)
     - GoogleUtilities/Network (~> 7.11)
     - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - GoogleAppMeasurement/AdIdSupport (10.14.0):
-    - GoogleAppMeasurement/WithoutAdIdSupport (= 10.14.0)
+  - GoogleAppMeasurement/AdIdSupport (10.16.0):
+    - GoogleAppMeasurement/WithoutAdIdSupport (= 10.16.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
     - GoogleUtilities/MethodSwizzler (~> 7.11)
     - GoogleUtilities/Network (~> 7.11)
     - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - GoogleAppMeasurement/WithoutAdIdSupport (10.14.0):
+  - GoogleAppMeasurement/WithoutAdIdSupport (10.16.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
     - GoogleUtilities/MethodSwizzler (~> 7.11)
     - GoogleUtilities/Network (~> 7.11)
@@ -77,10 +77,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Capacitor: b332cb737d447561e854039fb72195206685dce2
-  CapacitorCommunityAdmob: dfa5cf8cdd1d78c27b685d87413c51a91c761c69
+  CapacitorCommunityAdmob: 65f26933420c4e65b91947947acd4daf41d26bb6
   CapacitorCordova: 4ea17670ee562680988a7ce9db68dee5160fe564
-  Google-Mobile-Ads-SDK: 894be2e3e3e8281004bda14381f9af7ad73eeffd
-  GoogleAppMeasurement: 7fee012a868315d418f365fbc8d394d8e020e749
+  Google-Mobile-Ads-SDK: 976fdf273815674eed30b8aafffedb3c25b055e4
+  GoogleAppMeasurement: 079d7632810e9d9704a99932547ba1554acc4342
   GoogleUserMessagingPlatform: dce302b8f1b84d6e945812ee7a15c3f65a102cbf
   GoogleUtilities: 13e2c67ede716b8741c7989e26893d151b2b2084
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
@@ -88,4 +88,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: caf5c0243508aa7da79d79fc34adc99fda665398
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.13.0
