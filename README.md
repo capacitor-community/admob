@@ -177,6 +177,13 @@ If you testing on real device, you have to set `debugGeography` and add your dev
 
 **Note**: When testing, if you choose not consent (Manage -> Confirm Choices). The ads may not load/show. Even on testing enviroment. This is normal. It will work on Production so don't worry.
 
+**Note**: The order in which they are combined with other methods is as follows.
+
+1. AdMob.initialize
+2. AdMob.requestConsentInfo
+3. AdMob.showConsentForm (If consent form required )
+3/ AdMob.showBanner
+
 ### Show Banner
 
 ```ts
@@ -954,7 +961,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
