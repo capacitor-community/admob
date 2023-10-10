@@ -17,7 +17,7 @@ export interface AdMobPlugin extends AdMobDefinitions {
    * @param options AdMobInitializationOptions
    * @since 1.1.2
    */
-  initialize(options: AdMobInitializationOptions): Promise<void>;
+  initialize(options?: AdMobInitializationOptions): Promise<void>;
 
   /**
    * Confirm requestTrackingAuthorization status (iOS >14)

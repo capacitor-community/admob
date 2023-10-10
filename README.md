@@ -118,9 +118,9 @@ Don't forget to replace `[APP_ID]` by your AdMob application Id.
 import { AdMob } from '@capacitor-community/admob';
 
 export async function initialize(): Promise<void> {
-  const { status } = await AdMob.trackingAuthorizationStatus();
+  const [consentInfo, trackingInfo] = await Promise.all([AdMob.requestConsentInfo(), AdMob.trackingAuthorizationStatus()]);
 
-  if (status === 'notDetermined') {
+  if (consentInfo.status === AdmobConsentStatus.REQUIRED && trackingInfo.status === 'notDetermined') {
     /**
      * If you want to explain TrackingAuthorization before showing the iOS dialog,
      * you can show the modal here.
@@ -131,12 +131,13 @@ export async function initialize(): Promise<void> {
      * await modal.present();
      * await modal.onDidDismiss();  // Wait for close modal
      **/
+
+    if (consentInfo.isConsentFormAvailable) {
+      await AdMob.showConsentForm();
+    } else {
+      await AdMob.requestTrackingAuthorization();
+    }
   }
- 
-  AdMob.initialize({
-    testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
-    initializeForTesting: true,
-  });
 }
 ```
 
@@ -973,7 +974,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
