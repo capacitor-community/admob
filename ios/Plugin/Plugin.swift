@@ -29,57 +29,45 @@ public class AdMob: CAPPlugin {
         GADMobileAds.sharedInstance().start(completionHandler: nil)
         call.resolve([:])
     }
-    
+
     /**
      * DEPRECATED: It's now ship with Admob UMP Consent
      */
     @objc func requestTrackingAuthorization(_ call: CAPPluginCall) {
-        let isTrack = call.getBool("requestTrackingAuthorization") ?? true
-
-        if !isTrack {
-            GADMobileAds.sharedInstance().start(completionHandler: nil)
-            call.resolve([:])
-        } else if #available(iOS 14, *) {
+        if #available(iOS 14, *) {
             #if canImport(AppTrackingTransparency)
             ATTrackingManager.requestTrackingAuthorization(completionHandler: { _ in
-                // iOS >= 14
-                GADMobileAds.sharedInstance().start(completionHandler: nil)
                 call.resolve([:])
-
             })
             #else
-            GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.resolve([:])
             #endif
         } else {
-            // iOS < 14
-            GADMobileAds.sharedInstance().start(completionHandler: nil)
             call.resolve([:])
         }
     }
-    
+
     @objc func setApplicationMuted(_ call: CAPPluginCall) {
         if let shouldMute = call.getBool("muted") {
             GADMobileAds.sharedInstance().applicationMuted = shouldMute
             call.resolve([:])
         } else {
-            call.reject("muted property cannot be null");
-            return;
+            call.reject("muted property cannot be null")
+            return
         }
     }
-    
+
     @objc func setApplicationVolume(_ call: CAPPluginCall) {
         if var volume = call.getFloat("volume") {
-            //Clamp volumes. 
-            if (volume < 0.0) {volume = 0.0}
-            else if (volume > 1.0) {volume = 1.0}
-            
+            //Clamp volumes.
+            if volume < 0.0 {volume = 0.0} else if volume > 1.0 {volume = 1.0}
+
             GADMobileAds.sharedInstance().applicationVolume = volume
 
             call.resolve([:])
         } else {
-            call.reject("volume property cannot be null");
-            return;
+            call.reject("volume property cannot be null")
+            return
         }
     }
 
@@ -176,14 +164,14 @@ public class AdMob: CAPPlugin {
             }
         }
     }
-    
+
     /**
      * Admob: User Message Platform
      * https://support.google.com/admob/answer/10113005?hl=en
      */
     @objc func requestConsentInfo(_ call: CAPPluginCall) {
         let debugGeography = call.getInt("debugGeography", 0)
-        
+
         let testDeviceJSArray = call.getArray("testDeviceIdentifiers") ?? []
         var testDeviceIdentifiers: [String] = []
         if testDeviceJSArray.count > 0 {
@@ -193,20 +181,20 @@ public class AdMob: CAPPlugin {
                 }
             }
         }
-        
+
         let tagForUnderAgeOfConsent = call.getBool("tagForUnderAgeOfConsent", false)
 
         DispatchQueue.main.async {
             self.consentExecutor.requestConsentInfo(call, debugGeography, testDeviceIdentifiers, tagForUnderAgeOfConsent)
         }
     }
-    
+
     @objc func showConsentForm(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.consentExecutor.showConsentForm(call)
         }
     }
-    
+
     @objc func resetConsentInfo(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.consentExecutor.resetConsentInfo(call)

@@ -28,6 +28,15 @@ export interface AdMobPlugin extends AdMobDefinitions {
   trackingAuthorizationStatus(): Promise<TrackingAuthorizationStatusInterface>;
 
   /**
+   * request requestTrackingAuthorization (iOS >14).
+   * This is deprecated method. We recommend UMP Consent.
+   *
+   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
+   * @since 5.2.0
+   */
+  requestTrackingAuthorization(): Promise<void>;
+
+  /**
    * Report application mute state to AdMob SDK
    *
    * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
@@ -46,16 +55,8 @@ export interface AdMobPlugin extends AdMobDefinitions {
 
 export interface AdMobInitializationOptions {
   /**
-   * Use or not requestTrackingAuthorization in iOS(>14)
-   *
-   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547037-requesttrackingauthorization?changes=latest_minor
-   * @since 1.1.2
-   */
-  requestTrackingAuthorization?: boolean;
-
-  /**
    * An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true
-   * (Real Ads will be served to Testing devices but they will not count as 'real').
+   * (Real Ads will be served to Testing devices, but they will not count as 'real').
    *
    * @see https://developers.google.com/admob/android/test-ads#enable_test_devices
    * @since 1.2.0

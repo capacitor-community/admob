@@ -296,6 +296,7 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 
 * [`initialize(...)`](#initialize)
 * [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
+* [`requestTrackingAuthorization()`](#requesttrackingauthorization)
 * [`setApplicationMuted(...)`](#setapplicationmuted)
 * [`setApplicationVolume(...)`](#setapplicationvolume)
 * [`showBanner(...)`](#showbanner)
@@ -360,6 +361,18 @@ trackingAuthorizationStatus() => Promise<TrackingAuthorizationStatusInterface>
 Confirm requestTrackingAuthorization status (iOS &gt;14)
 
 **Returns:** <code>Promise&lt;<a href="#trackingauthorizationstatusinterface">TrackingAuthorizationStatusInterface</a>&gt;</code>
+
+--------------------
+
+
+### requestTrackingAuthorization()
+
+```typescript
+requestTrackingAuthorization() => Promise<void>
+```
+
+request requestTrackingAuthorization (iOS &gt;14).
+This is deprecated method. We recommend UMP Consent.
 
 --------------------
 
@@ -828,14 +841,13 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 
 #### AdMobInitializationOptions
 
-| Prop                               | Type                                                              | Description                                                                                                                                                                                                                                                |
-| ---------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`requestTrackingAuthorization`** | <code>boolean</code>                                              | Use or not requestTrackingAuthorization in iOS(&gt;14)                                                                                                                                                                                                     |
-| **`testingDevices`**               | <code>string[]</code>                                             | An Array of devices IDs that will be marked as tested devices if {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.initializeForTesting</a>} is true (Real Ads will be served to Testing devices but they will not count as 'real'). |
-| **`initializeForTesting`**         | <code>boolean</code>                                              | If set to true, the devices on {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.testingDevices</a>} will be registered to receive test production ads.                                                                              |
-| **`tagForChildDirectedTreatment`** | <code>boolean</code>                                              | For purposes of the Children's Online Privacy Protection Act (COPPA), there is a setting called tagForChildDirectedTreatment.                                                                                                                              |
-| **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                              | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.                                                                                                                   |
-| **`maxAdContentRating`**           | <code><a href="#maxadcontentrating">MaxAdContentRating</a></code> | As an app developer, you can indicate whether you want Google to treat your content as child-directed when you make an ad request.                                                                                                                         |
+| Prop                               | Type                                                              | Description                                                                                                                                                                                                                                                 |
+| ---------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`testingDevices`**               | <code>string[]</code>                                             | An Array of devices IDs that will be marked as tested devices if {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.initializeForTesting</a>} is true (Real Ads will be served to Testing devices, but they will not count as 'real'). |
+| **`initializeForTesting`**         | <code>boolean</code>                                              | If set to true, the devices on {@link <a href="#admobinitializationoptions">AdMobInitializationOptions.testingDevices</a>} will be registered to receive test production ads.                                                                               |
+| **`tagForChildDirectedTreatment`** | <code>boolean</code>                                              | For purposes of the Children's Online Privacy Protection Act (COPPA), there is a setting called tagForChildDirectedTreatment.                                                                                                                               |
+| **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                              | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.                                                                                                                    |
+| **`maxAdContentRating`**           | <code><a href="#maxadcontentrating">MaxAdContentRating</a></code> | As an app developer, you can indicate whether you want Google to treat your content as child-directed when you make an ad request.                                                                                                                          |
 
 
 #### TrackingAuthorizationStatusInterface
@@ -961,9 +973,7 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{
- [P in K]: T[P];
- }</code>
+<code>{ [P in K]: T[P]; }</code>
 
 
 ### Enums

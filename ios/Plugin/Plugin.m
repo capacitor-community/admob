@@ -7,6 +7,7 @@ CAP_PLUGIN(AdMob, "AdMob",
            CAP_PLUGIN_METHOD(initialize, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(trackingAuthorizationStatus, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(requestConsentInfo, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(requestTrackingAuthorization, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(showConsentForm, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(resetConsentInfo, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(setApplicationMuted, CAPPluginReturnPromise);

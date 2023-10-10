@@ -28,6 +28,10 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log('targetSettings');
   }
 
+  async requestTrackingAuthorization(): Promise<void> {
+    console.log('requestTrackingAuthorization');
+  }
+
   async trackingAuthorizationStatus(): Promise<TrackingAuthorizationStatusInterface> {
     return {
       status: 'authorized',

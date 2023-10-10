@@ -75,6 +75,11 @@ public class AdMob extends Plugin {
     }
 
     @PluginMethod
+    public void requestTrackingAuthorization(final PluginCall call) {
+        call.resolve();
+    }
+
+    @PluginMethod
     public void trackingAuthorizationStatus(final PluginCall call) {
         JSObject response = new JSObject();
         response.put("status", AuthorizationStatusEnum.AUTHORIZED.getStatus());
