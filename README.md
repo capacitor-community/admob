@@ -118,25 +118,30 @@ Don't forget to replace `[APP_ID]` by your AdMob application Id.
 import { AdMob } from '@capacitor-community/admob';
 
 export async function initialize(): Promise<void> {
-  const [consentInfo, trackingInfo] = await Promise.all([AdMob.requestConsentInfo(), AdMob.trackingAuthorizationStatus()]);
-
-  if (consentInfo.status === AdmobConsentStatus.REQUIRED && trackingInfo.status === 'notDetermined') {
-    /**
-     * If you want to explain TrackingAuthorization before showing the iOS dialog,
-     * you can show the modal here.
-     * ex)
-     * const modal = await this.modalCtrl.create({
-     *   component: RequestTrackingPage,
-     * });
-     * await modal.present();
-     * await modal.onDidDismiss();  // Wait for close modal
-     **/
-
-    if (consentInfo.isConsentFormAvailable) {
-      await AdMob.showConsentForm();
-    } else {
-      await AdMob.requestTrackingAuthorization();
-    }
+  await AdMob.initialize();
+ 
+  const [trackingInfo, consentInfo] = await Promise.all([
+   AdMob.trackingAuthorizationStatus(),
+   AdMob.requestConsentInfo(),
+  ]);
+ 
+  if (trackingInfo.status === 'notDetermined') {
+   /**
+    * If you want to explain TrackingAuthorization before showing the iOS dialog,
+    * you can show the modal here.
+    * ex)
+    * const modal = await this.modalCtrl.create({
+    *   component: RequestTrackingPage,
+    * });
+    * await modal.present();
+    * await modal.onDidDismiss();  // Wait for close modal
+    **/
+ 
+   await AdMob.requestTrackingAuthorization();
+  }
+ 
+  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+   await AdMob.showConsentForm();
   }
 }
 ```
@@ -974,7 +979,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
