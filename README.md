@@ -139,8 +139,13 @@ export async function initialize(): Promise<void> {
  
    await AdMob.requestTrackingAuthorization();
   }
- 
-  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+
+  const authorizationStatus = await AdMob.trackingAuthorizationStatus();
+  if (
+          authorizationStatus.status === 'authorized' &&
+          consentInfo.isConsentFormAvailable &&
+          consentInfo.status === AdmobConsentStatus.REQUIRED
+  ) {
    await AdMob.showConsentForm();
   }
 }
