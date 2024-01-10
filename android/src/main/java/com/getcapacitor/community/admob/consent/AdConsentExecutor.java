@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -18,6 +20,9 @@ import com.google.android.ump.ConsentRequestParameters;
 import com.google.android.ump.FormError;
 import com.google.android.ump.UserMessagingPlatform;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AdConsentExecutor extends Executor {
 
     private ConsentInformation consentInformation;
@@ -29,6 +34,59 @@ public class AdConsentExecutor extends Executor {
         String pluginLogTag
     ) {
         super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "AdConsentExecutor");
+    }
+
+    public boolean canShowPersonalizedAds(){
+        Context context = contextSupplier.get();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        String purposeConsent = prefs.getString("IABTCF_PurposeConsents", "");
+        String vendorConsent = prefs.getString("IABTCF_VendorConsents","");
+        String vendorLI = prefs.getString("IABTCF_VendorLegitimateInterests","");
+        String purposeLI = prefs.getString("IABTCF_PurposeLegitimateInterests","");
+
+        int googleId = 755;
+        boolean hasGoogleVendorConsent = hasAttribute(vendorConsent, googleId);
+        boolean hasGoogleVendorLI = hasAttribute(vendorLI, googleId);
+
+        List<Integer> indexes = new ArrayList<>();
+        indexes.add(1);
+        indexes.add(3);
+        indexes.add(4);
+
+        List<Integer> indexesLI = new ArrayList<>();
+        indexesLI.add(2);
+        indexesLI.add(7);
+        indexesLI.add(9);
+        indexesLI.add(10);
+
+        return hasConsentFor(indexes, purposeConsent, hasGoogleVendorConsent)
+                && hasConsentOrLegitimateInterestFor(indexesLI, purposeConsent, purposeLI, hasGoogleVendorConsent, hasGoogleVendorLI);
+
+    }
+    public boolean canShowAds(){
+        Context context = contextSupplier.get();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        String purposeConsent = prefs.getString("IABTCF_PurposeConsents", "");
+        String vendorConsent = prefs.getString("IABTCF_VendorConsents","");
+        String vendorLI = prefs.getString("IABTCF_VendorLegitimateInterests","");
+        String purposeLI = prefs.getString("IABTCF_PurposeLegitimateInterests","");
+
+        int googleId = 755;
+        boolean hasGoogleVendorConsent = hasAttribute(vendorConsent, googleId);
+        boolean hasGoogleVendorLI = hasAttribute(vendorLI, googleId);
+
+        List<Integer> indexes = new ArrayList<>();
+        indexes.add(1);
+
+        List<Integer> indexesLI = new ArrayList<>();
+        indexesLI.add(2);
+        indexesLI.add(7);
+        indexesLI.add(9);
+        indexesLI.add(10);
+
+        return hasConsentFor(indexes, purposeConsent, hasGoogleVendorConsent)
+                && hasConsentOrLegitimateInterestFor(indexesLI, purposeConsent, purposeLI, hasGoogleVendorConsent, hasGoogleVendorLI);
+
     }
 
     @PluginMethod
@@ -71,6 +129,8 @@ public class AdConsentExecutor extends Executor {
                     JSObject consentInfo = new JSObject();
                     consentInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
                     consentInfo.put("isConsentFormAvailable", consentInformation.isConsentFormAvailable());
+                    consentInfo.put("canShowAds", canShowAds());
+                    consentInfo.put("canShowPersonalizedAds", canShowPersonalizedAds());
                     call.resolve(consentInfo);
                 },
                 formError -> call.reject(formError.getMessage())
@@ -103,7 +163,8 @@ public class AdConsentExecutor extends Executor {
                                         } else {
                                             JSObject consentFormInfo = new JSObject();
                                             consentFormInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
-
+                                            consentFormInfo.put("canShowAds", canShowAds());
+                                            consentFormInfo.put("canShowPersonalizedAds", canShowPersonalizedAds());
                                             call.resolve(consentFormInfo);
                                         }
                                     }
@@ -141,5 +202,31 @@ public class AdConsentExecutor extends Executor {
         if (consentInformation == null) {
             consentInformation = UserMessagingPlatform.getConsentInformation(contextSupplier.get());
         }
+    }
+
+    private boolean hasAttribute(String input, int index) {
+        if (input == null) return false;
+        return input.length() >= index && input.charAt(index-1) == '1';
+    }
+
+    private boolean hasConsentFor(List<Integer> indexes, String purposeConsent, boolean hasVendorConsent) {
+        for (Integer p: indexes) {
+            if (!hasAttribute(purposeConsent, p)) {
+                return false;
+            }
+        }
+        return hasVendorConsent;
+    }
+
+    private boolean hasConsentOrLegitimateInterestFor(List<Integer> indexes, String purposeConsent, String purposeLI, boolean hasVendorConsent, boolean hasVendorLI){
+        for (Integer p: indexes) {
+            boolean purposeAndVendorLI = hasAttribute(purposeLI, p) && hasVendorLI;
+            boolean purposeConsentAndVendorConsent = hasAttribute(purposeConsent, p) && hasVendorConsent;
+            boolean isOk = purposeAndVendorLI || purposeConsentAndVendorConsent;
+            if (!isOk){
+                return false;
+            }
+        }
+        return true;
     }
 }

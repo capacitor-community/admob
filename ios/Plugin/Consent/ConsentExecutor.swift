@@ -25,7 +25,9 @@ class ConsentExecutor: NSObject {
                 } else {
                     call.resolve([
                         "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
-                        "isConsentFormAvailable": UMPConsentInformation.sharedInstance.formStatus == UMPFormStatus.available
+                        "isConsentFormAvailable": UMPConsentInformation.sharedInstance.formStatus == UMPFormStatus.available,
+                        "canShowAds": self.canShowAds(),
+                        "canShowPersonalizedAds": self.canShowPersonalizedAds()
                     ])
                 }
             })
@@ -50,12 +52,16 @@ class ConsentExecutor: NSObject {
                             }
 
                             call.resolve([
-                                "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus)
+                                "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
+                                "canShowAds": self.canShowAds(),
+                                "canShowPersonalizedAds": self.canShowPersonalizedAds()
                             ])
                         })
                     } else {
                         call.resolve([
-                            "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus)
+                            "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
+                            "canShowAds": self.canShowAds(),
+                            "canShowPersonalizedAds": self.canShowPersonalizedAds()
                         ])
                     }
                 })
@@ -83,5 +89,70 @@ class ConsentExecutor: NSObject {
         default:
             return "UNKNOWN"
         }
+    }
+
+    func isGDPR() -> Bool {
+        let settings = UserDefaults.standard
+        let gdpr = settings.integer(forKey: "IABTCF_gdprApplies")
+        return gdpr == 1
+    }
+
+    // Check if a binary string has a "1" at position "index" (1-based)
+    private func hasAttribute(input: String, index: Int) -> Bool {
+        return input.count >= index && String(Array(input)[index-1]) == "1"
+    }
+
+    // Check if consent is given for a list of purposes
+    private func hasConsentFor(_ purposes: [Int], _ purposeConsent: String, _ hasVendorConsent: Bool) -> Bool {
+        return purposes.allSatisfy { i in hasAttribute(input: purposeConsent, index: i) } && hasVendorConsent
+    }
+
+    // Check if a vendor either has consent or legitimate interest for a list of purposes
+    private func hasConsentOrLegitimateInterestFor(_ purposes: [Int], _ purposeConsent: String, _ purposeLI: String, _ hasVendorConsent: Bool, _ hasVendorLI: Bool) -> Bool {
+        return purposes.allSatisfy { i in
+            (hasAttribute(input: purposeLI, index: i) && hasVendorLI) ||
+            (hasAttribute(input: purposeConsent, index: i) && hasVendorConsent)
+        }
+    }
+
+    private func canShowAds() -> Bool {
+        let settings = UserDefaults.standard
+
+        //https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#in-app-details
+        //https://support.google.com/admob/answer/9760862?hl=en&ref_topic=9756841
+
+        let purposeConsent = settings.string(forKey: "IABTCF_PurposeConsents") ?? ""
+        let vendorConsent = settings.string(forKey: "IABTCF_VendorConsents") ?? ""
+        let vendorLI = settings.string(forKey: "IABTCF_VendorLegitimateInterests") ?? ""
+        let purposeLI = settings.string(forKey: "IABTCF_PurposeLegitimateInterests") ?? ""
+
+        let googleId = 755
+        let hasGoogleVendorConsent = hasAttribute(input: vendorConsent, index: googleId)
+        let hasGoogleVendorLI = hasAttribute(input: vendorLI, index: googleId)
+
+        // Minimum required for at least non-personalized ads
+        return hasConsentFor([1], purposeConsent, hasGoogleVendorConsent)
+            && hasConsentOrLegitimateInterestFor([2,7,9,10], purposeConsent, purposeLI, hasGoogleVendorConsent, hasGoogleVendorLI)
+
+    }
+
+    private func canShowPersonalizedAds() -> Bool {
+        let settings = UserDefaults.standard
+
+        //https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#in-app-details
+        //https://support.google.com/admob/answer/9760862?hl=en&ref_topic=9756841
+
+        // required for personalized ads
+        let purposeConsent = settings.string(forKey: "IABTCF_PurposeConsents") ?? ""
+        let vendorConsent = settings.string(forKey: "IABTCF_VendorConsents") ?? ""
+        let vendorLI = settings.string(forKey: "IABTCF_VendorLegitimateInterests") ?? ""
+        let purposeLI = settings.string(forKey: "IABTCF_PurposeLegitimateInterests") ?? ""
+
+        let googleId = 755
+        let hasGoogleVendorConsent = hasAttribute(input: vendorConsent, index: googleId)
+        let hasGoogleVendorLI = hasAttribute(input: vendorLI, index: googleId)
+
+        return hasConsentFor([1,3,4], purposeConsent, hasGoogleVendorConsent)
+            && hasConsentOrLegitimateInterestFor([2,7,9,10], purposeConsent, purposeLI, hasGoogleVendorConsent, hasGoogleVendorLI)
     }
 }
