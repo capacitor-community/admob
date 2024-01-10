@@ -44,26 +44,18 @@ class ConsentExecutor: NSObject {
                         return
                     }
 
-                    if UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatus.required {
-                        form?.present(from: rootViewController, completionHandler: { dismissError in
-                            if dismissError != nil {
-                                call.reject(dismissError?.localizedDescription ?? "Consent dismiss error")
-                                return
-                            }
+                    form?.present(from: rootViewController, completionHandler: { dismissError in
+                        if dismissError != nil {
+                            call.reject(dismissError?.localizedDescription ?? "Consent dismiss error")
+                            return
+                        }
 
-                            call.resolve([
-                                "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
-                                "canShowAds": self.canShowAds(),
-                                "canShowPersonalizedAds": self.canShowPersonalizedAds()
-                            ])
-                        })
-                    } else {
                         call.resolve([
                             "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
                             "canShowAds": self.canShowAds(),
                             "canShowPersonalizedAds": self.canShowPersonalizedAds()
                         ])
-                    }
+                    })
                 })
             } else {
                 call.reject("Consent Form not available")
