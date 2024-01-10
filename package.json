@@ -1,6 +1,6 @@
 {
   "name": "@ququplay/admob",
-  "version": "5.3.1",
+  "version": "5.3.2",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -14,7 +14,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "CapacitorCommunityAdmob.podspec"
+    "QuquplayAdmob.podspec"
   ],
   "author": "Masahiko Sakakibara <sakakibara@rdlabo.jp>",
   "license": "MIT",
