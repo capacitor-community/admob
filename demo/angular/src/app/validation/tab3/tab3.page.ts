@@ -54,7 +54,7 @@ export class Tab3Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
 
   ionViewWillEnter() {
     const eventKeys = Object.keys(RewardAdPluginEvents);
-    eventKeys.forEach(key => {
+    eventKeys.forEach(async key => {
       const handler = AdMob.addListener(RewardAdPluginEvents[key], value => {
         if (key === 'Dismissed') {
           AdMob.prepareRewardVideoAd({ adId: 'failed' })
@@ -82,7 +82,7 @@ export class Tab3Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
           value,
         );
       });
-      this.listenerHandlers.push(handler);
+      this.listenerHandlers.push(await handler);
     });
 
     this.eventItems = JSON.parse(JSON.stringify(tryItems));

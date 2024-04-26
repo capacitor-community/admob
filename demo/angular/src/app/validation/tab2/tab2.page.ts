@@ -50,7 +50,7 @@ export class Tab2Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
 
   ionViewWillEnter() {
     const eventKeys = Object.keys(InterstitialAdPluginEvents);
-    eventKeys.forEach(key => {
+    eventKeys.forEach(async key => {
       const handler = AdMob.addListener(
         InterstitialAdPluginEvents[key],
         value => {
@@ -81,7 +81,7 @@ export class Tab2Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
           }
         },
       );
-      this.listenerHandlers.push(handler);
+      this.listenerHandlers.push(await handler);
     });
 
     this.eventItems = JSON.parse(JSON.stringify(tryItems));
