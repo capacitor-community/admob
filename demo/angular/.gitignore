@@ -31,3 +31,4 @@ npm-debug.log*
 /plugins
 /www
 /.angular
+/.nx

@@ -76,12 +76,12 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
     private readonly ngZone: NgZone,
   ) {}
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     /**
      * Run every time the Ad height changes.
      * AdMob cannot be displayed above the content, so create margin for AdMob.
      */
-    const resizeHandler = AdMob.addListener(
+    const resizeHandler = await AdMob.addListener(
       BannerAdPluginEvents.SizeChanged,
       (info: AdMobBannerSize) => {
         this.appMargin = info.height;
@@ -288,9 +288,9 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   private registerInterstitialListeners(): void {
     const eventKeys = Object.keys(InterstitialAdPluginEvents);
 
-    eventKeys.forEach(key => {
+    eventKeys.forEach(async key => {
       console.log(`registering ${InterstitialAdPluginEvents[key]}`);
-      const handler = AdMob.addListener(
+      const handler = await AdMob.addListener(
         InterstitialAdPluginEvents[key],
         value => {
           console.log(`Interstitial Event "${key}"`, value);
@@ -307,15 +307,18 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   private registerRewardListeners(): void {
     const eventKeys = Object.keys(RewardAdPluginEvents);
 
-    eventKeys.forEach(key => {
+    eventKeys.forEach(async key => {
       console.log(`registering ${RewardAdPluginEvents[key]}`);
-      const handler = AdMob.addListener(RewardAdPluginEvents[key], value => {
-        console.log(`Reward Event "${key}"`, value);
+      const handler = await AdMob.addListener(
+        RewardAdPluginEvents[key],
+        value => {
+          console.log(`Reward Event "${key}"`, value);
 
-        this.ngZone.run(() => {
-          this.lastRewardEvent$$.next({ name: key, value: value });
-        });
-      });
+          this.ngZone.run(() => {
+            this.lastRewardEvent$$.next({ name: key, value: value });
+          });
+        },
+      );
       this.listenerHandlers.push(handler);
     });
   }
@@ -323,15 +326,18 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   private registerBannerListeners(): void {
     const eventKeys = Object.keys(BannerAdPluginEvents);
 
-    eventKeys.forEach(key => {
+    eventKeys.forEach(async key => {
       console.log(`registering ${BannerAdPluginEvents[key]}`);
-      const handler = AdMob.addListener(BannerAdPluginEvents[key], value => {
-        console.log(`Banner Event "${key}"`, value);
+      const handler = await AdMob.addListener(
+        BannerAdPluginEvents[key],
+        value => {
+          console.log(`Banner Event "${key}"`, value);
 
-        this.ngZone.run(() => {
-          this.lastBannerEvent$$.next({ name: key, value: value });
-        });
-      });
+          this.ngZone.run(() => {
+            this.lastBannerEvent$$.next({ name: key, value: value });
+          });
+        },
+      );
       this.listenerHandlers.push(handler);
     });
   }

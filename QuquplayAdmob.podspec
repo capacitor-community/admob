@@ -15,5 +15,5 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
   s.static_framework = true
   s.dependency 'Capacitor'
-  s.dependency 'Google-Mobile-Ads-SDK', '10.12.0'
+  s.dependency 'Google-Mobile-Ads-SDK', '11.3.0'
 end
