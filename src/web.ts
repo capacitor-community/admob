@@ -110,4 +110,18 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
       amount: 0,
     };
   }
+
+  async prepareRewardInterstitialAd(options: AdOptions): Promise<AdLoadInfo> {
+    console.log(options);
+    return {
+      adUnitId: options.adId,
+    };
+  }
+
+  async showRewardInterstitialAd(): Promise<AdMobRewardItem> {
+    return {
+      type: '',
+      amount: 0,
+    };
+  }
 }

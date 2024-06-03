@@ -25,6 +25,8 @@
 		DB061C5526394B5800538D26 /* AdInterstitialExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB061C5326394B5800538D26 /* AdInterstitialExecutor.swift */; };
 		DB061C5926394B7900538D26 /* FullScreenAdEventName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB061C5826394B7900538D26 /* FullScreenAdEventName.swift */; };
 		DBBC90F22697F1F400F2A663 /* AuthorizationStatusEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBC90F12697F1F400F2A663 /* AuthorizationStatusEnum.swift */; };
+		DC44B8892C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC44B8882C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift */; };
+		DC44B88B2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC44B88A2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +63,8 @@
 		DB061C5326394B5800538D26 /* AdInterstitialExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdInterstitialExecutor.swift; sourceTree = "<group>"; };
 		DB061C5826394B7900538D26 /* FullScreenAdEventName.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullScreenAdEventName.swift; sourceTree = "<group>"; };
 		DBBC90F12697F1F400F2A663 /* AuthorizationStatusEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthorizationStatusEnum.swift; path = Plugin/Helper/AuthorizationStatusEnum.swift; sourceTree = SOURCE_ROOT; };
+		DC44B8882C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdRewardInterstitialExecutor.swift; sourceTree = "<group>"; };
+		DC44B88A2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardedInterstitialAdPluginEvents.swift; sourceTree = "<group>"; };
 		F44715726BB7665615BDA523 /* Pods-Plugin.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plugin.debug.xcconfig"; path = "Target Support Files/Pods-Plugin/Pods-Plugin.debug.xcconfig"; sourceTree = "<group>"; };
 		FB011FA1245A5805FBC629D9 /* Pods_PluginTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PluginTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -121,6 +125,7 @@
 		50ADFF8A201F53D600D50D53 /* Plugin */ = {
 			isa = PBXGroup;
 			children = (
+				DC44B8872C0D971A001D8B37 /* RewardedInterstitial */,
 				BD7969362A4EA77900B13412 /* Consent */,
 				DBBC90F32697F26000F2A663 /* Helper */,
 				DB061C4926394B0400538D26 /* Rewarded */,
@@ -206,6 +211,15 @@
 			path = Helper;
 			sourceTree = "<group>";
 		};
+		DC44B8872C0D971A001D8B37 /* RewardedInterstitial */ = {
+			isa = PBXGroup;
+			children = (
+				DC44B8882C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift */,
+				DC44B88A2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift */,
+			);
+			path = RewardedInterstitial;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -229,6 +243,7 @@
 				50ADFF84201F53D600D50D53 /* Frameworks */,
 				50ADFF85201F53D600D50D53 /* Headers */,
 				50ADFF86201F53D600D50D53 /* Resources */,
+				2629298625CE1F6680C13FD9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -248,6 +263,7 @@
 				50ADFF8E201F53D600D50D53 /* Frameworks */,
 				50ADFF8F201F53D600D50D53 /* Resources */,
 				A6BD04EB568905DCA6108727 /* [CP] Embed Pods Frameworks */,
+				3A1D71941C67BCF50F106667 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -317,6 +333,42 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2629298625CE1F6680C13FD9 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Plugin/Pods-Plugin-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/GoogleUserMessagingPlatform/UserMessagingPlatformResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/UserMessagingPlatformResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Plugin/Pods-Plugin-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3A1D71941C67BCF50F106667 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PluginTests/Pods-PluginTests-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/GoogleUserMessagingPlatform/UserMessagingPlatformResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/UserMessagingPlatformResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PluginTests/Pods-PluginTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		A6BD04EB568905DCA6108727 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -396,7 +448,9 @@
 			files = (
 				DB061C5426394B5800538D26 /* InterstitialAdPluginEvents.swift in Sources */,
 				BD7969382A4EA78C00B13412 /* ConsentExecutor.swift in Sources */,
+				DC44B8892C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift in Sources */,
 				DB061C5526394B5800538D26 /* AdInterstitialExecutor.swift in Sources */,
+				DC44B88B2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift in Sources */,
 				DB061C5126394B4100538D26 /* AdRewardExecutor.swift in Sources */,
 				DBBC90F22697F1F400F2A663 /* AuthorizationStatusEnum.swift in Sources */,
 				DB061C44263949D800538D26 /* BannerAdPluginEvents.swift in Sources */,
