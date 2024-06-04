@@ -24,6 +24,7 @@ public class AdMob: CAPPlugin {
         self.bannerExecutor.plugin = self
         self.adInterstitialExecutor.plugin = self
         self.adRewardExecutor.plugin = self
+        self.adRewardInterstitialExecutor.plugin = self
         self.adInterstitialExecutor.plugin = self
         self.consentExecutor.plugin = self
         self.setRequestConfiguration(call)
