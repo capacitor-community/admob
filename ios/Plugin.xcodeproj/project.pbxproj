@@ -26,7 +26,7 @@
 		DB061C5926394B7900538D26 /* FullScreenAdEventName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB061C5826394B7900538D26 /* FullScreenAdEventName.swift */; };
 		DBBC90F22697F1F400F2A663 /* AuthorizationStatusEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBC90F12697F1F400F2A663 /* AuthorizationStatusEnum.swift */; };
 		DC44B8892C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC44B8882C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift */; };
-		DC44B88B2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC44B88A2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift */; };
+		DC44B88B2C0D9764001D8B37 /* RewardInterstitialAdPluginEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC44B88A2C0D9764001D8B37 /* RewardInterstitialAdPluginEvents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,7 +64,7 @@
 		DB061C5826394B7900538D26 /* FullScreenAdEventName.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullScreenAdEventName.swift; sourceTree = "<group>"; };
 		DBBC90F12697F1F400F2A663 /* AuthorizationStatusEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AuthorizationStatusEnum.swift; path = Plugin/Helper/AuthorizationStatusEnum.swift; sourceTree = SOURCE_ROOT; };
 		DC44B8882C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdRewardInterstitialExecutor.swift; sourceTree = "<group>"; };
-		DC44B88A2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardedInterstitialAdPluginEvents.swift; sourceTree = "<group>"; };
+		DC44B88A2C0D9764001D8B37 /* RewardInterstitialAdPluginEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardInterstitialAdPluginEvents.swift; sourceTree = "<group>"; };
 		F44715726BB7665615BDA523 /* Pods-Plugin.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Plugin.debug.xcconfig"; path = "Target Support Files/Pods-Plugin/Pods-Plugin.debug.xcconfig"; sourceTree = "<group>"; };
 		FB011FA1245A5805FBC629D9 /* Pods_PluginTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PluginTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -215,7 +215,7 @@
 			isa = PBXGroup;
 			children = (
 				DC44B8882C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift */,
-				DC44B88A2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift */,
+				DC44B88A2C0D9764001D8B37 /* RewardInterstitialAdPluginEvents.swift */,
 			);
 			path = RewardedInterstitial;
 			sourceTree = "<group>";
@@ -450,7 +450,7 @@
 				BD7969382A4EA78C00B13412 /* ConsentExecutor.swift in Sources */,
 				DC44B8892C0D9749001D8B37 /* AdRewardInterstitialExecutor.swift in Sources */,
 				DB061C5526394B5800538D26 /* AdInterstitialExecutor.swift in Sources */,
-				DC44B88B2C0D9764001D8B37 /* RewardedInterstitialAdPluginEvents.swift in Sources */,
+				DC44B88B2C0D9764001D8B37 /* RewardInterstitialAdPluginEvents.swift in Sources */,
 				DB061C5126394B4100538D26 /* AdRewardExecutor.swift in Sources */,
 				DBBC90F22697F1F400F2A663 /* AuthorizationStatusEnum.swift in Sources */,
 				DB061C44263949D800538D26 /* BannerAdPluginEvents.swift in Sources */,
