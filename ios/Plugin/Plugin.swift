@@ -59,7 +59,7 @@ public class AdMob: CAPPlugin {
 
     @objc func setApplicationVolume(_ call: CAPPluginCall) {
         if var volume = call.getFloat("volume") {
-            //Clamp volumes.
+            // Clamp volumes.
             if volume < 0.0 {volume = 0.0} else if volume > 1.0 {volume = 1.0}
 
             GADMobileAds.sharedInstance().applicationVolume = volume

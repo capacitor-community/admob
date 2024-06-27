@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
-    public weak var plugin: AdMob?
+    weak var plugin: AdMob?
     var rewardedAd: GADRewardedAd!
 
     func prepareRewardVideoAd(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
@@ -66,7 +66,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
         }
     }
 
-    public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
@@ -74,12 +74,12 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
         ])
     }
 
-    public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
     }
 
-    public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Dismissed.rawValue, data: [:])
     }

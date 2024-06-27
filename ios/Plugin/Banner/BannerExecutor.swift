@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 class BannerExecutor: NSObject, GADBannerViewDelegate {
-    public weak var plugin: AdMob?
+    weak var plugin: AdMob?
     var bannerView: GADBannerView!
 
     func showBanner(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
@@ -144,7 +144,7 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     }
 
     /// Tells the delegate an ad request loaded an ad.
-    public func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
+    func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
         NSLog("bannerViewDidReceiveAd")
 
         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
@@ -155,8 +155,8 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     }
 
     /// Tells the delegate an ad request failed.
-    public func bannerView(_ bannerView: GADBannerView,
-                           didFailToReceiveAdWithError error: Error) {
+    func bannerView(_ bannerView: GADBannerView,
+                    didFailToReceiveAdWithError error: Error) {
         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
@@ -169,18 +169,18 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
         ])
     }
 
-    public func bannerViewDidRecordImpression(_ bannerView: GADBannerView) {
+    func bannerViewDidRecordImpression(_ bannerView: GADBannerView) {
         self.plugin?.notifyListeners(BannerAdPluginEvents.AdImpression.rawValue, data: [:])
     }
 
     /// Tells the delegate that a full-screen view will be presented in response
     /// to the user clicking on an ad.
-    public func bannerViewWillPresentScreen(_ bannerView: GADBannerView) {
+    func bannerViewWillPresentScreen(_ bannerView: GADBannerView) {
         self.plugin?.notifyListeners(BannerAdPluginEvents.Opened.rawValue, data: [:])
     }
 
     /// Tells the delegate that the full-screen view will be dismissed.
-    public func bannerViewWillDismissScreen(_ bannerView: GADBannerView) {
+    func bannerViewWillDismissScreen(_ bannerView: GADBannerView) {
         self.plugin?.notifyListeners(BannerAdPluginEvents.Closed.rawValue, data: [:])
     }
 }
