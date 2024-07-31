@@ -16,14 +16,15 @@
 
 ## Maintainers
 
-| Maintainer          | GitHub                              | Social                                | Sponsoring Company                             |
-| ------------------- | ----------------------------------- | ------------------------------------- | ---------------------------------------------- |
-| Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo) | [@rdlabo](https://twitter.com/rdlabo) | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
-| Saninn Salas Diaz | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) | |
+| Maintainer          | GitHub                                           | Social                                          | Sponsoring Company                             |
+| ------------------- | ------------------------------------------------ | ----------------------------------------------- | ---------------------------------------------- |
+| Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo)              | [@rdlabo](https://twitter.com/rdlabo)           | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
+| Saninn Salas Diaz   | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) |                                                |
 
 Maintenance Status: Actively Maintained
 
 ## Contributors ✨
+
 <a href="https://github.com/capacitor-community/admob/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=capacitor-community/admob" />
 </a>
@@ -42,6 +43,7 @@ Made with [contributors-img](https://contrib.rocks).
 | **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  |
 
 ## Installation
+
 If you use capacitor 5:
 
 ```
@@ -118,9 +120,14 @@ Don't forget to replace `[APP_ID]` by your AdMob application Id.
 import { AdMob } from '@capacitor-community/admob';
 
 export async function initialize(): Promise<void> {
-  const [consentInfo, trackingInfo] = await Promise.all([AdMob.requestConsentInfo(), AdMob.trackingAuthorizationStatus()]);
+  await AdMob.initialize();
 
-  if (consentInfo.status === AdmobConsentStatus.REQUIRED && trackingInfo.status === 'notDetermined') {
+  const [trackingInfo, consentInfo] = await Promise.all([
+    AdMob.trackingAuthorizationStatus(),
+    AdMob.requestConsentInfo(),
+  ]);
+
+  if (trackingInfo.status === 'notDetermined') {
     /**
      * If you want to explain TrackingAuthorization before showing the iOS dialog,
      * you can show the modal here.
@@ -132,11 +139,16 @@ export async function initialize(): Promise<void> {
      * await modal.onDidDismiss();  // Wait for close modal
      **/
 
-    if (consentInfo.isConsentFormAvailable) {
-      await AdMob.showConsentForm();
-    } else {
-      await AdMob.requestTrackingAuthorization();
-    }
+    await AdMob.requestTrackingAuthorization();
+  }
+
+  const authorizationStatus = await AdMob.trackingAuthorizationStatus();
+  if (
+    authorizationStatus.status === 'authorized' &&
+    consentInfo.isConsentFormAvailable &&
+    consentInfo.status === AdmobConsentStatus.REQUIRED
+  ) {
+    await AdMob.showConsentForm();
   }
 }
 ```
@@ -170,10 +182,10 @@ async showConsent() {
 If you testing on real device, you have to set `debugGeography` and add your device ID to `testDeviceIdentifiers`. You can find your device ID with logcat (Android) or XCode (iOS).
 
 ```ts
-  const consentInfo = await AdMob.requestConsentInfo({
-    debugGeography: AdmobConsentDebugGeography.EEA,
-    testDeviceIdentifiers: ['YOUR_DEVICE_ID']
-  });
+const consentInfo = await AdMob.requestConsentInfo({
+  debugGeography: AdmobConsentDebugGeography.EEA,
+  testDeviceIdentifiers: ['YOUR_DEVICE_ID'],
+});
 ```
 
 **Note**: When testing, if you choose not consent (Manage -> Confirm Choices). The ads may not load/show. Even on testing enviroment. This is normal. It will work on Production so don't worry.
@@ -183,38 +195,53 @@ If you testing on real device, you have to set `debugGeography` and add your dev
 1. AdMob.initialize
 2. AdMob.requestConsentInfo
 3. AdMob.showConsentForm (If consent form required )
-3/ AdMob.showBanner
+   3/ AdMob.showBanner
 
 ### Show Banner
 
 ```ts
-import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, BannerAdPluginEvents, AdMobBannerSize } from '@capacitor-community/admob';
+import {
+  AdMob,
+  BannerAdOptions,
+  BannerAdSize,
+  BannerAdPosition,
+  BannerAdPluginEvents,
+  AdMobBannerSize,
+} from '@capacitor-community/admob';
 
 export async function banner(): Promise<void> {
-    AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
-      // Subscribe Banner Event Listener
-    });
+  AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
+    // Subscribe Banner Event Listener
+  });
 
-    AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size: AdMobBannerSize) => {
+  AdMob.addListener(
+    BannerAdPluginEvents.SizeChanged,
+    (size: AdMobBannerSize) => {
       // Subscribe Change Banner Size
-    });
+    },
+  );
 
-    const options: BannerAdOptions = {
-      adId: 'YOUR ADID',
-      adSize: BannerAdSize.BANNER,
-      position: BannerAdPosition.BOTTOM_CENTER,
-      margin: 0,
-      // isTesting: true
-      // npa: true
-    };
-    AdMob.showBanner(options);
+  const options: BannerAdOptions = {
+    adId: 'YOUR ADID',
+    adSize: BannerAdSize.BANNER,
+    position: BannerAdPosition.BOTTOM_CENTER,
+    margin: 0,
+    // isTesting: true
+    // npa: true
+  };
+  AdMob.showBanner(options);
 }
 ```
 
 ### Show Interstitial
 
 ```ts
-import { AdMob, AdOptions, AdLoadInfo, InterstitialAdPluginEvents } from '@capacitor-community/admob';
+import {
+  AdMob,
+  AdOptions,
+  AdLoadInfo,
+  InterstitialAdPluginEvents,
+} from '@capacitor-community/admob';
 
 export async function interstitial(): Promise<void> {
   AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
@@ -234,17 +261,26 @@ export async function interstitial(): Promise<void> {
 ### Show RewardVideo
 
 ```ts
-import { AdMob, RewardAdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob';
+import {
+  AdMob,
+  RewardAdOptions,
+  AdLoadInfo,
+  RewardAdPluginEvents,
+  AdMobRewardItem,
+} from '@capacitor-community/admob';
 
 export async function rewardVideo(): Promise<void> {
   AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
     // Subscribe prepared rewardVideo
   });
 
-  AdMob.addListener(RewardAdPluginEvents.Rewarded, (rewardItem: AdMobRewardItem) => {
-    // Subscribe user rewarded
-    console.log(rewardItem);
-  });
+  AdMob.addListener(
+    RewardAdPluginEvents.Rewarded,
+    (rewardItem: AdMobRewardItem) => {
+      // Subscribe user rewarded
+      console.log(rewardItem);
+    },
+  );
 
   const options: RewardAdOptions = {
     adId: 'YOUR ADID',
@@ -261,27 +297,31 @@ export async function rewardVideo(): Promise<void> {
 ```
 
 ## Server-side Verification Notice
+
 SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
 
 For E2E tests or just for validating the data in your `RewardAdOptions` work as expected, you can add a custom GET
 request to your mock endpoint after the `RewardAdPluginEvents.Rewarded` similar to this:
+
 ```ts
 AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
   // ...
   if (ENVIRONMENT_IS_DEVELOPMENT) {
     try {
-      const url = `https://your-staging-ssv-endpoint` + new URLSearchParams({
-        'ad_network': 'TEST',
-        'ad_unit': 'TEST',
-        'custom_data': customData, // <-- passed CustomData
-        'reward_amount': 'TEST',
-        'reward_item': 'TEST',
-        'timestamp': 'TEST',
-        'transaction_id': 'TEST',
-        'user_id': userId, // <-- Passed UserID
-        'signature': 'TEST',
-        'key_id': 'TEST'
-      });
+      const url =
+        `https://your-staging-ssv-endpoint` +
+        new URLSearchParams({
+          ad_network: 'TEST',
+          ad_unit: 'TEST',
+          custom_data: customData, // <-- passed CustomData
+          reward_amount: 'TEST',
+          reward_item: 'TEST',
+          timestamp: 'TEST',
+          transaction_id: 'TEST',
+          user_id: userId, // <-- Passed UserID
+          signature: 'TEST',
+          key_id: 'TEST',
+        });
       await fetch(url);
     } catch (err) {
       console.error(err);
@@ -291,58 +331,59 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 });
 ```
 
-
 ## Index
+
 <docgen-index>
 
-* [`initialize(...)`](#initialize)
-* [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
-* [`requestTrackingAuthorization()`](#requesttrackingauthorization)
-* [`setApplicationMuted(...)`](#setapplicationmuted)
-* [`setApplicationVolume(...)`](#setapplicationvolume)
-* [`showBanner(...)`](#showbanner)
-* [`hideBanner()`](#hidebanner)
-* [`resumeBanner()`](#resumebanner)
-* [`removeBanner()`](#removebanner)
-* [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
-* [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
-* [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
-* [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
-* [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
-* [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
-* [`requestConsentInfo(...)`](#requestconsentinfo)
-* [`showConsentForm()`](#showconsentform)
-* [`resetConsentInfo()`](#resetconsentinfo)
-* [`prepareInterstitial(...)`](#prepareinterstitial)
-* [`showInterstitial()`](#showinterstitial)
-* [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
-* [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
-* [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
-* [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
-* [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
-* [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
-* [`showRewardVideoAd()`](#showrewardvideoad)
-* [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
-* [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
-* [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
-* [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
-* [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
-* [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
-* [`prepareRewardInterstitialAd(...)`](#preparerewardinterstitialad)
-* [`showRewardInterstitialAd()`](#showrewardinterstitialad)
-* [`addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoload-)
-* [`addListener(RewardInterstitialAdPluginEvents.Loaded, ...)`](#addlistenerrewardinterstitialadplugineventsloaded-)
-* [`addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)`](#addlistenerrewardinterstitialadplugineventsrewarded-)
-* [`addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerrewardinterstitialadplugineventsdismissed-)
-* [`addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoshow-)
-* [`addListener(RewardInterstitialAdPluginEvents.Showed, ...)`](#addlistenerrewardinterstitialadplugineventsshowed-)
-* [Interfaces](#interfaces)
-* [Type Aliases](#type-aliases)
-* [Enums](#enums)
+- [`initialize(...)`](#initialize)
+- [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
+- [`requestTrackingAuthorization()`](#requesttrackingauthorization)
+- [`setApplicationMuted(...)`](#setapplicationmuted)
+- [`setApplicationVolume(...)`](#setapplicationvolume)
+- [`showBanner(...)`](#showbanner)
+- [`hideBanner()`](#hidebanner)
+- [`resumeBanner()`](#resumebanner)
+- [`removeBanner()`](#removebanner)
+- [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
+- [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
+- [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
+- [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
+- [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
+- [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
+- [`requestConsentInfo(...)`](#requestconsentinfo)
+- [`showConsentForm()`](#showconsentform)
+- [`resetConsentInfo()`](#resetconsentinfo)
+- [`prepareInterstitial(...)`](#prepareinterstitial)
+- [`showInterstitial()`](#showinterstitial)
+- [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
+- [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
+- [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
+- [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
+- [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
+- [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
+- [`showRewardVideoAd()`](#showrewardvideoad)
+- [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
+- [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
+- [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
+- [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
+- [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
+- [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
+- [`prepareRewardInterstitialAd(...)`](#preparerewardinterstitialad)
+- [`showRewardInterstitialAd()`](#showrewardinterstitialad)
+- [`addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoload-)
+- [`addListener(RewardInterstitialAdPluginEvents.Loaded, ...)`](#addlistenerrewardinterstitialadplugineventsloaded-)
+- [`addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)`](#addlistenerrewardinterstitialadplugineventsrewarded-)
+- [`addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerrewardinterstitialadplugineventsdismissed-)
+- [`addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoshow-)
+- [`addListener(RewardInterstitialAdPluginEvents.Showed, ...)`](#addlistenerrewardinterstitialadplugineventsshowed-)
+- [Interfaces](#interfaces)
+- [Type Aliases](#type-aliases)
+- [Enums](#enums)
 
 </docgen-index>
 
 ## API
+
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
@@ -358,8 +399,7 @@ Initialize AdMob with <a href="#admobinitializationoptions">AdMobInitializationO
 | ------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | **`options`** | <code><a href="#admobinitializationoptions">AdMobInitializationOptions</a></code> | <a href="#admobinitializationoptions">AdMobInitializationOptions</a> |
 
---------------------
-
+---
 
 ### trackingAuthorizationStatus()
 
@@ -371,8 +411,7 @@ Confirm requestTrackingAuthorization status (iOS &gt;14)
 
 **Returns:** <code>Promise&lt;<a href="#trackingauthorizationstatusinterface">TrackingAuthorizationStatusInterface</a>&gt;</code>
 
---------------------
-
+---
 
 ### requestTrackingAuthorization()
 
@@ -383,8 +422,7 @@ requestTrackingAuthorization() => Promise<void>
 request requestTrackingAuthorization (iOS &gt;14).
 This is deprecated method. We recommend UMP Consent.
 
---------------------
-
+---
 
 ### setApplicationMuted(...)
 
@@ -398,8 +436,7 @@ Report application mute state to AdMob SDK
 | ------------- | --------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#applicationmutedoptions">ApplicationMutedOptions</a></code> |
 
---------------------
-
+---
 
 ### setApplicationVolume(...)
 
@@ -413,8 +450,7 @@ Report application volume to AdMob SDK
 | ------------- | ----------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#applicationvolumeoptions">ApplicationVolumeOptions</a></code> |
 
---------------------
-
+---
 
 ### showBanner(...)
 
@@ -428,8 +464,7 @@ Show a banner Ad
 | ------------- | ----------------------------------------------------------- | ---------------------------------- |
 | **`options`** | <code><a href="#banneradoptions">BannerAdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
 
---------------------
-
+---
 
 ### hideBanner()
 
@@ -439,8 +474,7 @@ hideBanner() => Promise<void>
 
 Hide the banner, remove it from screen, but can show it later
 
---------------------
-
+---
 
 ### resumeBanner()
 
@@ -450,8 +484,7 @@ resumeBanner() => Promise<void>
 
 Resume the banner, show it after hide
 
---------------------
-
+---
 
 ### removeBanner()
 
@@ -461,13 +494,12 @@ removeBanner() => Promise<void>
 
 Destroy the banner, remove it from screen.
 
---------------------
-
+---
 
 ### addListener(BannerAdPluginEvents.SizeChanged, ...)
 
 ```typescript
-addListener(eventName: BannerAdPluginEvents.SizeChanged, listenerFunc: (info: AdMobBannerSize) => void) => PluginListenerHandle
+addListener(eventName: BannerAdPluginEvents.SizeChanged, listenerFunc: (info: AdMobBannerSize) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                              | Description         |
@@ -475,15 +507,14 @@ addListener(eventName: BannerAdPluginEvents.SizeChanged, listenerFunc: (info: Ad
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.SizeChanged</a></code> | bannerAdSizeChanged |
 | **`listenerFunc`** | <code>(info: <a href="#admobbannersize">AdMobBannerSize</a>) =&gt; void</code>    |                     |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(BannerAdPluginEvents.Loaded, ...)
 
 ```typescript
-addListener(eventName: BannerAdPluginEvents.Loaded, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: BannerAdPluginEvents.Loaded, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 Notice: request loaded Banner ad
@@ -493,15 +524,14 @@ Notice: request loaded Banner ad
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Loaded</a></code> | bannerAdLoaded |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |                |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(BannerAdPluginEvents.FailedToLoad, ...)
 
 ```typescript
-addListener(eventName: BannerAdPluginEvents.FailedToLoad, listenerFunc: (info: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: BannerAdPluginEvents.FailedToLoad, listenerFunc: (info: AdMobError) => void) => Promise<PluginListenerHandle>
 ```
 
 Notice: request failed Banner ad
@@ -511,15 +541,14 @@ Notice: request failed Banner ad
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.FailedToLoad</a></code> | bannerAdFailedToLoad |
 | **`listenerFunc`** | <code>(info: <a href="#admoberror">AdMobError</a>) =&gt; void</code>               |                      |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(BannerAdPluginEvents.Opened, ...)
 
 ```typescript
-addListener(eventName: BannerAdPluginEvents.Opened, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: BannerAdPluginEvents.Opened, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 Notice: full-screen banner view will be presented in response to the user clicking on an ad.
@@ -529,15 +558,14 @@ Notice: full-screen banner view will be presented in response to the user clicki
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Opened</a></code> | bannerAdOpened |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |                |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(BannerAdPluginEvents.Closed, ...)
 
 ```typescript
-addListener(eventName: BannerAdPluginEvents.Closed, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: BannerAdPluginEvents.Closed, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 Notice: The full-screen banner view will been dismissed.
@@ -547,15 +575,14 @@ Notice: The full-screen banner view will been dismissed.
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.Closed</a></code> | bannerAdClosed |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |                |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(BannerAdPluginEvents.AdImpression, ...)
 
 ```typescript
-addListener(eventName: BannerAdPluginEvents.AdImpression, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: BannerAdPluginEvents.AdImpression, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 Unimplemented
@@ -565,10 +592,9 @@ Unimplemented
 | **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.AdImpression</a></code> | AdImpression |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                         |              |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### requestConsentInfo(...)
 
@@ -584,8 +610,7 @@ Request user consent information
 
 **Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
 
---------------------
-
+---
 
 ### showConsentForm()
 
@@ -597,8 +622,7 @@ Shows a google user consent form (rendered from your GDPR message config).
 
 **Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
 
---------------------
-
+---
 
 ### resetConsentInfo()
 
@@ -608,8 +632,7 @@ resetConsentInfo() => Promise<void>
 
 Resets the UMP SDK state. Call requestConsentInfo function again to allow user modify their consent
 
---------------------
-
+---
 
 ### prepareInterstitial(...)
 
@@ -625,8 +648,7 @@ Prepare interstitial banner
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
---------------------
-
+---
 
 ### showInterstitial()
 
@@ -636,13 +658,12 @@ showInterstitial() => Promise<void>
 
 Show interstitial ad when it’s ready
 
---------------------
-
+---
 
 ### addListener(InterstitialAdPluginEvents.FailedToLoad, ...)
 
 ```typescript
-addListener(eventName: InterstitialAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: InterstitialAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                           |
@@ -650,15 +671,14 @@ addListener(eventName: InterstitialAdPluginEvents.FailedToLoad, listenerFunc: (e
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.FailedToLoad</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                          |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(InterstitialAdPluginEvents.Loaded, ...)
 
 ```typescript
-addListener(eventName: InterstitialAdPluginEvents.Loaded, listenerFunc: (info: AdLoadInfo) => void) => PluginListenerHandle
+addListener(eventName: InterstitialAdPluginEvents.Loaded, listenerFunc: (info: AdLoadInfo) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                     |
@@ -666,15 +686,14 @@ addListener(eventName: InterstitialAdPluginEvents.Loaded, listenerFunc: (info: A
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.Loaded</a></code> |
 | **`listenerFunc`** | <code>(info: <a href="#adloadinfo">AdLoadInfo</a>) =&gt; void</code>                     |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(InterstitialAdPluginEvents.Dismissed, ...)
 
 ```typescript
-addListener(eventName: InterstitialAdPluginEvents.Dismissed, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: InterstitialAdPluginEvents.Dismissed, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                        |
@@ -682,15 +701,14 @@ addListener(eventName: InterstitialAdPluginEvents.Dismissed, listenerFunc: () =>
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.Dismissed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                                  |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(InterstitialAdPluginEvents.FailedToShow, ...)
 
 ```typescript
-addListener(eventName: InterstitialAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: InterstitialAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                           |
@@ -698,15 +716,14 @@ addListener(eventName: InterstitialAdPluginEvents.FailedToShow, listenerFunc: (e
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.FailedToShow</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                          |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(InterstitialAdPluginEvents.Showed, ...)
 
 ```typescript
-addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                     |
@@ -714,10 +731,9 @@ addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => vo
 | **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.Showed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                               |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### prepareRewardVideoAd(...)
 
@@ -733,8 +749,7 @@ Prepare a reward video ad
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
---------------------
-
+---
 
 ### showRewardVideoAd()
 
@@ -746,13 +761,12 @@ Show a reward video ad
 
 **Returns:** <code>Promise&lt;<a href="#admobrewarditem">AdMobRewardItem</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(RewardAdPluginEvents.FailedToLoad, ...)
 
 ```typescript
-addListener(eventName: RewardAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: RewardAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                               |
@@ -760,15 +774,14 @@ addListener(eventName: RewardAdPluginEvents.FailedToLoad, listenerFunc: (error: 
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.FailedToLoad</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>              |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(RewardAdPluginEvents.Loaded, ...)
 
 ```typescript
-addListener(eventName: RewardAdPluginEvents.Loaded, listenerFunc: (info: AdLoadInfo) => void) => PluginListenerHandle
+addListener(eventName: RewardAdPluginEvents.Loaded, listenerFunc: (info: AdLoadInfo) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                         |
@@ -776,15 +789,14 @@ addListener(eventName: RewardAdPluginEvents.Loaded, listenerFunc: (info: AdLoadI
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Loaded</a></code> |
 | **`listenerFunc`** | <code>(info: <a href="#adloadinfo">AdLoadInfo</a>) =&gt; void</code>         |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(RewardAdPluginEvents.Rewarded, ...)
 
 ```typescript
-addListener(eventName: RewardAdPluginEvents.Rewarded, listenerFunc: (reward: AdMobRewardItem) => void) => PluginListenerHandle
+addListener(eventName: RewardAdPluginEvents.Rewarded, listenerFunc: (reward: AdMobRewardItem) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                             |
@@ -792,15 +804,14 @@ addListener(eventName: RewardAdPluginEvents.Rewarded, listenerFunc: (reward: AdM
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Rewarded</a></code>   |
 | **`listenerFunc`** | <code>(reward: <a href="#admobrewarditem">AdMobRewardItem</a>) =&gt; void</code> |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(RewardAdPluginEvents.Dismissed, ...)
 
 ```typescript
-addListener(eventName: RewardAdPluginEvents.Dismissed, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: RewardAdPluginEvents.Dismissed, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                            |
@@ -808,15 +819,14 @@ addListener(eventName: RewardAdPluginEvents.Dismissed, listenerFunc: () => void)
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Dismissed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                      |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(RewardAdPluginEvents.FailedToShow, ...)
 
 ```typescript
-addListener(eventName: RewardAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: RewardAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                               |
@@ -824,15 +834,14 @@ addListener(eventName: RewardAdPluginEvents.FailedToShow, listenerFunc: (error: 
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.FailedToShow</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>              |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(RewardAdPluginEvents.Showed, ...)
 
 ```typescript
-addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                         |
@@ -840,10 +849,9 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 | **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Showed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                   |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
---------------------
-
+---
 
 ### prepareRewardInterstitialAd(...)
 
@@ -859,8 +867,7 @@ Prepare a reward video ad
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
---------------------
-
+---
 
 ### showRewardInterstitialAd()
 
@@ -872,8 +879,7 @@ Show a reward video ad
 
 **Returns:** <code>Promise&lt;<a href="#admobrewardinterstitialitem">AdMobRewardInterstitialItem</a>&gt;</code>
 
---------------------
-
+---
 
 ### addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)
 
@@ -888,8 +894,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.FailedToLoad, listenerFu
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### addListener(RewardInterstitialAdPluginEvents.Loaded, ...)
 
@@ -904,8 +909,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Loaded, listenerFunc: (i
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)
 
@@ -920,8 +924,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Rewarded, listenerFunc: 
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)
 
@@ -936,8 +939,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Dismissed, listenerFunc:
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)
 
@@ -952,8 +954,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.FailedToShow, listenerFu
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### addListener(RewardInterstitialAdPluginEvents.Showed, ...)
 
@@ -968,11 +969,9 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 
 **Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
 
---------------------
-
+---
 
 ### Interfaces
-
 
 #### AdMobInitializationOptions
 
@@ -984,13 +983,11 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 | **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                              | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.                                                                                                                    |
 | **`maxAdContentRating`**           | <code><a href="#maxadcontentrating">MaxAdContentRating</a></code> | As an app developer, you can indicate whether you want Google to treat your content as child-directed when you make an ad request.                                                                                                                          |
 
-
 #### TrackingAuthorizationStatusInterface
 
 | Prop         | Type                                                                     |
 | ------------ | ------------------------------------------------------------------------ |
 | **`status`** | <code>'authorized' \| 'denied' \| 'notDetermined' \| 'restricted'</code> |
-
 
 #### ApplicationMutedOptions
 
@@ -998,13 +995,11 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 | ----------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`muted`** | <code>boolean</code> | To inform the SDK that the app volume has been muted. Note: Video ads that are ineligible to be shown with muted audio are not returned for ad requests made, when the app volume is reported as muted or set to a value of 0. This may restrict a subset of the broader video ads pool from serving. |
 
-
 #### ApplicationVolumeOptions
 
 | Prop         | Type                                                                               | Description                                                                                                                                                                                                                          |
 | ------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`volume`** | <code>0 \| 1 \| 0.1 \| 0.2 \| 0.3 \| 0.4 \| 0.5 \| 0.6 \| 0.7 \| 0.8 \| 0.9</code> | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. enable set 0.0 - 1.0, any float allowed. |
-
 
 #### BannerAdOptions
 
@@ -1015,13 +1010,11 @@ This interface extends <a href="#adoptions">AdOptions</a>
 | **`adSize`**   | <code><a href="#banneradsize">BannerAdSize</a></code>         | Banner Ad Size, defaults to ADAPTIVE_BANNER. IT can be: ADAPTIVE_BANNER, SMART_BANNER, BANNER, MEDIUM_RECTANGLE, FULL_BANNER, LEADERBOARD |
 | **`position`** | <code><a href="#banneradposition">BannerAdPosition</a></code> | Set Banner Ad position. TOP_CENTER or CENTER or BOTTOM_CENTER                                                                             |
 
-
 #### PluginListenerHandle
 
 | Prop         | Type                                      |
 | ------------ | ----------------------------------------- |
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
-
 
 #### AdMobBannerSize
 
@@ -1031,7 +1024,6 @@ When notice listener of OnAdLoaded, you can get banner size.
 | ------------ | ------------------- |
 | **`width`**  | <code>number</code> |
 | **`height`** | <code>number</code> |
-
 
 #### AdMobError
 
@@ -1043,14 +1035,12 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`code`**    | <code>number</code> | Gets the error's code.                 |
 | **`message`** | <code>string</code> | Gets the message describing the error. |
 
-
 #### AdmobConsentInfo
 
 | Prop                         | Type                                                              | Description                                           |
 | ---------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
 | **`status`**                 | <code><a href="#admobconsentstatus">AdmobConsentStatus</a></code> | The consent status of the user.                       |
 | **`isConsentFormAvailable`** | <code>boolean</code>                                              | If `true` a consent form is available and vice versa. |
-
 
 #### AdmobConsentRequestOptions
 
@@ -1060,13 +1050,11 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`testDeviceIdentifiers`**   | <code>string[]</code>                                                             | An array of test device IDs to allow. Note: On iOS, the ID may renew if you uninstall and reinstall the app. |
 | **`tagForUnderAgeOfConsent`** | <code>boolean</code>                                                              | Set to `true` to provide the option for the user to accept being shown personalized ads.                     |
 
-
 #### AdLoadInfo
 
 | Prop           | Type                |
 | -------------- | ------------------- |
 | **`adUnitId`** | <code>string</code> |
-
 
 #### AdOptions
 
@@ -1077,13 +1065,11 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`margin`**    | <code>number</code>  | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top. |
 | **`npa`**       | <code>boolean</code> | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads             |
 
-
 #### RewardAdOptions
 
 | Prop      | Type                                                                                                                                                                                                                                               | Description                                                                                                                                                                                     |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`ssv`** | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** * An optional UserId to pass to your SSV callback function. */ userId: string; /** * An optional custom set of data to pass to your SSV callback function. */ customData: string; }&gt;</code> | If you have enabled SSV in your AdMob Application. You can provide customData or a userId be passed to your callback to do further processing on. *Important* You *HAVE* to define one of them. |
-
+| **`ssv`** | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** _ An optional UserId to pass to your SSV callback function. _/ userId: string; /** _ An optional custom set of data to pass to your SSV callback function. _/ customData: string; }&gt;</code> | If you have enabled SSV in your AdMob Application. You can provide customData or a userId be passed to your callback to do further processing on. _Important_ You _HAVE_ to define one of them. |
 
 #### AdMobRewardItem
 
@@ -1095,13 +1081,11 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`type`**   | <code>string</code> | Rewarded type user got   |
 | **`amount`** | <code>number</code> | Rewarded amount user got |
 
-
 #### RewardInterstitialAdOptions
 
 | Prop      | Type                                                                                                                                                                                                                                               | Description                                                                                                                                                                                     |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`ssv`** | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** * An optional UserId to pass to your SSV callback function. */ userId: string; /** * An optional custom set of data to pass to your SSV callback function. */ customData: string; }&gt;</code> | If you have enabled SSV in your AdMob Application. You can provide customData or a userId be passed to your callback to do further processing on. *Important* You *HAVE* to define one of them. |
-
+| **`ssv`** | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** _ An optional UserId to pass to your SSV callback function. _/ userId: string; /** _ An optional custom set of data to pass to your SSV callback function. _/ customData: string; }&gt;</code> | If you have enabled SSV in your AdMob Application. You can provide customData or a userId be passed to your callback to do further processing on. _Important_ You _HAVE_ to define one of them. |
 
 #### AdMobRewardInterstitialItem
 
@@ -1113,24 +1097,21 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`type`**   | <code>string</code> | Rewarded type user got   |
 | **`amount`** | <code>number</code> | Rewarded amount user got |
 
-
 ### Type Aliases
-
 
 #### AtLeastOne
 
 <code>{[K in keyof T]: <a href="#pick">Pick</a>&lt;T, K&gt;}[keyof T]</code>
 
-
 #### Pick
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
-
+<code>{
+[P in K]: T[P];
+}</code>
 
 ### Enums
-
 
 #### MaxAdContentRating
 
@@ -1140,7 +1121,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`ParentalGuidance`** | <code>'ParentalGuidance'</code> | Content suitable for most audiences with parental guidance. |
 | **`Teen`**             | <code>'Teen'</code>             | Content suitable for teen and older audiences.              |
 | **`MatureAudience`**   | <code>'MatureAudience'</code>   | Content suitable only for mature audiences.                 |
-
 
 #### BannerAdSize
 
@@ -1154,7 +1134,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`ADAPTIVE_BANNER`**  | <code>'ADAPTIVE_BANNER'</code>  | A dynamically sized banner that is full-width and auto-height.                                      |
 | **`SMART_BANNER`**     | <code>'SMART_BANNER'</code>     |                                                                                                     |
 
-
 #### BannerAdPosition
 
 | Members             | Value                        | Description                               |
@@ -1162,7 +1141,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`TOP_CENTER`**    | <code>'TOP_CENTER'</code>    | Banner position be top-center             |
 | **`CENTER`**        | <code>'CENTER'</code>        | Banner position be center                 |
 | **`BOTTOM_CENTER`** | <code>'BOTTOM_CENTER'</code> | Banner position be bottom-center(default) |
-
 
 #### BannerAdPluginEvents
 
@@ -1175,7 +1153,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`Closed`**       | <code>"bannerAdClosed"</code>       | Close "Adsense" Event after user click banner                                                          |
 | **`AdImpression`** | <code>"bannerAdImpression"</code>   | Similarly, this method should be called when an impression is recorded for the ad by the mediated SDK. |
 
-
 #### AdmobConsentStatus
 
 | Members            | Value                       | Description                                                                           |
@@ -1185,7 +1162,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`REQUIRED`**     | <code>'REQUIRED'</code>     | User consent required but not yet obtained.                                           |
 | **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Unknown consent status, AdsConsent.requestInfoUpdate needs to be called to update it. |
 
-
 #### AdmobConsentDebugGeography
 
 | Members        | Value          | Description                                        |
@@ -1193,7 +1169,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`DISABLED`** | <code>0</code> | Debug geography disabled.                          |
 | **`EEA`**      | <code>1</code> | Geography appears as in EEA for debug devices.     |
 | **`NOT_EEA`**  | <code>2</code> | Geography appears as not in EEA for debug devices. |
-
 
 #### InterstitialAdPluginEvents
 
@@ -1205,7 +1180,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`FailedToShow`** | <code>'interstitialAdFailedToShow'</code> | Emits when the Interstitial ad is failed to show                                       |
 | **`Dismissed`**    | <code>'interstitialAdDismissed'</code>    | Emits when the Interstitial ad is not visible to the user anymore.                     |
 
-
 #### RewardAdPluginEvents
 
 | Members            | Value                                        | Description                                                                                                                                                                                                                                                                                                                                            |
@@ -1216,7 +1190,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`FailedToShow`** | <code>'onRewardedVideoAdFailedToShow'</code> | Emits when the AdReward video is failed to show                                                                                                                                                                                                                                                                                                        |
 | **`Dismissed`**    | <code>'onRewardedVideoAdDismissed'</code>    | Emits when the AdReward video is not visible to the user anymore. **Important**: This has nothing to do with the reward it self. This event will emits in this two cases: 1. The user starts the video ad but close it before the reward emit. 2. The user start the video and see it until end, then gets the reward and after that the ad is closed. |
 | **`Rewarded`**     | <code>'onRewardedVideoAdReward'</code>       | Emits when user get rewarded from AdReward                                                                                                                                                                                                                                                                                                             |
-
 
 #### RewardInterstitialAdPluginEvents
 
