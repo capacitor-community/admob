@@ -919,7 +919,7 @@ Show a reward video ad
 ### addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)
 
 ```typescript
-addListener(eventName: RewardInterstitialAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: RewardInterstitialAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                                       |
@@ -927,7 +927,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.FailedToLoad, listenerFu
 | **`eventName`**    | <code><a href="#rewardinterstitialadpluginevents">RewardInterstitialAdPluginEvents.FailedToLoad</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                                      |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -935,7 +935,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.FailedToLoad, listenerFu
 ### addListener(RewardInterstitialAdPluginEvents.Loaded, ...)
 
 ```typescript
-addListener(eventName: RewardInterstitialAdPluginEvents.Loaded, listenerFunc: (info: AdLoadInfo) => void) => PluginListenerHandle
+addListener(eventName: RewardInterstitialAdPluginEvents.Loaded, listenerFunc: (info: AdLoadInfo) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                                 |
@@ -943,7 +943,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Loaded, listenerFunc: (i
 | **`eventName`**    | <code><a href="#rewardinterstitialadpluginevents">RewardInterstitialAdPluginEvents.Loaded</a></code> |
 | **`listenerFunc`** | <code>(info: <a href="#adloadinfo">AdLoadInfo</a>) =&gt; void</code>                                 |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -951,7 +951,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Loaded, listenerFunc: (i
 ### addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)
 
 ```typescript
-addListener(eventName: RewardInterstitialAdPluginEvents.Rewarded, listenerFunc: (reward: AdMobRewardInterstitialItem) => void) => PluginListenerHandle
+addListener(eventName: RewardInterstitialAdPluginEvents.Rewarded, listenerFunc: (reward: AdMobRewardInterstitialItem) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                                     |
@@ -959,7 +959,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Rewarded, listenerFunc: 
 | **`eventName`**    | <code><a href="#rewardinterstitialadpluginevents">RewardInterstitialAdPluginEvents.Rewarded</a></code>   |
 | **`listenerFunc`** | <code>(reward: <a href="#admobrewardinterstitialitem">AdMobRewardInterstitialItem</a>) =&gt; void</code> |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -967,7 +967,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Rewarded, listenerFunc: 
 ### addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)
 
 ```typescript
-addListener(eventName: RewardInterstitialAdPluginEvents.Dismissed, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: RewardInterstitialAdPluginEvents.Dismissed, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                                    |
@@ -975,7 +975,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Dismissed, listenerFunc:
 | **`eventName`**    | <code><a href="#rewardinterstitialadpluginevents">RewardInterstitialAdPluginEvents.Dismissed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                                              |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -983,7 +983,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Dismissed, listenerFunc:
 ### addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)
 
 ```typescript
-addListener(eventName: RewardInterstitialAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => PluginListenerHandle
+addListener(eventName: RewardInterstitialAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                                       |
@@ -991,7 +991,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.FailedToShow, listenerFu
 | **`eventName`**    | <code><a href="#rewardinterstitialadpluginevents">RewardInterstitialAdPluginEvents.FailedToShow</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                                      |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -999,7 +999,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.FailedToShow, listenerFu
 ### addListener(RewardInterstitialAdPluginEvents.Showed, ...)
 
 ```typescript
-addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: () => void) => PluginListenerHandle
+addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                                                 |
@@ -1007,7 +1007,7 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 | **`eventName`**    | <code><a href="#rewardinterstitialadpluginevents">RewardInterstitialAdPluginEvents.Showed</a></code> |
 | **`listenerFunc`** | <code>() =&gt; void</code>                                                                           |
 
-**Returns:** <code><a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 

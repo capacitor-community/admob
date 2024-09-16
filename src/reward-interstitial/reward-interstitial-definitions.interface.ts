@@ -37,30 +37,30 @@ export interface RewardInterstitialDefinitions {
   addListener(
     eventName: RewardInterstitialAdPluginEvents.FailedToLoad,
     listenerFunc: (error: AdMobError) => void,
-  ): PluginListenerHandle;
+  ): Promise<PluginListenerHandle>;
 
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Loaded,
     listenerFunc: (info: AdLoadInfo) => void,
-  ): PluginListenerHandle;
+  ): Promise<PluginListenerHandle>;
 
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Rewarded,
     listenerFunc: (reward: AdMobRewardInterstitialItem) => void,
-  ): PluginListenerHandle;
+  ): Promise<PluginListenerHandle>;
 
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Dismissed,
     listenerFunc: () => void,
-  ): PluginListenerHandle;
+  ): Promise<PluginListenerHandle>;
 
   addListener(
     eventName: RewardInterstitialAdPluginEvents.FailedToShow,
     listenerFunc: (error: AdMobError) => void,
-  ): PluginListenerHandle;
+  ): Promise<PluginListenerHandle>;
 
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Showed,
     listenerFunc: () => void,
-  ): PluginListenerHandle;
+  ): Promise<PluginListenerHandle>;
 }
