@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
-    weak var plugin: AdMob?
+    weak var plugin: AdMobPlugin?
     var interstitial: GADInterstitialAd!
 
     func prepareInterstitial(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {

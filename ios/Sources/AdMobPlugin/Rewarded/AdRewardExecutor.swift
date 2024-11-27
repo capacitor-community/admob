@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
-    weak var plugin: AdMob?
+    weak var plugin: AdMobPlugin?
     var rewardedAd: GADRewardedAd!
 
     func prepareRewardVideoAd(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {

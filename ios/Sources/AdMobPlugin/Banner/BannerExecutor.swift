@@ -3,7 +3,7 @@ import Capacitor
 import GoogleMobileAds
 
 class BannerExecutor: NSObject, GADBannerViewDelegate {
-    weak var plugin: AdMob?
+    weak var plugin: AdMobPlugin?
     var bannerView: GADBannerView!
 
     func showBanner(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {

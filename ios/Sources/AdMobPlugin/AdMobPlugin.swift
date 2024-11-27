@@ -5,8 +5,28 @@ import GoogleMobileAds
 import AppTrackingTransparency
 #endif
 
-@objc(AdMob)
-public class AdMob: CAPPlugin {
+@objc(AdMobPlugin)
+public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "AdMob"
+    public let jsName = "AdMob"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "initialize", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "trackingAuthorizationStatus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestConsentInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestTrackingAuthorization", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showConsentForm", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "resetConsentInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setApplicationMuted", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setApplicationVolume", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "resumeBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "hideBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "removeBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareInterstitial", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showInterstitial", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareRewardVideoAd", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showRewardVideoAd", returnType: CAPPluginReturnPromise)
+    ]
 
     var testingDevices: [String] = []
 
