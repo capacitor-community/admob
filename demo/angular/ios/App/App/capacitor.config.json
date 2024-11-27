@@ -6,7 +6,6 @@
 	"webDir": "www",
 	"cordova": {},
 	"packageClassList": [
-		"AdMob",
-		"AdMob"
+		"AdMobPlugin"
 	]
 }
