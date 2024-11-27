@@ -4,7 +4,7 @@ import GoogleMobileAds
 import UserMessagingPlatform
 
 class ConsentExecutor: NSObject {
-    public weak var plugin: AdMob?
+    weak var plugin: AdMob?
 
     func requestConsentInfo(_ call: CAPPluginCall, _ debugGeography: Int, _ testDeviceIdentifiers: [String], _ tagForUnderAgeOfConsent: Bool) {
         let parameters = UMPRequestParameters()
