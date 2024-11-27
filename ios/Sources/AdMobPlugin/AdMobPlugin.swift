@@ -162,7 +162,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
             self.adRewardExecutor.showRewardVideoAd(call)
         }
     }
-    
+
     /**
      *  AdMob: Rewarded Interstitial Ads
      *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-interstitial

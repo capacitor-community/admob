@@ -28,6 +28,7 @@ import {
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
+  standalone: false,
 })
 export class HomePage implements ViewWillEnter, ViewWillLeave {
   public readonly bannerSizes: BannerAdSize[] = Object.keys(
