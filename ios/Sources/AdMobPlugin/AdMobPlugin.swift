@@ -33,6 +33,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     private let bannerExecutor = BannerExecutor()
     private let adInterstitialExecutor = AdInterstitialExecutor()
     private let adRewardExecutor = AdRewardExecutor()
+    private let adRewardInterstitialExecutor = AdRewardInterstitialExecutor()
     private let consentExecutor = ConsentExecutor()
 
     /**
@@ -43,6 +44,8 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         self.bannerExecutor.plugin = self
         self.adInterstitialExecutor.plugin = self
         self.adRewardExecutor.plugin = self
+        self.adRewardInterstitialExecutor.plugin = self
+        self.adInterstitialExecutor.plugin = self
         self.consentExecutor.plugin = self
         self.setRequestConfiguration(call)
 
@@ -143,7 +146,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
 
     /**
      *  AdMob: Rewarded Ads
-     *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-ads?hl=ja
+     *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-ads
      */
     @objc func prepareRewardVideoAd(_ call: CAPPluginCall) {
         let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/1712485313")
@@ -157,6 +160,25 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func showRewardVideoAd(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.adRewardExecutor.showRewardVideoAd(call)
+        }
+    }
+    
+    /**
+     *  AdMob: Rewarded Interstitial Ads
+     *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-interstitial
+     */
+    @objc func prepareRewardInterstitialAd(_ call: CAPPluginCall) {
+        let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/6978759866")
+        let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
+
+        DispatchQueue.main.async {
+            self.adRewardInterstitialExecutor.prepareRewardInterstitialAd(call, request, adUnitID)
+        }
+    }
+
+    @objc func showRewardInterstitialAd(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            self.adRewardInterstitialExecutor.showRewardInterstitialAd(call)
         }
     }
 
