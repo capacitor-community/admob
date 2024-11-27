@@ -76,6 +76,10 @@
     "*.{java}": [
       "npm run prettier -- --write",
       "git add"
+    ],
+    "*.{swift}": [
+      "npm run swiftlint -- --fix --format",
+      "git add"
     ]
   },
   "prettier": "@ionic/prettier-config",
