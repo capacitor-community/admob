@@ -44,6 +44,12 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## Installation
 
+If you use capacitor 6 and ios with Swift Package Manager:
+
+```bash
+% npm install --save @capacitor-community/admob@next
+```
+
 If you use capacitor 5:
 
 ```
