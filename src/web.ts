@@ -27,9 +27,7 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
-  async requestConsentInfo(
-    options?: AdmobConsentRequestOptions,
-  ): Promise<AdmobConsentInfo> {
+  async requestConsentInfo(options?: AdmobConsentRequestOptions): Promise<AdmobConsentInfo> {
     console.log('requestConsentInfo', options);
     return {
       status: AdmobConsentStatus.REQUIRED,

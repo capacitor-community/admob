@@ -90,26 +90,22 @@ public class AdConsentExecutor extends Executor {
             ensureConsentInfo();
             activitySupplier
                 .get()
-                .runOnUiThread(
-                    () ->
-                        UserMessagingPlatform.loadConsentForm(
-                            contextSupplier.get(),
-                            consentForm ->
-                                consentForm.show(
-                                    activitySupplier.get(),
-                                    formError -> {
-                                        if (formError != null) {
-                                            call.reject("Error when show consent form", formError.getMessage());
-                                        } else {
-                                            JSObject consentFormInfo = new JSObject();
-                                            consentFormInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
+                .runOnUiThread(() ->
+                    UserMessagingPlatform.loadConsentForm(
+                        contextSupplier.get(),
+                        consentForm ->
+                            consentForm.show(activitySupplier.get(), formError -> {
+                                if (formError != null) {
+                                    call.reject("Error when show consent form", formError.getMessage());
+                                } else {
+                                    JSObject consentFormInfo = new JSObject();
+                                    consentFormInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
 
-                                            call.resolve(consentFormInfo);
-                                        }
-                                    }
-                                ),
-                            formError -> call.reject("Error when show consent form", formError.getMessage())
-                        )
+                                    call.resolve(consentFormInfo);
+                                }
+                            }),
+                        formError -> call.reject("Error when show consent form", formError.getMessage())
+                    )
                 );
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);

@@ -34,26 +34,24 @@ public class AdRewardInterstitialExecutor extends Executor {
 
         activitySupplier
             .get()
-            .runOnUiThread(
-                () -> {
-                    try {
-                        final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                        final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                        RewardedInterstitialAd.load(
-                            contextSupplier.get(),
-                            id,
-                            adRequest,
-                            RewardedInterstitialAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(
-                                call,
-                                notifyListenersFunction,
-                                adOptions
-                            )
-                        );
-                    } catch (Exception ex) {
-                        call.reject(ex.getLocalizedMessage(), ex);
-                    }
+            .runOnUiThread(() -> {
+                try {
+                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                    final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+                    RewardedInterstitialAd.load(
+                        contextSupplier.get(),
+                        id,
+                        adRequest,
+                        RewardedInterstitialAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(
+                            call,
+                            notifyListenersFunction,
+                            adOptions
+                        )
+                    );
+                } catch (Exception ex) {
+                    call.reject(ex.getLocalizedMessage(), ex);
                 }
-            );
+            });
     }
 
     @PluginMethod
@@ -69,14 +67,12 @@ public class AdRewardInterstitialExecutor extends Executor {
         try {
             activitySupplier
                 .get()
-                .runOnUiThread(
-                    () -> {
-                        mRewardedInterstitialAd.show(
-                            activitySupplier.get(),
-                            RewardedInterstitialAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
-                        );
-                    }
-                );
+                .runOnUiThread(() -> {
+                    mRewardedInterstitialAd.show(
+                        activitySupplier.get(),
+                        RewardedInterstitialAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
+                    );
+                });
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
