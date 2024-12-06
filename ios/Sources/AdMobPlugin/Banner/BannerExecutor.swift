@@ -5,6 +5,8 @@ import GoogleMobileAds
 class BannerExecutor: NSObject, GADBannerViewDelegate {
     weak var plugin: AdMobPlugin?
     var bannerView: GADBannerView!
+    var adPosition: String = ""
+    var Margin: Int = 0
 
     func showBanner(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
         if let rootViewController = plugin?.getRootVC() {
@@ -109,28 +111,10 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
 
     private func addBannerViewToView(_ bannerView: GADBannerView, _ adPosition: String, _ Margin: Int) {
         removeBannerViewToView()
-        if let rootViewController = plugin?.getRootVC() {
-
-            bannerView.translatesAutoresizingMaskIntoConstraints = false
-            bannerView.tag = 2743243288699 // rand
-            rootViewController.view.addSubview(bannerView)
-            rootViewController.view.addConstraints(
-                [NSLayoutConstraint(item: bannerView,
-                                    attribute: adPosition == "TOP_CENTER" ? .top : .bottom,
-                                    relatedBy: .equal,
-                                    toItem: rootViewController.view.safeAreaLayoutGuide,
-                                    attribute: adPosition == "TOP_CENTER" ? .top : .bottom,
-                                    multiplier: 1,
-                                    constant: CGFloat(Int(Margin) * -1)),
-                 NSLayoutConstraint(item: bannerView,
-                                    attribute: .centerX,
-                                    relatedBy: .equal,
-                                    toItem: rootViewController.view,
-                                    attribute: .centerX,
-                                    multiplier: 1,
-                                    constant: 0)
-                ])
-        }
+        bannerView.translatesAutoresizingMaskIntoConstraints = false
+        bannerView.tag = 2743243288699 // rand
+        self.Margin = Margin
+        self.adPosition = adPosition
     }
 
     private func removeBannerViewToView() {
@@ -146,6 +130,25 @@ class BannerExecutor: NSObject, GADBannerViewDelegate {
     /// Tells the delegate an ad request loaded an ad.
     func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
         NSLog("bannerViewDidReceiveAd")
+        if let rootViewController = plugin?.getRootVC() {
+            rootViewController.view.addSubview(bannerView)
+            rootViewController.view.addConstraints(
+                [NSLayoutConstraint(item: bannerView,
+                                    attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
+                                    relatedBy: .equal,
+                                    toItem: rootViewController.view.safeAreaLayoutGuide,
+                                    attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
+                                    multiplier: 1,
+                                    constant: CGFloat(Int(self.Margin) * -1)),
+                    NSLayoutConstraint(item: bannerView,
+                                    attribute: .centerX,
+                                    relatedBy: .equal,
+                                    toItem: rootViewController.view,
+                                    attribute: .centerX,
+                                    multiplier: 1,
+                                    constant: 0)
+                ])
+        }
 
         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
             "width": bannerView.frame.width,
