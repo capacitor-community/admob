@@ -10,7 +10,7 @@ let package = Package(
             targets: ["AdMobPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", branch: "6.0.0"),
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "6.0.0"),
         .package(url: "https://github.com/googleads/swift-package-manager-google-mobile-ads.git", branch: "main")
     ],
     targets: [
