@@ -42,7 +42,7 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "release": "np --no-tests",
+    "release": "np --no-tests --any-branch",
     "prepare": "husky"
   },
   "devDependencies": {
