@@ -3,14 +3,14 @@ import PackageDescription
 
 let package = Package(
     name: "CapacitorCommunityAdmob",
-    platforms: [.iOS(.v13)],
+    platforms: [.iOS(.v14)],
     products: [
         .library(
             name: "CapacitorCommunityAdmob",
             targets: ["AdMobPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", branch: "6.0.0"),
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "7.0.0"),
         .package(url: "https://github.com/googleads/swift-package-manager-google-mobile-ads.git", branch: "main")
     ],
     targets: [
