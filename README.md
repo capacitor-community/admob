@@ -6,8 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/maintenance/yes/2024?style=flat-square" />
-  <!-- <a href="https://github.com/capacitor-community/example/actions?query=workflow%3A%22CI%22"><img src="https://img.shields.io/github/workflow/status/capacitor-community/example/CI?style=flat-square" /></a> -->
+  <img src="https://img.shields.io/maintenance/yes/2025?style=flat-square" />
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/l/@capacitor-community/admob?style=flat-square" /></a>
 <br>
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/dw/@capacitor-community/admob?style=flat-square" /></a>
@@ -44,30 +43,10 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## Installation
 
-If you use capacitor 6 and ios with Swift Package Manager:
-
-```bash
-% npm install --save @capacitor-community/admob@next
-```
-
-If you use capacitor 5:
+If you use capacitor 6:
 
 ```
-% npm install --save @capacitor-community/admob@5.0.0
-% npx cap update
-```
-
-If you use capacitor 4:
-
-```
-% npm install --save @capacitor-community/admob@4.0.0
-% npx cap update
-```
-
-capacitor 3:
-
-```
-% npm install --save @capacitor-community/admob@3.3.0
+% npm install --save @capacitor-community/admob@6
 % npx cap update
 ```
 
@@ -1173,7 +1152,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
