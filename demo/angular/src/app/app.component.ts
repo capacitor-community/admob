@@ -8,6 +8,7 @@ import { AdMob, AdMobInitializationOptions } from '@capacitor-community/admob';
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
+  standalone: false,
 })
 export class AppComponent {
   constructor(private platform: Platform) {

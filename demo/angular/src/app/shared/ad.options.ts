@@ -1,5 +1,9 @@
-import {BannerAdOptions, BannerAdPosition, BannerAdSize} from '../../../../../dist/esm/banner';
-import {AdOptions} from '../../../../../dist/esm/shared';
+import {
+  BannerAdOptions,
+  BannerAdPosition,
+  BannerAdSize,
+} from '../../../../../dist/esm/banner';
+import { AdOptions } from '../../../../../dist/esm/shared';
 
 export const bannerTopOptions: BannerAdOptions = {
   adId: 'ca-app-pub-3940256099942544/2934735716',
@@ -17,6 +21,10 @@ export const bannerBottomOptions: BannerAdOptions = {
 
 export const rewardOptions: AdOptions = {
   adId: 'ca-app-pub-3940256099942544/5224354917',
+};
+
+export const rewardInterstitialOptions: AdOptions = {
+  adId: 'ca-app-pub-3940256099942544/5354046379',
 };
 
 export const interstitialOptions: AdOptions = {

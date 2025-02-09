@@ -48,23 +48,22 @@ public class AdMobTest {
     public void beforeEach() {
         reset(pluginCallMock, mockedContext);
 
-        sut =
-            new AdMob() {
-                @Override
-                public Context getContext() {
-                    return mockedContext;
-                }
+        sut = new AdMob() {
+            @Override
+            public Context getContext() {
+                return mockedContext;
+            }
 
-                @Override
-                public AppCompatActivity getActivity() {
-                    return mockedActivity;
-                }
+            @Override
+            public AppCompatActivity getActivity() {
+                return mockedActivity;
+            }
 
-                @Override
-                public String getLogTag() {
-                    return "LogTag";
-                }
-            };
+            @Override
+            public String getLogTag() {
+                return "LogTag";
+            }
+        };
     }
 
     @AfterEach

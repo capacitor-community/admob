@@ -4,7 +4,7 @@ export default {
     {
       file: 'dist/plugin.js',
       format: 'iife',
-      name: 'AdMobPlugin',
+      name: 'capacitorStripe',
       globals: {
         '@capacitor/core': 'capacitorExports',
       },

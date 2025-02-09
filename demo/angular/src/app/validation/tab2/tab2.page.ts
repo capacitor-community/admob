@@ -42,6 +42,7 @@ const tryItems: ITestItems[] = [
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
+  standalone: false,
 })
 export class Tab2Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   private readonly listenerHandlers: PluginListenerHandle[] = [];

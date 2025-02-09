@@ -65,8 +65,13 @@ class AdInterstitialExecutorTest {
     void beforeEach() {
         runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
 
-        sut =
-            new AdInterstitialExecutor(() -> context, () -> mockedActivity, notifierMock, LOG_TAG, interstitialAdCallbackAndListenersMock);
+        sut = new AdInterstitialExecutor(
+            () -> context,
+            () -> mockedActivity,
+            notifierMock,
+            LOG_TAG,
+            interstitialAdCallbackAndListenersMock
+        );
     }
 
     @AfterEach
@@ -141,8 +146,7 @@ class AdInterstitialExecutorTest {
             Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
             uiThreadRunnable.run();
 
-            interstitialAdMockedStatic.verify(
-                () -> InterstitialAd.load(any(), idArgumentCaptor.capture(), adRequestCaptor.capture(), any())
+            interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(), idArgumentCaptor.capture(), adRequestCaptor.capture(), any())
             );
 
             assertEquals(idFromViewHelper, idArgumentCaptor.getValue());
@@ -152,8 +156,9 @@ class AdInterstitialExecutorTest {
         @Test
         @DisplayName("loads the ad with the InterstitialAdLoadCallback returned by the getInterstitialAdLoadCallback singleton")
         void usesCallbackHelper() {
-            when(interstitialAdCallbackAndListenersMock.getInterstitialAdLoadCallback(pluginCallMock, notifierMock))
-                .thenReturn(interstitialAdLoadCallbackMock);
+            when(interstitialAdCallbackAndListenersMock.getInterstitialAdLoadCallback(pluginCallMock, notifierMock)).thenReturn(
+                interstitialAdLoadCallbackMock
+            );
             final ArgumentCaptor<InterstitialAdLoadCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(
                 InterstitialAdLoadCallback.class
             );
@@ -202,9 +207,10 @@ class AdInterstitialExecutorTest {
 
             sut.showInterstitial(pluginCallMock, notifierMock);
 
-            Mockito
-                .verify(notifierMock)
-                .accept(ArgumentMatchers.eq(InterstitialAdPluginPluginEvent.FailedToLoad), argumentCaptor.capture());
+            Mockito.verify(notifierMock).accept(
+                ArgumentMatchers.eq(InterstitialAdPluginPluginEvent.FailedToLoad),
+                argumentCaptor.capture()
+            );
 
             JSObject emittedError = argumentCaptor.getValue();
 
