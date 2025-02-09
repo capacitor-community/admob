@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "CapacitorCommunityAdmob",
+    name: "QuquplayAdmob",
     platforms: [.iOS(.v14)],
     products: [
         .library(
-            name: "CapacitorCommunityAdmob",
+            name: "QuquplayAdmob",
             targets: ["AdMobPlugin"])
     ],
     dependencies: [
