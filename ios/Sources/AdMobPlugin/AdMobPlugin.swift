@@ -5,14 +5,35 @@ import GoogleMobileAds
 import AppTrackingTransparency
 #endif
 
-@objc(AdMob)
-public class AdMob: CAPPlugin {
+@objc(AdMobPlugin)
+public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "AdMob"
+    public let jsName = "AdMob"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "initialize", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "trackingAuthorizationStatus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestConsentInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestTrackingAuthorization", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showConsentForm", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "resetConsentInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setApplicationMuted", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setApplicationVolume", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "resumeBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "hideBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "removeBanner", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareInterstitial", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showInterstitial", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareRewardVideoAd", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showRewardVideoAd", returnType: CAPPluginReturnPromise)
+    ]
 
     var testingDevices: [String] = []
 
     private let bannerExecutor = BannerExecutor()
     private let adInterstitialExecutor = AdInterstitialExecutor()
     private let adRewardExecutor = AdRewardExecutor()
+    private let adRewardInterstitialExecutor = AdRewardInterstitialExecutor()
     private let consentExecutor = ConsentExecutor()
 
     /**
@@ -23,6 +44,8 @@ public class AdMob: CAPPlugin {
         self.bannerExecutor.plugin = self
         self.adInterstitialExecutor.plugin = self
         self.adRewardExecutor.plugin = self
+        self.adRewardInterstitialExecutor.plugin = self
+        self.adInterstitialExecutor.plugin = self
         self.consentExecutor.plugin = self
         self.setRequestConfiguration(call)
 
@@ -59,7 +82,7 @@ public class AdMob: CAPPlugin {
 
     @objc func setApplicationVolume(_ call: CAPPluginCall) {
         if var volume = call.getFloat("volume") {
-            //Clamp volumes.
+            // Clamp volumes.
             if volume < 0.0 {volume = 0.0} else if volume > 1.0 {volume = 1.0}
 
             GADMobileAds.sharedInstance().applicationVolume = volume
@@ -123,7 +146,7 @@ public class AdMob: CAPPlugin {
 
     /**
      *  AdMob: Rewarded Ads
-     *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-ads?hl=ja
+     *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-ads
      */
     @objc func prepareRewardVideoAd(_ call: CAPPluginCall) {
         let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/1712485313")
@@ -137,6 +160,25 @@ public class AdMob: CAPPlugin {
     @objc func showRewardVideoAd(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.adRewardExecutor.showRewardVideoAd(call)
+        }
+    }
+
+    /**
+     *  AdMob: Rewarded Interstitial Ads
+     *  https://developers.google.com/ad-manager/mobile-ads-sdk/ios/rewarded-interstitial
+     */
+    @objc func prepareRewardInterstitialAd(_ call: CAPPluginCall) {
+        let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/6978759866")
+        let request = self.GADRequestWithOption(call.getBool("npa") ?? false)
+
+        DispatchQueue.main.async {
+            self.adRewardInterstitialExecutor.prepareRewardInterstitialAd(call, request, adUnitID)
+        }
+    }
+
+    @objc func showRewardInterstitialAd(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            self.adRewardInterstitialExecutor.showRewardInterstitialAd(call)
         }
     }
 

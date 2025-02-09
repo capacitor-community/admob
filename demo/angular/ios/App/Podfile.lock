@@ -1,13 +1,13 @@
 PODS:
-  - Capacitor (6.0.0):
+  - Capacitor (7.0.1):
     - CapacitorCordova
-  - CapacitorCommunityAdmob (6.0.0-0):
+  - CapacitorCommunityAdmob (7.0.0):
     - Capacitor
     - Google-Mobile-Ads-SDK (= 11.3.0)
-  - CapacitorCordova (6.0.0)
+  - CapacitorCordova (7.0.1)
   - Google-Mobile-Ads-SDK (11.3.0):
     - GoogleUserMessagingPlatform (>= 1.1)
-  - GoogleUserMessagingPlatform (2.3.0)
+  - GoogleUserMessagingPlatform (2.7.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -28,12 +28,12 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/ios"
 
 SPEC CHECKSUMS:
-  Capacitor: 559d073c4ca6c27f8e7002c807eea94c3ba435a9
-  CapacitorCommunityAdmob: 859fda175acca723a87cb9419059fe5d818df617
-  CapacitorCordova: 8c4bfdf69368512e85b1d8b724dd7546abeb30af
+  Capacitor: 23fff43571a4d1e3ee7d67b5a3588c6e757c2913
+  CapacitorCommunityAdmob: 3a92f9967913e8d53aeaed8e4d1a3b5b51a6d228
+  CapacitorCordova: 63d476958d5022d76f197031e8b7ea3519988c64
   Google-Mobile-Ads-SDK: 301a16c461c331ba34ff4dab40a22ab7c147af61
-  GoogleUserMessagingPlatform: b1ad7bb1ee3ce64749d4fec24f667b36e45c396c
+  GoogleUserMessagingPlatform: a8b56893477f67212fbc8411c139e61d463349f5
 
-PODFILE CHECKSUM: caf5c0243508aa7da79d79fc34adc99fda665398
+PODFILE CHECKSUM: cc932066d42cbba5a5dcf74773455d5ab18749f7
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.15.2

@@ -1,20 +1,22 @@
 {
   "name": "@ququplay/admob",
-  "version": "6.0.0",
+  "version": "7.0.1",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "unpkg": "dist/plugin.js",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "files": [
     "android/src/main/",
     "android/build.gradle",
     "dist/",
-    "ios/Plugin/",
-    "QuquplayAdmob.podspec"
+    "ios/Sources",
+    "ios/Tests",
+    "Package.swift",
+    "CapacitorCommunityAdmob.podspec"
   ],
   "author": "Masahiko Sakakibara <sakakibara@rdlabo.jp>",
   "license": "MIT",
@@ -27,49 +29,46 @@
   },
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
-    "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -sdk iphoneos && cd ..",
+    "verify:ios": "xcodebuild -scheme CapacitorCommunityAdmob -destination generic/platform=iOS",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "npm run build",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
-    "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- autocorrect --format",
+    "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
     "eslint": "eslint src/. --ext ts",
-    "prettier": "prettier \"{src/*.ts,**/*.java}\"",
+    "prettier": "prettier \"{src/*.ts,**/*.java}\" --plugin=prettier-plugin-java",
     "swiftlint": "node-swiftlint",
     "docgen": "docgen --api AdMobPlugin --output-readme README.md --output-json dist/docs.json",
-    "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
+    "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "release": "np --no-tests"
+    "release": "np --no-tests --any-branch",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@capacitor/android": "^6.0.0",
-    "@capacitor/cli": "^6.0.0",
-    "@capacitor/core": "^6.0.0",
-    "@capacitor/docgen": "git+https://github.com/rdlabo/capacitor-docgen.git#feat/support_extends_build",
-    "@capacitor/ios": "^6.0.0",
-    "@ionic/eslint-config": "^0.3.0",
-    "@ionic/prettier-config": "^1.0.1",
-    "@ionic/swiftlint-config": "^1.1.2",
-    "eslint": "^7.11.0",
-    "husky": "^4.3.8",
-    "lint-staged": "^11.0.0",
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/docgen": "github:rdlabo/capacitor-docgen#feat/support_extends_build",
+    "@capacitor/ios": "^7.0.0",
+    "@ionic/eslint-config": "^0.4.0",
+    "@ionic/prettier-config": "^4.0.0",
+    "@ionic/swiftlint-config": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "eslint": "^8.57.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "np": "^8.0.4",
     "pre-commit": "^1.2.2",
-    "prettier": "~2.3.0",
-    "prettier-plugin-java": "~1.0.2",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.32.0",
-    "swiftlint": "^1.0.1",
+    "prettier": "^3.4.2",
+    "prettier-plugin-java": "^2.6.6",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.30.1",
+    "swiftlint": "^2.0.0",
     "typescript": "~4.1.5"
   },
   "dependencies": {
-    "@capacitor/core": "^6.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "@capacitor/core": "^7.0.0"
   },
   "lint-staged": {
     "*.{ts}": [
@@ -79,13 +78,10 @@
     "*.{java}": [
       "npm run prettier -- --write",
       "git add"
-    ],
-    "*.swift": [
-      "npm run swiftlint -- autocorrect --format",
-      "git add"
     ]
   },
   "prettier": "@ionic/prettier-config",
+  "swiftlint": "@ionic/swiftlint-config",
   "eslintConfig": {
     "extends": "@ionic/eslint-config/recommended"
   },

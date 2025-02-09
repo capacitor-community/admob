@@ -3,10 +3,9 @@
 	"appName": "capacitor-admob",
 	"bundledWebRuntime": false,
 	"npmClient": "npm",
-	"webDir": "www",
+	"webDir": "www/browser",
 	"cordova": {},
 	"packageClassList": [
-		"AdMob",
-		"AdMob"
+		"AdMobPlugin"
 	]
 }

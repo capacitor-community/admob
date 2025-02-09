@@ -34,22 +34,20 @@ public class AdRewardExecutor extends Executor {
 
         activitySupplier
             .get()
-            .runOnUiThread(
-                () -> {
-                    try {
-                        final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                        final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                        RewardedAd.load(
-                            contextSupplier.get(),
-                            id,
-                            adRequest,
-                            RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
-                        );
-                    } catch (Exception ex) {
-                        call.reject(ex.getLocalizedMessage(), ex);
-                    }
+            .runOnUiThread(() -> {
+                try {
+                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                    final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+                    RewardedAd.load(
+                        contextSupplier.get(),
+                        id,
+                        adRequest,
+                        RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
+                    );
+                } catch (Exception ex) {
+                    call.reject(ex.getLocalizedMessage(), ex);
                 }
-            );
+            });
     }
 
     @PluginMethod
@@ -65,14 +63,12 @@ public class AdRewardExecutor extends Executor {
         try {
             activitySupplier
                 .get()
-                .runOnUiThread(
-                    () -> {
-                        mRewardedAd.show(
-                            activitySupplier.get(),
-                            RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
-                        );
-                    }
-                );
+                .runOnUiThread(() -> {
+                    mRewardedAd.show(
+                        activitySupplier.get(),
+                        RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
+                    );
+                });
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
