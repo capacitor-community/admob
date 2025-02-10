@@ -2,8 +2,6 @@ package com.getcapacitor.community.admob.consent;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -12,10 +10,8 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.common.util.BiConsumer;
 import com.google.android.ump.ConsentDebugSettings;
-import com.google.android.ump.ConsentForm;
 import com.google.android.ump.ConsentInformation;
 import com.google.android.ump.ConsentRequestParameters;
-import com.google.android.ump.FormError;
 import com.google.android.ump.UserMessagingPlatform;
 
 public class AdConsentExecutor extends Executor {
@@ -58,22 +54,52 @@ public class AdConsentExecutor extends Executor {
             }
 
             ConsentRequestParameters consentRequestParameters = paramsBuilder.build();
-
-            if (activitySupplier.get() == null) {
+            Activity activity = activitySupplier.get();
+            if (activity == null) {
                 call.reject("Trying to request consent info but the Activity is null");
                 return;
             }
 
             consentInformation.requestConsentInfoUpdate(
-                activitySupplier.get(),
+                activity,
                 consentRequestParameters,
-                () -> {
-                    JSObject consentInfo = new JSObject();
-                    consentInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
-                    consentInfo.put("isConsentFormAvailable", consentInformation.isConsentFormAvailable());
-                    call.resolve(consentInfo);
-                },
+                () ->
+                    UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity, loadAndShowError -> {
+                        if (loadAndShowError != null) {
+                            call.reject(loadAndShowError.getMessage());
+                            return;
+                        }
+                        JSObject consentInfo = new JSObject();
+                        consentInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
+                        consentInfo.put("isConsentFormAvailable", consentInformation.isConsentFormAvailable());
+                        consentInfo.put("canRequestAds", consentInformation.canRequestAds());
+                        consentInfo.put("privacyOptionsRequirementStatus", consentInformation.getPrivacyOptionsRequirementStatus().name());
+                        call.resolve(consentInfo);
+                    }),
                 formError -> call.reject(formError.getMessage())
+            );
+        } catch (Exception ex) {
+            call.reject(ex.getLocalizedMessage(), ex);
+        }
+    }
+
+    @PluginMethod
+    public void showPrivacyOptionsForm(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
+        try {
+            Activity activity = activitySupplier.get();
+            if (activity == null) {
+                call.reject("Trying to show the privacy options form but the Activity is null");
+                return;
+            }
+            ensureConsentInfo();
+            activity.runOnUiThread(() ->
+                UserMessagingPlatform.showPrivacyOptionsForm(activity, formError -> {
+                    if (formError != null) {
+                        call.reject("Error when show privacy form", formError.getMessage());
+                    } else {
+                        call.resolve();
+                    }
+                })
             );
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);

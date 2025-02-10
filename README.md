@@ -336,6 +336,7 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
 * [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
 * [`requestConsentInfo(...)`](#requestconsentinfo)
+* [`showPrivacyOptionsForm()`](#showprivacyoptionsform)
 * [`showConsentForm()`](#showconsentform)
 * [`resetConsentInfo()`](#resetconsentinfo)
 * [`prepareInterstitial(...)`](#prepareinterstitial)
@@ -640,6 +641,17 @@ Request user consent information
 **Returns:** <code>Promise&lt;<a href="#admobconsentinfo">AdmobConsentInfo</a>&gt;</code>
 
 **Since:** 5.0.0
+
+--------------------
+
+
+### showPrivacyOptionsForm()
+
+```typescript
+showPrivacyOptionsForm() => Promise<void>
+```
+
+Shows a google privacy options form (rendered from your GDPR message config).
 
 --------------------
 
@@ -1123,10 +1135,12 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 
 #### AdmobConsentInfo
 
-| Prop                         | Type                                                              | Description                                           | Since |
-| ---------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- | ----- |
-| **`status`**                 | <code><a href="#admobconsentstatus">AdmobConsentStatus</a></code> | The consent status of the user.                       | 5.0.0 |
-| **`isConsentFormAvailable`** | <code>boolean</code>                                              | If `true` a consent form is available and vice versa. | 5.0.0 |
+| Prop                                  | Type                                                                                        | Description                                           | Since |
+| ------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----- |
+| **`status`**                          | <code><a href="#admobconsentstatus">AdmobConsentStatus</a></code>                           | The consent status of the user.                       | 5.0.0 |
+| **`isConsentFormAvailable`**          | <code>boolean</code>                                                                        | If `true` a consent form is available and vice versa. | 5.0.0 |
+| **`canRequestAds`**                   | <code>boolean</code>                                                                        | If `true` an ad can be shown.                         | 7.0.3 |
+| **`privacyOptionsRequirementStatus`** | <code><a href="#privacyoptionsrequirementstatus">PrivacyOptionsRequirementStatus</a></code> | Privacy options requirement status of the user.       | 7.0.3 |
 
 
 #### AdmobConsentRequestOptions
@@ -1211,7 +1225,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
@@ -1269,6 +1285,15 @@ From T, pick a set of properties whose keys are in the union K
 | **`OBTAINED`**     | <code>'OBTAINED'</code>     | User consent already obtained.                                                        |
 | **`REQUIRED`**     | <code>'REQUIRED'</code>     | User consent required but not yet obtained.                                           |
 | **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Unknown consent status, AdsConsent.requestInfoUpdate needs to be called to update it. |
+
+
+#### PrivacyOptionsRequirementStatus
+
+| Members            | Value                       | Description                                    |
+| ------------------ | --------------------------- | ---------------------------------------------- |
+| **`NOT_REQUIRED`** | <code>'NOT_REQUIRED'</code> | Privacy options entry point is not required.   |
+| **`REQUIRED`**     | <code>'REQUIRED'</code>     | Privacy options entry point is required.       |
+| **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Privacy options requirement status is unknown. |
 
 
 #### AdmobConsentDebugGeography

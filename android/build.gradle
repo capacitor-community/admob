@@ -5,6 +5,7 @@ ext {
     androidxJunitVersion = project.hasProperty('androidxJunitVersion') ? rootProject.ext.androidxJunitVersion : '1.2.1'
     androidxEspressoCoreVersion = project.hasProperty('androidxEspressoCoreVersion') ? rootProject.ext.androidxEspressoCoreVersion : '3.6.1'
     playServicesAdsVersion = project.hasProperty('playServicesAdsVersion') ? rootProject.ext.playServicesAdsVersion : '24.4.+'
+    userMessagingPlatformVersion = project.hasProperty('userMessagingPlatformVersion') ? rootProject.ext.playServicesAdsVersion : '3.1.0'
     androidxCoreKTXVersion = project.hasProperty('androidxCoreKTXVersion') ? rootProject.ext.androidxCoreKTXVersion : '1.13.0'
 }
 
@@ -63,23 +64,24 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
 
-    testImplementation 'org.mockito:mockito-inline:3.6.28'
-    testImplementation 'org.mockito:mockito-junit-jupiter:2.27.0'
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.2"
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.11.4"
     // https://medium.com/google-developer-experts/pushing-the-limits-of-androidx-test-3776ff249c71
     testImplementation "androidx.test:core:$testRunner"
     testImplementation "androidx.test:runner:$testRunner"
 
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.2"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.2"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.3.2"
-    testImplementation 'org.json:json:20200518'
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.11.4"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.11.4"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.11.4"
+    testImplementation 'org.json:json:20231013'
     // We do not need expresso tests here... or?
     //    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     //    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
 
 	// after 20.5.0, require minCompileSdk (31)
     implementation "com.google.android.gms:play-services-ads:$playServicesAdsVersion"
+    implementation "com.google.android.ump:user-messaging-platform:$userMessagingPlatformVersion"
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-ktx:$androidxCoreKTXVersion"
