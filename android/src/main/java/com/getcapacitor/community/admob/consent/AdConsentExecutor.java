@@ -63,6 +63,44 @@ public class AdConsentExecutor extends Executor {
         );
     }
 
+    public boolean isConsentOutdated() {
+        Context context = contextSupplier.get();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        String tcString = prefs.getString("IABTCF_TCString", "");
+
+        if (tcString == null || tcString.isEmpty()) {
+            return false;
+        }
+
+        // base64 alphabet used to store data in IABTCF string
+        String base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+        // date is stored in digits 1..7 of the IABTCF string
+        String dateSubstring = tcString.substring(1, 7);
+
+        // interpret date substring as base64-encoded integer value
+        long timestamp = 0L;
+
+        for (char c : dateSubstring.toCharArray()) {
+            int value = base64.indexOf(c);
+            timestamp = timestamp * 64 + value;
+        }
+
+        // timestamp is given in deci-seconds, convert to milliseconds
+        timestamp *= 100;
+
+        // compare with current timestamp to get age in days
+        long daysAgo = (System.currentTimeMillis() - timestamp) / (1000 * 60 * 60 * 24);
+
+        // delete TC string if age is over a year
+        if (daysAgo > 365) {
+            prefs.edit().remove("IABTCF_TCString").apply();
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean canShowAds() {
         Context context = contextSupplier.get();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
@@ -132,6 +170,7 @@ public class AdConsentExecutor extends Executor {
                     consentInfo.put("isConsentFormAvailable", consentInformation.isConsentFormAvailable());
                     consentInfo.put("canShowAds", canShowAds());
                     consentInfo.put("canShowPersonalizedAds", canShowPersonalizedAds());
+                    consentInfo.put("isConsentOutdated", isConsentOutdated());
                     call.resolve(consentInfo);
                 },
                 formError -> call.reject(formError.getMessage())
@@ -163,6 +202,7 @@ public class AdConsentExecutor extends Executor {
                                     consentFormInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
                                     consentFormInfo.put("canShowAds", canShowAds());
                                     consentFormInfo.put("canShowPersonalizedAds", canShowPersonalizedAds());
+                                    consentFormInfo.put("isConsentOutdated", isConsentOutdated());
                                     call.resolve(consentFormInfo);
                                 }
                             }),

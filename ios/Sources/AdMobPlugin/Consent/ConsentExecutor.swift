@@ -27,7 +27,8 @@ class ConsentExecutor: NSObject {
                         "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
                         "isConsentFormAvailable": UMPConsentInformation.sharedInstance.formStatus == UMPFormStatus.available,
                         "canShowAds": self.canShowAds(),
-                        "canShowPersonalizedAds": self.canShowPersonalizedAds()
+                        "canShowPersonalizedAds": self.canShowPersonalizedAds(),
+                        "isConsentOutdated": self.isConsentOutdated()
                     ])
                 }
             })
@@ -53,7 +54,8 @@ class ConsentExecutor: NSObject {
                         call.resolve([
                             "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
                             "canShowAds": self.canShowAds(),
-                            "canShowPersonalizedAds": self.canShowPersonalizedAds()
+                            "canShowPersonalizedAds": self.canShowPersonalizedAds(),
+                            "isConsentOutdated": self.isConsentOutdated()
                         ])
                     })
                 })
@@ -146,5 +148,41 @@ class ConsentExecutor: NSObject {
 
         return hasConsentFor([1,3,4], purposeConsent, hasGoogleVendorConsent)
             && hasConsentOrLegitimateInterestFor([2,7,9,10], purposeConsent, purposeLI, hasGoogleVendorConsent, hasGoogleVendorLI)
+    }
+
+    private func isConsentOutdated() -> Bool {
+        let settings = UserDefaults.standard
+        guard let tcString = settings.string(forKey: "IABTCF_TCString"), !tcString.isEmpty else {
+            return false
+        }
+
+        // base64 alphabet used to store data in IABTCF string
+        let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+
+        // date is stored in digits 1..7 of the IABTCF string
+        let dateSubstring = String(tcString[tcString.index(tcString.startIndex, offsetBy: 1)..<tcString.index(tcString.startIndex, offsetBy: 7)])
+
+        // interpret date substring as base64-encoded integer value
+        var timestamp: Int64 = 0
+
+        for char in dateSubstring {
+            if let value = base64.firstIndex(of: char) {
+                timestamp = timestamp * 64 + Int64(value.utf16Offset(in: base64))
+            }
+        }
+
+        // timestamp is given in deci-seconds, convert to milliseconds
+        timestamp *= 100
+
+        // compare with current timestamp to get age in days
+        let daysAgo = (Int64(Date().timeIntervalSince1970 * 1000) - timestamp) / (1000 * 60 * 60 * 24)
+
+        // delete TC string if age is over a year
+        if daysAgo > 365 {
+            settings.removeObject(forKey: "IABTCF_TCString")
+            return true
+        }
+
+        return false
     }
 }
