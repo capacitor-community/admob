@@ -16,4 +16,5 @@ Pod::Spec.new do |s|
   s.static_framework = true
   s.dependency 'Capacitor'
   s.dependency 'Google-Mobile-Ads-SDK', '11.3.0'
+  s.dependency 'GoogleUserMessagingPlatform', '>= 2.7.0', '< 3.0.0'
 end
