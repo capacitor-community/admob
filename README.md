@@ -1318,11 +1318,13 @@ From T, pick a set of properties whose keys are in the union K
 
 #### AdmobConsentDebugGeography
 
-| Members        | Value          | Description                                        |
-| -------------- | -------------- | -------------------------------------------------- |
-| **`DISABLED`** | <code>0</code> | Debug geography disabled.                          |
-| **`EEA`**      | <code>1</code> | Geography appears as in EEA for debug devices.     |
-| **`NOT_EEA`**  | <code>2</code> | Geography appears as not in EEA for debug devices. |
+| Members        | Value          | Description                                                   |
+| -------------- | -------------- | ------------------------------------------------------------- |
+| **`DISABLED`** | <code>0</code> | Debug geography disabled.                                     |
+| **`EEA`**      | <code>1</code> | Geography appears as in EEA for debug devices.                |
+| **`NOT_EEA`**  | <code>2</code> | Geography appears as not in EEA for debug devices.            |
+| **`US`**       | <code>3</code> | Geography appears as in regulated US state for debug devices. |
+| **`OTHER`**    | <code>4</code> | Geography appears as OTHER state for debug devices.           |
 
 
 #### InterstitialAdPluginEvents
