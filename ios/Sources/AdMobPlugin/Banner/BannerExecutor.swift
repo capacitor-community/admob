@@ -128,7 +128,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     }
 
     /// Tells the delegate an ad request loaded an ad.
-    func bannerViewDidReceiveAd(_ bannerView: GADBannerView) {
+    func bannerViewDidReceiveAd(_ bannerView: BannerView) {
         NSLog("bannerViewDidReceiveAd")
         if let rootViewController = plugin?.getRootVC() {
             rootViewController.view.addSubview(bannerView)
@@ -148,28 +148,13 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                                     multiplier: 1,
                                     constant: 0)
                 ])
+            self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
+                "width": bannerView.frame.width,
+                "height": bannerView.frame.height
+            ])
+            self.plugin?.notifyListeners(BannerAdPluginEvents.Loaded.rawValue, data: [:])
+
         }
-    }
-
-    private func removeBannerViewToView() {
-        if let rootViewController = plugin?.getRootVC() {
-            if let subView = rootViewController.view.viewWithTag(2743243288699) {
-                bannerView.delegate = nil
-                NSLog("AdMob: find subView")
-                subView.removeFromSuperview()
-            }
-        }
-    }
-
-    /// Tells the delegate an ad request loaded an ad.
-    func bannerViewDidReceiveAd(_ bannerView: BannerView) {
-        NSLog("bannerViewDidReceiveAd")
-
-        self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
-            "width": bannerView.frame.width,
-            "height": bannerView.frame.height
-        ])
-        self.plugin?.notifyListeners(BannerAdPluginEvents.Loaded.rawValue, data: [:])
     }
 
     /// Tells the delegate an ad request failed.
