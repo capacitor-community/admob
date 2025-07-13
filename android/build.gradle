@@ -4,12 +4,12 @@ ext {
     androidxCoordinatorLayoutVersion = project.hasProperty('androidxCoordinatorLayoutVersion') ? rootProject.ext.androidxCoordinatorLayoutVersion : '1.2.0'
     androidxJunitVersion = project.hasProperty('androidxJunitVersion') ? rootProject.ext.androidxJunitVersion : '1.2.1'
     androidxEspressoCoreVersion = project.hasProperty('androidxEspressoCoreVersion') ? rootProject.ext.androidxEspressoCoreVersion : '3.6.1'
-    playServicesAdsVersion = project.hasProperty('playServicesAdsVersion') ? rootProject.ext.playServicesAdsVersion : '23.0.0'
+    playServicesAdsVersion = project.hasProperty('playServicesAdsVersion') ? rootProject.ext.playServicesAdsVersion : '24.4.+'
     androidxCoreKTXVersion = project.hasProperty('androidxCoreKTXVersion') ? rootProject.ext.androidxCoreKTXVersion : '1.13.0'
 }
 
 buildscript {
-    ext.kotlin_version = project.hasProperty("kotlin_version") ? rootProject.ext.kotlin_version : '1.9.25'
+    ext.kotlin_version = project.hasProperty("kotlin_version") ? rootProject.ext.kotlin_version : '2.1.0'
     repositories {
         google()
         mavenCentral()
