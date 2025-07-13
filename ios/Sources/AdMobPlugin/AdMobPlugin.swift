@@ -25,7 +25,9 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "prepareInterstitial", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showInterstitial", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "prepareRewardVideoAd", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "showRewardVideoAd", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "showRewardVideoAd", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareRewardInterstitialAd", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showRewardInterstitialAd", returnType: CAPPluginReturnPromise)
     ]
 
     var testingDevices: [String] = []
