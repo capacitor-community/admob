@@ -2,13 +2,13 @@ import Foundation
 import Capacitor
 import GoogleMobileAds
 
-class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
+class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
-    var interstitial: GADInterstitialAd!
+    var interstitial: InterstitialAd!
 
-    func prepareInterstitial(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
-        GADInterstitialAd.load(
-            withAdUnitID: adUnitID,
+    func prepareInterstitial(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
+        InterstitialAd.load(
+            with: adUnitID,
             request: request,
             completionHandler: { (ad, error) in
                 if let error = error {
@@ -36,7 +36,7 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
     func showInterstitial(_ call: CAPPluginCall) {
         if let rootViewController = plugin?.getRootVC() {
             if let ad = self.interstitial {
-                ad.present(fromRootViewController: rootViewController)
+                ad.present(from: rootViewController)
                 call.resolve([:])
             } else {
                 NSLog("Ad wasn't ready")
@@ -45,7 +45,7 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
         }
     }
 
-    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+    func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         NSLog("InterstitialFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
@@ -53,12 +53,12 @@ class AdInterstitialExecutor: NSObject, GADFullScreenContentDelegate {
         ])
     }
 
-    func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
         NSLog("InterstitialFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Showed.rawValue, data: [:])
     }
 
-    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         NSLog("InterstitialFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Dismissed.rawValue, data: [:])
     }

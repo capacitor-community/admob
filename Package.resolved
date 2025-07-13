@@ -1,13 +1,12 @@
 {
-  "originHash" : "c2713bd99a9d482456f2a8abf0edabe1abd9aa8d6c5c114e14caa1b1ea778d3a",
   "pins" : [
     {
       "identity" : "capacitor-swift-pm",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ionic-team/capacitor-swift-pm.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "2827600e5da84dcfca0339c987e5a8394d6b22f9"
+        "revision" : "bc99a4197e8a966c99912a644a9aa5710f7e3409",
+        "version" : "7.0.1"
       }
     },
     {
@@ -15,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/googleads/swift-package-manager-google-mobile-ads.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "82c49f703da08f6c20715fd8bb8dfe5d94a2f187"
+        "revision" : "946770157e526c0fa8807ed516c3d9f81106e30a",
+        "version" : "12.6.0"
       }
     },
     {
@@ -29,5 +28,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
