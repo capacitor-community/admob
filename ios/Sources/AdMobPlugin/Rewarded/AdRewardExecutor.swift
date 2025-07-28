@@ -2,13 +2,13 @@ import Foundation
 import Capacitor
 import GoogleMobileAds
 
-class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
+class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
-    var rewardedAd: GADRewardedAd!
+    var rewardedAd: RewardedAd!
 
-    func prepareRewardVideoAd(_ call: CAPPluginCall, _ request: GADRequest, _ adUnitID: String) {
-        GADRewardedAd.load(
-            withAdUnitID: adUnitID,
+    func prepareRewardVideoAd(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
+        RewardedAd.load(
+            with: adUnitID,
             request: request,
             completionHandler: { (ad, error) in
                 if let error = error {
@@ -24,11 +24,11 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
                 self.rewardedAd = ad
 
                 if let providedOptions = call.getObject("ssv") {
-                    let ssvOptions = GADServerSideVerificationOptions()
+                    let ssvOptions = ServerSideVerificationOptions()
 
                     if let customData = providedOptions["customData"] as? String {
                         NSLog("Sending Custom Data: \(customData) to SSV callback")
-                        ssvOptions.customRewardString = customData
+                        ssvOptions.customRewardText = customData
                     }
 
                     if let userId = providedOptions["userId"] as? String {
@@ -53,7 +53,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
     func showRewardVideoAd(_ call: CAPPluginCall) {
         if let rootViewController = plugin?.getRootVC() {
             if let ad = self.rewardedAd {
-                ad.present(fromRootViewController: rootViewController,
+                ad.present(from: rootViewController,
                            userDidEarnRewardHandler: {
                             let reward = ad.adReward
                             self.plugin?.notifyListeners(RewardAdPluginEvents.Rewarded.rawValue, data: ["type": reward.type, "amount": reward.amount])
@@ -66,7 +66,7 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
         }
     }
 
-    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+    func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
@@ -74,12 +74,12 @@ class AdRewardExecutor: NSObject, GADFullScreenContentDelegate {
         ])
     }
 
-    func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
         NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
     }
 
-    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Dismissed.rawValue, data: [:])
     }

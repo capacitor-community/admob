@@ -7,25 +7,25 @@ class ConsentExecutor: NSObject {
     weak var plugin: AdMobPlugin?
 
     func requestConsentInfo(_ call: CAPPluginCall, _ debugGeography: Int, _ testDeviceIdentifiers: [String], _ tagForUnderAgeOfConsent: Bool) {
-        let parameters = UMPRequestParameters()
-        let debugSettings = UMPDebugSettings()
+        let parameters = RequestParameters()
+        let debugSettings = DebugSettings()
 
-        debugSettings.geography = UMPDebugGeography(rawValue: debugGeography) ?? UMPDebugGeography.disabled
+        debugSettings.geography = DebugGeography(rawValue: debugGeography) ?? DebugGeography.disabled
         debugSettings.testDeviceIdentifiers = testDeviceIdentifiers
 
         parameters.debugSettings = debugSettings
-        parameters.tagForUnderAgeOfConsent = tagForUnderAgeOfConsent
+        parameters.isTaggedForUnderAgeOfConsent = tagForUnderAgeOfConsent
 
         // Request an update to the consent information.
-        UMPConsentInformation.sharedInstance.requestConsentInfoUpdate(
+        ConsentInformation.shared.requestConsentInfoUpdate(
             with: parameters,
             completionHandler: { error in
                 if error != nil {
                     call.reject("Request consent info failed")
                 } else {
                     call.resolve([
-                        "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus),
-                        "isConsentFormAvailable": UMPConsentInformation.sharedInstance.formStatus == UMPFormStatus.available
+                        "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus),
+                        "isConsentFormAvailable": ConsentInformation.shared.formStatus == FormStatus.available
                     ])
                 }
             })
@@ -33,16 +33,16 @@ class ConsentExecutor: NSObject {
 
     func showConsentForm(_ call: CAPPluginCall) {
         if let rootViewController = plugin?.getRootVC() {
-            let formStatus = UMPConsentInformation.sharedInstance.formStatus
+            let formStatus = ConsentInformation.shared.formStatus
 
-            if formStatus == UMPFormStatus.available {
-                UMPConsentForm.load(completionHandler: {form, loadError in
+            if formStatus == FormStatus.available {
+                ConsentForm.load(with: {form, loadError in
                     if loadError != nil {
                         call.reject(loadError?.localizedDescription ?? "Load consent form error")
                         return
                     }
 
-                    if UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatus.required {
+                    if ConsentInformation.shared.consentStatus == ConsentStatus.required {
                         form?.present(from: rootViewController, completionHandler: { dismissError in
                             if dismissError != nil {
                                 call.reject(dismissError?.localizedDescription ?? "Consent dismiss error")
@@ -50,12 +50,12 @@ class ConsentExecutor: NSObject {
                             }
 
                             call.resolve([
-                                "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus)
+                                "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus)
                             ])
                         })
                     } else {
                         call.resolve([
-                            "status": self.getConsentStatusString(UMPConsentInformation.sharedInstance.consentStatus)
+                            "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus)
                         ])
                     }
                 })
@@ -68,17 +68,17 @@ class ConsentExecutor: NSObject {
     }
 
     func resetConsentInfo(_ call: CAPPluginCall) {
-        UMPConsentInformation.sharedInstance.reset()
+        ConsentInformation.shared.reset()
         call.resolve()
     }
 
-    func getConsentStatusString(_ consentStatus: UMPConsentStatus) -> String {
+    func getConsentStatusString(_ consentStatus: ConsentStatus) -> String {
         switch consentStatus {
-        case UMPConsentStatus.required:
+        case ConsentStatus.required:
             return "REQUIRED"
-        case UMPConsentStatus.notRequired:
+        case ConsentStatus.notRequired:
             return "NOT_REQUIRED"
-        case UMPConsentStatus.obtained:
+        case ConsentStatus.obtained:
             return "OBTAINED"
         default:
             return "UNKNOWN"

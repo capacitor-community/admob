@@ -25,7 +25,9 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "prepareInterstitial", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showInterstitial", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "prepareRewardVideoAd", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "showRewardVideoAd", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "showRewardVideoAd", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareRewardInterstitialAd", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showRewardInterstitialAd", returnType: CAPPluginReturnPromise)
     ]
 
     var testingDevices: [String] = []
@@ -49,7 +51,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         self.consentExecutor.plugin = self
         self.setRequestConfiguration(call)
 
-        GADMobileAds.sharedInstance().start(completionHandler: nil)
+        MobileAds.shared.start(completionHandler: nil)
         call.resolve([:])
     }
 
@@ -72,7 +74,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func setApplicationMuted(_ call: CAPPluginCall) {
         if let shouldMute = call.getBool("muted") {
-            GADMobileAds.sharedInstance().applicationMuted = shouldMute
+            MobileAds.shared.isApplicationMuted = shouldMute
             call.resolve([:])
         } else {
             call.reject("muted property cannot be null")
@@ -85,7 +87,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
             // Clamp volumes.
             if volume < 0.0 {volume = 0.0} else if volume > 1.0 {volume = 1.0}
 
-            GADMobileAds.sharedInstance().applicationVolume = volume
+            MobileAds.shared.applicationVolume = volume
 
             call.resolve([:])
         } else {
@@ -252,11 +254,11 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         return adUnitID
     }
 
-    private func GADRequestWithOption(_ npa: Bool) -> GADRequest {
-        let request = GADRequest()
+    private func GADRequestWithOption(_ npa: Bool) -> Request {
+        let request = Request()
 
         if npa {
-            let extras = GADExtras()
+            let extras = Extras()
             extras.additionalParameters = ["npa": "1"]
             request.register(extras)
         }
@@ -270,30 +272,30 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     private func setRequestConfiguration(_ call: CAPPluginCall) {
 
         if call.getBool("initializeForTesting") ?? false {
-            GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
+            MobileAds.shared.requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
         }
 
         if call.getBool("tagForChildDirectedTreatment") == true {
-            GADMobileAds.sharedInstance().requestConfiguration.tagForChildDirectedTreatment = true
+            MobileAds.shared.requestConfiguration.tagForChildDirectedTreatment = true
         }
 
         if call.getBool("tagForUnderAgeOfConsent") == true {
-            GADMobileAds.sharedInstance().requestConfiguration.tagForUnderAgeOfConsent = true
+            MobileAds.shared.requestConfiguration.tagForUnderAgeOfConsent = true
         }
 
         if call.getString("maxAdContentRating") != nil {
             switch call.getString("maxAdContentRating") {
             case "General":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                MobileAds.shared.requestConfiguration.maxAdContentRating =
                     GADMaxAdContentRating.general
             case "ParentalGuidance":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                MobileAds.shared.requestConfiguration.maxAdContentRating =
                     GADMaxAdContentRating.parentalGuidance
             case "Teen":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                MobileAds.shared.requestConfiguration.maxAdContentRating =
                     GADMaxAdContentRating.teen
             case "MatureAudience":
-                GADMobileAds.sharedInstance().requestConfiguration.maxAdContentRating =
+                MobileAds.shared.requestConfiguration.maxAdContentRating =
                     GADMaxAdContentRating.matureAudience
             default:
                 print("maxAdContentRating can't find value")
