@@ -54,28 +54,23 @@ public class AdConsentExecutor extends Executor {
             }
 
             ConsentRequestParameters consentRequestParameters = paramsBuilder.build();
-            Activity activity = activitySupplier.get();
-            if (activity == null) {
+
+            if (activitySupplier.get() == null) {
                 call.reject("Trying to request consent info but the Activity is null");
                 return;
             }
 
             consentInformation.requestConsentInfoUpdate(
-                activity,
+                activitySupplier.get(),
                 consentRequestParameters,
-                () ->
-                    UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity, loadAndShowError -> {
-                        if (loadAndShowError != null) {
-                            call.reject(loadAndShowError.getMessage());
-                            return;
-                        }
-                        JSObject consentInfo = new JSObject();
-                        consentInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
-                        consentInfo.put("isConsentFormAvailable", consentInformation.isConsentFormAvailable());
-                        consentInfo.put("canRequestAds", consentInformation.canRequestAds());
-                        consentInfo.put("privacyOptionsRequirementStatus", consentInformation.getPrivacyOptionsRequirementStatus().name());
-                        call.resolve(consentInfo);
-                    }),
+                () -> {
+                    JSObject consentInfo = new JSObject();
+                    consentInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
+                    consentInfo.put("isConsentFormAvailable", consentInformation.isConsentFormAvailable());
+                    consentInfo.put("canRequestAds", consentInformation.canRequestAds());
+                    consentInfo.put("privacyOptionsRequirementStatus", consentInformation.getPrivacyOptionsRequirementStatus().name());
+                    call.resolve(consentInfo);
+                },
                 formError -> call.reject(formError.getMessage())
             );
         } catch (Exception ex) {
@@ -109,30 +104,26 @@ public class AdConsentExecutor extends Executor {
     @PluginMethod
     public void showConsentForm(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         try {
-            if (activitySupplier.get() == null) {
+            Activity activity = activitySupplier.get();
+            if (activity == null) {
                 call.reject("Trying to show the consent form but the Activity is null");
                 return;
             }
-            ensureConsentInfo();
-            activitySupplier
-                .get()
-                .runOnUiThread(() ->
-                    UserMessagingPlatform.loadConsentForm(
-                        contextSupplier.get(),
-                        consentForm ->
-                            consentForm.show(activitySupplier.get(), formError -> {
-                                if (formError != null) {
-                                    call.reject("Error when show consent form", formError.getMessage());
-                                } else {
-                                    JSObject consentFormInfo = new JSObject();
-                                    consentFormInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
 
-                                    call.resolve(consentFormInfo);
-                                }
-                            }),
-                        formError -> call.reject("Error when show consent form", formError.getMessage())
-                    )
-                );
+            ensureConsentInfo();
+            activity.runOnUiThread(() ->
+                UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity, formError -> {
+                    if (formError != null) {
+                        call.reject("Error when show consent form", formError.getMessage());
+                        return;
+                    }
+
+                    JSObject consentFormInfo = new JSObject();
+                    consentFormInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
+                    consentFormInfo.put("canRequestAds", consentInformation.canRequestAds());
+                    call.resolve(consentFormInfo);
+                })
+            );
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
