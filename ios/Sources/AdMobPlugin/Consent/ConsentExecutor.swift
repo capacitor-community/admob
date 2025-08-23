@@ -25,10 +25,28 @@ class ConsentExecutor: NSObject {
                 } else {
                     call.resolve([
                         "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus),
-                        "isConsentFormAvailable": ConsentInformation.shared.formStatus == FormStatus.available
+                        "isConsentFormAvailable": ConsentInformation.shared.formStatus == FormStatus.available,
+                        "canRequestAds": ConsentInformation.shared.canRequestAds,
+                        "privacyOptionsRequirementStatus": self.getPrivacyOptionsRequirementStatus(ConsentInformation.shared.privacyOptionsRequirementStatus)
                     ])
                 }
             })
+    }
+
+    @MainActor
+    func showPrivacyOptionsForm(_ call: CAPPluginCall) {
+        guard let rootViewController = plugin?.getRootVC() else {
+            return call.reject("No ViewController")
+        }
+        
+        Task {
+            do {
+                try await ConsentForm.presentPrivacyOptionsForm(from: rootViewController)
+                call.resolve()
+            } catch {
+                call.reject("Failed to show privacy options form: \(error.localizedDescription)")
+            }
+        }
     }
 
     func showConsentForm(_ call: CAPPluginCall) {
@@ -36,29 +54,18 @@ class ConsentExecutor: NSObject {
             let formStatus = ConsentInformation.shared.formStatus
 
             if formStatus == FormStatus.available {
-                ConsentForm.load(with: {form, loadError in
-                    if loadError != nil {
-                        call.reject(loadError?.localizedDescription ?? "Load consent form error")
-                        return
-                    }
+                Task { @MainActor in
+                    do {
+                        try await ConsentForm.loadAndPresentIfRequired(from: rootViewController)
 
-                    if ConsentInformation.shared.consentStatus == ConsentStatus.required {
-                        form?.present(from: rootViewController, completionHandler: { dismissError in
-                            if dismissError != nil {
-                                call.reject(dismissError?.localizedDescription ?? "Consent dismiss error")
-                                return
-                            }
-
-                            call.resolve([
-                                "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus)
-                            ])
-                        })
-                    } else {
                         call.resolve([
-                            "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus)
+                            "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus),
+                            "canRequestAds": ConsentInformation.shared.canRequestAds
                         ])
+                    } catch {
+                        call.reject("Request consent info failed")
                     }
-                })
+                }
             } else {
                 call.reject("Consent Form not available")
             }
@@ -80,6 +87,17 @@ class ConsentExecutor: NSObject {
             return "NOT_REQUIRED"
         case ConsentStatus.obtained:
             return "OBTAINED"
+        default:
+            return "UNKNOWN"
+        }
+    }
+    
+    func getPrivacyOptionsRequirementStatus(_ requirementStatus: PrivacyOptionsRequirementStatus) -> String {
+        switch requirementStatus {
+        case PrivacyOptionsRequirementStatus.required:
+            return "REQUIRED"
+        case PrivacyOptionsRequirementStatus.notRequired:
+            return "NOT_REQUIRED"
         default:
             return "UNKNOWN"
         }
