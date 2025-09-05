@@ -411,7 +411,6 @@ requestTrackingAuthorization() => Promise<void>
 ```
 
 request requestTrackingAuthorization (iOS &gt;14).
-This is deprecated method. We recommend UMP Consent.
 
 **Since:** 5.2.0
 
