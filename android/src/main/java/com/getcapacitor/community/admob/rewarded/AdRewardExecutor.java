@@ -53,7 +53,7 @@ public class AdRewardExecutor extends Executor {
     @PluginMethod
     public void showRewardVideoAd(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         if (mRewardedAd == null) {
-            String errorMessage = "No Reward Video Ad can be show. It was not prepared or maybe it failed to be prepared.";
+            String errorMessage = "No Reward Video Ad can be shown. It was not prepared or maybe it failed to be prepared.";
             call.reject(errorMessage);
             AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
             notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad, errorObject);
