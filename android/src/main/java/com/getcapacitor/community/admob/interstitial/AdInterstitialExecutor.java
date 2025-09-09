@@ -55,7 +55,7 @@ public class AdInterstitialExecutor extends Executor {
 
     public void showInterstitial(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         if (interstitialAd == null) {
-            String errorMessage = "No Interstitial can be show. It was not prepared or maybe it failed to be prepared.";
+            String errorMessage = "No Interstitial can be shown. It was not prepared or maybe it failed to be prepared.";
             call.reject(errorMessage);
             AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
             notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.FailedToLoad, errorObject);
