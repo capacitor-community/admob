@@ -57,7 +57,7 @@ public class AdRewardInterstitialExecutor extends Executor {
     @PluginMethod
     public void showRewardInterstitialAd(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         if (mRewardedInterstitialAd == null) {
-            String errorMessage = "No Reward Video Ad can be show. It was not prepared or maybe it failed to be prepared.";
+            String errorMessage = "No Reward Interstitial Video Ad can be shown. It was not prepared or maybe it failed to be prepared.";
             call.reject(errorMessage);
             AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
             notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.FailedToLoad, errorObject);
