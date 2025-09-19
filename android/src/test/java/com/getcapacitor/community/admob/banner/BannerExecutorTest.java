@@ -14,12 +14,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -50,8 +52,20 @@ class BannerExecutorTest {
     @Mock(lenient = true)
     Context contextMock;
 
-    @Mock
+    @Mock(lenient = true)
     Activity activityMock;
+
+    @Mock(lenient = true)
+    Window windowMock;
+
+    @Mock(lenient = true)
+    WindowManager windowManagerMock;
+
+    @Mock(lenient = true)
+    Display displayMock;
+
+    @Mock(lenient = true)
+    WindowManager.LayoutParams attributesMock;
 
     @Mock
     BiConsumer<String, JSObject> notifierMock;
@@ -68,8 +82,16 @@ class BannerExecutorTest {
     @BeforeEach
     void beforeEach() {
         AdSizeStaticMock = Mockito.mockStatic(AdSize.class);
-        reset(contextMock, activityMock, notifierMock);
+        reset(contextMock, activityMock, notifierMock, windowMock, windowManagerMock, displayMock, attributesMock);
         adViewMockedConstruction = Mockito.mockConstruction(AdView.class, (mock, context) -> {});
+
+        when(activityMock.getWindowManager()).thenReturn(windowManagerMock);
+        when(activityMock.getWindow()).thenReturn(windowMock);
+
+        when(windowMock.getDecorView()).thenReturn(viewGroupMock);
+
+        when(windowManagerMock.getDefaultDisplay()).thenReturn(displayMock);
+        when(windowMock.getAttributes()).thenReturn(attributesMock);
 
         when(activityMock.findViewById(anyInt())).thenReturn(viewGroupMock);
         when(viewGroupMock.getChildAt(anyInt())).thenReturn(viewGroupMock);

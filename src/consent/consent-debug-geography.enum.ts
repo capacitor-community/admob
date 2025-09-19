@@ -17,6 +17,17 @@ export enum AdmobConsentDebugGeography {
 
   /**
    * Geography appears as not in EEA for debug devices.
+   * @deprecated
    */
   NOT_EEA = 2,
+
+  /**
+   * Geography appears as in regulated US state for debug devices.
+   */
+  US = 3,
+
+  /**
+   * Geography appears as OTHER state for debug devices.
+   */
+  OTHER = 4,
 }

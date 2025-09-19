@@ -28,6 +28,9 @@ object RewardedAdCallbackAndListeners {
     fun getRewardedAdLoadCallback(call: PluginCall, notifyListenersFunction: BiConsumer<String, JSObject>, adOptions: AdOptions): RewardedAdLoadCallback {
         return object : RewardedAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedAd) {
+                val immersiveMode = call.getBoolean("immersiveMode")
+                ad.setImmersiveMode(immersiveMode ?: false)
+
                 AdRewardExecutor.mRewardedAd = ad
                 AdRewardExecutor.mRewardedAd.fullScreenContentCallback = FullscreenPluginCallback(
                         RewardAdPluginEvents, notifyListenersFunction)

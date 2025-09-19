@@ -13,6 +13,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "initialize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "trackingAuthorizationStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "requestConsentInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showPrivacyOptionsForm", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "requestTrackingAuthorization", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showConsentForm", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resetConsentInfo", returnType: CAPPluginReturnPromise),
@@ -236,6 +237,12 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func showConsentForm(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             self.consentExecutor.showConsentForm(call)
+        }
+    }
+
+    @objc func showPrivacyOptionsForm(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            self.consentExecutor.showPrivacyOptionsForm(call)
         }
     }
 
