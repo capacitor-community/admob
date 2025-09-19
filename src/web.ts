@@ -8,10 +8,10 @@ import type {
   AdmobConsentRequestOptions,
 } from '.';
 import { AdmobConsentStatus } from './consent/consent-status.enum';
+import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
-import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   async initialize(): Promise<void> {
