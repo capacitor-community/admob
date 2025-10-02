@@ -8,6 +8,7 @@ import type {
   AdmobConsentRequestOptions,
 } from '.';
 import { AdmobConsentStatus } from './consent/consent-status.enum';
+import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
@@ -32,13 +33,21 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     return {
       status: AdmobConsentStatus.REQUIRED,
       isConsentFormAvailable: true,
+      canRequestAds: true,
+      privacyOptionsRequirementStatus: PrivacyOptionsRequirementStatus.REQUIRED,
     };
+  }
+
+  async showPrivacyOptionsForm(): Promise<void> {
+    console.log('showPrivacyOptionsForm');
   }
 
   async showConsentForm(): Promise<AdmobConsentInfo> {
     console.log('showConsentForm');
     return {
       status: AdmobConsentStatus.REQUIRED,
+      canRequestAds: true,
+      privacyOptionsRequirementStatus: PrivacyOptionsRequirementStatus.REQUIRED,
     };
   }
 

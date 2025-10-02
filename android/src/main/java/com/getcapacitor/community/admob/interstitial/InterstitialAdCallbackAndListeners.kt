@@ -16,7 +16,9 @@ object InterstitialAdCallbackAndListeners {
     ): InterstitialAdLoadCallback {
         return object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(ad: InterstitialAd) {
+                val immersiveMode = call.getBoolean("immersiveMode")
                 ad.fullScreenContentCallback = FullscreenPluginCallback(InterstitialAdPluginPluginEvent, notifyListenersFunction)
+                ad.setImmersiveMode(immersiveMode ?: false)
 
                 AdInterstitialExecutor.interstitialAd = ad
 

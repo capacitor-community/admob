@@ -61,10 +61,6 @@ class AdRewardExecutorTest {
         @BeforeEach
         void beforeEach() {
             runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
-        }
-
-        @AfterEach
-        void afterEach() {
             AdRewardExecutor.mRewardedAd = null;
         }
 
