@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.banner;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -102,21 +103,23 @@ public class BannerExecutor extends Executor {
                     break;
             }
 
-            // set Safe Area
-            View rootView = activitySupplier.get().getWindow().getDecorView();
-            rootView.setOnApplyWindowInsetsListener((v, insets) -> {
-                int bottomInset = insets.getSystemWindowInsetBottom();
-                int topInset = insets.getSystemWindowInsetTop();
+            // set Safe Area only for Android 15+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                View rootView = activitySupplier.get().getWindow().getDecorView();
+                rootView.setOnApplyWindowInsetsListener((v, insets) -> {
+                    int bottomInset = insets.getSystemWindowInsetBottom();
+                    int topInset = insets.getSystemWindowInsetTop();
 
-                if ("TOP_CENTER".equals(adOptions.position)) {
-                    mAdViewLayoutParams.setMargins(0, topInset, 0, 0);
-                } else {
-                    mAdViewLayoutParams.setMargins(0, 0, 0, bottomInset);
-                }
+                    if ("TOP_CENTER".equals(adOptions.position)) {
+                        mAdViewLayoutParams.setMargins(0, topInset, 0, 0);
+                    } else {
+                        mAdViewLayoutParams.setMargins(0, 0, 0, bottomInset);
+                    }
 
-                mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-                return insets;
-            });
+                    mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
+                    return insets;
+                });
+            }
 
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
