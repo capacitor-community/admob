@@ -121,6 +121,7 @@ public class AdConsentExecutor extends Executor {
                     JSObject consentFormInfo = new JSObject();
                     consentFormInfo.put("status", getConsentStatusString(consentInformation.getConsentStatus()));
                     consentFormInfo.put("canRequestAds", consentInformation.canRequestAds());
+                    consentFormInfo.put("privacyOptionsRequirementStatus", consentInformation.getPrivacyOptionsRequirementStatus().name());
                     call.resolve(consentFormInfo);
                 })
             );

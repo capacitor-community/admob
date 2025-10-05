@@ -60,7 +60,8 @@ class ConsentExecutor: NSObject {
 
                         call.resolve([
                             "status": self.getConsentStatusString(ConsentInformation.shared.consentStatus),
-                            "canRequestAds": ConsentInformation.shared.canRequestAds
+                            "canRequestAds": ConsentInformation.shared.canRequestAds,
+                            "privacyOptionsRequirementStatus": self.getPrivacyOptionsRequirementStatus(ConsentInformation.shared.privacyOptionsRequirementStatus)
                         ])
                     } catch {
                         call.reject("Request consent info failed")
