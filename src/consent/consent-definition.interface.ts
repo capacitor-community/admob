@@ -9,9 +9,15 @@ export interface AdmobConsentDefinitions {
    * @param options ConsentRequestOptions
    * @since 5.0.0
    */
-  requestConsentInfo(
-    options?: AdmobConsentRequestOptions,
-  ): Promise<AdmobConsentInfo>;
+  requestConsentInfo(options?: AdmobConsentRequestOptions): Promise<AdmobConsentInfo>;
+
+  /**
+   * Shows a google privacy options form (rendered from your GDPR message config).
+   *
+   * @group Consent
+   * @since 7.0.3
+   */
+  showPrivacyOptionsForm(): Promise<void>;
 
   /**
    * Shows a google user consent form (rendered from your GDPR message config).

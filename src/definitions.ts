@@ -31,7 +31,6 @@ export interface AdMobPlugin extends AdMobDefinitions {
 
   /**
    * request requestTrackingAuthorization (iOS >14).
-   * This is deprecated method. We recommend UMP Consent.
    *
    * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
    * @since 5.2.0

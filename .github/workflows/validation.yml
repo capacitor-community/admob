@@ -49,8 +49,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 22
-#      - run: npm install
-#      - run: npm run verify:android
+      - run: npm install
+      - run: npm run verify:android
 
   verify-ios:
     runs-on: macos-14
