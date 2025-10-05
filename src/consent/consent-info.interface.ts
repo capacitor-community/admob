@@ -16,13 +16,13 @@ export interface AdmobConsentInfo {
 
   /**
    * If `true` an ad can be shown.
-   * @since 6.2.0
+   * @since 7.0.3
    */
   canRequestAds: boolean;
 
   /**
    * Privacy options requirement status of the user.
-   * @since 6.2.0
+   * @since 7.0.3
    */
   privacyOptionsRequirementStatus: PrivacyOptionsRequirementStatus;
 }
