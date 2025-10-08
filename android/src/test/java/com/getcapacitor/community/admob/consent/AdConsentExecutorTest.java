@@ -62,7 +62,7 @@ public class AdConsentExecutorTest {
 
         adConsentExecutor = new AdConsentExecutor(() -> contextMock, () -> activityMock, notifierMock, LOG_TAG);
 
-        doAnswer(invocation -> {
+        doAnswer((invocation) -> {
             Runnable runnable = invocation.getArgument(0);
             runnable.run();
             return null;
