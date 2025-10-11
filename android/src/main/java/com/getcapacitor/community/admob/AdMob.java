@@ -19,6 +19,22 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.getcapacitor.community.admob.appopen.AppOpenAdPlugin;
+    private final AppOpenAdPlugin appOpenAdPlugin = new AppOpenAdPlugin();
+    @PluginMethod
+    public void loadAppOpen(final PluginCall call) {
+        appOpenAdPlugin.loadAppOpen(call);
+    }
+
+    @PluginMethod
+    public void showAppOpen(final PluginCall call) {
+        appOpenAdPlugin.showAppOpen(call);
+    }
+
+    @PluginMethod
+    public void isAppOpenLoaded(final PluginCall call) {
+        appOpenAdPlugin.isAppOpenLoaded(call);
+    }
 import org.json.JSONException;
 
 @CapacitorPlugin(
