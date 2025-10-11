@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 
-import { AdMob, AdMobInitializationOptions } from '@capacitor-community/admob';
+import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-root',
@@ -32,6 +32,39 @@ export class AppComponent {
       AdMob.setApplicationVolume({
         volume: 0.5,
       });
+
+      // Ejemplo de App Open Ad
+      this.showAppOpenAd();
     });
+  }
+
+  async showAppOpenAd() {
+    // Escuchar eventos
+    AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
+      console.log('App Open Ad cargado');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
+      console.log('Fallo al cargar App Open Ad');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
+      console.log('App Open Ad abierto');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
+      console.log('App Open Ad cerrado');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
+      console.log('Fallo al mostrar App Open Ad');
+    });
+
+    const options: AppOpenAdOptions = {
+      adUnitId: 'TU_AD_UNIT_ID', // Reemplaza por tu ID real
+      showOnColdStart: true,
+      showOnForeground: true,
+    };
+    await AdMob.loadAppOpen(options);
+    const { value } = await AdMob.isAppOpenLoaded();
+    if (value) {
+      await AdMob.showAppOpen();
+    }
   }
 }
