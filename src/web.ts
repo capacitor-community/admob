@@ -1,5 +1,3 @@
-
-
 import { WebPlugin } from '@capacitor/core';
 
 import type {
