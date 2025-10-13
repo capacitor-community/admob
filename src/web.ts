@@ -18,7 +18,6 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log('initialize');
   }
 
-  // Métodos stub para App Open Ad
 
   async requestTrackingAuthorization(): Promise<void> {
     console.log('requestTrackingAuthorization');
