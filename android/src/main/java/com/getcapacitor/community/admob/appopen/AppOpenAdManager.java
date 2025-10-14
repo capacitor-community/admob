@@ -34,12 +34,16 @@ public class AppOpenAdManager {
                 public void onAdLoaded(@NonNull AppOpenAd ad) {
                     appOpenAd = ad;
                     isLoadingAd = false;
-                    if (onLoaded != null) onLoaded.run();
+                    if (onLoaded != null) {
+                        onLoaded.run();
+                    }
                 }
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     isLoadingAd = false;
-                    if (onFailed != null) onFailed.run();
+                    if (onFailed != null) {
+                        onFailed.run();
+                    }
                 }
             }
         );
