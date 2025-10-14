@@ -13,10 +13,14 @@ import UIKit
     }
 
     public func loadAd(rootViewController: UIViewController, onLoaded: @escaping () -> Void, onFailed: @escaping () -> Void) {
-        if isLoadingAd || appOpenAd != nil { return }
+        if isLoadingAd || appOpenAd != nil {
+            return
+        }
+
         isLoadingAd = true
         GADAppOpenAd.load(withAdUnitID: adUnitId, request: GADRequest(), orientation: .portrait) { [weak self] ad, error in
             self?.isLoadingAd = false
+
             if let ad = ad {
                 self?.appOpenAd = ad
                 onLoaded()
@@ -31,6 +35,7 @@ import UIKit
             onFailedToShow()
             return
         }
+
         isShowingAd = true
         ad.fullScreenContentDelegate = self
         ad.present(fromRootViewController: rootViewController)
@@ -52,6 +57,7 @@ extension AppOpenAdManager: GADFullScreenContentDelegate {
         isShowingAd = false
         onClosed?()
     }
+
     public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         appOpenAd = nil
         isShowingAd = false
