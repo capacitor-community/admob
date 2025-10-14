@@ -13,11 +13,17 @@ import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
 
+// ✅ New: Define a specific type for App Open Ad options
+export interface AppOpenAdOptions {
+  adId: string;        // The AdMob unit ID for the app open ad
+  orientation?: 'portrait' | 'landscape'; // Optional orientation
+  npa?: boolean;       // Optional: non-personalized ads flag
+}
+
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   async initialize(): Promise<void> {
     console.log('initialize');
   }
-
 
   async requestTrackingAuthorization(): Promise<void> {
     console.log('requestTrackingAuthorization');
@@ -68,17 +74,14 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log('showBanner', options);
   }
 
-  // Hide the banner, remove it from screen, but can show it later
   async hideBanner(): Promise<void> {
     console.log('hideBanner');
   }
 
-  // Resume the banner, show it after hide
   async resumeBanner(): Promise<void> {
     console.log('resumeBanner');
   }
 
-  // Destroy the banner, remove it from screen.
   async removeBanner(): Promise<void> {
     console.log('removeBanner');
   }
@@ -95,7 +98,7 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   }
 
   async prepareRewardVideoAd(options: AdOptions): Promise<AdLoadInfo> {
-    console.log(options);
+    console.log('prepareRewardVideoAd', options);
     return {
       adUnitId: options.adId,
     };
@@ -109,7 +112,7 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   }
 
   async prepareRewardInterstitialAd(options: AdOptions): Promise<AdLoadInfo> {
-    console.log(options);
+    console.log('prepareRewardInterstitialAd', options);
     return {
       adUnitId: options.adId,
     };
@@ -122,8 +125,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
-  // Métodos stub para App Open Ad
-  async loadAppOpen(options: any): Promise<void> {
+  // ✅ Replaced "any" with AppOpenAdOptions type
+  async loadAppOpen(options: AppOpenAdOptions): Promise<void> {
     console.log('loadAppOpen', options);
   }
 
