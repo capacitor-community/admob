@@ -20,10 +20,12 @@ public class AppOpenAdManager {
 
     public void loadAd(Context context, final Runnable onLoaded, final Runnable onFailed) {
         if (isLoadingAd || appOpenAd != null) {
-          return;
+            return;
         }
+
         isLoadingAd = true;
         AdRequest request = new AdRequest.Builder().build();
+
         AppOpenAd.load(
             context,
             adUnitId,
@@ -34,13 +36,16 @@ public class AppOpenAdManager {
                 public void onAdLoaded(@NonNull AppOpenAd ad) {
                     appOpenAd = ad;
                     isLoadingAd = false;
+
                     if (onLoaded != null) {
                         onLoaded.run();
                     }
                 }
+
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     isLoadingAd = false;
+
                     if (onFailed != null) {
                         onFailed.run();
                     }
@@ -51,24 +56,35 @@ public class AppOpenAdManager {
 
     public void showAdIfAvailable(Activity activity, final Runnable onClosed, final Runnable onFailedToShow) {
         if (appOpenAd == null || isShowingAd) {
-            if (onFailedToShow != null) onFailedToShow.run();
+            if (onFailedToShow != null) {
+                onFailedToShow.run();
+            }
             return;
         }
+
         isShowingAd = true;
         appOpenAd.setFullScreenContentCallback(new FullScreenContentCallback() {
             @Override
             public void onAdDismissedFullScreenContent() {
                 appOpenAd = null;
                 isShowingAd = false;
-                if (onClosed != null) onClosed.run();
+
+                if (onClosed != null) {
+                    onClosed.run();
+                }
             }
+
             @Override
             public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
                 appOpenAd = null;
                 isShowingAd = false;
-                if (onFailedToShow != null) onFailedToShow.run();
+
+                if (onFailedToShow != null) {
+                    onFailedToShow.run();
+                }
             }
         });
+
         appOpenAd.show(activity);
     }
 
