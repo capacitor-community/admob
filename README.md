@@ -1,41 +1,3 @@
-### Mostrar App Open Ad
-
-```ts
-import {
-  AdMob,
-  AppOpenAdPluginEvents,
-  AppOpenAdOptions,
-} from '@capacitor-community/admob';
-
-export async function showAppOpenAd(): Promise<void> {
-  // Escuchar eventos
-  AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
-    console.log('App Open Ad cargado');
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
-    console.log('Fallo al cargar App Open Ad');
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
-    console.log('App Open Ad abierto');
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
-    console.log('App Open Ad cerrado');
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
-    console.log('Fallo al mostrar App Open Ad');
-  });
-
-  const options: AppOpenAdOptions = {
-    adUnitId: 'TU_AD_UNIT_ID',
-    showOnColdStart: true, // Opcional
-    showOnForeground: true, // Opcional
-  };
-  await AdMob.loadAppOpen(options);
-  const { value } = await AdMob.isAppOpenLoaded();
-  if (value) {
-    await AdMob.showAppOpen();
-  }
-}
 
 <p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
 <h3 align="center">AdMob</h3>
@@ -227,7 +189,46 @@ const consentInfo = await AdMob.requestConsentInfo({
 2. AdMob.requestConsentInfo
 3. AdMob.showConsentForm (If consent form required )
    3/ AdMob.showBanner
+   
+### Show App Open Ad
 
+```ts
+import {
+  AdMob,
+  AppOpenAdPluginEvents,
+  AppOpenAdOptions,
+} from '@capacitor-community/admob';
+
+export async function showAppOpenAd(): Promise<void> {
+  // Escuchar eventos
+  AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
+    console.log('App Open Ad cargado');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
+    console.log('Fallo al cargar App Open Ad');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
+    console.log('App Open Ad abierto');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
+    console.log('App Open Ad cerrado');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
+    console.log('Fallo al mostrar App Open Ad');
+  });
+
+  const options: AppOpenAdOptions = {
+    adUnitId: 'TU_AD_UNIT_ID',
+    showOnColdStart: true, // Opcional
+    showOnForeground: true, // Opcional
+  };
+  await AdMob.loadAppOpen(options);
+  const { value } = await AdMob.isAppOpenLoaded();
+  if (value) {
+    await AdMob.showAppOpen();
+  }
+}
+```
 ### Show Banner
 
 ```ts
