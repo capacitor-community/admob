@@ -10,22 +10,22 @@ export type AppOpenDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented
 
 export interface AppOpenAdPlugin {
   /**
-   * Carga un anuncio App Open
+   * Load an ad App Open
    */
   loadAppOpen(options: AppOpenAdOptions): Promise<void>;
 
   /**
-   * Muestra el anuncio App Open si está cargado
+   * Shows the App Open ad if loaded
    */
   showAppOpen(): Promise<void>;
 
   /**
-   * Verifica si el anuncio App Open está cargado
+   * Check if the App Open ad is loaded
    */
   isAppOpenLoaded(): Promise<{ value: boolean }>;
 
   /**
-   * Agrega listeners para eventos de App Open
+   * Add listeners for App Open events
    */
   addListener(
     eventName: AppOpenAdPluginEvents,
