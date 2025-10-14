@@ -200,7 +200,7 @@ import {
 } from '@capacitor-community/admob';
 
 export async function showAppOpenAd(): Promise<void> {
-  // Escuchar eventos
+  // listen to events
   AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
     console.log('App Open Ad loaded');
   });
