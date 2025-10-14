@@ -4,12 +4,14 @@ import type { InterstitialDefinitions } from './interstitial';
 import type { RewardDefinitions } from './reward';
 import type { RewardInterstitialDefinitions } from './reward-interstitial';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
+import type { AppOpenAdPlugin } from './app-open';
 
 type AdMobDefinitions = BannerDefinitions &
   RewardDefinitions &
   RewardInterstitialDefinitions &
   InterstitialDefinitions &
-  AdmobConsentDefinitions;
+  AdmobConsentDefinitions &
+  AppOpenAdPlugin;
 
 export interface AdMobPlugin extends AdMobDefinitions {
   /**
