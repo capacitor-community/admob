@@ -19,7 +19,9 @@ public class AppOpenAdManager {
     }
 
     public void loadAd(Context context, final Runnable onLoaded, final Runnable onFailed) {
-        if (isLoadingAd || appOpenAd != null) return;
+        if (isLoadingAd || appOpenAd != null) {
+          return;
+        }
         isLoadingAd = true;
         AdRequest request = new AdRequest.Builder().build();
         AppOpenAd.load(
