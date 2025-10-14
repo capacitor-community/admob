@@ -33,7 +33,7 @@ export class AppComponent {
         volume: 0.5,
       });
 
-      // Ejemplo de App Open Ad
+      // example of App Open Ad
       this.showAppOpenAd();
     });
   }
@@ -41,23 +41,23 @@ export class AppComponent {
   async showAppOpenAd() {
     // Escuchar eventos
     AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
-      console.log('App Open Ad cargado');
+      console.log('App Open Ad loaded');
     });
     AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
-      console.log('Fallo al cargar App Open Ad');
+      console.log('Failed to load App Open Ad');
     });
     AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
-      console.log('App Open Ad abierto');
+      console.log('App Open Ad open');
     });
     AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
-      console.log('App Open Ad cerrado');
+      console.log('App Open Ad close');
     });
     AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
-      console.log('Fallo al mostrar App Open Ad');
+      console.log('Failed to load App Open Ad');
     });
 
     const options: AppOpenAdOptions = {
-      adUnitId: 'TU_AD_UNIT_ID', // Reemplaza por tu ID real
+      adUnitId: 'TU_AD_UNIT_ID', // Replace with your real ID
       showOnColdStart: true,
       showOnForeground: true,
     };
