@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Platform } from '@ionic/angular';
+import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 
 import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions, AdMobInitializationOptions } from '@capacitor-community/admob';
 
@@ -8,7 +8,7 @@ import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions, AdMobInitializationOpti
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
-  standalone: false,
+  imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
   constructor(private platform: Platform) {

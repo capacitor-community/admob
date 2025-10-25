@@ -38,7 +38,7 @@ class ConsentExecutor: NSObject {
         guard let rootViewController = plugin?.getRootVC() else {
             return call.reject("No ViewController")
         }
-        
+
         Task {
             do {
                 try await ConsentForm.presentPrivacyOptionsForm(from: rootViewController)
@@ -92,7 +92,7 @@ class ConsentExecutor: NSObject {
             return "UNKNOWN"
         }
     }
-    
+
     func getPrivacyOptionsRequirementStatus(_ requirementStatus: PrivacyOptionsRequirementStatus) -> String {
         switch requirementStatus {
         case PrivacyOptionsRequirementStatus.required:

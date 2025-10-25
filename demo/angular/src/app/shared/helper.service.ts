@@ -11,15 +11,10 @@ export class HelperService {
   /**
    * items is not Deep Copy, this is substitution
    */
-  public async updateItem(
-    items: ITestItems[],
-    name: string,
-    result: boolean,
-    value: any = undefined,
-  ) {
+  public async updateItem(items: ITestItems[], name: string, result: boolean | undefined, value: unknown = undefined) {
     this.zone.run(() => {
       let isChanged = false;
-      items = items.map(item => {
+      items = items.map((item) => {
         if (item.name === name && item.result === undefined && !isChanged) {
           isChanged = true;
           if (item.expect === undefined) {
@@ -31,7 +26,7 @@ export class HelperService {
             if (item.name === BannerAdPluginEvents.SizeChanged) {
               item.result = this.bannerAdPluginEventsSizeChanged(
                 item.expect as number,
-                value,
+                value as { width: number; height: number },
               );
             } else if (item.expect === 'error') {
               item.result = this.receiveErrorValue(value);
@@ -41,20 +36,17 @@ export class HelperService {
         return item;
       });
     });
-    await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
   }
 
-  private bannerAdPluginEventsSizeChanged(
-    expect: number | string,
-    value: any,
-  ): boolean {
+  private bannerAdPluginEventsSizeChanged(expect: number | string, value: { width: number; height: number }): boolean {
     if (expect === 0) {
       return value.width === 0 && value.height === 0;
     }
     return value.width > 0 && value.height > 0;
   }
 
-  private receiveErrorValue(value: any): boolean {
-    return value.hasOwnProperty('code') && value.hasOwnProperty('message');
+  private receiveErrorValue(value: unknown): boolean {
+    return typeof value === 'object' && value !== null && 'code' in value && 'message' in value;
   }
 }
