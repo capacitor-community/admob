@@ -43,4 +43,12 @@ internal class InterstitialAdStub: InterstitialAd() {
         TODO("Not yet implemented")
     }
 
+    override fun getPlacementId(): Long {
+        return 0L
+    }
+
+    override fun setPlacementId(p0: Long) {
+        TODO("Not yet implemented")
+    }
+
 }
