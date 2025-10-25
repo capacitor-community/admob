@@ -1,10 +1,25 @@
-import { Component, NgZone } from '@angular/core';
+import { Component } from '@angular/core';
 import { AdMob, RewardAdPluginEvents } from '@capacitor-community/admob';
 import { ITestItems } from '../../shared/interfaces';
-import { ViewDidEnter, ViewWillEnter, ViewWillLeave } from '@ionic/angular';
+import {
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonListHeader,
+  IonTitle,
+  IonToolbar,
+  ViewDidEnter,
+  ViewWillEnter,
+  ViewWillLeave,
+} from '@ionic/angular/standalone';
 import { PluginListenerHandle } from '@capacitor/core';
 import { rewardOptions } from '../../shared/ad.options';
 import { HelperService } from '../../shared/helper.service';
+import { addIcons } from 'ionicons';
+import { checkmarkCircle, notificationsCircleOutline, playOutline } from 'ionicons/icons';
 
 const tryItems: ITestItems[] = [
   {
@@ -46,42 +61,26 @@ const tryItems: ITestItems[] = [
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
-  standalone: false,
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonLabel, IonItem, IonIcon],
 })
 export class Tab3Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
   private readonly listenerHandlers: PluginListenerHandle[] = [];
   public eventItems: ITestItems[] = [];
-  constructor(private helper: HelperService) {}
+  constructor(private helper: HelperService) {
+    addIcons({ playOutline, notificationsCircleOutline, checkmarkCircle });
+  }
 
   ionViewWillEnter() {
     const eventKeys = Object.keys(RewardAdPluginEvents);
-    eventKeys.forEach(async key => {
-      const handler = AdMob.addListener(RewardAdPluginEvents[key], value => {
+    eventKeys.forEach(async (key) => {
+      const eventName = RewardAdPluginEvents[key as keyof typeof RewardAdPluginEvents];
+      const handler = AdMob.addListener(eventName as any, (value: unknown) => {
         if (key === 'Dismissed') {
           AdMob.prepareRewardVideoAd({ adId: 'failed' })
-            .then(
-              async () =>
-                await this.helper.updateItem(
-                  this.eventItems,
-                  'prepareRewardVideoAdFailed',
-                  false,
-                ),
-            )
-            .catch(
-              async () =>
-                await this.helper.updateItem(
-                  this.eventItems,
-                  'prepareRewardVideoAdFailed',
-                  true,
-                ),
-            );
+            .then(async () => await this.helper.updateItem(this.eventItems, 'prepareRewardVideoAdFailed', false))
+            .catch(async () => await this.helper.updateItem(this.eventItems, 'prepareRewardVideoAdFailed', true));
         }
-        this.helper.updateItem(
-          this.eventItems,
-          RewardAdPluginEvents[key],
-          true,
-          value,
-        );
+        this.helper.updateItem(this.eventItems, eventName, true, value);
       });
       this.listenerHandlers.push(await handler);
     });
@@ -91,42 +90,14 @@ export class Tab3Page implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
 
   async ionViewDidEnter() {
     await AdMob.prepareRewardVideoAd(rewardOptions)
-      .then(
-        async data =>
-          await this.helper.updateItem(
-            this.eventItems,
-            'prepareRewardVideoAd',
-            !!data.adUnitId,
-          ),
-      )
-      .catch(
-        async () =>
-          await this.helper.updateItem(
-            this.eventItems,
-            'prepareRewardVideoAd',
-            false,
-          ),
-      );
+      .then(async (data) => await this.helper.updateItem(this.eventItems, 'prepareRewardVideoAd', !!data.adUnitId))
+      .catch(async () => await this.helper.updateItem(this.eventItems, 'prepareRewardVideoAd', false));
     await AdMob.showRewardVideoAd()
-      .then(
-        async () =>
-          await this.helper.updateItem(
-            this.eventItems,
-            'showRewardVideoAd',
-            true,
-          ),
-      )
-      .catch(
-        async () =>
-          await this.helper.updateItem(
-            this.eventItems,
-            'showRewardVideoAd',
-            false,
-          ),
-      );
+      .then(async () => await this.helper.updateItem(this.eventItems, 'showRewardVideoAd', true))
+      .catch(async () => await this.helper.updateItem(this.eventItems, 'showRewardVideoAd', false));
   }
 
   ionViewWillLeave() {
-    this.listenerHandlers.forEach(handler => handler.remove());
+    this.listenerHandlers.forEach((handler) => handler.remove());
   }
 }
