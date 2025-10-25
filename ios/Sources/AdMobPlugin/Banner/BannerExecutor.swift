@@ -136,7 +136,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                                     attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
                                     multiplier: 1,
                                     constant: CGFloat(Int(self.Margin) * -1)),
-                    NSLayoutConstraint(item: bannerView,
+                 NSLayoutConstraint(item: bannerView,
                                     attribute: .centerX,
                                     relatedBy: .equal,
                                     toItem: rootViewController.view,
