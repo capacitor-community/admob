@@ -70,7 +70,6 @@ public class AdMob extends Plugin {
         getLogTag()
     );
 
-    // ✅ AppOpenAd Plugin block now inside the class
     private final AppOpenAdPlugin appOpenAdPlugin = new AppOpenAdPlugin();
 
     @PluginMethod
