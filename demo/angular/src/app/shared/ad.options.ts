@@ -1,8 +1,4 @@
-import {
-  BannerAdOptions,
-  BannerAdPosition,
-  BannerAdSize,
-} from '../../../../../dist/esm/banner';
+import { BannerAdOptions, BannerAdPosition, BannerAdSize } from '../../../../../dist/esm/banner';
 import { AdOptions } from '../../../../../dist/esm/shared';
 
 export const bannerTopOptions: BannerAdOptions = {

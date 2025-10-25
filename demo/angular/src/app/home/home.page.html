@@ -11,9 +11,11 @@
     </ion-toolbar>
   </ion-header>
 
-  <section class="ion-text-center ion-padding-top" *ngIf="isLoading">
-    <ion-spinner></ion-spinner>
-  </section>
+  @if (isLoading) {
+    <section class="ion-text-center ion-padding-top">
+      <ion-spinner></ion-spinner>
+    </section>
+  }
 
   <ion-list>
     <ion-list-header>
@@ -25,49 +27,51 @@
   </ion-list>
 
   <ion-list>
-    <ion-list-header><ion-label>Banner 
-      <ng-container *ngIf="lastBannerEvent$ | async as lastBannerEvent">
-      <br>(Last Event: {{lastBannerEvent.name }} | {{lastBannerEvent.value | json}})
-    </ng-container>
-    </ion-label></ion-list-header>
-    <ion-item>
-      <ion-label>Banner Size</ion-label>
-      <ion-select [(ngModel)]="currentBannerSize" interface="popover" placeholder="Default" slot="end">
-        <ion-select-option [value]="undefined">Default</ion-select-option>
-        <ion-select-option *ngFor="let size of bannerSizes" [value]="size">{{size}}</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-item button="true" (click)="showTopBanner()">Show Top Banner</ion-item>
-    <ion-item button="true" (click)="showBottomBanner()">Show Bottom Banner</ion-item>
-    <ion-item button="true" (click)="hideBanner()">Hide Banner</ion-item>
-    <ion-item button="true" (click)="resumeBanner()">Resume Banner</ion-item>
-    <ion-item button="true" lines="full" (click)="removeBanner()">Remove Banner</ion-item>
-  </ion-list>
+    <ion-list-header><ion-label>Banner
+      @if (lastBannerEvent$ | async; as lastBannerEvent) {
+        <br>(Last Event: {{lastBannerEvent.name }} | {{lastBannerEvent.value | json}})
+        }
+      </ion-label></ion-list-header>
+      <ion-item>
+        <ion-label>Banner Size</ion-label>
+        <ion-select [(ngModel)]="currentBannerSize" interface="popover" placeholder="Default" slot="end">
+          <ion-select-option [value]="undefined">Default</ion-select-option>
+          @for (size of bannerSizes; track size) {
+            <ion-select-option [value]="size">{{size}}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      <ion-item button="true" (click)="showTopBanner()">Show Top Banner</ion-item>
+      <ion-item button="true" (click)="showBottomBanner()">Show Bottom Banner</ion-item>
+      <ion-item button="true" (click)="hideBanner()">Hide Banner</ion-item>
+      <ion-item button="true" (click)="resumeBanner()">Resume Banner</ion-item>
+      <ion-item button="true" lines="full" (click)="removeBanner()">Remove Banner</ion-item>
+    </ion-list>
 
-  <ion-list>
-    <ion-list-header><ion-label>Interstitial
-      <ng-container *ngIf="lastInterstitialEvent$ | async as lastInterstitialEvent">
-        <br>(Last Event: {{lastInterstitialEvent.name }} | {{lastInterstitialEvent.value | json}})
-      </ng-container>
-      
-    </ion-label></ion-list-header>
+    <ion-list>
+      <ion-list-header><ion-label>Interstitial
+        @if (lastInterstitialEvent$ | async; as lastInterstitialEvent) {
+          <br>(Last Event: {{lastInterstitialEvent.name }} | {{lastInterstitialEvent.value | json}})
+          }
 
-    <ion-item button="true" (click)="prepareInterstitial()" [disabled]="isPrepareInterstitial">Prepare Interstitial</ion-item>
-    <ion-item button="true" lines="full" (click)="showInterstitial()" [disabled]="!isPrepareInterstitial">Show Interstitial</ion-item>
-  </ion-list>
+        </ion-label></ion-list-header>
 
-  <ion-list>
-    <ion-list-header><ion-label>Reward
-      <ng-container *ngIf="lastRewardEvent$ | async as lastRewardEvent">
-        <br>(Last Event: {{lastRewardEvent.name }} | {{lastRewardEvent.value | json}})
-      </ng-container>
-      
-    </ion-label></ion-list-header>
-    <ion-item button="true" (click)="prepareReward()" [disabled]="isPrepareReward">Prepare Reward</ion-item>
-    <ion-item button="true" lines="full" (click)="showReward()" [disabled]="!isPrepareReward">Show Reward</ion-item>
-  </ion-list>
-</ion-content>
+        <ion-item button="true" (click)="prepareInterstitial()" [disabled]="isPrepareInterstitial">Prepare Interstitial</ion-item>
+        <ion-item button="true" lines="full" (click)="showInterstitial()" [disabled]="!isPrepareInterstitial">Show Interstitial</ion-item>
+      </ion-list>
 
-<ion-footer>
-  <ion-toolbar color="primary" class="ion-text-center">Footer Components</ion-toolbar>
-</ion-footer>
+      <ion-list>
+        <ion-list-header><ion-label>Reward
+          @if (lastRewardEvent$ | async; as lastRewardEvent) {
+            <br>(Last Event: {{lastRewardEvent.name }} | {{lastRewardEvent.value | json}})
+            }
+
+          </ion-label></ion-list-header>
+          <ion-item button="true" (click)="prepareReward()" [disabled]="isPrepareReward">Prepare Reward</ion-item>
+          <ion-item button="true" lines="full" (click)="showReward()" [disabled]="!isPrepareReward">Show Reward</ion-item>
+        </ion-list>
+      </ion-content>
+
+      <ion-footer>
+        <ion-toolbar color="primary" class="ion-text-center">Footer Components</ion-toolbar>
+      </ion-footer>

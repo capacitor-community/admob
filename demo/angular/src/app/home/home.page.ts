@@ -1,66 +1,91 @@
 import { Component, NgZone } from '@angular/core';
-import { ViewWillEnter, ViewWillLeave } from '@ionic/angular';
+import {
+  IonContent,
+  IonFooter,
+  IonHeader,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonListHeader,
+  IonSelect,
+  IonSelectOption,
+  IonSpinner,
+  IonTitle,
+  IonToolbar,
+  ToastController,
+  ViewWillEnter,
+  ViewWillLeave,
+} from '@ionic/angular/standalone';
 import { PluginListenerHandle } from '@capacitor/core';
-import { ToastController } from '@ionic/angular';
 
 import {
   AdMob,
   AdMobBannerSize,
+  AdmobConsentDebugGeography,
+  AdmobConsentInfo,
+  AdmobConsentStatus,
   AdMobRewardItem,
   BannerAdOptions,
   BannerAdPluginEvents,
   BannerAdSize,
   InterstitialAdPluginEvents,
   RewardAdPluginEvents,
-  AdmobConsentInfo,
-  AdmobConsentStatus,
-  AdmobConsentDebugGeography,
 } from '@capacitor-community/admob';
 import { ReplaySubject } from 'rxjs';
-import {
-  bannerTopOptions,
-  bannerBottomOptions,
-  rewardOptions,
-  interstitialOptions,
-} from '../shared/ad.options';
+import { bannerBottomOptions, bannerTopOptions, interstitialOptions, rewardOptions } from '../shared/ad.options';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  standalone: false,
+  imports: [
+    FormsModule,
+    AsyncPipe,
+    JsonPipe,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonSpinner,
+    IonList,
+    IonListHeader,
+    IonLabel,
+    IonItem,
+    IonSelect,
+    IonSelectOption,
+    IonFooter,
+  ],
 })
 export class HomePage implements ViewWillEnter, ViewWillLeave {
-  public readonly bannerSizes: BannerAdSize[] = Object.keys(
-    BannerAdSize,
-  ) as BannerAdSize[];
+  public readonly bannerSizes: BannerAdSize[] = Object.keys(BannerAdSize) as BannerAdSize[];
   public currentBannerSize?: BannerAdSize;
 
   private readonly lastBannerEvent$$ = new ReplaySubject<{
     name: string;
-    value: any;
+    value: unknown;
   }>(1);
   public readonly lastBannerEvent$ = this.lastBannerEvent$$.asObservable();
 
   private readonly lastRewardEvent$$ = new ReplaySubject<{
     name: string;
-    value: any;
+    value: unknown;
   }>(1);
   public readonly lastRewardEvent$ = this.lastRewardEvent$$.asObservable();
 
   private readonly lastInterstitialEvent$$ = new ReplaySubject<{
     name: string;
-    value: any;
+    value: unknown;
   }>(1);
-  public readonly lastInterstitialEvent$ =
-    this.lastInterstitialEvent$$.asObservable();
+  public readonly lastInterstitialEvent$ = this.lastInterstitialEvent$$.asObservable();
 
   private readonly listenerHandlers: PluginListenerHandle[] = [];
   /**
    * Height of AdSize
    */
   private appMargin = 0;
-  private bannerPosition: 'top' | 'bottom';
+  private bannerPosition: 'top' | 'bottom' = 'bottom';
 
   /**
    * For ion-item of template disabled
@@ -82,32 +107,27 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
      * Run every time the Ad height changes.
      * AdMob cannot be displayed above the content, so create margin for AdMob.
      */
-    const resizeHandler = await AdMob.addListener(
-      BannerAdPluginEvents.SizeChanged,
-      (info: AdMobBannerSize) => {
-        this.appMargin = info.height;
-        const app: HTMLElement = document.querySelector('ion-router-outlet');
+    const resizeHandler = await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (info: AdMobBannerSize) => {
+      this.appMargin = info.height;
+      const app = document.querySelector<HTMLElement>('ion-router-outlet')!;
 
-        if (this.appMargin === 0) {
-          app.style.marginTop = '';
-          return;
+      if (this.appMargin === 0) {
+        app.style.marginTop = '';
+        return;
+      }
+
+      if (this.appMargin > 0) {
+        const body = document.querySelector<HTMLElement>('body')!;
+        const bodyStyles = window.getComputedStyle(body);
+        const safeAreaBottom = bodyStyles.getPropertyValue('--ion-safe-area-bottom');
+
+        if (this.bannerPosition === 'top') {
+          app.style.marginTop = this.appMargin + 'px';
+        } else {
+          app.style.marginBottom = `calc(${safeAreaBottom} + ${this.appMargin}px)`;
         }
-
-        if (this.appMargin > 0) {
-          const body = document.querySelector('body');
-          const bodyStyles = window.getComputedStyle(body);
-          const safeAreaBottom = bodyStyles.getPropertyValue(
-            '--ion-safe-area-bottom',
-          );
-
-          if (this.bannerPosition === 'top') {
-            app.style.marginTop = this.appMargin + 'px';
-          } else {
-            app.style.marginBottom = `calc(${safeAreaBottom} + ${this.appMargin}px)`;
-          }
-        }
-      },
-    );
+      }
+    });
 
     this.listenerHandlers.push(resizeHandler);
 
@@ -117,7 +137,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   }
 
   ionViewWillLeave() {
-    this.listenerHandlers.forEach(handler => handler.remove());
+    this.listenerHandlers.forEach((handler) => handler.remove());
   }
 
   /**
@@ -130,10 +150,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
       testDeviceIdentifiers: ['163FB114BEF1FC09FF772E930677A8D5'],
     });
 
-    if (
-      consentInfo.status === AdmobConsentStatus.REQUIRED ||
-      consentInfo.status === AdmobConsentStatus.OBTAINED
-    ) {
+    if (consentInfo.status === AdmobConsentStatus.REQUIRED || consentInfo.status === AdmobConsentStatus.OBTAINED) {
       this.isConsentAvailable = true;
 
       const toast = await this.toastCtrl.create({
@@ -208,9 +225,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
     };
     console.log('Requesting banner with this options', bannerOptions);
 
-    const result = await AdMob.showBanner(bannerOptions).catch(e =>
-      console.error(e),
-    );
+    const result = await AdMob.showBanner(bannerOptions).catch((e) => console.error(e));
 
     if (result === undefined) {
       return;
@@ -220,33 +235,33 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   }
 
   async hideBanner() {
-    const result = await AdMob.hideBanner().catch(e => console.log(e));
+    const result = await AdMob.hideBanner().catch((e) => console.log(e));
     if (result === undefined) {
       return;
     }
 
-    const app: HTMLElement = document.querySelector('ion-router-outlet');
+    const app = document.querySelector<HTMLElement>('ion-router-outlet')!;
     app.style.marginTop = '0px';
     app.style.marginBottom = '0px';
   }
 
   async resumeBanner() {
-    const result = await AdMob.resumeBanner().catch(e => console.log(e));
+    const result = await AdMob.resumeBanner().catch((e) => console.log(e));
     if (result === undefined) {
       return;
     }
 
-    const app: HTMLElement = document.querySelector('ion-router-outlet');
+    const app = document.querySelector<HTMLElement>('ion-router-outlet')!;
     app.style.marginBottom = this.appMargin + 'px';
   }
 
   async removeBanner() {
-    const result = await AdMob.removeBanner().catch(e => console.log(e));
+    const result = await AdMob.removeBanner().catch((e) => console.log(e));
     if (result === undefined) {
       return;
     }
 
-    const app: HTMLElement = document.querySelector('ion-router-outlet');
+    const app = document.querySelector<HTMLElement>('ion-router-outlet')!;
     app.style.marginBottom = '0px';
     this.appMargin = 0;
     this.isPrepareBanner = false;
@@ -271,9 +286,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   }
 
   async showReward() {
-    const result: AdMobRewardItem = await AdMob.showRewardVideoAd().catch(
-      e => undefined,
-    );
+    const result: AdMobRewardItem | undefined = await AdMob.showRewardVideoAd().catch((e) => undefined);
     if (result === undefined) {
       return;
     }
@@ -289,18 +302,16 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   private registerInterstitialListeners(): void {
     const eventKeys = Object.keys(InterstitialAdPluginEvents);
 
-    eventKeys.forEach(async key => {
-      console.log(`registering ${InterstitialAdPluginEvents[key]}`);
-      const handler = await AdMob.addListener(
-        InterstitialAdPluginEvents[key],
-        value => {
-          console.log(`Interstitial Event "${key}"`, value);
+    eventKeys.forEach(async (key) => {
+      const eventName = InterstitialAdPluginEvents[key as keyof typeof InterstitialAdPluginEvents];
+      console.log(`registering ${eventName}`);
+      const handler = await AdMob.addListener(eventName as any, (value: unknown) => {
+        console.log(`Interstitial Event "${key}"`, value);
 
-          this.ngZone.run(() => {
-            this.lastInterstitialEvent$$.next({ name: key, value: value });
-          });
-        },
-      );
+        this.ngZone.run(() => {
+          this.lastInterstitialEvent$$.next({ name: key, value: value });
+        });
+      });
       this.listenerHandlers.push(handler);
     });
   }
@@ -308,18 +319,16 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   private registerRewardListeners(): void {
     const eventKeys = Object.keys(RewardAdPluginEvents);
 
-    eventKeys.forEach(async key => {
-      console.log(`registering ${RewardAdPluginEvents[key]}`);
-      const handler = await AdMob.addListener(
-        RewardAdPluginEvents[key],
-        value => {
-          console.log(`Reward Event "${key}"`, value);
+    eventKeys.forEach(async (key) => {
+      const eventName = RewardAdPluginEvents[key as keyof typeof RewardAdPluginEvents];
+      console.log(`registering ${eventName}`);
+      const handler = await AdMob.addListener(eventName as any, (value: unknown) => {
+        console.log(`Reward Event "${key}"`, value);
 
-          this.ngZone.run(() => {
-            this.lastRewardEvent$$.next({ name: key, value: value });
-          });
-        },
-      );
+        this.ngZone.run(() => {
+          this.lastRewardEvent$$.next({ name: key, value: value });
+        });
+      });
       this.listenerHandlers.push(handler);
     });
   }
@@ -327,18 +336,16 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   private registerBannerListeners(): void {
     const eventKeys = Object.keys(BannerAdPluginEvents);
 
-    eventKeys.forEach(async key => {
-      console.log(`registering ${BannerAdPluginEvents[key]}`);
-      const handler = await AdMob.addListener(
-        BannerAdPluginEvents[key],
-        value => {
-          console.log(`Banner Event "${key}"`, value);
+    eventKeys.forEach(async (key) => {
+      const eventName = BannerAdPluginEvents[key as keyof typeof BannerAdPluginEvents];
+      console.log(`registering ${eventName}`);
+      const handler = await AdMob.addListener(eventName as any, (value: unknown) => {
+        console.log(`Banner Event "${key}"`, value);
 
-          this.ngZone.run(() => {
-            this.lastBannerEvent$$.next({ name: key, value: value });
-          });
-        },
-      );
+        this.ngZone.run(() => {
+          this.lastBannerEvent$$.next({ name: key, value: value });
+        });
+      });
       this.listenerHandlers.push(handler);
     });
   }
@@ -365,7 +372,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   }
 
   async showInterstitial() {
-    await AdMob.showInterstitial().catch(e => console.log(e));
+    await AdMob.showInterstitial().catch((e) => console.log(e));
 
     this.isPrepareInterstitial = false;
   }
