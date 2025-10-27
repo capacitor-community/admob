@@ -118,5 +118,83 @@ public class AdOptionsTest {
             assertEquals(userId, adOptions.ssvInfo.getUserId());
             assertEquals(customData, adOptions.ssvInfo.getCustomData());
         }
+        @Test
+        public void appOpen_ad_Id() {
+            final String expected = "Some Given AppOpen Test Id";
+            when(pluginCallMock.getString(eq("adId"), anyString())).thenReturn(expected);
+
+            final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
+
+            assertEquals(expected, adOptions.adId);
+        }
+
+        @Test
+        public void appOpen_position() {
+            final String wantedProperty = "position";
+            final String expected = "TOP_CENTER";
+            final String defaultValue = "BOTTOM_CENTER";
+            when(pluginCallMock.getString(eq(wantedProperty), anyString())).thenReturn(expected);
+
+            final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
+
+            verify(pluginCallMock).getString(wantedProperty, defaultValue);
+            assertEquals(expected, adOptions.position);
+        }
+
+        @Test
+        public void appOpen_margin() {
+            final String wantedProperty = "margin";
+            final int expected = 10;
+            final int defaultValue = 0;
+            when(pluginCallMock.getInt(eq(wantedProperty), anyInt())).thenReturn(expected);
+
+            final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
+
+            verify(pluginCallMock).getInt(wantedProperty, defaultValue);
+            assertEquals(expected, adOptions.margin);
+        }
+
+        @Test
+        public void appOpen_isTesting() {
+            final String wantedProperty = "isTesting";
+            final boolean expected = true;
+            final boolean defaultValue = false;
+            when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean())).thenReturn(expected);
+
+            final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
+
+            verify(pluginCallMock).getBoolean(wantedProperty, defaultValue);
+            assertEquals(expected, adOptions.isTesting);
+        }
+
+        @Test
+        public void appOpen_npa() {
+            final String wantedProperty = "npa";
+            final boolean expected = true;
+            final boolean defaultValue = false;
+            lenient().when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean())).thenReturn(expected);
+
+            final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
+
+            verify(pluginCallMock).getBoolean(wantedProperty, defaultValue);
+            assertEquals(expected, adOptions.npa);
+        }
+
+        @Test
+        public void appOpen_ssv() {
+            final String customData = "customData";
+            final String userId = "userId";
+            final String wantedProperty = "ssv";
+            final JSObject expected = new JSObject();
+            expected.put(customData, customData);
+            expected.put(userId, userId);
+            lenient().when(pluginCallMock.getObject(eq(wantedProperty))).thenReturn(expected);
+
+            final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
+
+            verify(pluginCallMock, atLeastOnce()).getObject(wantedProperty);
+            assertEquals(userId, adOptions.ssvInfo.getUserId());
+            assertEquals(customData, adOptions.ssvInfo.getCustomData());
+        }
     }
 }
