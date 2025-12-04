@@ -12,12 +12,7 @@ import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requi
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
-
-export interface AppOpenAdOptions {
-  adId: string;        // The AdMob unit ID for the app open ad
-  orientation?: 'portrait' | 'landscape'; // Optional orientation
-  npa?: boolean;       // Optional: non-personalized ads flag
-}
+import type { AppOpenAdOptions } from './app-open/app-open-ad-options.interface';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   async initialize(): Promise<void> {
