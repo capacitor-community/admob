@@ -5,12 +5,12 @@ import android.content.Context;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import com.getcapacitor.community.admob.AdMobPlugin;
+import com.getcapacitor.Plugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 @CapacitorPlugin(name = "AppOpenAd")
-public class AppOpenAdPlugin extends AdMobPlugin {
+public class AppOpenAdPlugin extends Plugin {
     private AppOpenAdManager appOpenAdManager;
 
     @PluginMethod
