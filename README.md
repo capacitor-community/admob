@@ -1143,7 +1143,7 @@ Muestra el anuncio App Open si está cargado
 isAppOpenLoaded() => Promise<{ value: boolean; }>
 ```
 
-Verifica si el anuncio App Open está cargado
+Check if the App Open ad is loaded
 
 **Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
