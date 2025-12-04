@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 
-import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions, AdMobInitializationOptions } from '@capacitor-community/admob';
+import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-root',
