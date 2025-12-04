@@ -39,7 +39,7 @@ export class AppComponent {
   }
 
   async showAppOpenAd() {
-    // Escuchar eventos
+    // Listen to events
     AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
       console.log('App Open Ad loaded');
     });
