@@ -1156,7 +1156,7 @@ Check if the App Open ad is loaded
 addListener(eventName: AppOpenAdPluginEvents, listenerFunc: (...args: any[]) => void) => Promise<PluginListenerHandle>
 ```
 
-Agrega listeners para eventos de App Open
+Add listeners for App Open events
 
 | Param              | Type                                                                    |
 | ------------------ | ----------------------------------------------------------------------- |
