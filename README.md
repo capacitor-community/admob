@@ -1132,7 +1132,7 @@ Carga un anuncio App Open
 showAppOpen() => Promise<void>
 ```
 
-Muestra el anuncio App Open si está cargado
+Shows the App Open ad if loaded
 
 --------------------
 
