@@ -191,16 +191,12 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
                 switch ATTrackingManager.trackingAuthorizationStatus {
                 case .authorized:
                     call.resolve(["status": AuthorizationStatusEnum.Authorized.rawValue])
-                    break
-                case .denied:
+                    case .denied:
                     call.resolve(["status": AuthorizationStatusEnum.Denied.rawValue])
-                    break
-                case .restricted:
+                    case .restricted:
                     call.resolve(["status": AuthorizationStatusEnum.Restricted.rawValue])
-                    break
-                case .notDetermined:
+                    case .notDetermined:
                     call.resolve(["status": AuthorizationStatusEnum.NotDetermined.rawValue])
-                    break
                 @unknown default:
                     call.reject("trackingAuthorizationStatus can't get status")
                 }
