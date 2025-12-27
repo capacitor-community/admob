@@ -4,8 +4,8 @@ ext {
     androidxCoordinatorLayoutVersion = project.hasProperty('androidxCoordinatorLayoutVersion') ? rootProject.ext.androidxCoordinatorLayoutVersion : '1.3.0'
     androidxJunitVersion = project.hasProperty('androidxJunitVersion') ? rootProject.ext.androidxJunitVersion : '1.3.0'
     androidxEspressoCoreVersion = project.hasProperty('androidxEspressoCoreVersion') ? rootProject.ext.androidxEspressoCoreVersion : '3.7.0'
-    playServicesAdsVersion = project.hasProperty('playServicesAdsVersion') ? rootProject.ext.playServicesAdsVersion : '24.7.+'
-    userMessagingPlatformVersion = project.hasProperty('userMessagingPlatformVersion') ? rootProject.ext.userMessagingPlatformVersion : '3.1.0'
+    playServicesAdsVersion = project.hasProperty('playServicesAdsVersion') ? rootProject.ext.playServicesAdsVersion : '24.9.+'
+    userMessagingPlatformVersion = project.hasProperty('userMessagingPlatformVersion') ? rootProject.ext.userMessagingPlatformVersion : '4.0.0'
     androidxCoreKTXVersion = project.hasProperty('androidxCoreKTXVersion') ? rootProject.ext.androidxCoreKTXVersion : '1.15.0'
 }
 
