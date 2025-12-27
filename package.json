@@ -1,6 +1,6 @@
 {
   "name": "@capacitor-community/admob",
-  "version": "8.0.0-0",
+  "version": "8.0.0",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
