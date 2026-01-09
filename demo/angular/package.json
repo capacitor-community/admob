@@ -31,7 +31,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^21.0.4",
     "@angular/cli": "^21.0.4",
-    "@angular/compiler": "^21.0.6",
+    "@angular/compiler": "^21.0.7",
     "@angular/compiler-cli": "^21.0.6",
     "@angular/language-service": "^21.0.6",
     "@capacitor/cli": "^8.0.0",
