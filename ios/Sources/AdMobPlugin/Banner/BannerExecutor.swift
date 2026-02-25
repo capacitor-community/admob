@@ -20,23 +20,17 @@ class BannerExecutor: NSObject, BannerViewDelegate {
             switch adSize {
             case "BANNER":
                 bannerSize = AdSizeBanner
-                break
-            case "LARGE_BANNER":
+                case "LARGE_BANNER":
                 bannerSize = AdSizeLargeBanner
-                break
-            case "FULL_BANNER":
+                case "FULL_BANNER":
                 bannerSize = AdSizeFullBanner
-                break
-            case "LEADERBOARD":
+                case "LEADERBOARD":
                 bannerSize = AdSizeLeaderboard
-                break
-            case "MEDIUM_RECTANGLE":
+                case "MEDIUM_RECTANGLE":
                 bannerSize = AdSizeMediumRectangle
-                break
-            case "SMART_BANNER":
+                case "SMART_BANNER":
                 bannerSize = kGADAdSizeSmartBannerPortrait
-                break
-            default: // ADAPTIVE_BANNER
+                default: // ADAPTIVE_BANNER
                 let frame = { () -> CGRect in
                     // Here safe area is taken into account, hence the view frame is used
                     // after the view has been laid out.
@@ -44,7 +38,6 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                 }()
                 let viewWidth = frame.size.width
                 bannerSize = currentOrientationAnchoredAdaptiveBanner(width: viewWidth)
-                break
             }
 
             self.bannerView = BannerView(adSize: bannerSize)

@@ -53,7 +53,7 @@ jobs:
       - run: npm run verify:android
 
   verify-ios:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3

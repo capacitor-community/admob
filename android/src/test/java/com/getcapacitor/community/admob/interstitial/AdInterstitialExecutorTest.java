@@ -146,7 +146,8 @@ class AdInterstitialExecutorTest {
             Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
             uiThreadRunnable.run();
 
-            interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(), idArgumentCaptor.capture(), adRequestCaptor.capture(), any())
+            interstitialAdMockedStatic.verify(() ->
+                InterstitialAd.load(any(), idArgumentCaptor.capture(), adRequestCaptor.capture(), any())
             );
 
             assertEquals(idFromViewHelper, idArgumentCaptor.getValue());
