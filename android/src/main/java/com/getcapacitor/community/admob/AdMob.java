@@ -8,7 +8,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
-
+import com.getcapacitor.community.admob.appopen.AppOpenAdPlugin;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.getcapacitor.community.admob.consent.AdConsentExecutor;
 import com.getcapacitor.community.admob.helpers.AuthorizationStatusEnum;
@@ -16,19 +16,14 @@ import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndListeners;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.getcapacitor.community.admob.rewardedinterstitial.AdRewardInterstitialExecutor;
-import com.getcapacitor.community.admob.appopen.AppOpenAdPlugin;
-
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-
 import org.json.JSONException;
 
 @CapacitorPlugin(
-    permissions = {
-        @Permission(alias = "network", strings = { Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET })
-    }
+    permissions = { @Permission(alias = "network", strings = { Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET }) }
 )
 public class AdMob extends Plugin {
 
@@ -74,12 +69,12 @@ public class AdMob extends Plugin {
 
     @PluginMethod
     public void loadAppOpen(final PluginCall call) {
-        appOpenAdPlugin.loadAppOpen(call);
+        appOpenAdPlugin.loadAppOpen(getContext(), call, this::notifyListeners);
     }
 
     @PluginMethod
     public void showAppOpen(final PluginCall call) {
-        appOpenAdPlugin.showAppOpen(call);
+        appOpenAdPlugin.showAppOpen(getActivity(), call, this::notifyListeners);
     }
 
     @PluginMethod

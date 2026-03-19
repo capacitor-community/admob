@@ -1,7 +1,9 @@
 import type { PluginListenerHandle } from '@capacitor/core';
+
 import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import type { AppOpenAdPluginEvents } from './app-open-ad-plugin-events.enum';
+
 import type { AppOpenAdOptions } from './app-open-ad-options.interface';
+import type { AppOpenAdPluginEvents } from './app-open-ad-plugin-events.enum';
 
 export type AppOpenDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<
   AppOpenAdPluginEvents,

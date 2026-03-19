@@ -35,11 +35,23 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     ]
     private let appOpenAdPlugin = AppOpenAdPlugin()
     @objc func loadAppOpen(_ call: CAPPluginCall) {
-        appOpenAdPlugin.loadAppOpen(call)
+        appOpenAdPlugin.loadAppOpen(
+            call,
+            getRootViewController: self.getRootVC,
+            notify: { [weak self] eventName, data in
+                self?.notifyListeners(eventName, data: data)
+            }
+        )
     }
 
     @objc func showAppOpen(_ call: CAPPluginCall) {
-        appOpenAdPlugin.showAppOpen(call)
+        appOpenAdPlugin.showAppOpen(
+            call,
+            getRootViewController: self.getRootVC,
+            notify: { [weak self] eventName, data in
+                self?.notifyListeners(eventName, data: data)
+            }
+        )
     }
 
     @objc func isAppOpenLoaded(_ call: CAPPluginCall) {

@@ -54,13 +54,11 @@ export class AppComponent {
       console.log('App Open Ad close');
     });
     AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
-      console.log('Failed to load App Open Ad');
+      console.log('Failed to show App Open Ad');
     });
 
     const options: AppOpenAdOptions = {
-      adUnitId: 'TU_AD_UNIT_ID', // Replace with your real ID
-      showOnColdStart: true,
-      showOnForeground: true,
+      adUnitId: 'YOUR_AD_UNIT_ID', // Replace with your real ID
     };
     await AdMob.loadAppOpen(options);
     const { value } = await AdMob.isAppOpenLoaded();

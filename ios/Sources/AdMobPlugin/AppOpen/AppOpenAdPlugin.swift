@@ -2,11 +2,14 @@ import Foundation
 import Capacitor
 import UIKit
 
-@objc(AppOpenAdPlugin)
-public class AppOpenAdPlugin: CAPPlugin {
+@objc public class AppOpenAdPlugin: NSObject {
     private var appOpenAdManager: AppOpenAdManager?
 
-    @objc func loadAppOpen(_ call: CAPPluginCall) {
+    @objc func loadAppOpen(
+        _ call: CAPPluginCall,
+        getRootViewController: @escaping () -> UIViewController?,
+        notify: @escaping (String, [String: Any]) -> Void
+    ) {
         guard let adUnitId = call.getString("adUnitId") else {
             call.reject("adUnitId is required")
             return
@@ -15,12 +18,12 @@ public class AppOpenAdPlugin: CAPPlugin {
             appOpenAdManager = AppOpenAdManager(adUnitId: adUnitId)
         }
         DispatchQueue.main.async {
-            if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
+            if let rootVC = getRootViewController() {
                 self.appOpenAdManager?.loadAd(rootViewController: rootVC, onLoaded: {
-                    self.notifyListeners("appOpenAdLoaded", data: [:])
+                    notify("appOpenAdLoaded", [:])
                     call.resolve()
                 }, onFailed: {
-                    self.notifyListeners("appOpenAdFailedToLoad", data: [:])
+                    notify("appOpenAdFailedToLoad", [:])
                     call.reject("Failed to load App Open Ad")
                 })
             } else {
@@ -29,14 +32,25 @@ public class AppOpenAdPlugin: CAPPlugin {
         }
     }
 
-    @objc func showAppOpen(_ call: CAPPluginCall) {
+    @objc func showAppOpen(
+        _ call: CAPPluginCall,
+        getRootViewController: @escaping () -> UIViewController?,
+        notify: @escaping (String, [String: Any]) -> Void
+    ) {
         DispatchQueue.main.async {
-            if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
-                self.appOpenAdManager?.showAdIfAvailable(rootViewController: rootVC, onClosed: {
-                    self.notifyListeners("appOpenAdClosed", data: [:])
+            guard self.appOpenAdManager != nil else {
+                call.reject("App Open Ad manager is not initialized")
+                return
+            }
+
+            if let rootVC = getRootViewController() {
+                self.appOpenAdManager?.showAdIfAvailable(rootViewController: rootVC, onOpened: {
+                    notify("appOpenAdOpened", [:])
+                }, onClosed: {
+                    notify("appOpenAdClosed", [:])
                     call.resolve()
                 }, onFailedToShow: {
-                    self.notifyListeners("appOpenAdFailedToShow", data: [:])
+                    notify("appOpenAdFailedToShow", [:])
                     call.reject("Failed to show App Open Ad")
                 })
             } else {

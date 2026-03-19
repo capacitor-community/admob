@@ -7,12 +7,12 @@ import type {
   AdmobConsentInfo,
   AdmobConsentRequestOptions,
 } from '.';
+import type { AppOpenAdOptions } from './app-open/app-open-ad-options.interface';
 import { AdmobConsentStatus } from './consent/consent-status.enum';
 import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
-import type { AppOpenAdOptions } from './app-open/app-open-ad-options.interface';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   async initialize(): Promise<void> {
@@ -131,8 +131,9 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     return { value: false };
   }
 
-  addListener(eventName: string, _listenerFunc: (...args: any[]) => void): any {
+  addListener(eventName: string, listenerFunc: (...args: any[]) => void): any {
+    void listenerFunc;
     console.log('addListener', eventName);
-    return { remove: async () => {} };
+    return { remove: () => Promise.resolve() };
   }
 }

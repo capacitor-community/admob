@@ -3,12 +3,13 @@ package com.getcapacitor.community.admob.appopen;
 import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
-import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.appopen.AppOpenAd;
 
 public class AppOpenAdManager {
+
     private AppOpenAd appOpenAd = null;
     private boolean isLoadingAd = false;
     private boolean isShowingAd = false;
@@ -19,7 +20,17 @@ public class AppOpenAdManager {
     }
 
     public void loadAd(Context context, final Runnable onLoaded, final Runnable onFailed) {
-        if (isLoadingAd || appOpenAd != null) {
+        if (appOpenAd != null) {
+            if (onLoaded != null) {
+                onLoaded.run();
+            }
+            return;
+        }
+
+        if (isLoadingAd) {
+            if (onFailed != null) {
+                onFailed.run();
+            }
             return;
         }
 
@@ -54,7 +65,7 @@ public class AppOpenAdManager {
         );
     }
 
-    public void showAdIfAvailable(Activity activity, final Runnable onClosed, final Runnable onFailedToShow) {
+    public void showAdIfAvailable(Activity activity, final Runnable onOpened, final Runnable onClosed, final Runnable onFailedToShow) {
         if (appOpenAd == null || isShowingAd) {
             if (onFailedToShow != null) {
                 onFailedToShow.run();
@@ -63,27 +74,36 @@ public class AppOpenAdManager {
         }
 
         isShowingAd = true;
-        appOpenAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-            @Override
-            public void onAdDismissedFullScreenContent() {
-                appOpenAd = null;
-                isShowingAd = false;
+        appOpenAd.setFullScreenContentCallback(
+            new FullScreenContentCallback() {
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    if (onOpened != null) {
+                        onOpened.run();
+                    }
+                }
 
-                if (onClosed != null) {
-                    onClosed.run();
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    appOpenAd = null;
+                    isShowingAd = false;
+
+                    if (onClosed != null) {
+                        onClosed.run();
+                    }
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                    appOpenAd = null;
+                    isShowingAd = false;
+
+                    if (onFailedToShow != null) {
+                        onFailedToShow.run();
+                    }
                 }
             }
-
-            @Override
-            public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
-                appOpenAd = null;
-                isShowingAd = false;
-
-                if (onFailedToShow != null) {
-                    onFailedToShow.run();
-                }
-            }
-        });
+        );
 
         appOpenAd.show(activity);
     }
