@@ -7,13 +7,20 @@ import UIKit
     private var isLoadingAd = false
     private var isShowingAd = false
     private var adUnitId: String
+    private var onOpened: (() -> Void)?
 
     public init(adUnitId: String) {
         self.adUnitId = adUnitId
     }
 
     public func loadAd(rootViewController: UIViewController, onLoaded: @escaping () -> Void, onFailed: @escaping () -> Void) {
-        if isLoadingAd || appOpenAd != nil {
+        if appOpenAd != nil {
+            onLoaded()
+            return
+        }
+
+        if isLoadingAd {
+            onFailed()
             return
         }
 
@@ -30,17 +37,23 @@ import UIKit
         }
     }
 
-    public func showAdIfAvailable(rootViewController: UIViewController, onClosed: @escaping () -> Void, onFailedToShow: @escaping () -> Void) {
+    public func showAdIfAvailable(
+        rootViewController: UIViewController,
+        onOpened: @escaping () -> Void,
+        onClosed: @escaping () -> Void,
+        onFailedToShow: @escaping () -> Void
+    ) {
         guard let ad = appOpenAd, !isShowingAd else {
             onFailedToShow()
             return
         }
 
+        self.onOpened = onOpened
+        self.onClosed = onClosed
+        self.onFailedToShow = onFailedToShow
         isShowingAd = true
         ad.fullScreenContentDelegate = self
         ad.present(fromRootViewController: rootViewController)
-        self.onClosed = onClosed
-        self.onFailedToShow = onFailedToShow
     }
 
     public func isAdLoaded() -> Bool {
@@ -52,6 +65,10 @@ import UIKit
 }
 
 extension AppOpenAdManager: GADFullScreenContentDelegate {
+    public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        onOpened?()
+    }
+
     public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         appOpenAd = nil
         isShowingAd = false

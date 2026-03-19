@@ -2,19 +2,23 @@ package com.getcapacitor.community.admob.appopen;
 
 import android.app.Activity;
 import android.content.Context;
+import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.PluginMethod;
-import com.getcapacitor.annotation.CapacitorPlugin;
-import com.getcapacitor.Plugin;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-@CapacitorPlugin(name = "AppOpenAd")
-public class AppOpenAdPlugin extends Plugin {
+public class AppOpenAdPlugin {
+
+    public interface EventNotifier {
+        void notify(String eventName, JSObject data);
+    }
+
     private AppOpenAdManager appOpenAdManager;
 
-    @PluginMethod
-    public void loadAppOpen(PluginCall call) {
+    public void loadAppOpen(Context context, PluginCall call, EventNotifier notifier) {
+        if (context == null) {
+            call.reject("Context is not available");
+            return;
+        }
+
         String adUnitId = call.getString("adUnitId");
         if (adUnitId == null) {
             call.reject("adUnitId is required");
@@ -23,37 +27,51 @@ public class AppOpenAdPlugin extends Plugin {
         if (appOpenAdManager == null) {
             appOpenAdManager = new AppOpenAdManager(adUnitId);
         }
-        Context context = getContext();
-        appOpenAdManager.loadAd(context, () -> {
-            notifyListeners("appOpenAdLoaded", new JSONObject());
-            call.resolve();
-        }, () -> {
-            notifyListeners("appOpenAdFailedToLoad", new JSONObject());
-            call.reject("Failed to load App Open Ad");
-        });
+
+        appOpenAdManager.loadAd(
+            context,
+            () -> {
+                notifier.notify("appOpenAdLoaded", new JSObject());
+                call.resolve();
+            },
+            () -> {
+                notifier.notify("appOpenAdFailedToLoad", new JSObject());
+                call.reject("Failed to load App Open Ad");
+            }
+        );
     }
 
-    @PluginMethod
-    public void showAppOpen(PluginCall call) {
-        Activity activity = getActivity();
-        appOpenAdManager.showAdIfAvailable(activity, () -> {
-            notifyListeners("appOpenAdClosed", new JSONObject());
-            call.resolve();
-        }, () -> {
-            notifyListeners("appOpenAdFailedToShow", new JSONObject());
-            call.reject("Failed to show App Open Ad");
-        });
+    public void showAppOpen(Activity activity, PluginCall call, EventNotifier notifier) {
+        if (activity == null) {
+            call.reject("Activity is not available");
+            return;
+        }
+
+        if (appOpenAdManager == null || !appOpenAdManager.isAdLoaded()) {
+            call.reject("App Open Ad is not loaded");
+            return;
+        }
+
+        appOpenAdManager.showAdIfAvailable(
+            activity,
+            () -> {
+                notifier.notify("appOpenAdOpened", new JSObject());
+            },
+            () -> {
+                notifier.notify("appOpenAdClosed", new JSObject());
+                call.resolve();
+            },
+            () -> {
+                notifier.notify("appOpenAdFailedToShow", new JSObject());
+                call.reject("Failed to show App Open Ad");
+            }
+        );
     }
 
-    @PluginMethod
     public void isAppOpenLoaded(PluginCall call) {
         boolean loaded = appOpenAdManager != null && appOpenAdManager.isAdLoaded();
-        try {
-            JSONObject result = new JSONObject();
-            result.put("value", loaded);
-            call.resolve(result);
-        } catch (JSONException e) {
-            call.reject("JSON error");
-        }
+        JSObject result = new JSObject();
+        result.put("value", loaded);
+        call.resolve(result);
     }
 }
