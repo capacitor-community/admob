@@ -1,3 +1,42 @@
+### Mostrar App Open Ad
+
+```ts
+import {
+  AdMob,
+  AppOpenAdPluginEvents,
+  AppOpenAdOptions,
+} from '@capacitor-community/admob';
+
+export async function showAppOpenAd(): Promise<void> {
+  // Escuchar eventos
+  AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
+    console.log('App Open Ad cargado');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
+    console.log('Fallo al cargar App Open Ad');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
+    console.log('App Open Ad abierto');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
+    console.log('App Open Ad cerrado');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
+    console.log('Fallo al mostrar App Open Ad');
+  });
+
+  const options: AppOpenAdOptions = {
+    adUnitId: 'TU_AD_UNIT_ID',
+    showOnColdStart: true, // Opcional
+    showOnForeground: true, // Opcional
+  };
+  await AdMob.loadAppOpen(options);
+  const { value } = await AdMob.isAppOpenLoaded();
+  if (value) {
+    await AdMob.showAppOpen();
+  }
+}
+
 <p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
 <h3 align="center">AdMob</h3>
 <p align="center"><strong><code>@capacitor-community/admob</code></strong></p>
@@ -371,6 +410,10 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerrewardinterstitialadplugineventsdismissed-)
 * [`addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoshow-)
 * [`addListener(RewardInterstitialAdPluginEvents.Showed, ...)`](#addlistenerrewardinterstitialadplugineventsshowed-)
+* [`loadAppOpen(...)`](#loadappopen)
+* [`showAppOpen()`](#showappopen)
+* [`isAppOpenLoaded()`](#isappopenloaded)
+* [`addListener(AppOpenAdPluginEvents, ...)`](#addlistenerappopenadpluginevents-)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -1067,6 +1110,63 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 --------------------
 
 
+### loadAppOpen(...)
+
+```typescript
+loadAppOpen(options: AppOpenAdOptions) => Promise<void>
+```
+
+Carga un anuncio App Open
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#appopenadoptions">AppOpenAdOptions</a></code> |
+
+--------------------
+
+
+### showAppOpen()
+
+```typescript
+showAppOpen() => Promise<void>
+```
+
+Muestra el anuncio App Open si está cargado
+
+--------------------
+
+
+### isAppOpenLoaded()
+
+```typescript
+isAppOpenLoaded() => Promise<{ value: boolean; }>
+```
+
+Verifica si el anuncio App Open está cargado
+
+**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents, listenerFunc: (...args: any[]) => void) => Promise<PluginListenerHandle>
+```
+
+Agrega listeners para eventos de App Open
+
+| Param              | Type                                                                    |
+| ------------------ | ----------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents</a></code> |
+| **`listenerFunc`** | <code>(...args: any[]) =&gt; void</code>                                |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -1228,6 +1328,15 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 | **`amount`** | <code>number</code> | Rewarded amount user got |
 
 
+#### AppOpenAdOptions
+
+| Prop                   | Type                 |
+| ---------------------- | -------------------- |
+| **`adUnitId`**         | <code>string</code>  |
+| **`showOnColdStart`**  | <code>boolean</code> |
+| **`showOnForeground`** | <code>boolean</code> |
+
+
 ### Type Aliases
 
 
@@ -1240,7 +1349,9 @@ https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
@@ -1353,6 +1464,17 @@ From T, pick a set of properties whose keys are in the union K
 | **`FailedToShow`** | <code>'onRewardedInterstitialAdFailedToShow'</code> | Emits when the AdReward video is failed to show                                                                                                                                                                                                                                                                                                        |
 | **`Dismissed`**    | <code>'onRewardedInterstitialAdDismissed'</code>    | Emits when the AdReward video is not visible to the user anymore. **Important**: This has nothing to do with the reward it self. This event will emits in this two cases: 1. The user starts the video ad but close it before the reward emit. 2. The user start the video and see it until end, then gets the reward and after that the ad is closed. |
 | **`Rewarded`**     | <code>'onRewardedInterstitialAdReward'</code>       | Emits when user get rewarded from AdReward                                                                                                                                                                                                                                                                                                             |
+
+
+#### AppOpenAdPluginEvents
+
+| Members            | Value                                |
+| ------------------ | ------------------------------------ |
+| **`Loaded`**       | <code>'appOpenAdLoaded'</code>       |
+| **`FailedToLoad`** | <code>'appOpenAdFailedToLoad'</code> |
+| **`Opened`**       | <code>'appOpenAdOpened'</code>       |
+| **`Closed`**       | <code>'appOpenAdClosed'</code>       |
+| **`FailedToShow`** | <code>'appOpenAdFailedToShow'</code> |
 
 </docgen-api>
 
