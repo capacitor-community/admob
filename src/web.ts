@@ -1,3 +1,5 @@
+
+
 import { WebPlugin } from '@capacitor/core';
 
 import type {
@@ -17,6 +19,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   async initialize(): Promise<void> {
     console.log('initialize');
   }
+
+  // Métodos stub para App Open Ad
 
   async requestTrackingAuthorization(): Promise<void> {
     console.log('requestTrackingAuthorization');
@@ -119,5 +123,23 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
       type: '',
       amount: 0,
     };
+  }
+
+  // Métodos stub para App Open Ad
+  async loadAppOpen(options: any): Promise<void> {
+    console.log('loadAppOpen', options);
+  }
+
+  async showAppOpen(): Promise<void> {
+    console.log('showAppOpen');
+  }
+
+  async isAppOpenLoaded(): Promise<{ value: boolean }> {
+    return { value: false };
+  }
+
+  addListener(eventName: string, _listenerFunc: (...args: any[]) => void): any {
+    console.log('addListener', eventName);
+    return { remove: async () => {} };
   }
 }
