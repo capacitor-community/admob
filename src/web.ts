@@ -7,6 +7,7 @@ import type {
   AdmobConsentInfo,
   AdmobConsentRequestOptions,
 } from '.';
+import type { AppOpenAdOptions } from './app-open/app-open-ad-options.interface';
 import { AdmobConsentStatus } from './consent/consent-status.enum';
 import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
 import type { AdMobRewardItem } from './reward';
@@ -67,17 +68,14 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log('showBanner', options);
   }
 
-  // Hide the banner, remove it from screen, but can show it later
   async hideBanner(): Promise<void> {
     console.log('hideBanner');
   }
 
-  // Resume the banner, show it after hide
   async resumeBanner(): Promise<void> {
     console.log('resumeBanner');
   }
 
-  // Destroy the banner, remove it from screen.
   async removeBanner(): Promise<void> {
     console.log('removeBanner');
   }
@@ -94,7 +92,7 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   }
 
   async prepareRewardVideoAd(options: AdOptions): Promise<AdLoadInfo> {
-    console.log(options);
+    console.log('prepareRewardVideoAd', options);
     return {
       adUnitId: options.adId,
     };
@@ -108,7 +106,7 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
   }
 
   async prepareRewardInterstitialAd(options: AdOptions): Promise<AdLoadInfo> {
-    console.log(options);
+    console.log('prepareRewardInterstitialAd', options);
     return {
       adUnitId: options.adId,
     };
@@ -119,5 +117,23 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
       type: '',
       amount: 0,
     };
+  }
+
+  async loadAppOpen(options: AppOpenAdOptions): Promise<void> {
+    console.log('loadAppOpen', options);
+  }
+
+  async showAppOpen(): Promise<void> {
+    console.log('showAppOpen');
+  }
+
+  async isAppOpenLoaded(): Promise<{ value: boolean }> {
+    return { value: false };
+  }
+
+  addListener(eventName: string, listenerFunc: (...args: any[]) => void): any {
+    void listenerFunc;
+    console.log('addListener', eventName);
+    return { remove: () => Promise.resolve() };
   }
 }

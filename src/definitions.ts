@@ -1,3 +1,4 @@
+import type { AppOpenAdPlugin } from './app-open';
 import type { BannerDefinitions } from './banner';
 import type { AdmobConsentDefinitions } from './consent';
 import type { InterstitialDefinitions } from './interstitial';
@@ -9,7 +10,8 @@ type AdMobDefinitions = BannerDefinitions &
   RewardDefinitions &
   RewardInterstitialDefinitions &
   InterstitialDefinitions &
-  AdmobConsentDefinitions;
+  AdmobConsentDefinitions &
+  AppOpenAdPlugin;
 
 export interface AdMobPlugin extends AdMobDefinitions {
   /**

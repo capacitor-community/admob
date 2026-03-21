@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 
 import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 
-import { AdMob } from '@capacitor-community/admob';
+import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   imports: [IonApp, IonRouterOutlet],
+  standalone: false,
 })
 export class AppComponent {
   constructor(private platform: Platform) {
@@ -32,6 +33,37 @@ export class AppComponent {
       AdMob.setApplicationVolume({
         volume: 0.5,
       });
+
+      // example of App Open Ad
+      this.showAppOpenAd();
     });
+  }
+
+  async showAppOpenAd() {
+    // Listen to events
+    AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
+      console.log('App Open Ad loaded');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
+      console.log('Failed to load App Open Ad');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
+      console.log('App Open Ad open');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
+      console.log('App Open Ad close');
+    });
+    AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
+      console.log('Failed to show App Open Ad');
+    });
+
+    const options: AppOpenAdOptions = {
+      adUnitId: 'YOUR_AD_UNIT_ID', // Replace with your real ID
+    };
+    await AdMob.loadAppOpen(options);
+    const { value } = await AdMob.isAppOpenLoaded();
+    if (value) {
+      await AdMob.showAppOpen();
+    }
   }
 }

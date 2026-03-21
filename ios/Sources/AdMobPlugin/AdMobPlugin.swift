@@ -28,8 +28,35 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "prepareRewardVideoAd", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showRewardVideoAd", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "prepareRewardInterstitialAd", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "showRewardInterstitialAd", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "showRewardInterstitialAd", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "loadAppOpen", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "showAppOpen", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "isAppOpenLoaded", returnType: CAPPluginReturnPromise)
     ]
+    private let appOpenAdPlugin = AppOpenAdPlugin()
+    @objc func loadAppOpen(_ call: CAPPluginCall) {
+        appOpenAdPlugin.loadAppOpen(
+            call,
+            getRootViewController: self.getRootVC,
+            notify: { [weak self] eventName, data in
+                self?.notifyListeners(eventName, data: data)
+            }
+        )
+    }
+
+    @objc func showAppOpen(_ call: CAPPluginCall) {
+        appOpenAdPlugin.showAppOpen(
+            call,
+            getRootViewController: self.getRootVC,
+            notify: { [weak self] eventName, data in
+                self?.notifyListeners(eventName, data: data)
+            }
+        )
+    }
+
+    @objc func isAppOpenLoaded(_ call: CAPPluginCall) {
+        appOpenAdPlugin.isAppOpenLoaded(call)
+    }
 
     var testingDevices: [String] = []
 

@@ -1,3 +1,4 @@
+
 <p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
 <h3 align="center">AdMob</h3>
 <p align="center"><strong><code>@capacitor-community/admob</code></strong></p>
@@ -188,7 +189,44 @@ const consentInfo = await AdMob.requestConsentInfo({
 2. AdMob.requestConsentInfo
 3. AdMob.showConsentForm (If consent form required )
    3/ AdMob.showBanner
+   
+### Show App Open Ad
 
+```ts
+import {
+  AdMob,
+  AppOpenAdPluginEvents,
+  AppOpenAdOptions,
+} from '@capacitor-community/admob';
+
+export async function showAppOpenAd(): Promise<void> {
+  // listen to events
+  AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
+    console.log('App Open Ad loaded');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
+    console.log('Failed to load App Open Ad');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
+    console.log('App Open Ad open');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
+    console.log('App Open Ad close');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
+    console.log('Failed to show App Open Ad');
+  });
+
+  const options: AppOpenAdOptions = {
+    adUnitId: 'YOUR_AD_UNIT_ID',
+  };
+  await AdMob.loadAppOpen(options);
+  const { value } = await AdMob.isAppOpenLoaded();
+  if (value) {
+    await AdMob.showAppOpen();
+  }
+}
+```
 ### Show Banner
 
 ```ts
@@ -334,6 +372,10 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`requestTrackingAuthorization()`](#requesttrackingauthorization)
 * [`setApplicationMuted(...)`](#setapplicationmuted)
 * [`setApplicationVolume(...)`](#setapplicationvolume)
+* [`loadAppOpen(...)`](#loadappopen)
+* [`showAppOpen()`](#showappopen)
+* [`isAppOpenLoaded()`](#isappopenloaded)
+* [`addListener(AppOpenAdPluginEvents, ...)`](#addlistenerappopenadpluginevents-)
 * [`showBanner(...)`](#showbanner)
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
@@ -457,6 +499,63 @@ Report application volume to AdMob SDK
 | **`options`** | <code><a href="#applicationvolumeoptions">ApplicationVolumeOptions</a></code> |
 
 **Since:** 4.1.1
+
+--------------------
+
+
+### loadAppOpen(...)
+
+```typescript
+loadAppOpen(options: AppOpenAdOptions) => Promise<void>
+```
+
+Load an ad App Open
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#appopenadoptions">AppOpenAdOptions</a></code> |
+
+--------------------
+
+
+### showAppOpen()
+
+```typescript
+showAppOpen() => Promise<void>
+```
+
+Shows the App Open ad if loaded
+
+--------------------
+
+
+### isAppOpenLoaded()
+
+```typescript
+isAppOpenLoaded() => Promise<{ value: boolean; }>
+```
+
+Check if the App Open ad is loaded
+
+**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents, listenerFunc: (...args: any[]) => void) => Promise<PluginListenerHandle>
+```
+
+Add listeners for App Open events
+
+| Param              | Type                                                                    |
+| ------------------ | ----------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents</a></code> |
+| **`listenerFunc`** | <code>(...args: any[]) =&gt; void</code>                                |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -1102,6 +1201,20 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 | **`volume`** | <code>0 \| 1 \| 0.1 \| 0.2 \| 0.3 \| 0.4 \| 0.5 \| 0.6 \| 0.7 \| 0.8 \| 0.9</code> | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. enable set 0.0 - 1.0, any float allowed. | 4.1.1 |
 
 
+#### AppOpenAdOptions
+
+| Prop           | Type                |
+| -------------- | ------------------- |
+| **`adUnitId`** | <code>string</code> |
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
+
 #### BannerAdOptions
 
 This interface extends <a href="#adoptions">AdOptions</a>
@@ -1115,13 +1228,6 @@ This interface extends <a href="#adoptions">AdOptions</a>
 | **`margin`**        | <code>number</code>                                           | Margin Banner. Default is 0px; If position is BOTTOM_CENTER, margin is be margin-bottom. If position is TOP_CENTER, margin is be margin-top.                                                                                                                                                                         | <code>0</code>               | 1.1.2 |
 | **`npa`**           | <code>boolean</code>                                          | The default behavior of the Google Mobile Ads SDK is to serve personalized ads. Set this to true to request Non-Personalized Ads                                                                                                                                                                                     | <code>false</code>           | 1.2.0 |
 | **`immersiveMode`** | <code>boolean</code>                                          | Sets a flag that controls if this interstitial or reward object will be displayed in immersive mode. Call this method before show. During show, if this flag is on and immersive mode is supported, SYSTEM_UI_FLAG_IMMERSIVE_STICKY &SYSTEM_UI_FLAG_HIDE_NAVIGATION will be turned on for interstitial or reward ad. |                              | 7.0.3 |
-
-
-#### PluginListenerHandle
-
-| Prop         | Type                                      |
-| ------------ | ----------------------------------------- |
-| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
 #### AdMobBannerSize
@@ -1254,6 +1360,17 @@ From T, pick a set of properties whose keys are in the union K
 | **`ParentalGuidance`** | <code>'ParentalGuidance'</code> | Content suitable for most audiences with parental guidance. |
 | **`Teen`**             | <code>'Teen'</code>             | Content suitable for teen and older audiences.              |
 | **`MatureAudience`**   | <code>'MatureAudience'</code>   | Content suitable only for mature audiences.                 |
+
+
+#### AppOpenAdPluginEvents
+
+| Members            | Value                                |
+| ------------------ | ------------------------------------ |
+| **`Loaded`**       | <code>'appOpenAdLoaded'</code>       |
+| **`FailedToLoad`** | <code>'appOpenAdFailedToLoad'</code> |
+| **`Opened`**       | <code>'appOpenAdOpened'</code>       |
+| **`Closed`**       | <code>'appOpenAdClosed'</code>       |
+| **`FailedToShow`** | <code>'appOpenAdFailedToShow'</code> |
 
 
 #### BannerAdSize
