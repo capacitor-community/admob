@@ -37,11 +37,11 @@ public class AppOpenAdManager {
         isLoadingAd = true;
         AdRequest request = new AdRequest.Builder().build();
 
+        // play-services-ads 24.x: orientation overload removed; SDK picks orientation from the activity.
         AppOpenAd.load(
             context,
             adUnitId,
             request,
-            AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
             new AppOpenAd.AppOpenAdLoadCallback() {
                 @Override
                 public void onAdLoaded(@NonNull AppOpenAd ad) {
