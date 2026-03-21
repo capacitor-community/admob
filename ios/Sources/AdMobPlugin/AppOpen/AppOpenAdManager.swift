@@ -3,7 +3,7 @@ import GoogleMobileAds
 import UIKit
 
 @objc public class AppOpenAdManager: NSObject {
-    private var appOpenAd: GADAppOpenAd?
+    private var appOpenAd: AppOpenAd?
     private var isLoadingAd = false
     private var isShowingAd = false
     private var adUnitId: String
@@ -25,14 +25,22 @@ import UIKit
         }
 
         isLoadingAd = true
-        GADAppOpenAd.load(withAdUnitID: adUnitId, request: GADRequest(), orientation: .portrait) { [weak self] ad, error in
-            self?.isLoadingAd = false
-
-            if let ad = ad {
-                self?.appOpenAd = ad
-                onLoaded()
-            } else {
-                onFailed()
+        Task { [weak self] in
+            guard let self = self else {
+                return
+            }
+            do {
+                let ad = try await AppOpenAd.load(with: self.adUnitId, request: Request())
+                await MainActor.run {
+                    self.isLoadingAd = false
+                    self.appOpenAd = ad
+                    onLoaded()
+                }
+            } catch {
+                await MainActor.run {
+                    self.isLoadingAd = false
+                    onFailed()
+                }
             }
         }
     }
@@ -53,7 +61,7 @@ import UIKit
         self.onFailedToShow = onFailedToShow
         isShowingAd = true
         ad.fullScreenContentDelegate = self
-        ad.present(fromRootViewController: rootViewController)
+        ad.present(from: rootViewController)
     }
 
     public func isAdLoaded() -> Bool {
@@ -64,18 +72,18 @@ import UIKit
     private var onFailedToShow: (() -> Void)?
 }
 
-extension AppOpenAdManager: GADFullScreenContentDelegate {
-    public func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+extension AppOpenAdManager: FullScreenContentDelegate {
+    public func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
         onOpened?()
     }
 
-    public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         appOpenAd = nil
         isShowingAd = false
         onClosed?()
     }
 
-    public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+    public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         appOpenAd = nil
         isShowingAd = false
         onFailedToShow?()
