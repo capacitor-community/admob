@@ -19,6 +19,10 @@ public class AppOpenAdManager {
         this.adUnitId = adUnitId;
     }
 
+    public String getAdUnitId() {
+        return adUnitId;
+    }
+
     public void loadAd(Context context, final Runnable onLoaded, final Runnable onFailed) {
         if (appOpenAd != null) {
             if (onLoaded != null) {
