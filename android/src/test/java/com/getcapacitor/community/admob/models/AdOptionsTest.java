@@ -118,6 +118,7 @@ public class AdOptionsTest {
             assertEquals(userId, adOptions.ssvInfo.getUserId());
             assertEquals(customData, adOptions.ssvInfo.getCustomData());
         }
+
         @Test
         public void appOpen_ad_Id() {
             final String expected = "Some Given AppOpen Test Id";
