@@ -1,6 +1,9 @@
 package com.getcapacitor.community.admob;
 
 import android.Manifest;
+import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -69,7 +72,7 @@ public class AdMob extends Plugin {
 
     @PluginMethod
     public void loadAppOpen(final PluginCall call) {
-        appOpenAdPlugin.loadAppOpen(getContext(), call, this::notifyListeners);
+        appOpenAdPlugin.loadAppOpen(getContext(), getActivity(), call, this::notifyListeners);
     }
 
     @PluginMethod
@@ -79,7 +82,7 @@ public class AdMob extends Plugin {
 
     @PluginMethod
     public void isAppOpenLoaded(final PluginCall call) {
-        appOpenAdPlugin.isAppOpenLoaded(call);
+        appOpenAdPlugin.isAppOpenLoaded(getActivity(), call);
     }
 
     // ---------------------------------------------------------
@@ -90,18 +93,27 @@ public class AdMob extends Plugin {
     public void initialize(final PluginCall call) {
         this.setRequestConfiguration(call);
 
-        try {
-            MobileAds.initialize(
-                getContext(),
-                new OnInitializationCompleteListener() {
-                    @Override
-                    public void onInitializationComplete(InitializationStatus initializationStatus) {}
-                }
-            );
-            bannerExecutor.initialize();
-            call.resolve();
-        } catch (Exception ex) {
-            call.reject(ex.getLocalizedMessage(), ex);
+        // Same as banner/interstitial: bridge thread is not the UI thread — MobileAds + view setup must run on main.
+        Runnable initOnMain = () -> {
+            try {
+                MobileAds.initialize(
+                    getContext(),
+                    new OnInitializationCompleteListener() {
+                        @Override
+                        public void onInitializationComplete(InitializationStatus initializationStatus) {}
+                    }
+                );
+                bannerExecutor.initialize();
+                call.resolve();
+            } catch (Exception ex) {
+                call.reject(ex.getLocalizedMessage(), ex);
+            }
+        };
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.runOnUiThread(initOnMain);
+        } else {
+            new Handler(Looper.getMainLooper()).post(initOnMain);
         }
     }
 
