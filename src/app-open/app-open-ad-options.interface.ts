@@ -1,3 +1,3 @@
 export interface AppOpenAdOptions {
-  adUnitId: string;
+  adId: string;
 }
