@@ -4,18 +4,20 @@ import UIKit
 
 @objc public class AppOpenAdPlugin: NSObject {
     private var appOpenAdManager: AppOpenAdManager?
+    private var currentAdUnitId: String?
 
     @objc func loadAppOpen(
         _ call: CAPPluginCall,
         getRootViewController: @escaping () -> UIViewController?,
         notify: @escaping (String, [String: Any]) -> Void
     ) {
-        guard let adUnitId = call.getString("adUnitId") else {
-            call.reject("adUnitId is required")
+        guard let adUnitId = call.getString("adId") else {
+            call.reject("adId is required")
             return
         }
-        if appOpenAdManager == nil {
+        if appOpenAdManager == nil || currentAdUnitId != adUnitId {
             appOpenAdManager = AppOpenAdManager(adUnitId: adUnitId)
+            currentAdUnitId = adUnitId
         }
         DispatchQueue.main.async {
             if let rootVC = getRootViewController() {

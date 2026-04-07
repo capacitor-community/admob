@@ -12,7 +12,7 @@ export type AppOpenDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented
 
 export interface AppOpenAdPlugin {
   /**
-   * Load an ad App Open
+   * Load an App Open ad
    */
   loadAppOpen(options: AppOpenAdOptions): Promise<void>;
 
@@ -29,8 +29,5 @@ export interface AppOpenAdPlugin {
   /**
    * Add listeners for App Open events
    */
-  addListener(
-    eventName: AppOpenAdPluginEvents,
-    listenerFunc: (...args: any[]) => void,
-  ): Promise<PluginListenerHandle>;
+  addListener(eventName: AppOpenAdPluginEvents, listenerFunc: (...args: any[]) => void): Promise<PluginListenerHandle>;
 }

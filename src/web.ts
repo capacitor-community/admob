@@ -131,9 +131,9 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     return { value: false };
   }
 
-  addListener(eventName: string, listenerFunc: (...args: any[]) => void): any {
+  addListener(eventName: string, listenerFunc: (...args: any[]) => void): Promise<{ remove: () => Promise<void> }> {
     void listenerFunc;
     console.log('addListener', eventName);
-    return { remove: () => Promise.resolve() };
+    return Promise.resolve({ remove: () => Promise.resolve() });
   }
 }

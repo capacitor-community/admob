@@ -9,7 +9,7 @@ import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions } from '@capacitor-commu
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   imports: [IonApp, IonRouterOutlet],
-  standalone: false,
+  standalone: true,
 })
 export class AppComponent {
   constructor(private platform: Platform) {
@@ -58,7 +58,7 @@ export class AppComponent {
     });
 
     const options: AppOpenAdOptions = {
-      adUnitId: 'YOUR_AD_UNIT_ID', // Replace with your real ID
+      adId: 'YOUR_AD_UNIT_ID', // Replace with your real ID
     };
     await AdMob.loadAppOpen(options);
     const { value } = await AdMob.isAppOpenLoaded();

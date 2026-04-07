@@ -29,9 +29,9 @@ public class AppOpenAdPlugin {
             return;
         }
 
-        String adUnitId = call.getString("adUnitId");
+        String adUnitId = call.getString("adId");
         if (adUnitId == null) {
-            call.reject("adUnitId is required");
+            call.reject("adId is required");
             return;
         }
 
