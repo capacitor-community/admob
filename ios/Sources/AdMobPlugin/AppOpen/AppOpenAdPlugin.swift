@@ -44,8 +44,8 @@ import UIKit
         notify: @escaping (String, [String: Any]) -> Void
     ) {
         DispatchQueue.main.async {
-            guard self.appOpenAdManager != nil else {
-                call.reject("App Open Ad manager is not initialized")
+            guard let manager = self.appOpenAdManager, manager.isAdLoaded() else {
+                call.reject("App Open Ad is not loaded")
                 return
             }
 
