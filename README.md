@@ -36,10 +36,10 @@ Made with [contributors-img](https://contrib.rocks).
 
 ### Screenshots
 
-|             |                Banner                |                Interstitial                |                Reward                |
-| :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: |
-| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) |
-| **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  |
+|             |                Banner                |                Interstitial                |                Reward                |              App Open               |
+| :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: | :---------------------------------: |
+| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) | ![](demo/screenshots/ios_open.png)  |
+| **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  | ![](demo/screenshots/md_open.png)   |
 
 ## Installation
 

@@ -25,6 +25,7 @@ import {
   AdmobConsentInfo,
   AdmobConsentStatus,
   AdMobRewardItem,
+  AppOpenAdPluginEvents,
   BannerAdOptions,
   BannerAdPluginEvents,
   BannerAdSize,
@@ -32,7 +33,13 @@ import {
   RewardAdPluginEvents,
 } from '@capacitor-community/admob';
 import { ReplaySubject } from 'rxjs';
-import { bannerBottomOptions, bannerTopOptions, interstitialOptions, rewardOptions } from '../shared/ad.options';
+import {
+  appOpenOptions,
+  bannerBottomOptions,
+  bannerTopOptions,
+  interstitialOptions,
+  rewardOptions,
+} from '../shared/ad.options';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 
@@ -80,6 +87,12 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   }>(1);
   public readonly lastInterstitialEvent$ = this.lastInterstitialEvent$$.asObservable();
 
+  private readonly lastAppOpenEvent$$ = new ReplaySubject<{
+    name: string;
+    value: unknown;
+  }>(1);
+  public readonly lastAppOpenEvent$ = this.lastAppOpenEvent$$.asObservable();
+
   private readonly listenerHandlers: PluginListenerHandle[] = [];
   /**
    * Height of AdSize
@@ -94,6 +107,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
   public isPrepareBanner = false;
   public isPrepareReward = false;
   public isPrepareInterstitial = false;
+  public isAppOpenLoaded = false;
 
   public isLoading = false;
 
@@ -134,6 +148,7 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
     this.registerRewardListeners();
     this.registerBannerListeners();
     this.registerInterstitialListeners();
+    this.registerAppOpenListeners();
   }
 
   ionViewWillLeave() {
@@ -379,5 +394,49 @@ export class HomePage implements ViewWillEnter, ViewWillLeave {
 
   /**
    * ==================== /Interstitial ====================
+   */
+
+  /**
+   * ==================== App Open ====================
+   */
+  async loadAppOpen() {
+    this.isLoading = true;
+
+    try {
+      await AdMob.loadAppOpen(appOpenOptions);
+      console.log('App Open Ad loaded');
+      this.isAppOpenLoaded = true;
+    } catch (e) {
+      console.error('There was a problem loading the App Open Ad', e);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async showAppOpen() {
+    await AdMob.showAppOpen().catch((e) => console.log(e));
+
+    this.isAppOpenLoaded = false;
+  }
+
+  private registerAppOpenListeners(): void {
+    const eventKeys = Object.keys(AppOpenAdPluginEvents);
+
+    eventKeys.forEach(async (key) => {
+      const eventName = AppOpenAdPluginEvents[key as keyof typeof AppOpenAdPluginEvents];
+      console.log(`registering ${eventName}`);
+      const handler = await AdMob.addListener(eventName as any, (value: unknown) => {
+        console.log(`App Open Event "${key}"`, value);
+
+        this.ngZone.run(() => {
+          this.lastAppOpenEvent$$.next({ name: key, value: value });
+        });
+      });
+      this.listenerHandlers.push(handler);
+    });
+  }
+
+  /**
+   * ==================== /App Open ====================
    */
 }
