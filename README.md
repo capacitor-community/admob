@@ -374,7 +374,11 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`loadAppOpen(...)`](#loadappopen)
 * [`showAppOpen()`](#showappopen)
 * [`isAppOpenLoaded()`](#isappopenloaded)
-* [`addListener(AppOpenAdPluginEvents, ...)`](#addlistenerappopenadpluginevents-)
+* [`addListener(AppOpenAdPluginEvents.Loaded, ...)`](#addlistenerappopenadplugineventsloaded-)
+* [`addListener(AppOpenAdPluginEvents.FailedToLoad, ...)`](#addlistenerappopenadplugineventsfailedtoload-)
+* [`addListener(AppOpenAdPluginEvents.Opened, ...)`](#addlistenerappopenadplugineventsopened-)
+* [`addListener(AppOpenAdPluginEvents.Closed, ...)`](#addlistenerappopenadplugineventsclosed-)
+* [`addListener(AppOpenAdPluginEvents.FailedToShow, ...)`](#addlistenerappopenadplugineventsfailedtoshow-)
 * [`showBanner(...)`](#showbanner)
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
@@ -541,18 +545,80 @@ Check if the App Open ad is loaded
 --------------------
 
 
-### addListener(AppOpenAdPluginEvents, ...)
+### addListener(AppOpenAdPluginEvents.Loaded, ...)
 
 ```typescript
-addListener(eventName: AppOpenAdPluginEvents, listenerFunc: (...args: any[]) => void) => Promise<PluginListenerHandle>
+addListener(eventName: AppOpenAdPluginEvents.Loaded, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
-Add listeners for App Open events
+| Param              | Type                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.Loaded</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                     |
 
-| Param              | Type                                                                    |
-| ------------------ | ----------------------------------------------------------------------- |
-| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents</a></code> |
-| **`listenerFunc`** | <code>(...args: any[]) =&gt; void</code>                                |
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.FailedToLoad, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.FailedToLoad</a></code> |
+| **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.Opened, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.Opened, listenerFunc: () => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.Opened</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                     |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.Closed, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.Closed, listenerFunc: () => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.Closed</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                     |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.FailedToShow, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.FailedToShow</a></code> |
+| **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
@@ -1214,6 +1280,17 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
+#### AdMobError
+
+For more information
+https://developers.google.com/android/reference/com/google/android/gms/ads/AdError
+
+| Prop          | Type                | Description                            |
+| ------------- | ------------------- | -------------------------------------- |
+| **`code`**    | <code>number</code> | Gets the error's code.                 |
+| **`message`** | <code>string</code> | Gets the message describing the error. |
+
+
 #### BannerAdOptions
 
 This interface extends <a href="#adoptions">AdOptions</a>
@@ -1237,17 +1314,6 @@ When notice listener of OnAdLoaded, you can get banner size.
 | ------------ | ------------------- |
 | **`width`**  | <code>number</code> |
 | **`height`** | <code>number</code> |
-
-
-#### AdMobError
-
-For more information
-https://developers.google.com/android/reference/com/google/android/gms/ads/AdError
-
-| Prop          | Type                | Description                            |
-| ------------- | ------------------- | -------------------------------------- |
-| **`code`**    | <code>number</code> | Gets the error's code.                 |
-| **`message`** | <code>string</code> | Gets the message describing the error. |
 
 
 #### AdmobConsentInfo
