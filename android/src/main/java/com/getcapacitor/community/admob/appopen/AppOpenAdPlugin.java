@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.models.AdMobPluginError;
 
 public class AppOpenAdPlugin {
 
@@ -44,12 +45,14 @@ public class AppOpenAdPlugin {
             appOpenAdManager.loadAd(
                 appContext,
                 () -> {
-                    notifier.notify("appOpenAdLoaded", new JSObject());
+                    notifier.notify(AppOpenAdPluginEvents.Loaded, new JSObject());
                     call.resolve();
                 },
-                () -> {
-                    notifier.notify("appOpenAdFailedToLoad", new JSObject());
-                    call.reject("Failed to load App Open Ad");
+                (loadAdError) -> {
+                    String errorMessage = loadAdError != null ? loadAdError.getMessage() : "Failed to load App Open Ad";
+                    int errorCode = loadAdError != null ? loadAdError.getCode() : -1;
+                    notifier.notify(AppOpenAdPluginEvents.FailedToLoad, new AdMobPluginError(errorCode, errorMessage));
+                    call.reject(errorMessage);
                 }
             );
         });
@@ -70,15 +73,17 @@ public class AppOpenAdPlugin {
             appOpenAdManager.showAdIfAvailable(
                 activity,
                 () -> {
-                    notifier.notify("appOpenAdOpened", new JSObject());
+                    notifier.notify(AppOpenAdPluginEvents.Showed, new JSObject());
                 },
                 () -> {
-                    notifier.notify("appOpenAdClosed", new JSObject());
+                    notifier.notify(AppOpenAdPluginEvents.Dismissed, new JSObject());
                     call.resolve();
                 },
-                () -> {
-                    notifier.notify("appOpenAdFailedToShow", new JSObject());
-                    call.reject("Failed to show App Open Ad");
+                (adError) -> {
+                    String errorMessage = adError != null ? adError.getMessage() : "Failed to show App Open Ad";
+                    int errorCode = adError != null ? adError.getCode() : -1;
+                    notifier.notify(AppOpenAdPluginEvents.FailedToShow, new AdMobPluginError(errorCode, errorMessage));
+                    call.reject(errorMessage);
                 }
             );
         });

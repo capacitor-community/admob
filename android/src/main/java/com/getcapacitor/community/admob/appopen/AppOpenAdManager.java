@@ -3,10 +3,12 @@ package com.getcapacitor.community.admob.appopen;
 import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
+import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.appopen.AppOpenAd;
+import java.util.function.Consumer;
 
 public class AppOpenAdManager {
 
@@ -23,7 +25,7 @@ public class AppOpenAdManager {
         return adUnitId;
     }
 
-    public void loadAd(Context context, final Runnable onLoaded, final Runnable onFailed) {
+    public void loadAd(Context context, final Runnable onLoaded, final Consumer<LoadAdError> onFailed) {
         if (appOpenAd != null) {
             if (onLoaded != null) {
                 onLoaded.run();
@@ -33,7 +35,7 @@ public class AppOpenAdManager {
 
         if (isLoadingAd) {
             if (onFailed != null) {
-                onFailed.run();
+                onFailed.accept(null);
             }
             return;
         }
@@ -62,17 +64,22 @@ public class AppOpenAdManager {
                     isLoadingAd = false;
 
                     if (onFailed != null) {
-                        onFailed.run();
+                        onFailed.accept(loadAdError);
                     }
                 }
             }
         );
     }
 
-    public void showAdIfAvailable(Activity activity, final Runnable onOpened, final Runnable onClosed, final Runnable onFailedToShow) {
+    public void showAdIfAvailable(
+        Activity activity,
+        final Runnable onOpened,
+        final Runnable onClosed,
+        final Consumer<AdError> onFailedToShow
+    ) {
         if (appOpenAd == null || isShowingAd) {
             if (onFailedToShow != null) {
-                onFailedToShow.run();
+                onFailedToShow.accept(null);
             }
             return;
         }
@@ -98,12 +105,12 @@ public class AppOpenAdManager {
                 }
 
                 @Override
-                public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                public void onAdFailedToShowFullScreenContent(AdError adError) {
                     appOpenAd = null;
                     isShowingAd = false;
 
                     if (onFailedToShow != null) {
-                        onFailedToShow.run();
+                        onFailedToShow.accept(adError);
                     }
                 }
             }
