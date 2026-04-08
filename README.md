@@ -1,4 +1,3 @@
-
 <p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
 <h3 align="center">AdMob</h3>
 <p align="center"><strong><code>@capacitor-community/admob</code></strong></p>
@@ -218,7 +217,7 @@ export async function showAppOpenAd(): Promise<void> {
   });
 
   const options: AppOpenAdOptions = {
-    adUnitId: 'YOUR_AD_UNIT_ID',
+    adId: 'YOUR_AD_UNIT_ID',
   };
   await AdMob.loadAppOpen(options);
   const { value } = await AdMob.isAppOpenLoaded();
@@ -509,7 +508,7 @@ Report application volume to AdMob SDK
 loadAppOpen(options: AppOpenAdOptions) => Promise<void>
 ```
 
-Load an ad App Open
+Load an App Open ad
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
@@ -1203,9 +1202,9 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 
 #### AppOpenAdOptions
 
-| Prop           | Type                |
-| -------------- | ------------------- |
-| **`adUnitId`** | <code>string</code> |
+| Prop       | Type                |
+| ---------- | ------------------- |
+| **`adId`** | <code>string</code> |
 
 
 #### PluginListenerHandle
