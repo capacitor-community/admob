@@ -73,10 +73,10 @@ public class AppOpenAdPlugin {
             appOpenAdManager.showAdIfAvailable(
                 activity,
                 () -> {
-                    notifier.notify(AppOpenAdPluginEvents.Showed, new JSObject());
+                    notifier.notify(AppOpenAdPluginEvents.Opened, new JSObject());
                 },
                 () -> {
-                    notifier.notify(AppOpenAdPluginEvents.Dismissed, new JSObject());
+                    notifier.notify(AppOpenAdPluginEvents.Closed, new JSObject());
                     call.resolve();
                 },
                 (adError) -> {

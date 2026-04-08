@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 
-import { AdMob, AppOpenAdPluginEvents, AppOpenAdOptions } from '@capacitor-community/admob';
+import { AdMob } from '@capacitor-community/admob';
 
 @Component({
   selector: 'app-root',
@@ -17,53 +17,26 @@ export class AppComponent {
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
-      /**
-       * initialize() require after platform.ready();
-       */
-      AdMob.initialize({
-        testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
-        initializeForTesting: true,
+    this.platform
+      .ready()
+      .then(() => {
+        /**
+         * initialize() require after platform.ready();
+         */
+        return AdMob.initialize({
+          testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
+          initializeForTesting: true,
+        });
+      })
+      .then(() => {
+        return AdMob.setApplicationMuted({
+          muted: false,
+        });
+      })
+      .then(() => {
+        return AdMob.setApplicationVolume({
+          volume: 0.5,
+        });
       });
-
-      AdMob.setApplicationMuted({
-        muted: false,
-      });
-
-      AdMob.setApplicationVolume({
-        volume: 0.5,
-      });
-
-      // example of App Open Ad
-      this.showAppOpenAd();
-    });
-  }
-
-  async showAppOpenAd() {
-    // Listen to events
-    AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
-      console.log('App Open Ad loaded');
-    });
-    AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
-      console.log('Failed to load App Open Ad');
-    });
-    AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
-      console.log('App Open Ad open');
-    });
-    AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
-      console.log('App Open Ad close');
-    });
-    AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
-      console.log('Failed to show App Open Ad');
-    });
-
-    const options: AppOpenAdOptions = {
-      adId: 'YOUR_AD_UNIT_ID', // Replace with your real ID
-    };
-    await AdMob.loadAppOpen(options);
-    const { value } = await AdMob.isAppOpenLoaded();
-    if (value) {
-      await AdMob.showAppOpen();
-    }
   }
 }
