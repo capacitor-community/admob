@@ -74,18 +74,28 @@ import UIKit
 
 extension AppOpenAdManager: FullScreenContentDelegate {
     public func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
+        let onOpened = self.onOpened
+        self.onOpened = nil
         onOpened?()
     }
 
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         appOpenAd = nil
         isShowingAd = false
+        let onClosed = self.onClosed
+        self.onOpened = nil
+        self.onClosed = nil
+        self.onFailedToShow = nil
         onClosed?()
     }
 
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         appOpenAd = nil
         isShowingAd = false
+        let onFailedToShow = self.onFailedToShow
+        self.onOpened = nil
+        self.onClosed = nil
+        self.onFailedToShow = nil
         onFailedToShow?()
     }
 }
