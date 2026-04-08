@@ -24,9 +24,13 @@ import UIKit
                 self.appOpenAdManager?.loadAd(rootViewController: rootVC, onLoaded: {
                     notify("appOpenAdLoaded", [:])
                     call.resolve()
-                }, onFailed: {
-                    notify("appOpenAdFailedToLoad", [:])
-                    call.reject("Failed to load App Open Ad")
+                }, onFailed: { error in
+                    let message = error?.localizedDescription ?? "Failed to load App Open Ad"
+                    notify("appOpenAdFailedToLoad", [
+                        "code": 0,
+                        "message": message
+                    ])
+                    call.reject(message)
                 })
             } else {
                 call.reject("No rootViewController")
@@ -51,9 +55,13 @@ import UIKit
                 }, onClosed: {
                     notify("appOpenAdClosed", [:])
                     call.resolve()
-                }, onFailedToShow: {
-                    notify("appOpenAdFailedToShow", [:])
-                    call.reject("Failed to show App Open Ad")
+                }, onFailedToShow: { error in
+                    let message = error?.localizedDescription ?? "Failed to show App Open Ad"
+                    notify("appOpenAdFailedToShow", [
+                        "code": 0,
+                        "message": message
+                    ])
+                    call.reject(message)
                 })
             } else {
                 call.reject("No rootViewController")

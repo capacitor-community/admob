@@ -13,14 +13,14 @@ import UIKit
         self.adUnitId = adUnitId
     }
 
-    public func loadAd(rootViewController: UIViewController, onLoaded: @escaping () -> Void, onFailed: @escaping () -> Void) {
+    public func loadAd(rootViewController: UIViewController, onLoaded: @escaping () -> Void, onFailed: @escaping (Error?) -> Void) {
         if appOpenAd != nil {
             onLoaded()
             return
         }
 
         if isLoadingAd {
-            onFailed()
+            onFailed(nil)
             return
         }
 
@@ -39,7 +39,7 @@ import UIKit
             } catch {
                 await MainActor.run {
                     self.isLoadingAd = false
-                    onFailed()
+                    onFailed(error)
                 }
             }
         }
@@ -49,10 +49,10 @@ import UIKit
         rootViewController: UIViewController,
         onOpened: @escaping () -> Void,
         onClosed: @escaping () -> Void,
-        onFailedToShow: @escaping () -> Void
+        onFailedToShow: @escaping (Error?) -> Void
     ) {
         guard let ad = appOpenAd, !isShowingAd else {
-            onFailedToShow()
+            onFailedToShow(nil)
             return
         }
 
@@ -69,7 +69,7 @@ import UIKit
     }
 
     private var onClosed: (() -> Void)?
-    private var onFailedToShow: (() -> Void)?
+    private var onFailedToShow: ((Error?) -> Void)?
 }
 
 extension AppOpenAdManager: FullScreenContentDelegate {
@@ -96,6 +96,6 @@ extension AppOpenAdManager: FullScreenContentDelegate {
         self.onOpened = nil
         self.onClosed = nil
         self.onFailedToShow = nil
-        onFailedToShow?()
+        onFailedToShow?(error)
     }
 }
