@@ -13,7 +13,7 @@ import UIKit
         self.adUnitId = adUnitId
     }
 
-    public func loadAd(rootViewController: UIViewController, onLoaded: @escaping () -> Void, onFailed: @escaping (Error?) -> Void) {
+    public func loadAd(onLoaded: @escaping () -> Void, onFailed: @escaping (Error?) -> Void) {
         if appOpenAd != nil {
             onLoaded()
             return
