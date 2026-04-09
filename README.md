@@ -203,8 +203,8 @@ export async function showAppOpenAd(): Promise<void> {
   AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
     console.log('App Open Ad loaded');
   });
-  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, () => {
-    console.log('Failed to load App Open Ad');
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, (error) => {
+    console.log('Failed to load App Open Ad', error);
   });
   AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
     console.log('App Open Ad open');
@@ -212,8 +212,8 @@ export async function showAppOpenAd(): Promise<void> {
   AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
     console.log('App Open Ad close');
   });
-  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, () => {
-    console.log('Failed to show App Open Ad');
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, (error) => {
+    console.log('Failed to show App Open Ad', error);
   });
 
   const options: AppOpenAdOptions = {

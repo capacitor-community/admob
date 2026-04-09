@@ -20,21 +20,17 @@ import UIKit
             currentAdUnitId = adUnitId
         }
         DispatchQueue.main.async {
-            if let rootVC = getRootViewController() {
-                self.appOpenAdManager?.loadAd(rootViewController: rootVC, onLoaded: {
-                    notify("appOpenAdLoaded", [:])
-                    call.resolve()
-                }, onFailed: { error in
-                    let message = error?.localizedDescription ?? "Failed to load App Open Ad"
-                    notify("appOpenAdFailedToLoad", [
-                        "code": 0,
-                        "message": message
-                    ])
-                    call.reject(message)
-                })
-            } else {
-                call.reject("No rootViewController")
-            }
+            self.appOpenAdManager?.loadAd(onLoaded: {
+                notify("appOpenAdLoaded", [:])
+                call.resolve()
+            }, onFailed: { error in
+                let message = error?.localizedDescription ?? "Failed to load App Open Ad"
+                notify("appOpenAdFailedToLoad", [
+                    "code": 0,
+                    "message": message
+                ])
+                call.reject(message)
+            })
         }
     }
 
