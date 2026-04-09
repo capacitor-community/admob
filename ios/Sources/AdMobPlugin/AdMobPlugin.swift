@@ -37,7 +37,6 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func loadAppOpen(_ call: CAPPluginCall) {
         appOpenAdPlugin.loadAppOpen(
             call,
-            getRootViewController: self.getRootVC,
             notify: { [weak self] eventName, data in
                 self?.notifyListeners(eventName, data: data)
             }

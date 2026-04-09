@@ -45,8 +45,10 @@ public class AppOpenAdPlugin {
             appOpenAdManager.loadAd(
                 appContext,
                 () -> {
-                    notifier.notify(AppOpenAdPluginEvents.Loaded, new JSObject());
-                    call.resolve();
+                    JSObject adInfo = new JSObject();
+                    adInfo.put("adUnitId", adUnitId);
+                    notifier.notify(AppOpenAdPluginEvents.Loaded, adInfo);
+                    call.resolve(adInfo);
                 },
                 (loadAdError) -> {
                     String errorMessage = loadAdError != null ? loadAdError.getMessage() : "Failed to load App Open Ad";
@@ -64,7 +66,7 @@ public class AppOpenAdPlugin {
             return;
         }
 
-        activity.runOnUiThread(() -> {
+        runOnMain(activity, () -> {
             if (appOpenAdManager == null || !appOpenAdManager.isAdLoaded()) {
                 call.reject("App Open Ad is not loaded");
                 return;
