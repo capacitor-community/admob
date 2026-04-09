@@ -8,7 +8,6 @@ import UIKit
 
     @objc func loadAppOpen(
         _ call: CAPPluginCall,
-        getRootViewController: @escaping () -> UIViewController?,
         notify: @escaping (String, [String: Any]) -> Void
     ) {
         guard let adUnitId = call.getString("adId") else {
@@ -21,11 +20,11 @@ import UIKit
         }
         DispatchQueue.main.async {
             self.appOpenAdManager?.loadAd(onLoaded: {
-                notify("appOpenAdLoaded", [:])
-                call.resolve()
+                notify(AppOpenAdPluginEvents.Loaded.rawValue, ["adUnitId": adUnitId])
+                call.resolve(["adUnitId": adUnitId])
             }, onFailed: { error in
                 let message = error?.localizedDescription ?? "Failed to load App Open Ad"
-                notify("appOpenAdFailedToLoad", [
+                notify(AppOpenAdPluginEvents.FailedToLoad.rawValue, [
                     "code": 0,
                     "message": message
                 ])
@@ -47,13 +46,13 @@ import UIKit
 
             if let rootVC = getRootViewController() {
                 self.appOpenAdManager?.showAdIfAvailable(rootViewController: rootVC, onOpened: {
-                    notify("appOpenAdOpened", [:])
+                    notify(AppOpenAdPluginEvents.Opened.rawValue, [:])
                 }, onClosed: {
-                    notify("appOpenAdClosed", [:])
+                    notify(AppOpenAdPluginEvents.Closed.rawValue, [:])
                     call.resolve()
                 }, onFailedToShow: { error in
                     let message = error?.localizedDescription ?? "Failed to show App Open Ad"
-                    notify("appOpenAdFailedToShow", [
+                    notify(AppOpenAdPluginEvents.FailedToShow.rawValue, [
                         "code": 0,
                         "message": message
                     ])
