@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.banner;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.util.Supplier;
+import androidx.webkit.WebViewCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
@@ -33,6 +35,9 @@ public class BannerExecutor extends Executor {
     private RelativeLayout mAdViewLayout;
     private AdView mAdView;
     private ViewGroup mViewGroup;
+
+    // https://issues.chromium.org/issues/40699457
+    private static final int WEBVIEW_VERSION_WITH_SAFE_AREA_FIX = 140;
 
     public BannerExecutor(
         Supplier<Context> contextSupplier,
@@ -104,7 +109,7 @@ public class BannerExecutor extends Executor {
             }
 
             // set Safe Area only for Android 15+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            if (getWebViewMajorVersion() >= WEBVIEW_VERSION_WITH_SAFE_AREA_FIX) {
                 View rootView = activitySupplier.get().getWindow().getDecorView();
                 rootView.setOnApplyWindowInsetsListener((v, insets) -> {
                     int bottomInset = insets.getSystemWindowInsetBottom();
@@ -299,5 +304,19 @@ public class BannerExecutor extends Executor {
                 // Add AdViewLayout top of the WebView
                 mViewGroup.addView(mAdViewLayout);
             });
+    }
+
+    private Integer getWebViewMajorVersion() {
+        try {
+            PackageInfo info = WebViewCompat.getCurrentWebViewPackage(contextSupplier.get());
+            if (info != null && info.versionName != null) {
+                String[] versionSegments = info.versionName.split("\\.");
+                return Integer.valueOf(versionSegments[0]);
+            }
+        } catch (Throwable ignored) {
+            // WebViewCompat can fail to initialize in local JVM unit tests.
+        }
+
+        return 0;
     }
 }
