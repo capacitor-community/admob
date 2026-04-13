@@ -108,7 +108,8 @@ public class BannerExecutor extends Executor {
                     break;
             }
 
-            // set Safe Area only for Android 15+
+            // set Safe Area only for Android WebView version 140+ due to the following issue:
+            // https://issues.chromium.org/issues/40699457
             if (getWebViewMajorVersion() >= WEBVIEW_VERSION_WITH_SAFE_AREA_FIX) {
                 View rootView = activitySupplier.get().getWindow().getDecorView();
                 rootView.setOnApplyWindowInsetsListener((v, insets) -> {
