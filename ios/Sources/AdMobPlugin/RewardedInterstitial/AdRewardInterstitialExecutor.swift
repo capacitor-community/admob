@@ -4,7 +4,9 @@ import GoogleMobileAds
 
 class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
-    var rewardedInterstitialAd: RewardedInterstitialAd!
+    private var preparedAds: [String: RewardedInterstitialAd] = [:]
+    private var lastPreparedAdId: String?
+    private var currentlyShowingAdId: String?
 
     func prepareRewardInterstitialAd(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
         RewardedInterstitialAd.load(
@@ -12,7 +14,7 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
             request: request,
             completionHandler: { (ad, error) in
                 if let error = error {
-                    NSLog("Rewarded ad failed to load with error: \(error.localizedDescription)")
+                    NSLog("Rewarded interstitial ad failed to load with error: \(error.localizedDescription)")
                     self.plugin?.notifyListeners(RewardInterstitialAdPluginEvents.FailedToLoad.rawValue, data: [
                         "code": 0,
                         "message": error.localizedDescription
@@ -21,7 +23,10 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
                     return
                 }
 
-                self.rewardedInterstitialAd = ad
+                guard let ad = ad else {
+                    call.reject("Loading failed")
+                    return
+                }
 
                 if let providedOptions = call.getObject("ssv") {
                     let ssvOptions = ServerSideVerificationOptions()
@@ -36,10 +41,13 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
                         ssvOptions.userIdentifier = userId
                     }
 
-                    self.rewardedInterstitialAd?.serverSideVerificationOptions = ssvOptions
+                    ad.serverSideVerificationOptions = ssvOptions
                 }
 
-                self.rewardedInterstitialAd?.fullScreenContentDelegate = self
+                ad.fullScreenContentDelegate = self
+                self.preparedAds[adUnitID] = ad
+                self.lastPreparedAdId = adUnitID
+
                 self.plugin?.notifyListeners(RewardInterstitialAdPluginEvents.Loaded.rawValue, data: [
                     "adUnitId": adUnitID
                 ])
@@ -51,8 +59,14 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func showRewardInterstitialAd(_ call: CAPPluginCall) {
+        guard let adId = call.getString("adId") ?? lastPreparedAdId else {
+            call.reject("No ad prepared")
+            return
+        }
+
         if let rootViewController = plugin?.getRootVC() {
-            if let ad = self.rewardedInterstitialAd {
+            if let ad = preparedAds[adId] {
+                currentlyShowingAdId = adId
                 ad.present(from: rootViewController,
                            userDidEarnRewardHandler: {
                             let reward = ad.adReward
@@ -67,6 +81,7 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardInterstitialAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
@@ -80,7 +95,15 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardInterstitialAdPluginEvents.Dismissed.rawValue, data: [:])
+    }
+
+    private func removeCurrentlyShowingAd() {
+        guard let adId = currentlyShowingAdId else { return }
+        preparedAds.removeValue(forKey: adId)
+        if lastPreparedAdId == adId { lastPreparedAdId = nil }
+        currentlyShowingAdId = nil
     }
 }

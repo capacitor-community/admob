@@ -4,7 +4,9 @@ import GoogleMobileAds
 
 class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
-    var interstitial: InterstitialAd!
+    private var preparedAds: [String: InterstitialAd] = [:]
+    private var lastPreparedAdId: String?
+    private var currentlyShowingAdId: String?
 
     func prepareInterstitial(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
         InterstitialAd.load(
@@ -12,7 +14,7 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
             request: request,
             completionHandler: { (ad, error) in
                 if let error = error {
-                    NSLog("Rewarded ad failed to load with error: \(error.localizedDescription)")
+                    NSLog("Interstitial ad failed to load with error: \(error.localizedDescription)")
                     self.plugin?.notifyListeners(InterstitialAdPluginEvents.FailedToLoad.rawValue, data: [
                         "code": 0,
                         "message": error.localizedDescription
@@ -21,8 +23,11 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
                     return
                 }
 
-                self.interstitial = ad
-                self.interstitial.fullScreenContentDelegate = self
+                if let ad = ad {
+                    ad.fullScreenContentDelegate = self
+                    self.preparedAds[adUnitID] = ad
+                    self.lastPreparedAdId = adUnitID
+                }
                 self.plugin?.notifyListeners(InterstitialAdPluginEvents.Loaded.rawValue, data: [
                     "adUnitId": adUnitID
                 ])
@@ -34,8 +39,14 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func showInterstitial(_ call: CAPPluginCall) {
+        guard let adId = call.getString("adId") ?? lastPreparedAdId else {
+            call.reject("No ad prepared")
+            return
+        }
+
         if let rootViewController = plugin?.getRootVC() {
-            if let ad = self.interstitial {
+            if let ad = preparedAds[adId] {
+                currentlyShowingAdId = adId
                 ad.present(from: rootViewController)
                 call.resolve([:])
             } else {
@@ -46,6 +57,7 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        removeCurrentlyShowingAd()
         NSLog("InterstitialFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
@@ -59,7 +71,15 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        removeCurrentlyShowingAd()
         NSLog("InterstitialFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Dismissed.rawValue, data: [:])
+    }
+
+    private func removeCurrentlyShowingAd() {
+        guard let adId = currentlyShowingAdId else { return }
+        preparedAds.removeValue(forKey: adId)
+        if lastPreparedAdId == adId { lastPreparedAdId = nil }
+        currentlyShowingAdId = nil
     }
 }

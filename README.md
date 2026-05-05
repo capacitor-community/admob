@@ -285,6 +285,16 @@ export async function interstitial(): Promise<void> {
   };
   await AdMob.prepareInterstitial(options);
   await AdMob.showInterstitial();
+
+  // You can also prepare multiple interstitials and show a specific one by passing its adId:
+  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
+  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
+
+  // Show a specific prepared ad
+  await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
+
+  // Or omit adId to show the most recently prepared one (default behavior)
+  await AdMob.showInterstitial();
 }
 ```
 
@@ -324,6 +334,16 @@ export async function rewardVideo(): Promise<void> {
   };
   await AdMob.prepareRewardVideoAd(options);
   const rewardItem = await AdMob.showRewardVideoAd();
+
+  // You can also prepare multiple reward ads and show a specific one by passing its adId:
+  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
+  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-2' });
+
+  // Show a specific prepared ad
+  const reward = await AdMob.showRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
+
+  // Or omit adId to show the most recently prepared one (default behavior)
+  const reward2 = await AdMob.showRewardVideoAd();
 }
 ```
 
@@ -372,7 +392,7 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`setApplicationMuted(...)`](#setapplicationmuted)
 * [`setApplicationVolume(...)`](#setapplicationvolume)
 * [`loadAppOpen(...)`](#loadappopen)
-* [`showAppOpen()`](#showappopen)
+* [`showAppOpen(...)`](#showappopen)
 * [`isAppOpenLoaded()`](#isappopenloaded)
 * [`addListener(AppOpenAdPluginEvents.Loaded, ...)`](#addlistenerappopenadplugineventsloaded-)
 * [`addListener(AppOpenAdPluginEvents.FailedToLoad, ...)`](#addlistenerappopenadplugineventsfailedtoload-)
@@ -394,14 +414,14 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`showConsentForm()`](#showconsentform)
 * [`resetConsentInfo()`](#resetconsentinfo)
 * [`prepareInterstitial(...)`](#prepareinterstitial)
-* [`showInterstitial()`](#showinterstitial)
+* [`showInterstitial(...)`](#showinterstitial)
 * [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
 * [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
 * [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
 * [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
 * [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
 * [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
-* [`showRewardVideoAd()`](#showrewardvideoad)
+* [`showRewardVideoAd(...)`](#showrewardvideoad)
 * [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
 * [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
 * [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
@@ -409,7 +429,7 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
 * [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
 * [`prepareRewardInterstitialAd(...)`](#preparerewardinterstitialad)
-* [`showRewardInterstitialAd()`](#showrewardinterstitialad)
+* [`showRewardInterstitialAd(...)`](#showrewardinterstitialad)
 * [`addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoload-)
 * [`addListener(RewardInterstitialAdPluginEvents.Loaded, ...)`](#addlistenerrewardinterstitialadplugineventsloaded-)
 * [`addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)`](#addlistenerrewardinterstitialadplugineventsrewarded-)
@@ -521,13 +541,17 @@ Load an App Open ad
 --------------------
 
 
-### showAppOpen()
+### showAppOpen(...)
 
 ```typescript
-showAppOpen() => Promise<void>
+showAppOpen(options?: AdShowOptions) => Promise<void>
 ```
 
 Shows the App Open ad if loaded
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.
 
 --------------------
 
@@ -878,13 +902,17 @@ Prepare interstitial banner
 --------------------
 
 
-### showInterstitial()
+### showInterstitial(...)
 
 ```typescript
-showInterstitial() => Promise<void>
+showInterstitial(options?: AdShowOptions) => Promise<void>
 ```
 
 Show interstitial ad when it’s ready
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.            |
 
 **Since:** 1.1.2
 
@@ -990,13 +1018,17 @@ Prepare a reward video ad
 --------------------
 
 
-### showRewardVideoAd()
+### showRewardVideoAd(...)
 
 ```typescript
-showRewardVideoAd() => Promise<AdMobRewardItem>
+showRewardVideoAd(options?: AdShowOptions) => Promise<AdMobRewardItem>
 ```
 
 Show a reward video ad
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.            |
 
 **Returns:** <code>Promise&lt;<a href="#admobrewarditem">AdMobRewardItem</a>&gt;</code>
 
@@ -1120,13 +1152,17 @@ Prepare a reward video ad
 --------------------
 
 
-### showRewardInterstitialAd()
+### showRewardInterstitialAd(...)
 
 ```typescript
-showRewardInterstitialAd() => Promise<AdMobRewardInterstitialItem>
+showRewardInterstitialAd(options?: AdShowOptions) => Promise<AdMobRewardInterstitialItem>
 ```
 
 Show a reward video ad
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.            |
 
 **Returns:** <code>Promise&lt;<a href="#admobrewardinterstitialitem">AdMobRewardInterstitialItem</a>&gt;</code>
 
@@ -1340,6 +1376,13 @@ When notice listener of OnAdLoaded, you can get banner size.
 | Prop           | Type                |
 | -------------- | ------------------- |
 | **`adUnitId`** | <code>string</code> |
+
+
+#### AdShowOptions
+
+| Prop       | Type                | Description                                                                                   | Since |
+| ---------- | ------------------- | --------------------------------------------------------------------------------------------- | ----- |
+| **`adId`** | <code>string</code> | The ad unit ID of a previously prepared ad to show. If omitted, the most recently prepared ad is shown. | 8.0.1 |
 
 
 #### AdOptions

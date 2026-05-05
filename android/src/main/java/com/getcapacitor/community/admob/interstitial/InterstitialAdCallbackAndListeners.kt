@@ -20,7 +20,8 @@ object InterstitialAdCallbackAndListeners {
                 ad.fullScreenContentCallback = FullscreenPluginCallback(InterstitialAdPluginPluginEvent, notifyListenersFunction)
                 ad.setImmersiveMode(immersiveMode ?: false)
 
-                AdInterstitialExecutor.interstitialAd = ad
+                AdInterstitialExecutor.preparedAds[ad.adUnitId] = ad
+                AdInterstitialExecutor.lastPreparedAdId = ad.adUnitId
 
                 val adInfo = JSObject()
                 adInfo.put("adUnitId", ad.adUnitId)

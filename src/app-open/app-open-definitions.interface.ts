@@ -1,7 +1,7 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import type { AdMobError } from '../shared';
+import type { AdMobError, AdShowOptions } from '../shared';
 
 import type { AppOpenAdOptions } from './app-open-ad-options.interface';
 import type { AppOpenAdPluginEvents } from './app-open-ad-plugin-events.enum';
@@ -19,8 +19,10 @@ export interface AppOpenAdPlugin {
 
   /**
    * Shows the App Open ad if loaded
+   *
+   * @param options Optional. Pass { adId } to show a specific prepared ad instead of the most recent one.
    */
-  showAppOpen(): Promise<void>;
+  showAppOpen(options?: AdShowOptions): Promise<void>;
 
   /**
    * Check if the App Open ad is loaded
