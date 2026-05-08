@@ -42,8 +42,8 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
                 self.rewardedInterstitialAd?.fullScreenContentDelegate = self
 
                 self.rewardedInterstitialAd?.paidEventHandler = { adValue in
-                    let networkName = ad?.responseInfo?.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
-                    let impressionId = ad?.responseInfo?.responseIdentifier ?? ""
+                    let networkName = ad?.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+                    let impressionId = ad?.responseInfo.responseIdentifier ?? ""
                     self.plugin?.notifyListeners(RewardInterstitialAdPluginEvents.AdImpression.rawValue, data: [
                         "adUnitId": adUnitID,
                         "valueMicros": adValue.value.int64Value,
