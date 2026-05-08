@@ -35,8 +35,8 @@ import UIKit
                     self.isLoadingAd = false
                     self.appOpenAd = ad
                     ad.paidEventHandler = { adValue in
-                        let networkName = ad.responseInfo?.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
-                        let impressionId = ad.responseInfo?.responseIdentifier ?? ""
+                        let networkName = ad.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+                        let impressionId = ad.responseInfo.responseIdentifier ?? ""
                         onPaidEvent(
                             adValue.value.int64Value,
                             adValue.currencyCode,
