@@ -6,4 +6,5 @@ object AppOpenAdPluginEvents {
     const val Opened = "appOpenAdOpened"
     const val Closed = "appOpenAdClosed"
     const val FailedToShow = "appOpenAdFailedToShow"
+    const val AdImpression = "appOpenAdImpression"
 }

@@ -7,6 +7,7 @@ import android.os.Looper
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.models.AdMobPluginError
+import com.getcapacitor.community.admob.models.AdMobRevenueData
 
 class AppOpenAdPlugin {
 
@@ -56,6 +57,10 @@ class AppOpenAdPlugin {
                     val errorCode = loadAdError?.code ?: -1
                     notifier.notify(AppOpenAdPluginEvents.FailedToLoad, AdMobPluginError(errorCode, errorMessage))
                     call.reject(errorMessage)
+                },
+                onPaidEvent = { adValue, networkName, impressionId ->
+                    val revenueData = AdMobRevenueData(adValue, adUnitId, networkName, impressionId)
+                    notifier.notify(AppOpenAdPluginEvents.AdImpression, revenueData)
                 }
             )
         }

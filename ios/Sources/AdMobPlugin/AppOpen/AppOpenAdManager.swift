@@ -13,7 +13,7 @@ import UIKit
         self.adUnitId = adUnitId
     }
 
-    public func loadAd(onLoaded: @escaping () -> Void, onFailed: @escaping (Error?) -> Void) {
+    public func loadAd(onLoaded: @escaping () -> Void, onFailed: @escaping (Error?) -> Void, onPaidEvent: @escaping (_ valueMicros: Int64, _ currencyCode: String, _ precision: Int, _ networkName: String, _ impressionId: String) -> Void) {
         if appOpenAd != nil {
             onLoaded()
             return
@@ -34,6 +34,17 @@ import UIKit
                 await MainActor.run {
                     self.isLoadingAd = false
                     self.appOpenAd = ad
+                    ad.paidEventHandler = { adValue in
+                        let networkName = ad.responseInfo?.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+                        let impressionId = ad.responseInfo?.responseIdentifier ?? ""
+                        onPaidEvent(
+                            adValue.value.int64Value,
+                            adValue.currencyCode,
+                            adValue.precision.rawValue,
+                            networkName,
+                            impressionId
+                        )
+                    }
                     onLoaded()
                 }
             } catch {
