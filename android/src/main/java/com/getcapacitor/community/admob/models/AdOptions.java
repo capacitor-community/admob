@@ -28,6 +28,7 @@ public abstract class AdOptions {
     public static final String INTERSTITIAL_TESTER_ID = "ca-app-pub-3940256099942544/1033173712";
     public static final String REWARD_VIDEO_TESTER_ID = "ca-app-pub-3940256099942544/5224354917";
     public static final String REWARD_INTERSTITIAL_TESTER_ID = "ca-app-pub-3940256099942544/5354046379";
+    public static final String APP_OPEN_TESTER_ID = "ca-app-pub-3940256099942544/9257395921";
 
     /**
      * The position of the ad, it can be TOP_CENTER,
@@ -144,6 +145,15 @@ public abstract class AdOptions {
                 @Override
                 public String getTestingId() {
                     return AdOptions.REWARD_INTERSTITIAL_TESTER_ID;
+                }
+            };
+        }
+
+        public AdOptions createAppOpenOptions(PluginCall call) {
+            return new AdOptions(call) {
+                @Override
+                public String getTestingId() {
+                    return AdOptions.APP_OPEN_TESTER_ID;
                 }
             };
         }

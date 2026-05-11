@@ -36,10 +36,10 @@ Made with [contributors-img](https://contrib.rocks).
 
 ### Screenshots
 
-|             |                Banner                |                Interstitial                |                Reward                |
-| :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: |
-| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) |
-| **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  |
+|             |                Banner                |                Interstitial                |                Reward                |              App Open               |
+| :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: | :---------------------------------: |
+| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) | ![](demo/screenshots/ios_open.png)  |
+| **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  | ![](demo/screenshots/md_open.png)   |
 
 ## Installation
 
@@ -188,7 +188,44 @@ const consentInfo = await AdMob.requestConsentInfo({
 2. AdMob.requestConsentInfo
 3. AdMob.showConsentForm (If consent form required )
    3/ AdMob.showBanner
+   
+### Show App Open Ad
 
+```ts
+import {
+  AdMob,
+  AppOpenAdPluginEvents,
+  AppOpenAdOptions,
+} from '@capacitor-community/admob';
+
+export async function showAppOpenAd(): Promise<void> {
+  // listen to events
+  AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
+    console.log('App Open Ad loaded');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, (error) => {
+    console.log('Failed to load App Open Ad', error);
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
+    console.log('App Open Ad open');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
+    console.log('App Open Ad close');
+  });
+  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, (error) => {
+    console.log('Failed to show App Open Ad', error);
+  });
+
+  const options: AppOpenAdOptions = {
+    adId: 'YOUR_AD_UNIT_ID',
+  };
+  await AdMob.loadAppOpen(options);
+  const { value } = await AdMob.isAppOpenLoaded();
+  if (value) {
+    await AdMob.showAppOpen();
+  }
+}
+```
 ### Show Banner
 
 ```ts
@@ -334,6 +371,14 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`requestTrackingAuthorization()`](#requesttrackingauthorization)
 * [`setApplicationMuted(...)`](#setapplicationmuted)
 * [`setApplicationVolume(...)`](#setapplicationvolume)
+* [`loadAppOpen(...)`](#loadappopen)
+* [`showAppOpen()`](#showappopen)
+* [`isAppOpenLoaded()`](#isappopenloaded)
+* [`addListener(AppOpenAdPluginEvents.Loaded, ...)`](#addlistenerappopenadplugineventsloaded-)
+* [`addListener(AppOpenAdPluginEvents.FailedToLoad, ...)`](#addlistenerappopenadplugineventsfailedtoload-)
+* [`addListener(AppOpenAdPluginEvents.Opened, ...)`](#addlistenerappopenadplugineventsopened-)
+* [`addListener(AppOpenAdPluginEvents.Closed, ...)`](#addlistenerappopenadplugineventsclosed-)
+* [`addListener(AppOpenAdPluginEvents.FailedToShow, ...)`](#addlistenerappopenadplugineventsfailedtoshow-)
 * [`showBanner(...)`](#showbanner)
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
@@ -457,6 +502,125 @@ Report application volume to AdMob SDK
 | **`options`** | <code><a href="#applicationvolumeoptions">ApplicationVolumeOptions</a></code> |
 
 **Since:** 4.1.1
+
+--------------------
+
+
+### loadAppOpen(...)
+
+```typescript
+loadAppOpen(options: AppOpenAdOptions) => Promise<void>
+```
+
+Load an App Open ad
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#appopenadoptions">AppOpenAdOptions</a></code> |
+
+--------------------
+
+
+### showAppOpen()
+
+```typescript
+showAppOpen() => Promise<void>
+```
+
+Shows the App Open ad if loaded
+
+--------------------
+
+
+### isAppOpenLoaded()
+
+```typescript
+isAppOpenLoaded() => Promise<{ value: boolean; }>
+```
+
+Check if the App Open ad is loaded
+
+**Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.Loaded, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.Loaded, listenerFunc: () => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.Loaded</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                     |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.FailedToLoad, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.FailedToLoad, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.FailedToLoad</a></code> |
+| **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.Opened, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.Opened, listenerFunc: () => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.Opened</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                     |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.Closed, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.Closed, listenerFunc: () => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.Closed</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                     |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.FailedToShow, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.FailedToShow, listenerFunc: (error: AdMobError) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.FailedToShow</a></code> |
+| **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -1102,6 +1266,31 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 | **`volume`** | <code>0 \| 1 \| 0.1 \| 0.2 \| 0.3 \| 0.4 \| 0.5 \| 0.6 \| 0.7 \| 0.8 \| 0.9</code> | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. enable set 0.0 - 1.0, any float allowed. | 4.1.1 |
 
 
+#### AppOpenAdOptions
+
+| Prop       | Type                |
+| ---------- | ------------------- |
+| **`adId`** | <code>string</code> |
+
+
+#### PluginListenerHandle
+
+| Prop         | Type                                      |
+| ------------ | ----------------------------------------- |
+| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
+
+#### AdMobError
+
+For more information
+https://developers.google.com/android/reference/com/google/android/gms/ads/AdError
+
+| Prop          | Type                | Description                            |
+| ------------- | ------------------- | -------------------------------------- |
+| **`code`**    | <code>number</code> | Gets the error's code.                 |
+| **`message`** | <code>string</code> | Gets the message describing the error. |
+
+
 #### BannerAdOptions
 
 This interface extends <a href="#adoptions">AdOptions</a>
@@ -1117,13 +1306,6 @@ This interface extends <a href="#adoptions">AdOptions</a>
 | **`immersiveMode`** | <code>boolean</code>                                          | Sets a flag that controls if this interstitial or reward object will be displayed in immersive mode. Call this method before show. During show, if this flag is on and immersive mode is supported, SYSTEM_UI_FLAG_IMMERSIVE_STICKY &SYSTEM_UI_FLAG_HIDE_NAVIGATION will be turned on for interstitial or reward ad. |                              | 7.0.3 |
 
 
-#### PluginListenerHandle
-
-| Prop         | Type                                      |
-| ------------ | ----------------------------------------- |
-| **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
-
-
 #### AdMobBannerSize
 
 When notice listener of OnAdLoaded, you can get banner size.
@@ -1132,17 +1314,6 @@ When notice listener of OnAdLoaded, you can get banner size.
 | ------------ | ------------------- |
 | **`width`**  | <code>number</code> |
 | **`height`** | <code>number</code> |
-
-
-#### AdMobError
-
-For more information
-https://developers.google.com/android/reference/com/google/android/gms/ads/AdError
-
-| Prop          | Type                | Description                            |
-| ------------- | ------------------- | -------------------------------------- |
-| **`code`**    | <code>number</code> | Gets the error's code.                 |
-| **`message`** | <code>string</code> | Gets the message describing the error. |
 
 
 #### AdmobConsentInfo
@@ -1254,6 +1425,17 @@ From T, pick a set of properties whose keys are in the union K
 | **`ParentalGuidance`** | <code>'ParentalGuidance'</code> | Content suitable for most audiences with parental guidance. |
 | **`Teen`**             | <code>'Teen'</code>             | Content suitable for teen and older audiences.              |
 | **`MatureAudience`**   | <code>'MatureAudience'</code>   | Content suitable only for mature audiences.                 |
+
+
+#### AppOpenAdPluginEvents
+
+| Members            | Value                                |
+| ------------------ | ------------------------------------ |
+| **`Loaded`**       | <code>'appOpenAdLoaded'</code>       |
+| **`FailedToLoad`** | <code>'appOpenAdFailedToLoad'</code> |
+| **`Opened`**       | <code>'appOpenAdOpened'</code>       |
+| **`Closed`**       | <code>'appOpenAdClosed'</code>       |
+| **`FailedToShow`** | <code>'appOpenAdFailedToShow'</code> |
 
 
 #### BannerAdSize

@@ -1,6 +1,8 @@
 package com.getcapacitor.community.admob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -127,6 +129,12 @@ public class AdMobTest {
         @DisplayName("Initializes the banner executor")
         public void bannerExecutorInitialize() {
             when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(false);
+            doAnswer((invocation) -> {
+                ((Runnable) invocation.getArgument(0)).run();
+                return null;
+            })
+                .when(mockedActivity)
+                .runOnUiThread(any(Runnable.class));
 
             sut.initialize(pluginCallMock);
 
