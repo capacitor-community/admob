@@ -9,7 +9,6 @@ import { AdMob } from '@capacitor-community/admob';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   imports: [IonApp, IonRouterOutlet],
-  standalone: true,
 })
 export class AppComponent {
   constructor(private platform: Platform) {
