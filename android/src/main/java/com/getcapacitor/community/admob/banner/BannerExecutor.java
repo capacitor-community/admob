@@ -223,11 +223,19 @@ public class BannerExecutor extends Executor {
     }
 
     private void updateExistingAdView(AdOptions adOptions) {
+        // Bind to the AdView present when this call was made. `mAdView` is a
+        // shared field that another UI-thread task can null before this one
+        // runs; using the captured reference avoids a NullPointerException.
+        final AdView adView = mAdView;
         activitySupplier
             .get()
             .runOnUiThread(() -> {
+                if (adView != mAdView) {
+                    // Banner was removed or replaced before this task ran.
+                    return;
+                }
                 final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                mAdView.loadAd(adRequest);
+                adView.loadAd(adRequest);
             });
     }
 
@@ -236,22 +244,36 @@ public class BannerExecutor extends Executor {
      * https://developers.google.com/admob/ios/banner?hl=ja
      */
     private void createNewAdView(AdOptions adOptions) {
+        // Bind to the AdView instance created for this call. `mAdView` is a
+        // shared field that removeBanner/hideBanner or a stale ad-listener
+        // callback can null from the UI thread before this posted task runs;
+        // reading the field inside the task would then throw a
+        // NullPointerException (e.g. in AdViewIdHelper.assignIdToAdView).
+        final AdView adView = mAdView;
+
         // Run AdMob In Main UI Thread
         activitySupplier
             .get()
             .runOnUiThread(() -> {
+                if (adView != mAdView) {
+                    // Banner was removed or replaced before this task ran.
+                    return;
+                }
                 final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                 // Assign the correct id needed
-                AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
+                AdViewIdHelper.assignIdToAdView(adView, adOptions, adRequest, logTag, contextSupplier.get());
                 // Add the AdView to the view hierarchy.
-                mAdViewLayout.addView(mAdView);
+                mAdViewLayout.addView(adView);
                 // Start loading the ad.
-                mAdView.loadAd(adRequest);
-                mAdView.setAdListener(
+                adView.loadAd(adRequest);
+                adView.setAdListener(
                     new AdListener() {
                         @Override
                         public void onAdLoaded() {
-                            final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
+                            if (adView != mAdView) {
+                                return;
+                            }
+                            final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(adView);
 
                             notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
                             notifyListeners(BannerAdPluginEvents.Loaded.getWebEventName(), emptyObject);
@@ -260,12 +282,18 @@ public class BannerExecutor extends Executor {
 
                         @Override
                         public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                            if (mAdView != null) {
-                                mViewGroup.removeView(mAdViewLayout);
-                                mAdViewLayout.removeView(mAdView);
-                                mAdView.destroy();
-                                mAdView = null;
+                            if (adView != mAdView) {
+                                // Stale callback from a banner that was already removed or
+                                // replaced. Do not touch the current banner or emit teardown
+                                // events for a view the JS layer has already discarded.
+                                super.onAdFailedToLoad(adError);
+                                return;
                             }
+
+                            mViewGroup.removeView(mAdViewLayout);
+                            mAdViewLayout.removeView(adView);
+                            adView.destroy();
+                            mAdView = null;
 
                             final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
                             notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
