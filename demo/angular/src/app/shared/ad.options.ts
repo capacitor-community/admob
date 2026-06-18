@@ -1,6 +1,6 @@
-import { BannerAdOptions, BannerAdPosition, BannerAdSize } from '../../../../../dist/esm/banner';
-import { AdOptions } from '../../../../../dist/esm/shared';
-import { AppOpenAdOptions } from '../../../../../dist/esm/app-open';
+import { BannerAdOptions, BannerAdPosition, BannerAdSize } from '@capacitor-community/admob';
+import { AdOptions } from '@capacitor-community/admob';
+import { AppOpenAdOptions } from '@capacitor-community/admob';
 
 export const bannerTopOptions: BannerAdOptions = {
   adId: 'ca-app-pub-3940256099942544/2934735716',
