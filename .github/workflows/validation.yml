@@ -10,30 +10,36 @@ jobs:
   lint:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
       - run: npm install
       - run: npm run lint
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
       - run: npm install
       - run: npm run lint
 
   test-demo:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
       - run: npm install
       - run: npm run build
       - run: npm install && npm run test:ci
@@ -43,10 +49,12 @@ jobs:
   verify-web:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
       - run: npm install
       - run: npm run verify:web
 
@@ -54,22 +62,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'zulu'
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
       - run: npm install
       - run: npm run verify:android
 
   verify-ios:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
       - run: npm run verify:ios
