@@ -7,6 +7,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "test": "ng test",
+    "test:ci": "ng test --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "cap": "ng build --configuration production && npx cap copy"
@@ -30,25 +32,20 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^21.0.4",
+    "@angular/build": "^21.0.4",
     "@angular/cli": "^21.0.4",
     "@angular/compiler": "^21.0.7",
     "@angular/compiler-cli": "^21.0.6",
     "@angular/language-service": "^21.0.6",
     "@capacitor/cli": "^8.0.0",
     "@ionic/angular-toolkit": "^12.3.0",
-    "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "angular-eslint": "21.1.0",
     "eslint": "^9.37.0",
-    "jasmine-core": "~5.1.0",
-    "jasmine-spec-reporter": "~5.0.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "jsdom": "^25.0.1",
     "native-run": "^1.7.2",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.46.0"
+    "typescript-eslint": "8.46.0",
+    "vitest": "^4.0.0"
   }
 }

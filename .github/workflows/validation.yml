@@ -27,6 +27,19 @@ jobs:
       - run: npm install
       - run: npm run lint
 
+  test-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run build
+      - run: npm install && npm run test:ci
+        working-directory: demo/angular
+
+
   verify-web:
     runs-on: ubuntu-latest
     steps:

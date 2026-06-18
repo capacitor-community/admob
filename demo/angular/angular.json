@@ -11,66 +11,64 @@
             "schematics": {},
             "architect": {
                 "build": {
-                    "builder": "@angular-devkit/build-angular:application",
-                    "options": {
-                        "outputPath": {
-                            "base": "www"
-                        },
-                        "index": "src/index.html",
-                        "polyfills": [
-                            "src/polyfills.ts"
-                        ],
-                        "tsConfig": "tsconfig.app.json",
-                        "assets": [
-                            {
-                                "glob": "**/*",
-                                "input": "src/assets",
-                                "output": "assets"
-                            }
-                        ],
-                        "styles": [
-                            {
-                                "input": "src/theme/variables.scss"
-                            },
-                            {
-                                "input": "src/global.scss"
-                            }
-                        ],
-                        "scripts": [],
-                        "aot": false,
-                        "extractLicenses": false,
-                        "sourceMap": true,
-                        "optimization": false,
-                        "namedChunks": true,
-                        "browser": "src/main.ts"
+                  "builder": "@angular/build:application",
+                  "options": {
+                    "outputPath": {
+                      "base": "www"
                     },
-                    "configurations": {
-                        "production": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
-                                }
-                            ],
-                            "optimization": true,
-                            "outputHashing": "all",
-                            "sourceMap": false,
-                            "namedChunks": false,
-                            "aot": true,
-                            "extractLicenses": true,
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                }
-                            ]
-                        },
-                        "ci": {
-                            "progress": false
+                    "index": "src/index.html",
+                    "polyfills": ["src/polyfills.ts"],
+                    "tsConfig": "tsconfig.app.json",
+                    "assets": [
+                      {
+                        "glob": "**/*",
+                        "input": "src/assets",
+                        "output": "assets"
+                      }
+                    ],
+                    "styles": [
+                      {
+                        "input": "src/theme/variables.scss"
+                      },
+                      {
+                        "input": "src/global.scss"
+                      }
+                    ],
+                    "scripts": [],
+                    "aot": false,
+                    "extractLicenses": false,
+                    "sourceMap": true,
+                    "optimization": false,
+                    "namedChunks": true,
+                    "browser": "src/main.ts"
+                  },
+                  "configurations": {
+                    "production": {
+                      "fileReplacements": [
+                        {
+                          "replace": "src/environments/environment.ts",
+                          "with": "src/environments/environment.prod.ts"
                         }
+                      ],
+                      "optimization": true,
+                      "outputHashing": "all",
+                      "sourceMap": false,
+                      "namedChunks": false,
+                      "aot": true,
+                      "extractLicenses": true,
+                      "budgets": [
+                        {
+                          "type": "initial",
+                          "maximumWarning": "2mb",
+                          "maximumError": "5mb"
+                        }
+                      ]
                     },
-                    "defaultConfiguration": ""
+                    "ci": {
+                      "progress": false
+                    }
+                  },
+                  "defaultConfiguration": ""
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
@@ -91,30 +89,15 @@
                     }
                 },
                 "test": {
-                    "builder": "@angular-devkit/build-angular:karma",
+                    "builder": "@angular/build:unit-test",
                     "options": {
-                        "main": "src/test.ts",
-                        "polyfills": "src/polyfills.ts",
                         "tsConfig": "tsconfig.spec.json",
-                        "karmaConfig": "karma.conf.js",
-                        "styles": [],
-                        "scripts": [],
-                        "assets": [
-                            {
-                                "glob": "favicon.ico",
-                                "input": "src/",
-                                "output": "/"
-                            },
-                            {
-                                "glob": "**/*",
-                                "input": "src/assets",
-                                "output": "/assets"
-                            }
-                        ]
+                        "buildTarget": "app:build",
+                        "runner": "vitest",
+                        "runnerConfig": "vitest.config.ts"
                     },
                     "configurations": {
                         "ci": {
-                            "progress": false,
                             "watch": false
                         }
                     }
