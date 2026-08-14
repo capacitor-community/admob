@@ -121,8 +121,11 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
-  async loadAppOpen(options: AppOpenAdOptions): Promise<void> {
+  async loadAppOpen(options: AppOpenAdOptions): Promise<AdLoadInfo> {
     console.log('loadAppOpen', options);
+    return {
+      adUnitId: options.adId,
+    };
   }
 
   async showAppOpen(options?: AdShowOptions): Promise<void> {

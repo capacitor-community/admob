@@ -534,7 +534,7 @@ Report application volume to AdMob SDK
 ### loadAppOpen(...)
 
 ```typescript
-loadAppOpen(options: AppOpenAdOptions) => Promise<void>
+loadAppOpen(options: AppOpenAdOptions) => Promise<AdLoadInfo>
 ```
 
 Load an App Open ad
@@ -542,6 +542,8 @@ Load an App Open ad
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
 | **`options`** | <code><a href="#appopenadoptions">AppOpenAdOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
 --------------------
 
@@ -577,13 +579,13 @@ Check if the App Open ad is loaded
 ### addListener(AppOpenAdPluginEvents.Loaded, ...)
 
 ```typescript
-addListener(eventName: AppOpenAdPluginEvents.Loaded, listenerFunc: () => void) => Promise<PluginListenerHandle>
+addListener(eventName: AppOpenAdPluginEvents.Loaded, listenerFunc: (info: AdLoadInfo) => void) => Promise<PluginListenerHandle>
 ```
 
 | Param              | Type                                                                           |
 | ------------------ | ------------------------------------------------------------------------------ |
 | **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.Loaded</a></code> |
-| **`listenerFunc`** | <code>() =&gt; void</code>                                                     |
+| **`listenerFunc`** | <code>(info: <a href="#adloadinfo">AdLoadInfo</a>) =&gt; void</code>           |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
