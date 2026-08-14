@@ -29,7 +29,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
             case "MEDIUM_RECTANGLE":
                 bannerSize = AdSizeMediumRectangle
             case "SMART_BANNER":
-                bannerSize = largePortraitAnchoredAdaptiveBanner(width: rootViewController.view.frame.width)
+                bannerSize = kGADAdSizeSmartBannerPortrait
             default: // ADAPTIVE_BANNER
                 let frame = { () -> CGRect in
                     // Here safe area is taken into account, hence the view frame is used
@@ -37,7 +37,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                     return rootViewController.view.frame.inset(by: rootViewController.view.safeAreaInsets)
                 }()
                 let viewWidth = frame.size.width
-                bannerSize = largeAnchoredAdaptiveBanner(width: viewWidth)
+                bannerSize = currentOrientationAnchoredAdaptiveBanner(width: viewWidth)
             }
 
             self.bannerView = BannerView(adSize: bannerSize)
