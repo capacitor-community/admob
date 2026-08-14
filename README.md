@@ -50,6 +50,12 @@ If you use capacitor 6:
 % npx cap update
 ```
 
+### Google Mobile Ads SDK compatibility
+
+To preserve behavior for users of the current major version, this plugin continues to use Google Mobile Ads SDK APIs that are deprecated but still supported. Replacing those APIs can change banner sizing and age-restricted treatment behavior, so that migration is deferred until the next major release.
+
+Migration to the [GMA Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) is also deferred until the next major release because it requires breaking changes to SDK initialization, ad requests, and mediation integration.
+
 ### Android configuration
 
 In file `android/app/src/main/AndroidManifest.xml`, add the following XML elements under `<manifest><application>` :
