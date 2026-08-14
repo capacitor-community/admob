@@ -19,6 +19,7 @@ import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndListeners;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.getcapacitor.community.admob.rewardedinterstitial.AdRewardInterstitialExecutor;
+import com.google.android.gms.ads.AgeRestrictedTreatment;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -254,27 +255,14 @@ public class AdMob extends Plugin {
 
         // tagForChildDirectedTreatment
         final Boolean tagForChildDirectedTreatment = call.getBoolean("tagForChildDirectedTreatment");
-        int TAG_FOR_CHILD_DIRECTED_TREATMENT;
-
-        if (tagForChildDirectedTreatment == null) {
-            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED;
-        } else if (tagForChildDirectedTreatment) {
-            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE;
-        } else {
-            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE;
-        }
-
         // tagForUnderAgeOfConsent
         final Boolean tagForUnderAgeOfConsent = call.getBoolean("tagForUnderAgeOfConsent");
-        int TAG_FOR_UNDER_AGE_OF_CONSENT;
 
-        if (tagForUnderAgeOfConsent == null) {
-            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED;
-        } else if (tagForUnderAgeOfConsent) {
-            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE;
-        } else {
-            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE;
-        }
+        final AgeRestrictedTreatment ageRestrictedTreatment = Boolean.TRUE.equals(tagForChildDirectedTreatment)
+            ? AgeRestrictedTreatment.CHILD
+            : Boolean.TRUE.equals(tagForUnderAgeOfConsent)
+                ? AgeRestrictedTreatment.TEEN
+                : AgeRestrictedTreatment.UNSPECIFIED;
 
         // maxAdContentRating
         final String maxAdContentRating = call.getString("maxAdContentRating");
@@ -300,8 +288,7 @@ public class AdMob extends Plugin {
         try {
             RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
                 .setTestDeviceIds(testingDevices.<String>toList())
-                .setTagForChildDirectedTreatment(TAG_FOR_CHILD_DIRECTED_TREATMENT)
-                .setTagForUnderAgeOfConsent(TAG_FOR_UNDER_AGE_OF_CONSENT)
+                .setAgeRestrictedTreatment(ageRestrictedTreatment)
                 .setMaxAdContentRating(MAX_AD_CONTENT_RATING)
                 .build();
             MobileAds.setRequestConfiguration(requestConfiguration);

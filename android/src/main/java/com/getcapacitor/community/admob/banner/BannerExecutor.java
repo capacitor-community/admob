@@ -72,13 +72,15 @@ public class BannerExecutor extends Executor {
         try {
             mAdView = new AdView(contextSupplier.get());
 
-            if (!adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
+            if (adOptions.adSize.toString().equals("SMART_BANNER")) {
+                mAdView.setAdSize(
+                    AdSize.getLargePortraitAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (defaultWidthPixels / density))
+                );
+            } else if (!adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
                 mAdView.setAdSize(adOptions.adSize.getSize());
             } else {
                 // ADAPTIVE BANNER
-                mAdView.setAdSize(
-                    AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (defaultWidthPixels / density))
-                );
+                mAdView.setAdSize(AdSize.getLargeAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (defaultWidthPixels / density)));
             }
 
             // Setup AdView Layout

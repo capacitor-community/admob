@@ -12,7 +12,7 @@ enum class BannerAdSizeEnum(val size: AdSize) {
     MEDIUM_RECTANGLE(AdSize.MEDIUM_RECTANGLE),
     LEADERBOARD(AdSize.LEADERBOARD),
     ADAPTIVE_BANNER(AdSize.INVALID), // We should not use the AdSize here but calculate the device size
-    SMART_BANNER(AdSize.SMART_BANNER);
+    SMART_BANNER(AdSize.INVALID);
 
     override fun toString(): String {
         return name

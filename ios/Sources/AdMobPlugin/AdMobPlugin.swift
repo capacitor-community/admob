@@ -304,13 +304,15 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
             MobileAds.shared.requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
         }
 
+        let ageRestrictedTreatment: AgeRestrictedTreatment
         if call.getBool("tagForChildDirectedTreatment") == true {
-            MobileAds.shared.requestConfiguration.tagForChildDirectedTreatment = true
+            ageRestrictedTreatment = .child
+        } else if call.getBool("tagForUnderAgeOfConsent") == true {
+            ageRestrictedTreatment = .teen
+        } else {
+            ageRestrictedTreatment = .unspecified
         }
-
-        if call.getBool("tagForUnderAgeOfConsent") == true {
-            MobileAds.shared.requestConfiguration.tagForUnderAgeOfConsent = true
-        }
+        MobileAds.shared.requestConfiguration.ageRestrictedTreatment = ageRestrictedTreatment
 
         if call.getString("maxAdContentRating") != nil {
             switch call.getString("maxAdContentRating") {
