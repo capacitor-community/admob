@@ -66,14 +66,14 @@ import UIKit
                 }, onClosed: {
                     self.preparedManagers.removeValue(forKey: adId)
                     if self.lastPreparedAdId == adId {
-                        self.lastPreparedAdId = Array(self.preparedManagers.keys).last
+                        self.lastPreparedAdId = self.preparedManagers.first(where: { $0.value.isAdLoaded() })?.key
                     }
                     notify(AppOpenAdPluginEvents.Closed.rawValue, [:])
                     call.resolve()
                 }, onFailedToShow: { error in
                     self.preparedManagers.removeValue(forKey: adId)
                     if self.lastPreparedAdId == adId {
-                        self.lastPreparedAdId = Array(self.preparedManagers.keys).last
+                        self.lastPreparedAdId = self.preparedManagers.first(where: { $0.value.isAdLoaded() })?.key
                     }
                     let message = error?.localizedDescription ?? "Failed to show App Open Ad"
                     notify(AppOpenAdPluginEvents.FailedToShow.rawValue, [

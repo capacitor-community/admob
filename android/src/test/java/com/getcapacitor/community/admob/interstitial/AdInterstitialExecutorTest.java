@@ -300,7 +300,12 @@ class AdInterstitialExecutorTest {
             verify(adTwo).setFullScreenContentCallback(callback.capture());
             callback.getValue().onAdDismissedFullScreenContent();
 
-            assertEquals("ad-unit-1", AdInterstitialExecutor.lastPreparedAdId);
+            reset(mockedActivity);
+            sut.showInterstitial(pluginCallMock, notifierMock);
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(adOne).show(any());
         }
 
         @Test
