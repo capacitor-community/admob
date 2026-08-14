@@ -26,6 +26,8 @@ export interface AppOpenAdPlugin {
 
   /**
    * Check if the App Open ad is loaded
+   *
+   * @param options Optional. Pass an adId to check a specific prepared ad instead of the most recent one.
    */
   isAppOpenLoaded(options?: AdShowOptions): Promise<{ value: boolean }>;
 
