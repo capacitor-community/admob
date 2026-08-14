@@ -4,7 +4,9 @@ import GoogleMobileAds
 
 class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
-    var rewardedAd: RewardedAd!
+    private var preparedAds: [String: RewardedAd] = [:]
+    private var lastPreparedAdId: String?
+    private var currentlyShowingAdId: String?
 
     func prepareRewardVideoAd(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
         RewardedAd.load(
@@ -21,7 +23,10 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                     return
                 }
 
-                self.rewardedAd = ad
+                guard let ad = ad else {
+                    call.reject("Loading failed")
+                    return
+                }
 
                 if let providedOptions = call.getObject("ssv") {
                     let ssvOptions = ServerSideVerificationOptions()
@@ -36,14 +41,13 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                         ssvOptions.userIdentifier = userId
                     }
 
-                    self.rewardedAd?.serverSideVerificationOptions = ssvOptions
+                    ad.serverSideVerificationOptions = ssvOptions
                 }
 
-                self.rewardedAd?.fullScreenContentDelegate = self
-
-                self.rewardedAd?.paidEventHandler = { adValue in
-                    let networkName = ad?.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
-                    let impressionId = ad?.responseInfo.responseIdentifier ?? ""
+                ad.fullScreenContentDelegate = self
+                ad.paidEventHandler = { adValue in
+                    let networkName = ad.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+                    let impressionId = ad.responseInfo.responseIdentifier ?? ""
                     self.plugin?.notifyListeners(RewardAdPluginEvents.AdImpression.rawValue, data: [
                         "adUnitId": adUnitID,
                         "valueMicros": adValue.value.int64Value,
@@ -53,6 +57,8 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                         "impressionId": impressionId
                     ])
                 }
+                self.preparedAds[adUnitID] = ad
+                self.lastPreparedAdId = adUnitID
 
                 self.plugin?.notifyListeners(RewardAdPluginEvents.Loaded.rawValue, data: [
                     "adUnitId": adUnitID
@@ -65,8 +71,18 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func showRewardVideoAd(_ call: CAPPluginCall) {
+        guard let adId = call.getString("adId") ?? lastPreparedAdId else {
+            call.reject("No ad prepared")
+            return
+        }
+        guard currentlyShowingAdId == nil else {
+            call.reject("An ad is already showing")
+            return
+        }
+
         if let rootViewController = plugin?.getRootVC() {
-            if let ad = self.rewardedAd {
+            if let ad = preparedAds[adId] {
+                currentlyShowingAdId = adId
                 ad.present(from: rootViewController,
                            userDidEarnRewardHandler: {
                             let reward = ad.adReward
@@ -81,6 +97,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
             "code": 0,
@@ -94,7 +111,15 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Dismissed.rawValue, data: [:])
+    }
+
+    private func removeCurrentlyShowingAd() {
+        guard let adId = currentlyShowingAdId else { return }
+        preparedAds.removeValue(forKey: adId)
+        if lastPreparedAdId == adId { lastPreparedAdId = nil }
+        currentlyShowingAdId = nil
     }
 }

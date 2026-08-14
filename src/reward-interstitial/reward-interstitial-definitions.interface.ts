@@ -1,18 +1,17 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import type { AdLoadInfo, AdMobError, AdMobRevenueData } from '../shared';
+import type { AdLoadInfo, AdMobError, AdMobRevenueData, AdShowOptions } from '../shared';
 
 import type { RewardInterstitialAdOptions } from './reward-interstitial-ad-options.interface';
 import type { RewardInterstitialAdPluginEvents } from './reward-interstitial-ad-plugin-events.enum';
 import type { AdMobRewardInterstitialItem } from './reward-interstitial-item.interface';
 
 // This is just to validate that we do not forget to implement any event name
-export type RewardInterstitialDefinitionsHasAllEvents =
-  ValidateAllEventsEnumAreImplemented<
-    RewardInterstitialAdPluginEvents,
-    RewardInterstitialDefinitions
-  >;
+export type RewardInterstitialDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<
+  RewardInterstitialAdPluginEvents,
+  RewardInterstitialDefinitions
+>;
 
 export interface RewardInterstitialDefinitions {
   /**
@@ -22,17 +21,16 @@ export interface RewardInterstitialDefinitions {
    * @param options RewardAdOptions
    * @since 1.1.2
    */
-  prepareRewardInterstitialAd(
-    options: RewardInterstitialAdOptions,
-  ): Promise<AdLoadInfo>;
+  prepareRewardInterstitialAd(options: RewardInterstitialAdOptions): Promise<AdLoadInfo>;
 
   /**
    * Show a reward video ad
    *
    * @group RewardVideo
+   * @param options Optional. Pass { adId } to show a specific prepared ad instead of the most recent one.
    * @since 1.1.2
    */
-  showRewardInterstitialAd(): Promise<AdMobRewardInterstitialItem>;
+  showRewardInterstitialAd(options?: AdShowOptions): Promise<AdMobRewardInterstitialItem>;
 
   addListener(
     eventName: RewardInterstitialAdPluginEvents.FailedToLoad,

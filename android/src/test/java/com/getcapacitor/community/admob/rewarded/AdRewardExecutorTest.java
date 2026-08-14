@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.app.Activity;
 import android.content.Context;
@@ -61,7 +62,8 @@ class AdRewardExecutorTest {
         @BeforeEach
         void beforeEach() {
             runnableArgumentCaptor = ArgumentCaptor.forClass(Runnable.class);
-            AdRewardExecutor.mRewardedAd = null;
+            AdRewardExecutor.preparedAds.clear();
+            AdRewardExecutor.lastPreparedAdId = null;
         }
 
         @Test
@@ -102,8 +104,9 @@ class AdRewardExecutorTest {
         @Test
         @DisplayName("Should call show when Reward was prepared")
         void shouldCallShowWhenPrepared() {
-            RewardedAd mockedInterstitialAd = mock(RewardedAd.class);
-            AdRewardExecutor.mRewardedAd = mockedInterstitialAd;
+            RewardedAd mockedRewardedAd = mock(RewardedAd.class);
+            AdRewardExecutor.preparedAds.put("test-ad-id", mockedRewardedAd);
+            AdRewardExecutor.lastPreparedAdId = "test-ad-id";
 
             sut.showRewardVideoAd(pluginCallMock, notifierMock);
 
@@ -112,7 +115,60 @@ class AdRewardExecutorTest {
             uiThreadRunnable.run();
 
             Mockito.verify(pluginCallMock, times(0)).reject(any());
-            verify(mockedInterstitialAd).show(any(), any());
+            verify(mockedRewardedAd).show(any(), any());
+        }
+
+        @Test
+        @DisplayName("Should show a specific reward ad when adId is provided")
+        void shouldShowSpecificAdWhenAdIdProvided() {
+            RewardedAd adOne = mock(RewardedAd.class);
+            RewardedAd adTwo = mock(RewardedAd.class);
+            AdRewardExecutor.preparedAds.put("reward-1", adOne);
+            AdRewardExecutor.preparedAds.put("reward-2", adTwo);
+            AdRewardExecutor.lastPreparedAdId = "reward-2";
+
+            when(pluginCallMock.getString("adId")).thenReturn("reward-1");
+
+            sut.showRewardVideoAd(pluginCallMock, notifierMock);
+
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(adOne).show(any(), any());
+            verify(adTwo, times(0)).show(any(), any());
+        }
+
+        @Test
+        @DisplayName("Should show the last prepared reward ad when no adId is provided")
+        void shouldShowLastPreparedWhenNoAdId() {
+            RewardedAd adOne = mock(RewardedAd.class);
+            RewardedAd adTwo = mock(RewardedAd.class);
+            AdRewardExecutor.preparedAds.put("reward-1", adOne);
+            AdRewardExecutor.preparedAds.put("reward-2", adTwo);
+            AdRewardExecutor.lastPreparedAdId = "reward-2";
+
+            sut.showRewardVideoAd(pluginCallMock, notifierMock);
+
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(adTwo).show(any(), any());
+            verify(adOne, times(0)).show(any(), any());
+        }
+
+        @Test
+        @DisplayName("Should reject when requesting a non-existent reward adId")
+        void shouldRejectWhenAdIdNotFound() {
+            RewardedAd adOne = mock(RewardedAd.class);
+            AdRewardExecutor.preparedAds.put("reward-1", adOne);
+            AdRewardExecutor.lastPreparedAdId = "reward-1";
+
+            when(pluginCallMock.getString("adId")).thenReturn("non-existent");
+
+            sut.showRewardVideoAd(pluginCallMock, notifierMock);
+
+            verify(pluginCallMock).reject(any());
+            verify(mockedActivity, times(0)).runOnUiThread(any());
         }
     }
 }

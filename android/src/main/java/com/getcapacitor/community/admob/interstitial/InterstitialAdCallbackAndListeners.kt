@@ -29,7 +29,8 @@ object InterstitialAdCallbackAndListeners {
                     notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.AdImpression, revenueData)
                 }
 
-                AdInterstitialExecutor.interstitialAd = ad
+                AdInterstitialExecutor.preparedAds[ad.adUnitId] = ad
+                AdInterstitialExecutor.lastPreparedAdId = ad.adUnitId
 
                 val adInfo = JSObject()
                 adInfo.put("adUnitId", ad.adUnitId)

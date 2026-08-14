@@ -136,14 +136,14 @@ internal class InterstitialAdCallbackAndListenersTest {
 
             @Test
             fun `onAdLoaded should store the ad on the static reference`() {
-                AdInterstitialExecutor.interstitialAd = null;
+                AdInterstitialExecutor.preparedAds.clear()
                 val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
                 val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
 
                 // ACt
                 listener.onAdLoaded(interstitialAdStub)
                 Mockito.verify(pluginCall).resolve(argumentCaptor.capture())
-                assertEquals(AdInterstitialExecutor.interstitialAd, interstitialAdStub);
+                assertEquals(AdInterstitialExecutor.preparedAds[interstitialAdStub.adUnitId], interstitialAdStub)
             }
 
             @Test

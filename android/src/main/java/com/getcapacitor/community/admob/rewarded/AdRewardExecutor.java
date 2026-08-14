@@ -7,6 +7,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
+import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -14,10 +15,13 @@ import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.common.util.BiConsumer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class AdRewardExecutor extends Executor {
 
-    public static RewardedAd mRewardedAd;
+    public static final Map<String, RewardedAd> preparedAds = new LinkedHashMap<>();
+    public static String lastPreparedAdId;
 
     public AdRewardExecutor(
         Supplier<Context> contextSupplier,
@@ -52,7 +56,11 @@ public class AdRewardExecutor extends Executor {
 
     @PluginMethod
     public void showRewardVideoAd(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        if (mRewardedAd == null) {
+        String requestedAdId = call.getString("adId");
+        String adId = requestedAdId != null ? requestedAdId : lastPreparedAdId;
+        RewardedAd ad = adId != null ? preparedAds.get(adId) : null;
+
+        if (ad == null) {
             String errorMessage = "No Reward Video Ad can be shown. It was not prepared or maybe it failed to be prepared.";
             call.reject(errorMessage);
             AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
@@ -64,7 +72,13 @@ public class AdRewardExecutor extends Executor {
             activitySupplier
                 .get()
                 .runOnUiThread(() -> {
-                    mRewardedAd.show(
+                    ad.setFullScreenContentCallback(
+                        new FullscreenPluginCallback(RewardAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
+                            preparedAds.remove(adId);
+                            if (adId != null && adId.equals(lastPreparedAdId)) lastPreparedAdId = null;
+                        })
+                    );
+                    ad.show(
                         activitySupplier.get(),
                         RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
                     );

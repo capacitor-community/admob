@@ -11,7 +11,7 @@ import type { AppOpenAdOptions } from './app-open/app-open-ad-options.interface'
 import { AdmobConsentStatus } from './consent/consent-status.enum';
 import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
 import type { AdMobRewardItem } from './reward';
-import type { AdOptions, AdLoadInfo } from './shared';
+import type { AdOptions, AdLoadInfo, AdShowOptions } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
 
 export class AdMobWeb extends WebPlugin implements AdMobPlugin {
@@ -87,8 +87,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
-  async showInterstitial(): Promise<void> {
-    console.log('showInterstitial');
+  async showInterstitial(options?: AdShowOptions): Promise<void> {
+    console.log('showInterstitial', options);
   }
 
   async prepareRewardVideoAd(options: AdOptions): Promise<AdLoadInfo> {
@@ -98,7 +98,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
-  async showRewardVideoAd(): Promise<AdMobRewardItem> {
+  async showRewardVideoAd(options?: AdShowOptions): Promise<AdMobRewardItem> {
+    console.log('showRewardVideoAd', options);
     return {
       type: '',
       amount: 0,
@@ -112,7 +113,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     };
   }
 
-  async showRewardInterstitialAd(): Promise<AdMobRewardItem> {
+  async showRewardInterstitialAd(options?: AdShowOptions): Promise<AdMobRewardItem> {
+    console.log('showRewardInterstitialAd', options);
     return {
       type: '',
       amount: 0,
@@ -123,8 +125,8 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log('loadAppOpen', options);
   }
 
-  async showAppOpen(): Promise<void> {
-    console.log('showAppOpen');
+  async showAppOpen(options?: AdShowOptions): Promise<void> {
+    console.log('showAppOpen', options);
   }
 
   async isAppOpenLoaded(): Promise<{ value: boolean }> {

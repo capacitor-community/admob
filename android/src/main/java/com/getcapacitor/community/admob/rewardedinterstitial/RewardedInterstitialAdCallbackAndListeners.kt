@@ -28,8 +28,7 @@ object RewardedInterstitialAdCallbackAndListeners {
     fun getRewardedAdLoadCallback(call: PluginCall, notifyListenersFunction: BiConsumer<String, JSObject>, adOptions: AdOptions): RewardedInterstitialAdLoadCallback {
         return object : RewardedInterstitialAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedInterstitialAd) {
-                AdRewardInterstitialExecutor.mRewardedInterstitialAd = ad
-                AdRewardInterstitialExecutor.mRewardedInterstitialAd.fullScreenContentCallback = FullscreenPluginCallback(
+                ad.fullScreenContentCallback = FullscreenPluginCallback(
                         RewardInterstitialAdPluginEvents, notifyListenersFunction)
 
                 ad.setOnPaidEventListener { adValue ->
@@ -39,6 +38,9 @@ object RewardedInterstitialAdCallbackAndListeners {
                     val revenueData = AdMobRevenueData(adValue, ad.adUnitId, networkName, impressionId)
                     notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.AdImpression, revenueData)
                 }
+
+                AdRewardInterstitialExecutor.preparedAds[ad.adUnitId] = ad
+                AdRewardInterstitialExecutor.lastPreparedAdId = ad.adUnitId
 
                 val adInfo = JSObject()
                 adInfo.put("adUnitId", ad.adUnitId)

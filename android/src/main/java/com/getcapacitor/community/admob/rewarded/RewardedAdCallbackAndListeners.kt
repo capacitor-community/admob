@@ -31,9 +31,7 @@ object RewardedAdCallbackAndListeners {
             override fun onAdLoaded(ad: RewardedAd) {
                 val immersiveMode = call.getBoolean("immersiveMode")
                 ad.setImmersiveMode(immersiveMode ?: false)
-
-                AdRewardExecutor.mRewardedAd = ad
-                AdRewardExecutor.mRewardedAd.fullScreenContentCallback = FullscreenPluginCallback(
+                ad.fullScreenContentCallback = FullscreenPluginCallback(
                         RewardAdPluginEvents, notifyListenersFunction)
 
                 ad.setOnPaidEventListener { adValue ->
@@ -53,8 +51,11 @@ object RewardedAdCallbackAndListeners {
                     adOptions.ssvInfo.userId?.let {
                         ssvOptions.setUserId(it)
                     }
-                    AdRewardExecutor.mRewardedAd.setServerSideVerificationOptions(ssvOptions.build())
+                    ad.setServerSideVerificationOptions(ssvOptions.build())
                 }
+
+                AdRewardExecutor.preparedAds[ad.adUnitId] = ad
+                AdRewardExecutor.lastPreparedAdId = ad.adUnitId
 
                 val adInfo = JSObject()
                 adInfo.put("adUnitId", ad.adUnitId)
