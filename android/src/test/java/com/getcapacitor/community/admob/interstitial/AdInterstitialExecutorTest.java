@@ -21,6 +21,7 @@ import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.common.util.BiConsumer;
@@ -280,6 +281,31 @@ class AdInterstitialExecutorTest {
 
             verify(adTwo).show(any());
             verify(adOne, times(0)).show(any());
+        }
+
+        @Test
+        @DisplayName("Should fall back to the remaining prepared ad after dismissal")
+        void shouldFallBackToRemainingAdAfterDismissal() {
+            InterstitialAd adOne = mock(InterstitialAd.class);
+            InterstitialAd adTwo = mock(InterstitialAd.class);
+            AdInterstitialExecutor.preparedAds.put("ad-unit-1", adOne);
+            AdInterstitialExecutor.preparedAds.put("ad-unit-2", adTwo);
+            AdInterstitialExecutor.lastPreparedAdId = "ad-unit-2";
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            ArgumentCaptor<FullScreenContentCallback> callback = ArgumentCaptor.forClass(FullScreenContentCallback.class);
+            verify(adTwo).setFullScreenContentCallback(callback.capture());
+            callback.getValue().onAdDismissedFullScreenContent();
+
+            reset(mockedActivity);
+            sut.showInterstitial(pluginCallMock, notifierMock);
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(adOne).show(any());
         }
 
         @Test

@@ -89,13 +89,17 @@ class AppOpenAdPlugin {
                 },
                 onClosed = {
                     preparedManagers.remove(adId)
-                    if (lastPreparedAdId == adId) lastPreparedAdId = null
+                    if (lastPreparedAdId == adId) {
+                        lastPreparedAdId = preparedManagers.entries.lastOrNull { it.value.isAdLoaded }?.key
+                    }
                     notifier.notify(AppOpenAdPluginEvents.Closed, JSObject())
                     call.resolve()
                 },
                 onFailedToShow = { adError ->
                     preparedManagers.remove(adId)
-                    if (lastPreparedAdId == adId) lastPreparedAdId = null
+                    if (lastPreparedAdId == adId) {
+                        lastPreparedAdId = preparedManagers.entries.lastOrNull { it.value.isAdLoaded }?.key
+                    }
                     val errorMessage = adError?.message ?: "Failed to show App Open Ad"
                     val errorCode = adError?.code ?: -1
                     notifier.notify(AppOpenAdPluginEvents.FailedToShow, AdMobPluginError(errorCode, errorMessage))
