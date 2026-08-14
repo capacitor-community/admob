@@ -15,16 +15,17 @@ type AdMobDefinitions = BannerDefinitions &
 
 export interface AdMobPlugin extends AdMobDefinitions {
   /**
-   * Initialize AdMob with AdMobInitializationOptions
+   * Initializes the Google Mobile Ads SDK.
    *
    * @group Initialize
-   * @param options AdMobInitializationOptions
+   * @param options Optional SDK initialization settings.
    * @since 1.1.2
    */
   initialize(options?: AdMobInitializationOptions): Promise<void>;
 
   /**
-   * Confirm requestTrackingAuthorization status (iOS >14)
+   * Returns the current App Tracking Transparency authorization status on iOS 14 and later.
+   * Returns `authorized` on earlier iOS versions, Android, and web.
    *
    * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
    * @since 3.1.0
@@ -32,25 +33,26 @@ export interface AdMobPlugin extends AdMobDefinitions {
   trackingAuthorizationStatus(): Promise<TrackingAuthorizationStatusInterface>;
 
   /**
-   * request requestTrackingAuthorization (iOS >14).
+   * Requests App Tracking Transparency authorization on iOS 14 and later.
+   * Resolves without taking action on earlier iOS versions, Android, and web.
    *
-   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
+   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-requesttrackingauthorization
    * @since 5.2.0
    */
   requestTrackingAuthorization(): Promise<void>;
 
   /**
-   * Report application mute state to AdMob SDK
+   * Reports whether the application audio is muted to the Google Mobile Ads SDK.
    *
-   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
+   * @see https://developers.google.com/admob/android/global-settings
    * @since 4.1.1
    */
   setApplicationMuted(options: ApplicationMutedOptions): Promise<void>;
 
   /**
-   * Report application volume to AdMob SDK
+   * Reports the application audio volume to the Google Mobile Ads SDK.
    *
-   * @see https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/3547038-trackingauthorizationstatus
+   * @see https://developers.google.com/admob/android/global-settings
    * @since 4.1.1
    */
   setApplicationVolume(options: ApplicationVolumeOptions): Promise<void>;
@@ -58,8 +60,8 @@ export interface AdMobPlugin extends AdMobDefinitions {
 
 export interface AdMobInitializationOptions {
   /**
-   * An Array of devices IDs that will be marked as tested devices if {@link AdMobInitializationOptions.initializeForTesting} is true
-   * (Real Ads will be served to Testing devices, but they will not count as 'real').
+   * Device IDs to register as test devices when {@link AdMobInitializationOptions.initializeForTesting} is `true`.
+   * Requests from registered devices receive test ads and do not generate invalid traffic.
    *
    * @see https://developers.google.com/admob/android/test-ads#enable_test_devices
    * @since 1.2.0
@@ -67,8 +69,7 @@ export interface AdMobInitializationOptions {
   testingDevices?: string[];
 
   /**
-   * If set to true, the devices on {@link AdMobInitializationOptions.testingDevices} will
-   * be registered to receive test production ads.
+   * Whether to register {@link AdMobInitializationOptions.testingDevices} as test devices.
    *
    * @see AdMobInitializationOptions.testingDevices
    * @default false
@@ -95,8 +96,8 @@ export interface AdMobInitializationOptions {
   tagForUnderAgeOfConsent?: boolean;
 
   /**
-   * As an app developer,
-   * you can indicate whether you want Google to treat your content as child-directed when you make an ad request.
+   * The maximum ad content rating applied to all ad requests.
+   * Ads with a higher rating are excluded.
    *
    * @see https://developers.google.com/admob/android/targeting#child-directed_setting
    * @since 3.1.0
@@ -142,7 +143,7 @@ export interface ApplicationVolumeOptions {
   /**
    * If your app has its own volume controls (such as custom music or sound effect volumes),
    * disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings.
-   * enable set 0.0 - 1.0, any float allowed.
+   * Use a supported value from 0.0 (silent) to 1.0 (full volume).
    *
    * @see https://developers.google.com/admob/android/global-settings
    * @since 4.1.1

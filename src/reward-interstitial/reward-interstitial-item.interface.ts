@@ -1,15 +1,14 @@
 /**
- * For more information
- * https://developers.google.com/admob/android/rewarded-video-adapters?hl=en
+ * The reward earned by the user after viewing a rewarded interstitial ad.
  */
 export interface AdMobRewardInterstitialItem {
   /**
-   * Rewarded type user got
+   * The reward item type configured for the ad unit.
    */
   type: string;
 
   /**
-   * Rewarded amount user got
+   * The reward amount earned by the user.
    */
   amount: number;
 }

@@ -1,27 +1,27 @@
 // This enum should be keep in sync with their native equivalents with the same name
 export enum InterstitialAdPluginEvents {
   /**
-   * Emits after trying to prepare and Interstitial, when it is loaded and ready to be show
+   * Emits when an interstitial ad has loaded and is ready to show.
    */
   Loaded = 'interstitialAdLoaded',
   /**
-   * Emits after trying to prepare and Interstitial, when it could not be loaded
+   * Emits when an interstitial ad fails to load.
    */
   FailedToLoad = 'interstitialAdFailedToLoad',
   /**
-   * Emits when the Interstitial ad is visible to the user
+   * Emits when an interstitial ad is shown.
    */
   Showed = 'interstitialAdShowed',
   /**
-   * Emits when the Interstitial ad is failed to show
+   * Emits when a loaded interstitial ad fails to show.
    */
   FailedToShow = 'interstitialAdFailedToShow',
   /**
-   * Emits when the Interstitial ad is not visible to the user anymore.
+   * Emits when an interstitial ad is dismissed.
    */
   Dismissed= 'interstitialAdDismissed',
   /**
-   * Emits when an impression-level ad revenue event is recorded
+   * Emits impression-level ad revenue data when a paid event is recorded.
    */
   AdImpression = 'interstitialAdImpression',
 }

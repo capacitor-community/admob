@@ -3,17 +3,17 @@
  */
  export enum BannerAdPosition {
   /**
-   * Banner position be top-center
+   * Positions the banner at the top center of the screen.
    */
   TOP_CENTER = 'TOP_CENTER',
 
   /**
-   * Banner position be center
+   * Positions the banner at the center of the screen.
    */
   CENTER = 'CENTER',
 
   /**
-   * Banner position be bottom-center(default)
+   * Positions the banner at the bottom center of the screen.
    */
   BOTTOM_CENTER = 'BOTTOM_CENTER',
 }

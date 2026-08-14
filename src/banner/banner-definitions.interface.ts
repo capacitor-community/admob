@@ -15,7 +15,7 @@ export type BannerDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<
 
 export interface BannerDefinitions {
   /**
-   * Show a banner Ad
+   * Displays a banner ad.
    *
    * @group Banner
    * @param options AdOptions
@@ -24,7 +24,7 @@ export interface BannerDefinitions {
   showBanner(options: BannerAdOptions): Promise<void>;
 
   /**
-   * Hide the banner, remove it from screen, but can show it later
+   * Hides the current banner without destroying it.
    *
    * @group Banner
    * @since 1.1.2
@@ -32,7 +32,7 @@ export interface BannerDefinitions {
   hideBanner(): Promise<void>;
 
   /**
-   * Resume the banner, show it after hide
+   * Shows a previously hidden banner.
    *
    * @group Banner
    * @since 1.1.2
@@ -40,7 +40,7 @@ export interface BannerDefinitions {
   resumeBanner(): Promise<void>;
 
   /**
-   * Destroy the banner, remove it from screen.
+   * Destroys the current banner and removes it from the screen.
    *
    * @group Banner
    * @since 1.1.2
@@ -48,6 +48,7 @@ export interface BannerDefinitions {
   removeBanner(): Promise<void>;
 
   /**
+   * Listens for changes to the displayed banner dimensions.
    *
    * @group Banner
    * @param eventName bannerAdSizeChanged
@@ -60,7 +61,7 @@ export interface BannerDefinitions {
   ): Promise<PluginListenerHandle>;
 
   /**
-   * Notice: request loaded Banner ad
+   * Listens for banner ad load events.
    *
    * @group Banner
    * @param eventName bannerAdLoaded
@@ -73,7 +74,7 @@ export interface BannerDefinitions {
   ): Promise<PluginListenerHandle>;
 
   /**
-   * Notice: request failed Banner ad
+   * Listens for banner ad load failures.
    *
    * @group Banner
    * @param eventName bannerAdFailedToLoad
@@ -86,7 +87,7 @@ export interface BannerDefinitions {
   ): Promise<PluginListenerHandle>;
 
   /**
-   * Notice: full-screen banner view will be presented in response to the user clicking on an ad.
+   * Listens for banner overlay opened events.
    *
    * @group Banner
    * @param eventName bannerAdOpened
@@ -99,7 +100,7 @@ export interface BannerDefinitions {
   ): Promise<PluginListenerHandle>;
 
   /**
-   * Notice: The full-screen banner view will been dismissed.
+   * Listens for banner overlay closed events.
    *
    * @group Banner
    * @param eventName bannerAdClosed
@@ -112,7 +113,7 @@ export interface BannerDefinitions {
   ): Promise<PluginListenerHandle>;
 
   /**
-   * Notice: an impression is recorded for the banner ad.
+   * Listens for banner impression events.
    *
    * @group Banner
    * @param eventName AdImpression
@@ -124,6 +125,11 @@ export interface BannerDefinitions {
     listenerFunc: () => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for banner impression-level ad revenue events.
+   *
+   * @group Banner
+   */
   addListener(
     eventName: BannerAdPluginEvents.AdPaid,
     listenerFunc: (data: AdMobRevenueData) => void,

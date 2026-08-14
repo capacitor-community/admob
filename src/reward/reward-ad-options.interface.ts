@@ -3,23 +3,23 @@ import type { AdOptions } from '../shared/ad-options.interface';
 // This is a type to ensure that IF ssv is provided, at least one of userId or customData is required.
 type AtLeastOne<T> = {[K in keyof T]: Pick<T, K>}[keyof T];
 
-// Because only RewardedAds use SSV. This interface is only available for RewardedAds
+/**
+ * Options for loading a rewarded ad.
+ */
 export interface RewardAdOptions extends AdOptions {
   /**
-   * If you have enabled SSV in your AdMob Application. You can provide customData or
-   * a userId be passed to your callback to do further processing on.
-   * 
-   * *Important* You *HAVE* to define one of them.
+   * Server-side verification options for the rewarded ad.
+   * Provide at least one of `userId` or `customData`.
    * 
    * @see https://support.google.com/admob/answer/9603226?hl=en-GB
    */
   ssv?: AtLeastOne<{
     /**
-     * An optional UserId to pass to your SSV callback function.
+     * A user identifier passed to the SSV callback.
      */
     userId: string;
     /**
-     * An optional custom set of data to pass to your SSV callback function.
+     * Custom data passed to the SSV callback.
      */
     customData: string;
   }>;

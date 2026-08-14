@@ -13,43 +13,61 @@ export type AppOpenDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented
 
 export interface AppOpenAdPlugin {
   /**
-   * Load an App Open ad
+   * Loads an App Open ad and returns the loaded ad unit ID.
    */
   loadAppOpen(options: AppOpenAdOptions): Promise<AdLoadInfo>;
 
   /**
-   * Shows the App Open ad if loaded
+   * Shows a loaded App Open ad.
    *
    * @param options Optional. Pass { adId } to show a specific prepared ad instead of the most recent one.
    */
   showAppOpen(options?: AdShowOptions): Promise<void>;
 
   /**
-   * Check if the App Open ad is loaded
+   * Checks whether an App Open ad is loaded.
    *
    * @param options Optional. Pass an adId to check a specific prepared ad instead of the most recent one.
    */
   isAppOpenLoaded(options?: AdShowOptions): Promise<{ value: boolean }>;
 
+  /**
+   * Listens for App Open ad load events.
+   */
   addListener(
     eventName: AppOpenAdPluginEvents.Loaded,
     listenerFunc: (info: AdLoadInfo) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for App Open ad load failures.
+   */
   addListener(
     eventName: AppOpenAdPluginEvents.FailedToLoad,
     listenerFunc: (error: AdMobError) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for App Open ad opened events.
+   */
   addListener(eventName: AppOpenAdPluginEvents.Opened, listenerFunc: () => void): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for App Open ad closed events.
+   */
   addListener(eventName: AppOpenAdPluginEvents.Closed, listenerFunc: () => void): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for App Open ad show failures.
+   */
   addListener(
     eventName: AppOpenAdPluginEvents.FailedToShow,
     listenerFunc: (error: AdMobError) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for App Open impression-level ad revenue events.
+   */
   addListener(
     eventName: AppOpenAdPluginEvents.AdImpression,
     listenerFunc: (data: AdMobRevenueData) => void,
