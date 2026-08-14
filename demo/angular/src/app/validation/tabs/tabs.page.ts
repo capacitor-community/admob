@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { addIcons } from 'ionicons';
-import { easel, play, reader, videocam } from 'ionicons/icons';
+import { easel, phonePortrait, play, reader, videocam } from 'ionicons/icons';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 
 @Component({
@@ -11,6 +11,6 @@ import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angu
 })
 export class TabsPage {
   constructor() {
-    addIcons({ play, easel, reader, videocam });
+    addIcons({ play, easel, reader, videocam, phonePortrait });
   }
 }
