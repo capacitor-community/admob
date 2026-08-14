@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/maintenance/yes/2025?style=flat-square" />
+  <img src="https://img.shields.io/maintenance/yes/2026?style=flat-square" />
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/l/@capacitor-community/admob?style=flat-square" /></a>
 <br>
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/dw/@capacitor-community/admob?style=flat-square" /></a>
@@ -32,7 +32,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## Demo
 
-[Demo code is here.](https://github.com/capacitor-community/admob/tree/master/demo)
+[Demo code is here.](https://github.com/capacitor-community/admob/tree/main/demo)
 
 ### Screenshots
 
@@ -43,10 +43,10 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## Installation
 
-If you use capacitor 6:
+If you use Capacitor 7:
 
 ```
-% npm install --save @capacitor-community/admob@6
+% npm install --save @capacitor-community/admob@7
 % npx cap update
 ```
 
@@ -55,6 +55,8 @@ If you use capacitor 6:
 To preserve behavior for users of the current major version, this plugin continues to use Google Mobile Ads SDK APIs that are deprecated but still supported. Replacing those APIs can change banner sizing and age-restricted treatment behavior, so that migration is deferred until the next major release.
 
 Migration to the [GMA Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) is also deferred until the next major release because it requires breaking changes to SDK initialization, ad requests, and mediation integration.
+
+Android continues to use GMA SDK (Legacy) 25.4.x. On iOS, both Swift Package Manager and CocoaPods are fixed to GMA SDK 13.6.0 until CocoaPods support is removed in the next major release.
 
 ### Android configuration
 
@@ -78,8 +80,8 @@ Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
 This plugin will use the following project variables (defined in your app's `variables.gradle` file):
 
-- `playServicesAdsVersion` version of `com.google.android.gms:play-services-ads` (default: `23.0.0`)
-- `androidxCoreKTXVersion`: version of `androidx.core:core-ktx` (default: `1.13.0`)
+- `playServicesAdsVersion` version of `com.google.android.gms:play-services-ads` (default: `25.4.+`)
+- `androidxCoreKTXVersion`: version of `androidx.core:core-ktx` (default: `1.15.0`)
 
 ### iOS configuration
 
@@ -108,7 +110,7 @@ Don't forget to replace `[APP_ID]` by your AdMob application Id.
 ### Initialize AdMob
 
 ```ts
-import { AdMob } from '@capacitor-community/admob';
+import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
 
 export async function initialize(): Promise<void> {
   await AdMob.initialize();
@@ -180,6 +182,8 @@ showPrivacyOptionsForm() {
 If you testing on real device, you have to set `debugGeography` and add your device ID to `testDeviceIdentifiers`. You can find your device ID with logcat (Android) or XCode (iOS).
 
 ```ts
+import { AdMob, AdmobConsentDebugGeography } from '@capacitor-community/admob';
+
 const consentInfo = await AdMob.requestConsentInfo({
   debugGeography: AdmobConsentDebugGeography.EEA,
   testDeviceIdentifiers: ['YOUR_DEVICE_ID'],
@@ -202,12 +206,13 @@ import {
   AdMob,
   AppOpenAdPluginEvents,
   AppOpenAdOptions,
+  AdLoadInfo,
 } from '@capacitor-community/admob';
 
 export async function showAppOpenAd(): Promise<void> {
   // listen to events
-  AdMob.addListener(AppOpenAdPluginEvents.Loaded, () => {
-    console.log('App Open Ad loaded');
+  AdMob.addListener(AppOpenAdPluginEvents.Loaded, (info: AdLoadInfo) => {
+    console.log('App Open Ad loaded', info.adUnitId);
   });
   AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, (error) => {
     console.log('Failed to load App Open Ad', error);
@@ -225,10 +230,10 @@ export async function showAppOpenAd(): Promise<void> {
   const options: AppOpenAdOptions = {
     adId: 'YOUR_AD_UNIT_ID',
   };
-  await AdMob.loadAppOpen(options);
-  const { value } = await AdMob.isAppOpenLoaded();
+  const { adUnitId } = await AdMob.loadAppOpen(options);
+  const { value } = await AdMob.isAppOpenLoaded({ adId: adUnitId });
   if (value) {
-    await AdMob.showAppOpen();
+    await AdMob.showAppOpen({ adId: adUnitId });
   }
 }
 ```
@@ -266,6 +271,30 @@ export async function banner(): Promise<void> {
   };
   AdMob.showBanner(options);
 }
+```
+
+### Impression-level ad revenue
+
+Full-screen ad formats emit revenue data through their `AdImpression` event. Banners use the separate `AdPaid` event.
+
+```ts
+import {
+  AdMob,
+  AdMobRevenueData,
+  BannerAdPluginEvents,
+  InterstitialAdPluginEvents,
+} from '@capacitor-community/admob';
+
+AdMob.addListener(
+  InterstitialAdPluginEvents.AdImpression,
+  (data: AdMobRevenueData) => {
+    console.log(data);
+  },
+);
+
+AdMob.addListener(BannerAdPluginEvents.AdPaid, (data: AdMobRevenueData) => {
+  console.log(data);
+});
 ```
 
 ### Show Interstitial
@@ -353,6 +382,20 @@ export async function rewardVideo(): Promise<void> {
 }
 ```
 
+### Show Rewarded Interstitial
+
+```ts
+import { AdMob, RewardInterstitialAdOptions } from '@capacitor-community/admob';
+
+export async function rewardInterstitial(): Promise<void> {
+  const options: RewardInterstitialAdOptions = {
+    adId: 'YOUR ADID',
+  };
+  const { adUnitId } = await AdMob.prepareRewardInterstitialAd(options);
+  await AdMob.showRewardInterstitialAd({ adId: adUnitId });
+}
+```
+
 ## Server-side Verification Notice
 
 SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
@@ -399,7 +442,7 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`setApplicationVolume(...)`](#setapplicationvolume)
 * [`loadAppOpen(...)`](#loadappopen)
 * [`showAppOpen(...)`](#showappopen)
-* [`isAppOpenLoaded()`](#isappopenloaded)
+* [`isAppOpenLoaded(...)`](#isappopenloaded)
 * [`addListener(AppOpenAdPluginEvents.Loaded, ...)`](#addlistenerappopenadplugineventsloaded-)
 * [`addListener(AppOpenAdPluginEvents.FailedToLoad, ...)`](#addlistenerappopenadplugineventsfailedtoload-)
 * [`addListener(AppOpenAdPluginEvents.Opened, ...)`](#addlistenerappopenadplugineventsopened-)
@@ -564,18 +607,22 @@ Shows the App Open ad if loaded
 
 | Param         | Type                                                    | Description                                                          |
 | ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
-| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.            |
 
 --------------------
 
 
-### isAppOpenLoaded()
+### isAppOpenLoaded(...)
 
 ```typescript
-isAppOpenLoaded() => Promise<{ value: boolean; }>
+isAppOpenLoaded(options?: AdShowOptions) => Promise<{ value: boolean; }>
 ```
 
 Check if the App Open ad is loaded
+
+| Param         | Type                                                    | Description                                                                                  |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass an `adId` to check a specific prepared ad instead of the most recently loaded. |
 
 **Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
@@ -838,7 +885,7 @@ Notice: The full-screen banner view will been dismissed.
 addListener(eventName: BannerAdPluginEvents.AdImpression, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
-Unimplemented
+Notice: an impression is recorded for the banner ad.
 
 | Param              | Type                                                                               | Description  |
 | ------------------ | ---------------------------------------------------------------------------------- | ------------ |

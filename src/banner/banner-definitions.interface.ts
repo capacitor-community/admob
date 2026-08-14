@@ -112,7 +112,7 @@ export interface BannerDefinitions {
   ): Promise<PluginListenerHandle>;
 
   /**
-   * Unimplemented
+   * Notice: an impression is recorded for the banner ad.
    *
    * @group Banner
    * @param eventName AdImpression
