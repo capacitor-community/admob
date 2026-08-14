@@ -15,7 +15,7 @@ export type RewardDefinitionsHasAllEvents = ValidateAllEventsEnumAreImplemented<
 
 export interface RewardDefinitions {
   /**
-   * Prepare a reward video ad
+   * Loads a rewarded ad and returns the loaded ad unit ID.
    *
    * @group RewardVideo
    * @param options RewardAdOptions
@@ -24,7 +24,7 @@ export interface RewardDefinitions {
   prepareRewardVideoAd(options: RewardAdOptions): Promise<AdLoadInfo>;
 
   /**
-   * Show a reward video ad
+   * Shows a loaded rewarded ad and resolves when the user earns the reward.
    *
    * @group RewardVideo
    * @param options Optional. Pass { adId } to show a specific prepared ad instead of the most recent one.
@@ -32,33 +32,54 @@ export interface RewardDefinitions {
    */
   showRewardVideoAd(options?: AdShowOptions): Promise<AdMobRewardItem>;
 
+  /**
+   * Listens for rewarded ad load failures.
+   */
   addListener(
     eventName: RewardAdPluginEvents.FailedToLoad,
     listenerFunc: (error: AdMobError) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded ad load events.
+   */
   addListener(
     eventName: RewardAdPluginEvents.Loaded,
     listenerFunc: (info: AdLoadInfo) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for earned reward events.
+   */
   addListener(
     eventName: RewardAdPluginEvents.Rewarded,
     listenerFunc: (reward: AdMobRewardItem) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded ad dismissed events.
+   */
   addListener(eventName: RewardAdPluginEvents.Dismissed, listenerFunc: () => void): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded ad show failures.
+   */
   addListener(
     eventName: RewardAdPluginEvents.FailedToShow,
     listenerFunc: (error: AdMobError) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded ad shown events.
+   */
   addListener(
     eventName: RewardAdPluginEvents.Showed,
     listenerFunc: () => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded impression-level ad revenue events.
+   */
   addListener(
     eventName: RewardAdPluginEvents.AdImpression,
     listenerFunc: (data: AdMobRevenueData) => void,

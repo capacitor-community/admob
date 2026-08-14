@@ -1,6 +1,7 @@
 /**
- * For more information
- * https://developers.google.com/android/reference/com/google/android/gms/ads/AdError
+ * An error returned by the Google Mobile Ads SDK.
+ *
+ * @see https://developers.google.com/admob/android/reference/com/google/android/gms/ads/AdError
  */
  export interface AdMobError {
   /**

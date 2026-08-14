@@ -40,9 +40,10 @@
    ADAPTIVE_BANNER = 'ADAPTIVE_BANNER',
   
    /**
-    * @deprecated 
-    * Will be removed in next AdMob versions use `ADAPTIVE_BANNER`
-    * Screen width x 32|50|90
+    * A legacy smart banner sized to the screen width.
+    * Retained for compatibility; use `ADAPTIVE_BANNER` for new integrations.
+    *
+    * @deprecated Use `ADAPTIVE_BANNER` instead.
     */
    SMART_BANNER = 'SMART_BANNER',
 

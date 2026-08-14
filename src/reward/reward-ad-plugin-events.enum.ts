@@ -1,37 +1,34 @@
 // This enum should be keep in sync with their native equivalents with the same name
 export enum RewardAdPluginEvents {
   /**
-   * Emits after trying to prepare a RewardAd and the Video is loaded and ready to be show
+   * Emits when a rewarded ad has loaded and is ready to show.
    */
   Loaded = 'onRewardedVideoAdLoaded',
   /**
-   * Emits after trying to prepare a RewardAd when it could not be loaded
+   * Emits when a rewarded ad fails to load.
    */
   FailedToLoad = 'onRewardedVideoAdFailedToLoad',
   /**
-   * Emits when the AdReward video is visible to the user
+   * Emits when a rewarded ad is shown.
    */
   Showed = 'onRewardedVideoAdShowed',
   /**
-   * Emits when the AdReward video is failed to show
+   * Emits when a loaded rewarded ad fails to show.
    */
   FailedToShow = 'onRewardedVideoAdFailedToShow',
   /**
-   * Emits when the AdReward video is not visible to the user anymore.
+   * Emits when a rewarded ad is dismissed.
    *
-   * **Important**: This has nothing to do with the reward it self. This event
-   * will emits in this two cases:
-   * 1. The user starts the video ad but close it before the reward emit.
-   * 2. The user start the video and see it until end, then gets the reward
-   * and after that the ad is closed.
+   * This event does not indicate whether the user earned a reward. Listen for
+   * `Rewarded` separately before granting the reward.
    */
   Dismissed= 'onRewardedVideoAdDismissed',
   /**
-   * Emits when user get rewarded from AdReward
+   * Emits when the user earns the advertised reward.
    */
   Rewarded= 'onRewardedVideoAdReward',
   /**
-   * Emits when an impression-level ad revenue event is recorded
+   * Emits impression-level ad revenue data when a paid event is recorded.
    */
   AdImpression = 'onRewardedVideoAdImpression',
 }

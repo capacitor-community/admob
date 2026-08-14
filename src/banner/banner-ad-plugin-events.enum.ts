@@ -1,22 +1,37 @@
 // This enum should be keep in sync with their native equivalents with the same name
 export enum BannerAdPluginEvents {
+  /**
+   * Emits when the displayed banner size changes.
+   */
   SizeChanged = "bannerAdSizeChanged",
+
+  /**
+   * Emits when a banner ad has loaded.
+   */
   Loaded = "bannerAdLoaded",
+
+  /**
+   * Emits when a banner ad fails to load.
+   */
   FailedToLoad = "bannerAdFailedToLoad",
 
   /**
-   * Open "Adsense" Event after user click banner
+   * Emits when a banner opens an overlay after the user taps it.
    */
   Opened = "bannerAdOpened",
 
   /**
-   * Close "Adsense" Event after user click banner
+   * Emits when the banner overlay is closed.
    */
   Closed = "bannerAdClosed",
 
   /**
-   * Similarly, this method should be called when an impression is recorded for the ad by the mediated SDK.
+   * Emits when an impression is recorded for the banner ad.
    */
   AdImpression = "bannerAdImpression",
+
+  /**
+   * Emits impression-level ad revenue data when a paid event is recorded.
+   */
   AdPaid = "bannerAdPaid",
 }

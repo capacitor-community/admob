@@ -15,53 +15,74 @@ export type RewardInterstitialDefinitionsHasAllEvents = ValidateAllEventsEnumAre
 
 export interface RewardInterstitialDefinitions {
   /**
-   * Prepare a reward video ad
+   * Loads a rewarded interstitial ad and returns the loaded ad unit ID.
    *
-   * @group RewardVideo
-   * @param options RewardAdOptions
+   * @group RewardInterstitial
+   * @param options RewardInterstitialAdOptions
    * @since 1.1.2
    */
   prepareRewardInterstitialAd(options: RewardInterstitialAdOptions): Promise<AdLoadInfo>;
 
   /**
-   * Show a reward video ad
+   * Shows a loaded rewarded interstitial ad and resolves when the user earns the reward.
    *
-   * @group RewardVideo
+   * @group RewardInterstitial
    * @param options Optional. Pass { adId } to show a specific prepared ad instead of the most recent one.
    * @since 1.1.2
    */
   showRewardInterstitialAd(options?: AdShowOptions): Promise<AdMobRewardInterstitialItem>;
 
+  /**
+   * Listens for rewarded interstitial ad load failures.
+   */
   addListener(
     eventName: RewardInterstitialAdPluginEvents.FailedToLoad,
     listenerFunc: (error: AdMobError) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded interstitial ad load events.
+   */
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Loaded,
     listenerFunc: (info: AdLoadInfo) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for earned reward events.
+   */
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Rewarded,
     listenerFunc: (reward: AdMobRewardInterstitialItem) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded interstitial ad dismissed events.
+   */
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Dismissed,
     listenerFunc: () => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded interstitial ad show failures.
+   */
   addListener(
     eventName: RewardInterstitialAdPluginEvents.FailedToShow,
     listenerFunc: (error: AdMobError) => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded interstitial ad shown events.
+   */
   addListener(
     eventName: RewardInterstitialAdPluginEvents.Showed,
     listenerFunc: () => void,
   ): Promise<PluginListenerHandle>;
 
+  /**
+   * Listens for rewarded interstitial impression-level ad revenue events.
+   */
   addListener(
     eventName: RewardInterstitialAdPluginEvents.AdImpression,
     listenerFunc: (data: AdMobRevenueData) => void,
