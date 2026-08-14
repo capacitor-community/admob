@@ -65,12 +65,16 @@ import UIKit
                     notify(AppOpenAdPluginEvents.Opened.rawValue, [:])
                 }, onClosed: {
                     self.preparedManagers.removeValue(forKey: adId)
-                    if self.lastPreparedAdId == adId { self.lastPreparedAdId = nil }
+                    if self.lastPreparedAdId == adId {
+                        self.lastPreparedAdId = Array(self.preparedManagers.keys).last
+                    }
                     notify(AppOpenAdPluginEvents.Closed.rawValue, [:])
                     call.resolve()
                 }, onFailedToShow: { error in
                     self.preparedManagers.removeValue(forKey: adId)
-                    if self.lastPreparedAdId == adId { self.lastPreparedAdId = nil }
+                    if self.lastPreparedAdId == adId {
+                        self.lastPreparedAdId = Array(self.preparedManagers.keys).last
+                    }
                     let message = error?.localizedDescription ?? "Failed to show App Open Ad"
                     notify(AppOpenAdPluginEvents.FailedToShow.rawValue, [
                         "code": 0,

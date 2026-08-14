@@ -78,7 +78,10 @@ public class AdInterstitialExecutor extends Executor {
                     adToShow.setFullScreenContentCallback(
                         new FullscreenPluginCallback(InterstitialAdPluginPluginEvent.INSTANCE, notifyListenersFunction, () -> {
                             preparedAds.remove(adId);
-                            if (adId != null && adId.equals(lastPreparedAdId)) lastPreparedAdId = null;
+                            if (adId != null && adId.equals(lastPreparedAdId)) {
+                                lastPreparedAdId = null;
+                                for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
+                            }
                         })
                     );
                     adToShow.show(activitySupplier.get());

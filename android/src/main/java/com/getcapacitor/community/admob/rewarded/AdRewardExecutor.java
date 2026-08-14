@@ -75,7 +75,10 @@ public class AdRewardExecutor extends Executor {
                     ad.setFullScreenContentCallback(
                         new FullscreenPluginCallback(RewardAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
                             preparedAds.remove(adId);
-                            if (adId != null && adId.equals(lastPreparedAdId)) lastPreparedAdId = null;
+                            if (adId != null && adId.equals(lastPreparedAdId)) {
+                                lastPreparedAdId = null;
+                                for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
+                            }
                         })
                     );
                     ad.show(

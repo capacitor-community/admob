@@ -119,7 +119,7 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
     private func removeCurrentlyShowingAd() {
         guard let adId = currentlyShowingAdId else { return }
         preparedAds.removeValue(forKey: adId)
-        if lastPreparedAdId == adId { lastPreparedAdId = nil }
+        if lastPreparedAdId == adId { lastPreparedAdId = Array(preparedAds.keys).last }
         currentlyShowingAdId = nil
     }
 }
