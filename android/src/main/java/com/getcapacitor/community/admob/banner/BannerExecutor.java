@@ -288,6 +288,12 @@ public class BannerExecutor extends Executor {
                             notifyListeners(BannerAdPluginEvents.Closed.getWebEventName(), emptyObject);
                             super.onAdClosed();
                         }
+
+                        @Override
+                        public void onAdImpression() {
+                            notifyListeners(BannerAdPluginEvents.AdImpression.getWebEventName(), emptyObject);
+                            super.onAdImpression();
+                        }
                     }
                 );
 
@@ -301,7 +307,7 @@ public class BannerExecutor extends Executor {
                         if (impressionId == null) impressionId = "";
                     }
                     AdMobRevenueData revenueData = new AdMobRevenueData(adValue, mAdView.getAdUnitId(), networkName, impressionId);
-                    notifyListeners(BannerAdPluginEvents.AdImpression.getWebEventName(), revenueData);
+                    notifyListeners(BannerAdPluginEvents.AdPaid.getWebEventName(), revenueData);
                 });
 
                 // Add AdViewLayout top of the WebView
