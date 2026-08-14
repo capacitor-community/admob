@@ -9,4 +9,5 @@ object RewardInterstitialAdPluginEvents: LoadPluginEventNames {
     override val Showed = "onRewardedInterstitialAdShowed"
     override val FailedToShow = "onRewardedInterstitialAdFailedToShow"
     override val Dismissed = "onRewardedInterstitialAdDismissed"
+    const val AdImpression = "onRewardedInterstitialAdImpression"
 }

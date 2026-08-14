@@ -49,6 +49,20 @@ class BannerExecutor: NSObject, BannerViewDelegate {
             self.bannerView.load(request)
             self.bannerView.delegate = self
 
+            self.bannerView.paidEventHandler = { [weak self] adValue in
+                guard let self = self else { return }
+                let networkName = self.bannerView.responseInfo?.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+                let impressionId = self.bannerView.responseInfo?.responseIdentifier ?? ""
+                self.plugin?.notifyListeners(BannerAdPluginEvents.AdPaid.rawValue, data: [
+                    "adUnitId": self.bannerView.adUnitID ?? "",
+                    "valueMicros": adValue.value.int64Value,
+                    "currencyCode": adValue.currencyCode,
+                    "precision": adValue.precision.rawValue,
+                    "networkName": networkName,
+                    "impressionId": impressionId
+                ])
+            }
+
             call.resolve([:])
         }
     }

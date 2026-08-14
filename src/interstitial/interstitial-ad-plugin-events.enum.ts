@@ -20,4 +20,8 @@ export enum InterstitialAdPluginEvents {
    * Emits when the Interstitial ad is not visible to the user anymore.
    */
   Dismissed= 'interstitialAdDismissed',
+  /**
+   * Emits when an impression-level ad revenue event is recorded
+   */
+  AdImpression = 'interstitialAdImpression',
 }

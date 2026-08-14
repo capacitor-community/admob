@@ -40,6 +40,20 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                 }
 
                 self.rewardedAd?.fullScreenContentDelegate = self
+
+                self.rewardedAd?.paidEventHandler = { adValue in
+                    let networkName = ad?.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+                    let impressionId = ad?.responseInfo.responseIdentifier ?? ""
+                    self.plugin?.notifyListeners(RewardAdPluginEvents.AdImpression.rawValue, data: [
+                        "adUnitId": adUnitID,
+                        "valueMicros": adValue.value.int64Value,
+                        "currencyCode": adValue.currencyCode,
+                        "precision": adValue.precision.rawValue,
+                        "networkName": networkName,
+                        "impressionId": impressionId
+                    ])
+                }
+
                 self.plugin?.notifyListeners(RewardAdPluginEvents.Loaded.rawValue, data: [
                     "adUnitId": adUnitID
                 ])

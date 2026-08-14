@@ -30,4 +30,8 @@ export enum RewardInterstitialAdPluginEvents {
    * Emits when user get rewarded from AdReward
    */
   Rewarded = 'onRewardedInterstitialAdReward',
+  /**
+   * Emits when an impression-level ad revenue event is recorded
+   */
+  AdImpression = 'onRewardedInterstitialAdImpression',
 }

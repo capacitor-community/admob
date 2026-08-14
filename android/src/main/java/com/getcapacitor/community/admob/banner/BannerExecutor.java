@@ -18,6 +18,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
+import com.getcapacitor.community.admob.models.AdMobRevenueData;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdListener;
@@ -295,6 +296,19 @@ public class BannerExecutor extends Executor {
                         }
                     }
                 );
+
+                mAdView.setOnPaidEventListener((adValue) -> {
+                    String networkName = "";
+                    String impressionId = "";
+                    if (mAdView.getResponseInfo() != null) {
+                        networkName = mAdView.getResponseInfo().getMediationAdapterClassName();
+                        if (networkName == null) networkName = "";
+                        impressionId = mAdView.getResponseInfo().getResponseId();
+                        if (impressionId == null) impressionId = "";
+                    }
+                    AdMobRevenueData revenueData = new AdMobRevenueData(adValue, mAdView.getAdUnitId(), networkName, impressionId);
+                    notifyListeners(BannerAdPluginEvents.AdPaid.getWebEventName(), revenueData);
+                });
 
                 // Add AdViewLayout top of the WebView
                 mViewGroup.addView(mAdViewLayout);

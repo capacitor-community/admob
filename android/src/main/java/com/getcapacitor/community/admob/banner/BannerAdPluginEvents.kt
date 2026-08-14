@@ -8,4 +8,5 @@ enum class BannerAdPluginEvents(val webEventName: String) {
     Loaded("bannerAdLoaded"),
     Clicked("bannerAdClicked"),
     AdImpression("bannerAdImpression"),
+    AdPaid("bannerAdPaid"),
 }

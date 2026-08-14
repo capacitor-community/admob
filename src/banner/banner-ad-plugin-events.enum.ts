@@ -18,4 +18,5 @@ export enum BannerAdPluginEvents {
    * Similarly, this method should be called when an impression is recorded for the ad by the mediated SDK.
    */
   AdImpression = "bannerAdImpression",
+  AdPaid = "bannerAdPaid",
 }
