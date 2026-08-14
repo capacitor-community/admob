@@ -1,0 +1,20 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>INTERSTITIAL</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-list-header><ion-label>PROGRESS</ion-label></ion-list-header>
+    @for (item of vm.eventItems(); track $index) {
+    <ion-item [lines]="$last ? 'full' : undefined">
+      <ion-icon slot="start" [name]="item.type === 'method' ? 'play-outline' : 'notifications-circle-outline'" />
+      <ion-label>{{ item.name }}</ion-label>
+      @if (item.result !== undefined) {
+      <ion-icon slot="end" name="checkmark-circle" [color]="item.result ? 'success' : 'danger'" />
+      }
+    </ion-item>
+    }
+  </ion-list>
+</ion-content>
