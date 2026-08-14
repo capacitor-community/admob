@@ -71,9 +71,14 @@ import UIKit
                     notify(AppOpenAdPluginEvents.Closed.rawValue, [:])
                     call.resolve()
                 }, onFailedToShow: { error in
-                    self.preparedManagers.removeValue(forKey: adId)
-                    if self.lastPreparedAdId == adId {
-                        self.lastPreparedAdId = self.preparedManagers.first(where: { $0.value.isAdLoaded() })?.key
+                    // A second show request while this ad is already presented fails
+                    // without consuming the ad. Keep the manager alive so its weak
+                    // full-screen delegate can still deliver the original close event.
+                    if !manager.isAdLoaded() {
+                        self.preparedManagers.removeValue(forKey: adId)
+                        if self.lastPreparedAdId == adId {
+                            self.lastPreparedAdId = self.preparedManagers.first(where: { $0.value.isAdLoaded() })?.key
+                        }
                     }
                     let message = error?.localizedDescription ?? "Failed to show App Open Ad"
                     notify(AppOpenAdPluginEvents.FailedToShow.rawValue, [
