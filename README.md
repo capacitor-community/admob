@@ -105,9 +105,13 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
 
 Don't forget to replace `[APP_ID]` by your AdMob application Id.
 
-## Example
+## Tutorial
 
-### Initialize AdMob
+Complete the common initialization and consent setup once before loading ads. Then follow the tutorial for each ad format you use.
+
+### Common setup
+
+#### Initialize AdMob
 
 ```ts
 import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
@@ -148,7 +152,7 @@ export async function initialize(): Promise<void> {
 
 Send an array of device Ids in `testingDevices` to use production like ads on your specified devices -> https://developers.google.com/admob/android/test-ads#enable_test_devices
 
-### User Message Platform (UMP)
+#### User Message Platform (UMP)
 
 To use UMP, you must [create your GDPR messages](https://support.google.com/admob/answer/10113207?hl=en&ref_topic=10105230&sjid=6731900490614517032-AP).
 
@@ -192,14 +196,18 @@ const consentInfo = await AdMob.requestConsentInfo({
 
 **Note**: When testing, if you choose not consent (Manage -> Confirm Choices). The ads may not load/show. Even on testing enviroment. This is normal. It will work on Production so don't worry.
 
-**Note**: The order in which they are combined with other methods is as follows.
+Before requesting an ad, complete these steps in order:
 
-1. AdMob.initialize
-2. AdMob.requestConsentInfo
-3. AdMob.showConsentForm (If consent form required )
-   3/ AdMob.showBanner
-   
-### Show App Open Ad
+1. Call `AdMob.initialize()`.
+2. Call `AdMob.requestConsentInfo()`.
+3. If required, call `AdMob.showConsentForm()`.
+4. Load or show the ad format you need.
+
+### Choose an ad format
+
+Register event listeners before loading or showing an ad so that the first lifecycle and impression events are not missed.
+
+#### Show App Open Ad
 
 ```ts
 import {
@@ -207,6 +215,7 @@ import {
   AppOpenAdPluginEvents,
   AppOpenAdOptions,
   AdLoadInfo,
+  AdMobRevenueData,
 } from '@capacitor-community/admob';
 
 export async function showAppOpenAd(): Promise<void> {
@@ -226,6 +235,13 @@ export async function showAppOpenAd(): Promise<void> {
   AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, (error) => {
     console.log('Failed to show App Open Ad', error);
   });
+  AdMob.addListener(
+    AppOpenAdPluginEvents.AdImpression,
+    (data: AdMobRevenueData) => {
+      // Forward impression-level revenue to your analytics provider.
+      console.log(data);
+    },
+  );
 
   const options: AppOpenAdOptions = {
     adId: 'YOUR_AD_UNIT_ID',
@@ -237,7 +253,8 @@ export async function showAppOpenAd(): Promise<void> {
   }
 }
 ```
-### Show Banner
+
+#### Show Banner
 
 ```ts
 import {
@@ -247,6 +264,7 @@ import {
   BannerAdPosition,
   BannerAdPluginEvents,
   AdMobBannerSize,
+  AdMobRevenueData,
 } from '@capacitor-community/admob';
 
 export async function banner(): Promise<void> {
@@ -258,6 +276,14 @@ export async function banner(): Promise<void> {
     BannerAdPluginEvents.SizeChanged,
     (size: AdMobBannerSize) => {
       // Subscribe Change Banner Size
+    },
+  );
+
+  AdMob.addListener(
+    BannerAdPluginEvents.AdPaid,
+    (data: AdMobRevenueData) => {
+      // Forward impression-level revenue to your analytics provider.
+      console.log(data);
     },
   );
 
@@ -273,37 +299,14 @@ export async function banner(): Promise<void> {
 }
 ```
 
-### Impression-level ad revenue
-
-Full-screen ad formats emit revenue data through their `AdImpression` event. Banners use the separate `AdPaid` event.
-
-```ts
-import {
-  AdMob,
-  AdMobRevenueData,
-  BannerAdPluginEvents,
-  InterstitialAdPluginEvents,
-} from '@capacitor-community/admob';
-
-AdMob.addListener(
-  InterstitialAdPluginEvents.AdImpression,
-  (data: AdMobRevenueData) => {
-    console.log(data);
-  },
-);
-
-AdMob.addListener(BannerAdPluginEvents.AdPaid, (data: AdMobRevenueData) => {
-  console.log(data);
-});
-```
-
-### Show Interstitial
+#### Show Interstitial
 
 ```ts
 import {
   AdMob,
   AdOptions,
   AdLoadInfo,
+  AdMobRevenueData,
   InterstitialAdPluginEvents,
 } from '@capacitor-community/admob';
 
@@ -311,6 +314,14 @@ export async function interstitial(): Promise<void> {
   AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
     // Subscribe prepared interstitial
   });
+
+  AdMob.addListener(
+    InterstitialAdPluginEvents.AdImpression,
+    (data: AdMobRevenueData) => {
+      // Forward impression-level revenue to your analytics provider.
+      console.log(data);
+    },
+  );
 
   const options: AdOptions = {
     adId: 'YOUR ADID',
@@ -333,7 +344,7 @@ export async function interstitial(): Promise<void> {
 }
 ```
 
-### Show RewardVideo
+#### Show RewardVideo
 
 ```ts
 import {
@@ -342,6 +353,7 @@ import {
   AdLoadInfo,
   RewardAdPluginEvents,
   AdMobRewardItem,
+  AdMobRevenueData,
 } from '@capacitor-community/admob';
 
 export async function rewardVideo(): Promise<void> {
@@ -354,6 +366,14 @@ export async function rewardVideo(): Promise<void> {
     (rewardItem: AdMobRewardItem) => {
       // Subscribe user rewarded
       console.log(rewardItem);
+    },
+  );
+
+  AdMob.addListener(
+    RewardAdPluginEvents.AdImpression,
+    (data: AdMobRevenueData) => {
+      // Forward impression-level revenue to your analytics provider.
+      console.log(data);
     },
   );
 
@@ -382,12 +402,25 @@ export async function rewardVideo(): Promise<void> {
 }
 ```
 
-### Show Rewarded Interstitial
+#### Show Rewarded Interstitial
 
 ```ts
-import { AdMob, RewardInterstitialAdOptions } from '@capacitor-community/admob';
+import {
+  AdMob,
+  AdMobRevenueData,
+  RewardInterstitialAdOptions,
+  RewardInterstitialAdPluginEvents,
+} from '@capacitor-community/admob';
 
 export async function rewardInterstitial(): Promise<void> {
+  AdMob.addListener(
+    RewardInterstitialAdPluginEvents.AdImpression,
+    (data: AdMobRevenueData) => {
+      // Forward impression-level revenue to your analytics provider.
+      console.log(data);
+    },
+  );
+
   const options: RewardInterstitialAdOptions = {
     adId: 'YOUR ADID',
   };
