@@ -1,7 +1,7 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import type { AdMobError, AdShowOptions } from '../shared';
+import type { AdMobError, AdMobRevenueData, AdShowOptions } from '../shared';
 
 import type { AppOpenAdOptions } from './app-open-ad-options.interface';
 import type { AppOpenAdPluginEvents } from './app-open-ad-plugin-events.enum';
@@ -27,7 +27,7 @@ export interface AppOpenAdPlugin {
   /**
    * Check if the App Open ad is loaded
    */
-  isAppOpenLoaded(): Promise<{ value: boolean }>;
+  isAppOpenLoaded(options?: AdShowOptions): Promise<{ value: boolean }>;
 
   addListener(eventName: AppOpenAdPluginEvents.Loaded, listenerFunc: () => void): Promise<PluginListenerHandle>;
 
@@ -43,5 +43,10 @@ export interface AppOpenAdPlugin {
   addListener(
     eventName: AppOpenAdPluginEvents.FailedToShow,
     listenerFunc: (error: AdMobError) => void,
+  ): Promise<PluginListenerHandle>;
+
+  addListener(
+    eventName: AppOpenAdPluginEvents.AdImpression,
+    listenerFunc: (data: AdMobRevenueData) => void,
   ): Promise<PluginListenerHandle>;
 }

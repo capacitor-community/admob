@@ -31,6 +31,15 @@ import UIKit
                     "message": message
                 ])
                 call.reject(message)
+            }, onPaidEvent: { valueMicros, currencyCode, precision, networkName, impressionId in
+                notify(AppOpenAdPluginEvents.AdImpression.rawValue, [
+                    "adUnitId": adUnitId,
+                    "valueMicros": valueMicros,
+                    "currencyCode": currencyCode,
+                    "precision": precision,
+                    "networkName": networkName,
+                    "impressionId": impressionId
+                ])
             })
         }
     }

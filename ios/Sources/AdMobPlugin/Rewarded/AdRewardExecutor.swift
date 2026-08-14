@@ -45,6 +45,18 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                 }
 
                 ad.fullScreenContentDelegate = self
+                ad.paidEventHandler = { adValue in
+                    let networkName = ad.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+                    let impressionId = ad.responseInfo.responseIdentifier ?? ""
+                    self.plugin?.notifyListeners(RewardAdPluginEvents.AdImpression.rawValue, data: [
+                        "adUnitId": adUnitID,
+                        "valueMicros": adValue.value.int64Value,
+                        "currencyCode": adValue.currencyCode,
+                        "precision": adValue.precision.rawValue,
+                        "networkName": networkName,
+                        "impressionId": impressionId
+                    ])
+                }
                 self.preparedAds[adUnitID] = ad
                 self.lastPreparedAdId = adUnitID
 
@@ -61,6 +73,10 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     func showRewardVideoAd(_ call: CAPPluginCall) {
         guard let adId = call.getString("adId") ?? lastPreparedAdId else {
             call.reject("No ad prepared")
+            return
+        }
+        guard currentlyShowingAdId == nil else {
+            call.reject("An ad is already showing")
             return
         }
 

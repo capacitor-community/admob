@@ -10,6 +10,7 @@ internal class InterstitialAdStub: InterstitialAd() {
 
     private var immersiveMode = false;
     private var fullScreenContentCallback: FullScreenContentCallback? = null
+    private var onPaidEventListener: OnPaidEventListener? = null
 
     override fun getAdUnitId(): String {
         return "adUnit"
@@ -36,11 +37,11 @@ internal class InterstitialAdStub: InterstitialAd() {
     }
 
     override fun setOnPaidEventListener(p0: OnPaidEventListener?) {
-        TODO("Not yet implemented")
+        onPaidEventListener = p0
     }
 
     override fun getOnPaidEventListener(): OnPaidEventListener? {
-        TODO("Not yet implemented")
+        return onPaidEventListener
     }
 
     override fun getPlacementId(): Long {

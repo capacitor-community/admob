@@ -4,4 +4,5 @@ public enum AppOpenAdPluginEvents: String {
     case Opened = "appOpenAdOpened"
     case Closed = "appOpenAdClosed"
     case FailedToShow = "appOpenAdFailedToShow"
+    case AdImpression = "appOpenAdImpression"
 }

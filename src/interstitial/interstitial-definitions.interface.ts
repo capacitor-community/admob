@@ -1,7 +1,7 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import type { AdLoadInfo, AdMobError, AdOptions, AdShowOptions } from '../shared';
+import type { AdLoadInfo, AdMobError, AdMobRevenueData, AdOptions, AdShowOptions } from '../shared';
 
 import type { InterstitialAdPluginEvents } from './interstitial-ad-plugin-events.enum';
 
@@ -47,5 +47,13 @@ export interface InterstitialDefinitions {
     listenerFunc: (error: AdMobError) => void,
   ): Promise<PluginListenerHandle>;
 
-  addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => void): Promise<PluginListenerHandle>;
+  addListener(
+    eventName: InterstitialAdPluginEvents.Showed,
+    listenerFunc: () => void,
+  ): Promise<PluginListenerHandle>;
+
+  addListener(
+    eventName: InterstitialAdPluginEvents.AdImpression,
+    listenerFunc: (data: AdMobRevenueData) => void,
+  ): Promise<PluginListenerHandle>;
 }

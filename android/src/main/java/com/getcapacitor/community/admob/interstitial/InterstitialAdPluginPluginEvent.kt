@@ -8,4 +8,5 @@ object InterstitialAdPluginPluginEvent: LoadPluginEventNames {
     override val Showed = "interstitialAdShowed"
     override val FailedToShow = "interstitialAdFailedToShow"
     override val Dismissed = "interstitialAdDismissed"
+    const val AdImpression = "interstitialAdImpression"
 }

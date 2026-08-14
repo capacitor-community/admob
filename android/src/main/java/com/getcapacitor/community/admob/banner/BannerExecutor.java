@@ -18,6 +18,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
+import com.getcapacitor.community.admob.models.AdMobRevenueData;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdListener;
@@ -103,27 +104,10 @@ public class BannerExecutor extends Executor {
                     break;
             }
 
-            // set Safe Area only for Android 15+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                View rootView = activitySupplier.get().getWindow().getDecorView();
-                rootView.setOnApplyWindowInsetsListener((v, insets) -> {
-                    int bottomInset = insets.getSystemWindowInsetBottom();
-                    int topInset = insets.getSystemWindowInsetTop();
-
-                    if ("TOP_CENTER".equals(adOptions.position)) {
-                        mAdViewLayoutParams.setMargins(0, topInset, 0, 0);
-                    } else {
-                        mAdViewLayoutParams.setMargins(0, 0, 0, bottomInset);
-                    }
-
-                    mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-                    return insets;
-                });
-            }
-
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
             int densityMargin = (int) (adOptions.margin * density);
+            int[] margins = new int[] { 0, densityMargin, 0, densityMargin };
 
             // Center Banner Ads
             int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
@@ -133,13 +117,35 @@ public class BannerExecutor extends Executor {
                 if (fullscreen) {
                     margin = (realWidthPixels - defaultWidthPixels) / 2;
                 }
+                margins[0] = margin;
+                margins[2] = margin;
                 mAdViewLayoutParams.setMargins(margin, densityMargin, margin, densityMargin);
             } else {
                 int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
                 if (fullscreen) {
                     sideMargin = (realWidthPixels - adWidth) / 2;
                 }
+                margins[0] = sideMargin;
+                margins[2] = sideMargin;
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
+            }
+
+            // set Safe Area only for Android 15+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                View rootView = activitySupplier.get().getWindow().getDecorView();
+                rootView.setOnApplyWindowInsetsListener((v, insets) -> {
+                    int bottomInset = insets.getSystemWindowInsetBottom();
+                    int topInset = insets.getSystemWindowInsetTop();
+
+                    if ("TOP_CENTER".equals(adOptions.position)) {
+                        mAdViewLayoutParams.setMargins(margins[0], margins[1] + topInset, margins[2], margins[3]);
+                    } else {
+                        mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
+                    }
+
+                    mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
+                    return insets;
+                });
             }
 
             createNewAdView(adOptions);
@@ -295,6 +301,19 @@ public class BannerExecutor extends Executor {
                         }
                     }
                 );
+
+                mAdView.setOnPaidEventListener((adValue) -> {
+                    String networkName = "";
+                    String impressionId = "";
+                    if (mAdView.getResponseInfo() != null) {
+                        networkName = mAdView.getResponseInfo().getMediationAdapterClassName();
+                        if (networkName == null) networkName = "";
+                        impressionId = mAdView.getResponseInfo().getResponseId();
+                        if (impressionId == null) impressionId = "";
+                    }
+                    AdMobRevenueData revenueData = new AdMobRevenueData(adValue, mAdView.getAdUnitId(), networkName, impressionId);
+                    notifyListeners(BannerAdPluginEvents.AdPaid.getWebEventName(), revenueData);
+                });
 
                 // Add AdViewLayout top of the WebView
                 mViewGroup.addView(mAdViewLayout);

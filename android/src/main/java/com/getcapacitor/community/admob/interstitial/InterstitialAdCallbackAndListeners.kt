@@ -4,6 +4,7 @@ import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
 import com.getcapacitor.community.admob.models.AdMobPluginError
+import com.getcapacitor.community.admob.models.AdMobRevenueData
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -19,6 +20,14 @@ object InterstitialAdCallbackAndListeners {
                 val immersiveMode = call.getBoolean("immersiveMode")
                 ad.fullScreenContentCallback = FullscreenPluginCallback(InterstitialAdPluginPluginEvent, notifyListenersFunction)
                 ad.setImmersiveMode(immersiveMode ?: false)
+
+                ad.setOnPaidEventListener { adValue ->
+                    val responseInfo = ad.responseInfo
+                    val networkName = responseInfo?.mediationAdapterClassName ?: ""
+                    val impressionId = responseInfo?.responseId ?: ""
+                    val revenueData = AdMobRevenueData(adValue, ad.adUnitId, networkName, impressionId)
+                    notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.AdImpression, revenueData)
+                }
 
                 AdInterstitialExecutor.preparedAds[ad.adUnitId] = ad
                 AdInterstitialExecutor.lastPreparedAdId = ad.adUnitId
