@@ -285,6 +285,16 @@ export async function interstitial(): Promise<void> {
   };
   await AdMob.prepareInterstitial(options);
   await AdMob.showInterstitial();
+
+  // You can also prepare multiple interstitials and show a specific one by passing its adId:
+  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
+  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
+
+  // Show a specific prepared ad
+  await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
+
+  // Or omit adId to show the most recently prepared one (default behavior)
+  await AdMob.showInterstitial();
 }
 ```
 
@@ -324,6 +334,16 @@ export async function rewardVideo(): Promise<void> {
   };
   await AdMob.prepareRewardVideoAd(options);
   const rewardItem = await AdMob.showRewardVideoAd();
+
+  // You can also prepare multiple reward ads and show a specific one by passing its adId:
+  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
+  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-2' });
+
+  // Show a specific prepared ad
+  const reward = await AdMob.showRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
+
+  // Or omit adId to show the most recently prepared one (default behavior)
+  const reward2 = await AdMob.showRewardVideoAd();
 }
 ```
 
@@ -372,13 +392,14 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`setApplicationMuted(...)`](#setapplicationmuted)
 * [`setApplicationVolume(...)`](#setapplicationvolume)
 * [`loadAppOpen(...)`](#loadappopen)
-* [`showAppOpen()`](#showappopen)
+* [`showAppOpen(...)`](#showappopen)
 * [`isAppOpenLoaded()`](#isappopenloaded)
 * [`addListener(AppOpenAdPluginEvents.Loaded, ...)`](#addlistenerappopenadplugineventsloaded-)
 * [`addListener(AppOpenAdPluginEvents.FailedToLoad, ...)`](#addlistenerappopenadplugineventsfailedtoload-)
 * [`addListener(AppOpenAdPluginEvents.Opened, ...)`](#addlistenerappopenadplugineventsopened-)
 * [`addListener(AppOpenAdPluginEvents.Closed, ...)`](#addlistenerappopenadplugineventsclosed-)
 * [`addListener(AppOpenAdPluginEvents.FailedToShow, ...)`](#addlistenerappopenadplugineventsfailedtoshow-)
+* [`addListener(AppOpenAdPluginEvents.AdImpression, ...)`](#addlistenerappopenadplugineventsadimpression-)
 * [`showBanner(...)`](#showbanner)
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
@@ -389,33 +410,37 @@ AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
 * [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
 * [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
 * [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
+* [`addListener(BannerAdPluginEvents.AdPaid, ...)`](#addlistenerbanneradplugineventsadpaid-)
 * [`requestConsentInfo(...)`](#requestconsentinfo)
 * [`showPrivacyOptionsForm()`](#showprivacyoptionsform)
 * [`showConsentForm()`](#showconsentform)
 * [`resetConsentInfo()`](#resetconsentinfo)
 * [`prepareInterstitial(...)`](#prepareinterstitial)
-* [`showInterstitial()`](#showinterstitial)
+* [`showInterstitial(...)`](#showinterstitial)
 * [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
 * [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
 * [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
 * [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
 * [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
+* [`addListener(InterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerinterstitialadplugineventsadimpression-)
 * [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
-* [`showRewardVideoAd()`](#showrewardvideoad)
+* [`showRewardVideoAd(...)`](#showrewardvideoad)
 * [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
 * [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
 * [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
 * [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
 * [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
 * [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
+* [`addListener(RewardAdPluginEvents.AdImpression, ...)`](#addlistenerrewardadplugineventsadimpression-)
 * [`prepareRewardInterstitialAd(...)`](#preparerewardinterstitialad)
-* [`showRewardInterstitialAd()`](#showrewardinterstitialad)
+* [`showRewardInterstitialAd(...)`](#showrewardinterstitialad)
 * [`addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoload-)
 * [`addListener(RewardInterstitialAdPluginEvents.Loaded, ...)`](#addlistenerrewardinterstitialadplugineventsloaded-)
 * [`addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)`](#addlistenerrewardinterstitialadplugineventsrewarded-)
 * [`addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerrewardinterstitialadplugineventsdismissed-)
 * [`addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoshow-)
 * [`addListener(RewardInterstitialAdPluginEvents.Showed, ...)`](#addlistenerrewardinterstitialadplugineventsshowed-)
+* [`addListener(RewardInterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerrewardinterstitialadplugineventsadimpression-)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -521,13 +546,17 @@ Load an App Open ad
 --------------------
 
 
-### showAppOpen()
+### showAppOpen(...)
 
 ```typescript
-showAppOpen() => Promise<void>
+showAppOpen(options?: AdShowOptions) => Promise<void>
 ```
 
 Shows the App Open ad if loaded
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.
 
 --------------------
 
@@ -619,6 +648,22 @@ addListener(eventName: AppOpenAdPluginEvents.FailedToShow, listenerFunc: (error:
 | ------------------ | ------------------------------------------------------------------------------------ |
 | **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.FailedToShow</a></code> |
 | **`listenerFunc`** | <code>(error: <a href="#admoberror">AdMobError</a>) =&gt; void</code>                |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
+### addListener(AppOpenAdPluginEvents.AdImpression, ...)
+
+```typescript
+addListener(eventName: AppOpenAdPluginEvents.AdImpression, listenerFunc: (data: AdMobRevenueData) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| **`eventName`**    | <code><a href="#appopenadpluginevents">AppOpenAdPluginEvents.AdImpression</a></code> |
+| **`listenerFunc`** | <code>(data: <a href="#admobrevenuedata">AdMobRevenueData</a>) =&gt; void</code>     |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
@@ -799,6 +844,22 @@ Unimplemented
 --------------------
 
 
+### addListener(BannerAdPluginEvents.AdPaid, ...)
+
+```typescript
+addListener(eventName: BannerAdPluginEvents.AdPaid, listenerFunc: (data: AdMobRevenueData) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                             |
+| ------------------ | -------------------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#banneradpluginevents">BannerAdPluginEvents.AdPaid</a></code>     |
+| **`listenerFunc`** | <code>(data: <a href="#admobrevenuedata">AdMobRevenueData</a>) =&gt; void</code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
 ### requestConsentInfo(...)
 
 ```typescript
@@ -878,13 +939,17 @@ Prepare interstitial banner
 --------------------
 
 
-### showInterstitial()
+### showInterstitial(...)
 
 ```typescript
-showInterstitial() => Promise<void>
+showInterstitial(options?: AdShowOptions) => Promise<void>
 ```
 
 Show interstitial ad when it’s ready
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.            |
 
 **Since:** 1.1.2
 
@@ -971,6 +1036,22 @@ addListener(eventName: InterstitialAdPluginEvents.Showed, listenerFunc: () => vo
 --------------------
 
 
+### addListener(InterstitialAdPluginEvents.AdImpression, ...)
+
+```typescript
+addListener(eventName: InterstitialAdPluginEvents.AdImpression, listenerFunc: (data: AdMobRevenueData) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#interstitialadpluginevents">InterstitialAdPluginEvents.AdImpression</a></code> |
+| **`listenerFunc`** | <code>(data: <a href="#admobrevenuedata">AdMobRevenueData</a>) =&gt; void</code>               |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
 ### prepareRewardVideoAd(...)
 
 ```typescript
@@ -990,13 +1071,17 @@ Prepare a reward video ad
 --------------------
 
 
-### showRewardVideoAd()
+### showRewardVideoAd(...)
 
 ```typescript
-showRewardVideoAd() => Promise<AdMobRewardItem>
+showRewardVideoAd(options?: AdShowOptions) => Promise<AdMobRewardItem>
 ```
 
 Show a reward video ad
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.            |
 
 **Returns:** <code>Promise&lt;<a href="#admobrewarditem">AdMobRewardItem</a>&gt;</code>
 
@@ -1101,6 +1186,22 @@ addListener(eventName: RewardAdPluginEvents.Showed, listenerFunc: () => void) =>
 --------------------
 
 
+### addListener(RewardAdPluginEvents.AdImpression, ...)
+
+```typescript
+addListener(eventName: RewardAdPluginEvents.AdImpression, listenerFunc: (data: AdMobRevenueData) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                               |
+| ------------------ | ---------------------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.AdImpression</a></code> |
+| **`listenerFunc`** | <code>(data: <a href="#admobrevenuedata">AdMobRevenueData</a>) =&gt; void</code>   |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
 ### prepareRewardInterstitialAd(...)
 
 ```typescript
@@ -1120,13 +1221,17 @@ Prepare a reward video ad
 --------------------
 
 
-### showRewardInterstitialAd()
+### showRewardInterstitialAd(...)
 
 ```typescript
-showRewardInterstitialAd() => Promise<AdMobRewardInterstitialItem>
+showRewardInterstitialAd(options?: AdShowOptions) => Promise<AdMobRewardInterstitialItem>
 ```
 
 Show a reward video ad
+
+| Param         | Type                                                    | Description                                                          |
+| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass `{ adId }` to show a specific prepared ad.            |
 
 **Returns:** <code>Promise&lt;<a href="#admobrewardinterstitialitem">AdMobRewardInterstitialItem</a>&gt;</code>
 
@@ -1231,6 +1336,22 @@ addListener(eventName: RewardInterstitialAdPluginEvents.Showed, listenerFunc: ()
 --------------------
 
 
+### addListener(RewardInterstitialAdPluginEvents.AdImpression, ...)
+
+```typescript
+addListener(eventName: RewardInterstitialAdPluginEvents.AdImpression, listenerFunc: (data: AdMobRevenueData) => void) => Promise<PluginListenerHandle>
+```
+
+| Param              | Type                                                                                                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#rewardinterstitialadpluginevents">RewardInterstitialAdPluginEvents.AdImpression</a></code> |
+| **`listenerFunc`** | <code>(data: <a href="#admobrevenuedata">AdMobRevenueData</a>) =&gt; void</code>                           |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -1291,6 +1412,18 @@ https://developers.google.com/android/reference/com/google/android/gms/ads/AdErr
 | **`message`** | <code>string</code> | Gets the message describing the error. |
 
 
+#### AdMobRevenueData
+
+| Prop               | Type                                                          |
+| ------------------ | ------------------------------------------------------------- |
+| **`adUnitId`**     | <code>string</code>                                           |
+| **`valueMicros`**  | <code>number</code>                                           |
+| **`currencyCode`** | <code>string</code>                                           |
+| **`precision`**    | <code><a href="#advalueprecision">AdValuePrecision</a></code> |
+| **`networkName`**  | <code>string</code>                                           |
+| **`impressionId`** | <code>string</code>                                           |
+
+
 #### BannerAdOptions
 
 This interface extends <a href="#adoptions">AdOptions</a>
@@ -1340,6 +1473,13 @@ When notice listener of OnAdLoaded, you can get banner size.
 | Prop           | Type                |
 | -------------- | ------------------- |
 | **`adUnitId`** | <code>string</code> |
+
+
+#### AdShowOptions
+
+| Prop       | Type                | Description                                                                                   | Since |
+| ---------- | ------------------- | --------------------------------------------------------------------------------------------- | ----- |
+| **`adId`** | <code>string</code> | The ad unit ID of a previously prepared ad to show. If omitted, the most recently prepared ad is shown. | 8.0.1 |
 
 
 #### AdOptions
@@ -1436,6 +1576,17 @@ From T, pick a set of properties whose keys are in the union K
 | **`Opened`**       | <code>'appOpenAdOpened'</code>       |
 | **`Closed`**       | <code>'appOpenAdClosed'</code>       |
 | **`FailedToShow`** | <code>'appOpenAdFailedToShow'</code> |
+| **`AdImpression`** | <code>'appOpenAdImpression'</code>   |
+
+
+#### AdValuePrecision
+
+| Members                 | Value          |
+| ----------------------- | -------------- |
+| **`Unknown`**           | <code>0</code> |
+| **`Estimated`**         | <code>1</code> |
+| **`PublisherProvided`** | <code>2</code> |
+| **`Precise`**           | <code>3</code> |
 
 
 #### BannerAdSize
@@ -1470,6 +1621,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`Opened`**       | <code>"bannerAdOpened"</code>       | Open "Adsense" Event after user click banner                                                           |
 | **`Closed`**       | <code>"bannerAdClosed"</code>       | Close "Adsense" Event after user click banner                                                          |
 | **`AdImpression`** | <code>"bannerAdImpression"</code>   | Similarly, this method should be called when an impression is recorded for the ad by the mediated SDK. |
+| **`AdPaid`**       | <code>"bannerAdPaid"</code>         |                                                                                                        |
 
 
 #### AdmobConsentStatus
@@ -1511,6 +1663,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`Showed`**       | <code>'interstitialAdShowed'</code>       | Emits when the Interstitial ad is visible to the user                                  |
 | **`FailedToShow`** | <code>'interstitialAdFailedToShow'</code> | Emits when the Interstitial ad is failed to show                                       |
 | **`Dismissed`**    | <code>'interstitialAdDismissed'</code>    | Emits when the Interstitial ad is not visible to the user anymore.                     |
+| **`AdImpression`** | <code>'interstitialAdImpression'</code>   | Emits when an impression-level ad revenue event is recorded                            |
 
 
 #### RewardAdPluginEvents
@@ -1523,6 +1676,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`FailedToShow`** | <code>'onRewardedVideoAdFailedToShow'</code> | Emits when the AdReward video is failed to show                                                                                                                                                                                                                                                                                                        |
 | **`Dismissed`**    | <code>'onRewardedVideoAdDismissed'</code>    | Emits when the AdReward video is not visible to the user anymore. **Important**: This has nothing to do with the reward it self. This event will emits in this two cases: 1. The user starts the video ad but close it before the reward emit. 2. The user start the video and see it until end, then gets the reward and after that the ad is closed. |
 | **`Rewarded`**     | <code>'onRewardedVideoAdReward'</code>       | Emits when user get rewarded from AdReward                                                                                                                                                                                                                                                                                                             |
+| **`AdImpression`** | <code>'onRewardedVideoAdImpression'</code>   | Emits when an impression-level ad revenue event is recorded                                                                                                                                                                                                                                                                                            |
 
 
 #### RewardInterstitialAdPluginEvents
@@ -1535,6 +1689,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`FailedToShow`** | <code>'onRewardedInterstitialAdFailedToShow'</code> | Emits when the AdReward video is failed to show                                                                                                                                                                                                                                                                                                        |
 | **`Dismissed`**    | <code>'onRewardedInterstitialAdDismissed'</code>    | Emits when the AdReward video is not visible to the user anymore. **Important**: This has nothing to do with the reward it self. This event will emits in this two cases: 1. The user starts the video ad but close it before the reward emit. 2. The user start the video and see it until end, then gets the reward and after that the ad is closed. |
 | **`Rewarded`**     | <code>'onRewardedInterstitialAdReward'</code>       | Emits when user get rewarded from AdReward                                                                                                                                                                                                                                                                                                             |
+| **`AdImpression`** | <code>'onRewardedInterstitialAdImpression'</code>   | Emits when an impression-level ad revenue event is recorded                                                                                                                                                                                                                                                                                            |
 
 </docgen-api>
 

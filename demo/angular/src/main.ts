@@ -1,25 +1,21 @@
-import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
-
-import { environment } from './environments/environment';
+import { enableProdMode, provideZoneChangeDetection } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
+import { provideRouter, withPreloading } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
-import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
-import { AppRoutingModule } from './app/app-routing.module';
-import { AppComponent } from './app/app.component';
-import * as allIcons from 'ionicons/icons';
-import { addIcons } from 'ionicons';
-
-addIcons(allIcons);
+import { App } from './app/app';
+import { routerPreloadingStrategy, routes } from './app/app.routes';
+import { environment } from './environments/environment';
 
 if (environment.production) {
   enableProdMode();
 }
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideZoneChangeDetection(),
-    importProvidersFrom(BrowserModule, AppRoutingModule),
+    provideRouter(routes, withPreloading(routerPreloadingStrategy)),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideIonicAngular({}),
+    provideIonicAngular(),
   ],
-}).catch((err) => console.log(err));
+}).catch((error: unknown) => console.error(error));

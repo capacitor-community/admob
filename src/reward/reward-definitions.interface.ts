@@ -1,7 +1,7 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { ValidateAllEventsEnumAreImplemented } from '../private/validate-all-events-implemented.type';
-import type { AdLoadInfo, AdMobError } from '../shared';
+import type { AdLoadInfo, AdMobError, AdMobRevenueData, AdShowOptions } from '../shared';
 
 import type { RewardAdOptions } from './reward-ad-options.interface';
 import type { RewardAdPluginEvents } from './reward-ad-plugin-events.enum';
@@ -27,9 +27,10 @@ export interface RewardDefinitions {
    * Show a reward video ad
    *
    * @group RewardVideo
+   * @param options Optional. Pass { adId } to show a specific prepared ad instead of the most recent one.
    * @since 1.1.2
    */
-  showRewardVideoAd(): Promise<AdMobRewardItem>;
+  showRewardVideoAd(options?: AdShowOptions): Promise<AdMobRewardItem>;
 
   addListener(
     eventName: RewardAdPluginEvents.FailedToLoad,
@@ -46,10 +47,7 @@ export interface RewardDefinitions {
     listenerFunc: (reward: AdMobRewardItem) => void,
   ): Promise<PluginListenerHandle>;
 
-  addListener(
-    eventName: RewardAdPluginEvents.Dismissed,
-    listenerFunc: () => void,
-  ): Promise<PluginListenerHandle>;
+  addListener(eventName: RewardAdPluginEvents.Dismissed, listenerFunc: () => void): Promise<PluginListenerHandle>;
 
   addListener(
     eventName: RewardAdPluginEvents.FailedToShow,
@@ -59,5 +57,10 @@ export interface RewardDefinitions {
   addListener(
     eventName: RewardAdPluginEvents.Showed,
     listenerFunc: () => void,
+  ): Promise<PluginListenerHandle>;
+
+  addListener(
+    eventName: RewardAdPluginEvents.AdImpression,
+    listenerFunc: (data: AdMobRevenueData) => void,
   ): Promise<PluginListenerHandle>;
 }

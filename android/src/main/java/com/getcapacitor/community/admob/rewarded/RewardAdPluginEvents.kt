@@ -9,4 +9,5 @@ object RewardAdPluginEvents: LoadPluginEventNames {
     override val Showed = "onRewardedVideoAdShowed"
     override val FailedToShow = "onRewardedVideoAdFailedToShow"
     override val Dismissed = "onRewardedVideoAdDismissed"
+    const val AdImpression = "onRewardedVideoAdImpression"
 }

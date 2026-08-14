@@ -5,4 +5,5 @@ public enum RewardInterstitialAdPluginEvents: String {
     case FailedToShow = "onRewardedInterstitialAdFailedToShow"
     case Dismissed = "onRewardedInterstitialAdDismissed"
     case Rewarded = "onRewardedInterstitialAdReward"
+    case AdImpression = "onRewardedInterstitialAdImpression"
 }

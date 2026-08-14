@@ -5,4 +5,5 @@ public enum BannerAdPluginEvents: String {
     case Opened = "bannerAdOpened"
     case Loaded = "bannerAdLoaded"
     case AdImpression = "bannerAdImpression"
+    case AdPaid = "bannerAdPaid"
 }

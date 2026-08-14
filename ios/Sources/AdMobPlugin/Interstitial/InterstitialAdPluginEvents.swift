@@ -4,4 +4,5 @@ public enum InterstitialAdPluginEvents: String {
     case Showed = "interstitialAdShowed"
     case FailedToShow = "interstitialAdFailedToShow"
     case Dismissed = "interstitialAdDismissed"
+    case AdImpression = "interstitialAdImpression"
 }

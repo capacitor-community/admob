@@ -7,14 +7,18 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.common.util.BiConsumer
 
-class FullscreenPluginCallback(private val loadPluginObject: LoadPluginEventNames,
-                               private val notifyListenersFunction: BiConsumer<String, JSObject>): FullScreenContentCallback() {
+class FullscreenPluginCallback(
+    private val loadPluginObject: LoadPluginEventNames,
+    private val notifyListenersFunction: BiConsumer<String, JSObject>,
+    private val onCompleted: Runnable? = null
+): FullScreenContentCallback() {
 
     override fun onAdShowedFullScreenContent() {
         notifyListenersFunction.accept(loadPluginObject.Showed, JSObject())
     }
 
     override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+        onCompleted?.run()
         val adMobError = AdMobPluginError(adError)
         notifyListenersFunction.accept(
                 loadPluginObject.FailedToShow, adMobError
@@ -22,6 +26,7 @@ class FullscreenPluginCallback(private val loadPluginObject: LoadPluginEventName
     }
 
     override fun onAdDismissedFullScreenContent() {
+        onCompleted?.run()
         notifyListenersFunction.accept(loadPluginObject.Dismissed, JSObject())
     }
 }

@@ -7,6 +7,7 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
+import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -14,10 +15,13 @@ import com.getcapacitor.community.admob.models.Executor;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 import com.google.android.gms.common.util.BiConsumer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class AdRewardInterstitialExecutor extends Executor {
 
-    public static RewardedInterstitialAd mRewardedInterstitialAd;
+    public static final Map<String, RewardedInterstitialAd> preparedAds = new LinkedHashMap<>();
+    public static String lastPreparedAdId;
 
     public AdRewardInterstitialExecutor(
         Supplier<Context> contextSupplier,
@@ -56,7 +60,11 @@ public class AdRewardInterstitialExecutor extends Executor {
 
     @PluginMethod
     public void showRewardInterstitialAd(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
-        if (mRewardedInterstitialAd == null) {
+        String requestedAdId = call.getString("adId");
+        String adId = requestedAdId != null ? requestedAdId : lastPreparedAdId;
+        RewardedInterstitialAd ad = adId != null ? preparedAds.get(adId) : null;
+
+        if (ad == null) {
             String errorMessage = "No Reward Interstitial Video Ad can be shown. It was not prepared or maybe it failed to be prepared.";
             call.reject(errorMessage);
             AdMobPluginError errorObject = new AdMobPluginError(-1, errorMessage);
@@ -68,7 +76,13 @@ public class AdRewardInterstitialExecutor extends Executor {
             activitySupplier
                 .get()
                 .runOnUiThread(() -> {
-                    mRewardedInterstitialAd.show(
+                    ad.setFullScreenContentCallback(
+                        new FullscreenPluginCallback(RewardInterstitialAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
+                            preparedAds.remove(adId);
+                            if (adId != null && adId.equals(lastPreparedAdId)) lastPreparedAdId = null;
+                        })
+                    );
+                    ad.show(
                         activitySupplier.get(),
                         RewardedInterstitialAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
                     );

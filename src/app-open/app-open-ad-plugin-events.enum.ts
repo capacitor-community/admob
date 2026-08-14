@@ -4,4 +4,5 @@ export enum AppOpenAdPluginEvents {
   Opened = 'appOpenAdOpened',
   Closed = 'appOpenAdClosed',
   FailedToShow = 'appOpenAdFailedToShow',
+  AdImpression = 'appOpenAdImpression',
 }

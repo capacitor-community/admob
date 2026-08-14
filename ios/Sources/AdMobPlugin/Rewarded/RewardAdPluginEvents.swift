@@ -5,4 +5,5 @@ public enum RewardAdPluginEvents: String {
     case FailedToShow = "onRewardedVideoAdFailedToShow"
     case Dismissed = "onRewardedVideoAdDismissed"
     case Rewarded = "onRewardedVideoAdReward"
+    case AdImpression = "onRewardedVideoAdImpression"
 }

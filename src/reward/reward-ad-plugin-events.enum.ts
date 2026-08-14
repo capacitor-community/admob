@@ -30,4 +30,8 @@ export enum RewardAdPluginEvents {
    * Emits when user get rewarded from AdReward
    */
   Rewarded= 'onRewardedVideoAdReward',
+  /**
+   * Emits when an impression-level ad revenue event is recorded
+   */
+  AdImpression = 'onRewardedVideoAdImpression',
 }

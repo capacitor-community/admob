@@ -7,6 +7,7 @@ import android.os.Looper
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.models.AdMobPluginError
+import com.getcapacitor.community.admob.models.AdMobRevenueData
 
 class AppOpenAdPlugin {
 
@@ -14,7 +15,8 @@ class AppOpenAdPlugin {
         fun notify(eventName: String, data: JSObject)
     }
 
-    private var appOpenAdManager: AppOpenAdManager? = null
+    private val preparedManagers = LinkedHashMap<String, AppOpenAdManager>()
+    private var lastPreparedAdId: String? = null
 
     private fun runOnMain(activity: Activity?, runnable: Runnable) {
         if (activity != null) {
@@ -38,13 +40,12 @@ class AppOpenAdPlugin {
 
         val appContext = context.applicationContext
         runOnMain(activity) {
-            if (appOpenAdManager == null || adUnitId != appOpenAdManager?.adUnitId) {
-                appOpenAdManager = AppOpenAdManager(adUnitId)
-            }
+            val manager = preparedManagers.getOrPut(adUnitId) { AppOpenAdManager(adUnitId) }
 
-            appOpenAdManager?.loadAd(
+            manager.loadAd(
                 appContext,
                 onLoaded = {
+                    lastPreparedAdId = adUnitId
                     val adInfo = JSObject().apply {
                         put("adUnitId", adUnitId)
                     }
@@ -56,6 +57,10 @@ class AppOpenAdPlugin {
                     val errorCode = loadAdError?.code ?: -1
                     notifier.notify(AppOpenAdPluginEvents.FailedToLoad, AdMobPluginError(errorCode, errorMessage))
                     call.reject(errorMessage)
+                },
+                onPaidEvent = { adValue, networkName, impressionId ->
+                    val revenueData = AdMobRevenueData(adValue, adUnitId, networkName, impressionId)
+                    notifier.notify(AppOpenAdPluginEvents.AdImpression, revenueData)
                 }
             )
         }
@@ -67,22 +72,30 @@ class AppOpenAdPlugin {
             return
         }
 
+        val adId = call.getString("adId") ?: lastPreparedAdId
+
         runOnMain(activity) {
-            if (appOpenAdManager == null || appOpenAdManager?.isAdLoaded != true) {
+            val manager = if (adId != null) preparedManagers[adId] else null
+
+            if (manager == null || !manager.isAdLoaded) {
                 call.reject("App Open Ad is not loaded")
                 return@runOnMain
             }
 
-            appOpenAdManager?.showAdIfAvailable(
+            manager.showAdIfAvailable(
                 activity,
                 onOpened = {
                     notifier.notify(AppOpenAdPluginEvents.Opened, JSObject())
                 },
                 onClosed = {
+                    preparedManagers.remove(adId)
+                    if (lastPreparedAdId == adId) lastPreparedAdId = null
                     notifier.notify(AppOpenAdPluginEvents.Closed, JSObject())
                     call.resolve()
                 },
                 onFailedToShow = { adError ->
+                    preparedManagers.remove(adId)
+                    if (lastPreparedAdId == adId) lastPreparedAdId = null
                     val errorMessage = adError?.message ?: "Failed to show App Open Ad"
                     val errorCode = adError?.code ?: -1
                     notifier.notify(AppOpenAdPluginEvents.FailedToShow, AdMobPluginError(errorCode, errorMessage))
@@ -93,8 +106,9 @@ class AppOpenAdPlugin {
     }
 
     fun isAppOpenLoaded(activity: Activity?, call: PluginCall) {
+        val adId = call.getString("adId") ?: lastPreparedAdId
         runOnMain(activity) {
-            val loaded = appOpenAdManager?.isAdLoaded ?: false
+            val loaded = adId?.let { preparedManagers[it]?.isAdLoaded } ?: false
             val result = JSObject().apply {
                 put("value", loaded)
             }

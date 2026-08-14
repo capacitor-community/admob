@@ -185,7 +185,8 @@ class AdInterstitialExecutorTest {
 
         @BeforeEach
         void beforeEach() {
-            AdInterstitialExecutor.interstitialAd = null;
+            AdInterstitialExecutor.preparedAds.clear();
+            AdInterstitialExecutor.lastPreparedAdId = null;
         }
 
         @Test
@@ -230,7 +231,8 @@ class AdInterstitialExecutorTest {
         @DisplayName("Should call show when Interstitial was prepared")
         void shouldCallShowWhenPrepared() {
             InterstitialAd mockedInterstitialAd = mock(InterstitialAd.class);
-            AdInterstitialExecutor.interstitialAd = mockedInterstitialAd;
+            AdInterstitialExecutor.preparedAds.put("test-ad-id", mockedInterstitialAd);
+            AdInterstitialExecutor.lastPreparedAdId = "test-ad-id";
 
             sut.showInterstitial(pluginCallMock, notifierMock);
 
@@ -240,6 +242,59 @@ class AdInterstitialExecutorTest {
 
             Mockito.verify(pluginCallMock, times(0)).reject(any());
             verify(mockedInterstitialAd).show(any());
+        }
+
+        @Test
+        @DisplayName("Should show a specific ad when adId is provided")
+        void shouldShowSpecificAdWhenAdIdProvided() {
+            InterstitialAd adOne = mock(InterstitialAd.class);
+            InterstitialAd adTwo = mock(InterstitialAd.class);
+            AdInterstitialExecutor.preparedAds.put("ad-unit-1", adOne);
+            AdInterstitialExecutor.preparedAds.put("ad-unit-2", adTwo);
+            AdInterstitialExecutor.lastPreparedAdId = "ad-unit-2";
+
+            when(pluginCallMock.getString("adId")).thenReturn("ad-unit-1");
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(adOne).show(any());
+            verify(adTwo, times(0)).show(any());
+        }
+
+        @Test
+        @DisplayName("Should show the last prepared ad when no adId is provided")
+        void shouldShowLastPreparedWhenNoAdId() {
+            InterstitialAd adOne = mock(InterstitialAd.class);
+            InterstitialAd adTwo = mock(InterstitialAd.class);
+            AdInterstitialExecutor.preparedAds.put("ad-unit-1", adOne);
+            AdInterstitialExecutor.preparedAds.put("ad-unit-2", adTwo);
+            AdInterstitialExecutor.lastPreparedAdId = "ad-unit-2";
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(adTwo).show(any());
+            verify(adOne, times(0)).show(any());
+        }
+
+        @Test
+        @DisplayName("Should reject when requesting a non-existent adId")
+        void shouldRejectWhenAdIdNotFound() {
+            InterstitialAd adOne = mock(InterstitialAd.class);
+            AdInterstitialExecutor.preparedAds.put("ad-unit-1", adOne);
+            AdInterstitialExecutor.lastPreparedAdId = "ad-unit-1";
+
+            when(pluginCallMock.getString("adId")).thenReturn("non-existent");
+
+            sut.showInterstitial(pluginCallMock, notifierMock);
+
+            verify(pluginCallMock).reject(any());
+            verify(mockedActivity, times(0)).runOnUiThread(any());
         }
     }
 }

@@ -4,6 +4,7 @@ import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
 import com.getcapacitor.community.admob.models.AdMobPluginError
+import com.getcapacitor.community.admob.models.AdMobRevenueData
 import com.getcapacitor.community.admob.models.AdOptions
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.OnUserEarnedRewardListener
@@ -27,9 +28,19 @@ object RewardedInterstitialAdCallbackAndListeners {
     fun getRewardedAdLoadCallback(call: PluginCall, notifyListenersFunction: BiConsumer<String, JSObject>, adOptions: AdOptions): RewardedInterstitialAdLoadCallback {
         return object : RewardedInterstitialAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedInterstitialAd) {
-                AdRewardInterstitialExecutor.mRewardedInterstitialAd = ad
-                AdRewardInterstitialExecutor.mRewardedInterstitialAd.fullScreenContentCallback = FullscreenPluginCallback(
+                ad.fullScreenContentCallback = FullscreenPluginCallback(
                         RewardInterstitialAdPluginEvents, notifyListenersFunction)
+
+                ad.setOnPaidEventListener { adValue ->
+                    val responseInfo = ad.responseInfo
+                    val networkName = responseInfo?.mediationAdapterClassName ?: ""
+                    val impressionId = responseInfo?.responseId ?: ""
+                    val revenueData = AdMobRevenueData(adValue, ad.adUnitId, networkName, impressionId)
+                    notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.AdImpression, revenueData)
+                }
+
+                AdRewardInterstitialExecutor.preparedAds[ad.adUnitId] = ad
+                AdRewardInterstitialExecutor.lastPreparedAdId = ad.adUnitId
 
                 val adInfo = JSObject()
                 adInfo.put("adUnitId", ad.adUnitId)
