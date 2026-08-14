@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>capacitor-admob</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">capacitor-admob</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  @if (vm.isLoading()) {
+  <section class="ion-text-center ion-padding-top">
+    <ion-spinner />
+  </section>
+  }
+
+  <ion-list>
+    <ion-list-header><ion-label>Consent</ion-label></ion-list-header>
+    <ion-item [button]="true" (click)="vm.requestConsentInfo()">Request Consent Info</ion-item>
+    <ion-item [button]="true" [disabled]="!vm.isConsentAvailable()" (click)="vm.showConsentForm()">
+      Show Consent Form
+    </ion-item>
+    <ion-item [button]="true" [disabled]="!vm.isConsentAvailable()" (click)="vm.resetConsentInfo()">
+      Reset Consent Info
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        Banner @if (vm.lastBannerEvent(); as event) {
+        <br />(Last Event: {{ event.name }} | {{ event.value | json }}) }
+      </ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-label>Banner Size</ion-label>
+      <ion-select
+        [ngModel]="vm.currentBannerSize()"
+        (ngModelChange)="vm.currentBannerSize.set($event)"
+        interface="popover"
+        placeholder="Default"
+        slot="end"
+      >
+        <ion-select-option [value]="undefined">Default</ion-select-option>
+        @for (size of vm.bannerSizes(); track size) {
+        <ion-select-option [value]="size">{{ size }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    <ion-item [button]="true" (click)="vm.showTopBanner()">Show Top Banner</ion-item>
+    <ion-item [button]="true" (click)="vm.showBottomBanner()">Show Bottom Banner</ion-item>
+    <ion-item [button]="true" (click)="vm.hideBanner()">Hide Banner</ion-item>
+    <ion-item [button]="true" (click)="vm.resumeBanner()">Resume Banner</ion-item>
+    <ion-item [button]="true" lines="full" (click)="vm.removeBanner()">Remove Banner</ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        Interstitial @if (vm.lastInterstitialEvent(); as event) {
+        <br />(Last Event: {{ event.name }} | {{ event.value | json }}) }
+      </ion-label>
+    </ion-list-header>
+    <ion-item [button]="true" [disabled]="vm.isInterstitialPrepared()" (click)="vm.prepareInterstitial()">
+      Prepare Interstitial
+    </ion-item>
+    <ion-item [button]="true" [disabled]="!vm.isInterstitialPrepared()" (click)="vm.showInterstitial()">
+      Show Interstitial
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        Reward @if (vm.lastRewardEvent(); as event) {
+        <br />(Last Event: {{ event.name }} | {{ event.value | json }}) }
+      </ion-label>
+    </ion-list-header>
+    <ion-item [button]="true" [disabled]="vm.isRewardPrepared()" (click)="vm.prepareReward()">Prepare Reward</ion-item>
+    <ion-item [button]="true" [disabled]="!vm.isRewardPrepared()" (click)="vm.showReward()">Show Reward</ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        App Open @if (vm.lastAppOpenEvent(); as event) {
+        <br />(Last Event: {{ event.name }} | {{ event.value | json }}) }
+      </ion-label>
+    </ion-list-header>
+    <ion-item [button]="true" [disabled]="vm.isAppOpenLoaded()" (click)="vm.loadAppOpen()">Load App Open</ion-item>
+    <ion-item [button]="true" [disabled]="!vm.isAppOpenLoaded()" (click)="vm.showAppOpen()">Show App Open</ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="primary" class="ion-text-center">Footer Components</ion-toolbar>
+</ion-footer>

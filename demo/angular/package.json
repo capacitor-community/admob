@@ -10,7 +10,6 @@
     "test": "ng test",
     "test:ci": "ng test --watch=false",
     "lint": "ng lint",
-    "e2e": "ng e2e",
     "cap": "ng build --configuration production && npx cap copy"
   },
   "private": true,
@@ -39,7 +38,7 @@
     "@angular/language-service": "^21.0.6",
     "@capacitor/cli": "^8.0.0",
     "@ionic/angular-toolkit": "^12.3.0",
-    "@types/jasminewd2": "~2.0.3",
+    "@rdlabo/eslint-plugin-rules": "^21.2.7",
     "angular-eslint": "21.1.0",
     "eslint": "^9.37.0",
     "jsdom": "^25.0.1",
