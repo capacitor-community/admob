@@ -203,11 +203,21 @@ Before requesting an ad, complete these steps in order:
 3. If required, call `AdMob.showConsentForm()`.
 4. Load or show the ad format you need.
 
-### Choose an ad format
+### Choose by advertising goal
 
 Register event listeners before loading or showing an ad so that the first lifecycle and impression events are not missed.
 
-#### Show App Open Ad
+| Goal | Ad format |
+| --- | --- |
+| Monetize an app-open experience | App Open |
+| Keep an ad visible alongside app content | Banner |
+| Show a full-screen ad at a natural break without granting a reward | Interstitial |
+| Offer a dedicated rewarded experience | Rewarded |
+| Offer a reward at a natural transition | Rewarded Interstitial |
+
+#### Monetize an app-open experience
+
+Use an App Open ad when the app starts or returns to the foreground.
 
 ```ts
 import {
@@ -254,7 +264,9 @@ export async function showAppOpenAd(): Promise<void> {
 }
 ```
 
-#### Show Banner
+#### Keep an ad visible alongside app content
+
+Use a Banner ad when the ad should remain visible without replacing the current screen.
 
 ```ts
 import {
@@ -299,7 +311,9 @@ export async function banner(): Promise<void> {
 }
 ```
 
-#### Show Interstitial
+#### Show a full-screen ad without a reward
+
+Use an Interstitial ad at a natural break when the user should not receive an in-app reward.
 
 ```ts
 import {
@@ -344,7 +358,13 @@ export async function interstitial(): Promise<void> {
 }
 ```
 
-#### Show RewardVideo
+#### Grant a reward after an ad experience
+
+Treat rewarded ads as a reward flow, not as another non-rewarded interstitial placement. Grant the reward only from the rewarded result or event.
+
+##### Rewarded video
+
+Use a Rewarded ad for a dedicated reward flow.
 
 ```ts
 import {
@@ -352,7 +372,6 @@ import {
   RewardAdOptions,
   AdLoadInfo,
   RewardAdPluginEvents,
-  AdMobRewardItem,
   AdMobRevenueData,
 } from '@capacitor-community/admob';
 
@@ -360,14 +379,6 @@ export async function rewardVideo(): Promise<void> {
   AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
     // Subscribe prepared rewardVideo
   });
-
-  AdMob.addListener(
-    RewardAdPluginEvents.Rewarded,
-    (rewardItem: AdMobRewardItem) => {
-      // Subscribe user rewarded
-      console.log(rewardItem);
-    },
-  );
 
   AdMob.addListener(
     RewardAdPluginEvents.AdImpression,
@@ -389,6 +400,8 @@ export async function rewardVideo(): Promise<void> {
   };
   await AdMob.prepareRewardVideoAd(options);
   const rewardItem = await AdMob.showRewardVideoAd();
+  // Grant the reward once, using this result.
+  console.log(rewardItem);
 
   // You can also prepare multiple reward ads and show a specific one by passing its adId:
   await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
@@ -402,11 +415,14 @@ export async function rewardVideo(): Promise<void> {
 }
 ```
 
-#### Show Rewarded Interstitial
+##### Rewarded interstitial
+
+Use a Rewarded Interstitial ad when the rewarded experience belongs at a natural transition in the app.
 
 ```ts
 import {
   AdMob,
+  AdMobRewardInterstitialItem,
   AdMobRevenueData,
   RewardInterstitialAdOptions,
   RewardInterstitialAdPluginEvents,
@@ -425,11 +441,14 @@ export async function rewardInterstitial(): Promise<void> {
     adId: 'YOUR ADID',
   };
   const { adUnitId } = await AdMob.prepareRewardInterstitialAd(options);
-  await AdMob.showRewardInterstitialAd({ adId: adUnitId });
+  const rewardItem: AdMobRewardInterstitialItem =
+    await AdMob.showRewardInterstitialAd({ adId: adUnitId });
+  // Grant the reward once, using this result.
+  console.log(rewardItem);
 }
 ```
 
-## Server-side Verification Notice
+##### Server-side verification
 
 SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
 
