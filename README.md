@@ -6,6 +6,10 @@
 </p>
 
 <p align="center">
+  <strong><a href="https://docs.rdlabo.dev/projects/capacitor-admob">Read the full documentation</a></strong>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/maintenance/yes/2026?style=flat-square" />
   <a href="https://www.npmjs.com/package/@capacitor-community/admob"><img src="https://img.shields.io/npm/l/@capacitor-community/admob?style=flat-square" /></a>
 <br>
@@ -15,10 +19,10 @@
 
 ## Maintainers
 
-| Maintainer          | GitHub                                           | Social                                          | Sponsoring Company                             |
-| ------------------- | ------------------------------------------------ | ----------------------------------------------- | ---------------------------------------------- |
-| Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo)              | [@rdlabo](https://twitter.com/rdlabo)           | RELATION DESIGN LABO, GENERAL INC. ASSOCIATION |
-| Saninn Salas Diaz   | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) |                                                |
+| Maintainer          | GitHub                                           | Social                                          |
+| ------------------- | ------------------------------------------------ | ----------------------------------------------- |
+| Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo)              | [@rdlabo](https://twitter.com/rdlabo)           |
+| Saninn Salas Diaz   | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) |
 
 Maintenance Status: Actively Maintained
 
