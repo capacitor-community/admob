@@ -2,12 +2,12 @@ package com.getcapacitor.community.admob.appopen
 
 import android.app.Activity
 import android.content.Context
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.AdValue
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.appopen.AppOpenAd
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAd
+import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 
 class AppOpenAdManager(val adUnitId: String) {
 
@@ -18,7 +18,7 @@ class AppOpenAdManager(val adUnitId: String) {
     val isAdLoaded: Boolean
         get() = appOpenAd != null
 
-    fun loadAd(context: Context, onLoaded: () -> Unit, onFailed: (LoadAdError?) -> Unit, onPaidEvent: (AdValue, String, String) -> Unit) {
+    fun loadAd(context: Context, onLoaded: () -> Unit, onFailed: (LoadAdError?) -> Unit) {
         if (appOpenAd != null) {
             onLoaded()
             return
@@ -30,28 +30,20 @@ class AppOpenAdManager(val adUnitId: String) {
         }
 
         isLoadingAd = true
-        val request = AdRequest.Builder().build()
+        val request = AdRequest.Builder(adUnitId).build()
 
-        // play-services-ads 24.x: orientation overload removed; SDK picks orientation from the activity.
         AppOpenAd.load(
-            context,
-            adUnitId,
             request,
-            object : AppOpenAd.AppOpenAdLoadCallback() {
+            object : AdLoadCallback<AppOpenAd> {
                 override fun onAdLoaded(ad: AppOpenAd) {
                     appOpenAd = ad
                     isLoadingAd = false
-                    ad.setOnPaidEventListener { adValue ->
-                        val networkName = ad.responseInfo?.mediationAdapterClassName ?: ""
-                        val impressionId = ad.responseInfo?.responseId ?: ""
-                        onPaidEvent(adValue, networkName, impressionId)
-                    }
                     onLoaded()
                 }
 
-                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
                     isLoadingAd = false
-                    onFailed(loadAdError)
+                    onFailed(adError)
                 }
             }
         )
@@ -61,7 +53,7 @@ class AppOpenAdManager(val adUnitId: String) {
         activity: Activity,
         onOpened: () -> Unit,
         onClosed: () -> Unit,
-        onFailedToShow: (AdError?) -> Unit
+        onFailedToShow: (FullScreenContentError?) -> Unit
     ) {
         if (appOpenAd == null || isShowingAd) {
             onFailedToShow(null)
@@ -69,7 +61,7 @@ class AppOpenAdManager(val adUnitId: String) {
         }
 
         isShowingAd = true
-        appOpenAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+        appOpenAd?.adEventCallback = object : AppOpenAdEventCallback {
             override fun onAdShowedFullScreenContent() {
                 onOpened()
             }
@@ -80,10 +72,10 @@ class AppOpenAdManager(val adUnitId: String) {
                 onClosed()
             }
 
-            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+            override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                 appOpenAd = null
                 isShowingAd = false
-                onFailedToShow(adError)
+                onFailedToShow(fullScreenContentError)
             }
         }
 

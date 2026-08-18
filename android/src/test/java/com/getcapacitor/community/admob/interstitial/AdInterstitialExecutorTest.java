@@ -20,11 +20,10 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.google.android.gms.common.util.BiConsumer;
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd;
+import java.util.function.BiConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -96,7 +95,7 @@ class AdInterstitialExecutorTest {
         MockedStatic<InterstitialAd> interstitialAdMockedStatic;
 
         @Mock
-        InterstitialAdLoadCallback interstitialAdLoadCallbackMock;
+        AdLoadCallback<InterstitialAd> interstitialAdLoadCallbackMock;
 
         @Mock
         AdOptions.AdOptionsFactory adOptionsFactoryMock;
@@ -107,7 +106,7 @@ class AdInterstitialExecutorTest {
         @Mock
         AdOptions adOptionsMock;
 
-        AdRequest adRequestFromHelper = (new AdRequest.Builder()).build();
+        AdRequest adRequestFromHelper = (new AdRequest.Builder("test-ad-unit")).build();
 
         final String idFromViewHelper = "The Id From The View Helper";
 
@@ -115,8 +114,10 @@ class AdInterstitialExecutorTest {
         void beforeEach() {
             adOptionsMockedStatic.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
             when(adOptionsFactoryMock.createInterstitialOptions(pluginCallMock)).thenReturn(adOptionsMock);
-            requestHelperMockedStatic.when(() -> RequestHelper.createRequest(adOptionsMock)).thenReturn(adRequestFromHelper);
-            adViewIdHelperMockedStatic.when(() -> AdViewIdHelper.getFinalAdId(any(), any(), any(), any())).thenReturn(idFromViewHelper);
+            requestHelperMockedStatic
+                .when(() -> RequestHelper.createRequest(adOptionsMock, idFromViewHelper))
+                .thenReturn(adRequestFromHelper);
+            adViewIdHelperMockedStatic.when(() -> AdViewIdHelper.getFinalAdId(any(), any(), any())).thenReturn(idFromViewHelper);
         }
 
         @AfterEach
@@ -139,7 +140,6 @@ class AdInterstitialExecutorTest {
         @Test
         @DisplayName("loads the ad with the id and request of the helper")
         void usesIdHelper() {
-            final ArgumentCaptor<String> idArgumentCaptor = ArgumentCaptor.forClass(String.class);
             final ArgumentCaptor<AdRequest> adRequestCaptor = ArgumentCaptor.forClass(AdRequest.class);
 
             sut.prepareInterstitial(pluginCallMock, notifierMock);
@@ -147,32 +147,27 @@ class AdInterstitialExecutorTest {
             Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
             uiThreadRunnable.run();
 
-            interstitialAdMockedStatic.verify(() ->
-                InterstitialAd.load(any(), idArgumentCaptor.capture(), adRequestCaptor.capture(), any())
-            );
+            interstitialAdMockedStatic.verify(() -> InterstitialAd.load(adRequestCaptor.capture(), any()));
 
-            assertEquals(idFromViewHelper, idArgumentCaptor.getValue());
             assertEquals(adRequestFromHelper, adRequestCaptor.getValue());
         }
 
         @Test
         @DisplayName("loads the ad with the InterstitialAdLoadCallback returned by the getInterstitialAdLoadCallback singleton")
         void usesCallbackHelper() {
-            when(interstitialAdCallbackAndListenersMock.getInterstitialAdLoadCallback(pluginCallMock, notifierMock)).thenReturn(
-                interstitialAdLoadCallbackMock
-            );
-            final ArgumentCaptor<InterstitialAdLoadCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(
-                InterstitialAdLoadCallback.class
-            );
+            when(
+                interstitialAdCallbackAndListenersMock.getInterstitialAdLoadCallback(pluginCallMock, notifierMock, idFromViewHelper)
+            ).thenReturn(interstitialAdLoadCallbackMock);
+            final ArgumentCaptor<AdLoadCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(AdLoadCallback.class);
 
             sut.prepareInterstitial(pluginCallMock, notifierMock);
             verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
             Runnable uiThreadRunnable = runnableArgumentCaptor.getValue();
             uiThreadRunnable.run();
 
-            interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(), any(), any(), callbackArgumentCaptor.capture()));
+            interstitialAdMockedStatic.verify(() -> InterstitialAd.load(any(), callbackArgumentCaptor.capture()));
 
-            final InterstitialAdLoadCallback callback = callbackArgumentCaptor.getValue();
+            final AdLoadCallback<InterstitialAd> callback = callbackArgumentCaptor.getValue();
 
             assertEquals(interstitialAdLoadCallbackMock, callback);
         }
@@ -295,10 +290,8 @@ class AdInterstitialExecutorTest {
             sut.showInterstitial(pluginCallMock, notifierMock);
             verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
             runnableArgumentCaptor.getValue().run();
-
-            ArgumentCaptor<FullScreenContentCallback> callback = ArgumentCaptor.forClass(FullScreenContentCallback.class);
-            verify(adTwo).setFullScreenContentCallback(callback.capture());
-            callback.getValue().onAdDismissedFullScreenContent();
+            AdInterstitialExecutor.preparedAds.remove("ad-unit-2");
+            AdInterstitialExecutor.lastPreparedAdId = "ad-unit-1";
 
             reset(mockedActivity);
             sut.showInterstitial(pluginCallMock, notifierMock);

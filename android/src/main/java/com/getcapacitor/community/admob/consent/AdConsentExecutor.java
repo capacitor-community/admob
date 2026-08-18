@@ -8,11 +8,11 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.models.Executor;
-import com.google.android.gms.common.util.BiConsumer;
 import com.google.android.ump.ConsentDebugSettings;
 import com.google.android.ump.ConsentInformation;
 import com.google.android.ump.ConsentRequestParameters;
 import com.google.android.ump.UserMessagingPlatform;
+import java.util.function.BiConsumer;
 
 public class AdConsentExecutor extends Executor {
 

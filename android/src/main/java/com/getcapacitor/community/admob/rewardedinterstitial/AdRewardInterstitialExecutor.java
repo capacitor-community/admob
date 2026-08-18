@@ -7,16 +7,15 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
-import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
-import com.google.android.gms.common.util.BiConsumer;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAd;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class AdRewardInterstitialExecutor extends Executor {
 
@@ -40,16 +39,15 @@ public class AdRewardInterstitialExecutor extends Executor {
             .get()
             .runOnUiThread(() -> {
                 try {
-                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                    final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+                    final String id = AdViewIdHelper.getFinalAdId(adOptions, logTag, contextSupplier.get());
+                    final AdRequest adRequest = RequestHelper.createRequest(adOptions, id);
                     RewardedInterstitialAd.load(
-                        contextSupplier.get(),
-                        id,
                         adRequest,
                         RewardedInterstitialAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(
                             call,
                             notifyListenersFunction,
-                            adOptions
+                            adOptions,
+                            id
                         )
                     );
                 } catch (Exception ex) {
@@ -76,14 +74,17 @@ public class AdRewardInterstitialExecutor extends Executor {
             activitySupplier
                 .get()
                 .runOnUiThread(() -> {
-                    ad.setFullScreenContentCallback(
-                        new FullscreenPluginCallback(RewardInterstitialAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
-                            preparedAds.remove(adId);
-                            if (adId != null && adId.equals(lastPreparedAdId)) {
-                                lastPreparedAdId = null;
-                                for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
+                    ad.setAdEventCallback(
+                        RewardedInterstitialAdCallbackAndListeners.INSTANCE.getRewardedInterstitialAdEventCallback(
+                            notifyListenersFunction,
+                            () -> {
+                                preparedAds.remove(adId);
+                                if (adId != null && adId.equals(lastPreparedAdId)) {
+                                    lastPreparedAdId = null;
+                                    for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
+                                }
                             }
-                        })
+                        )
                     );
                     ad.show(
                         activitySupplier.get(),

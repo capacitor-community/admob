@@ -4,8 +4,7 @@ import static org.mockito.Mockito.verify;
 
 import android.os.Bundle;
 import com.getcapacitor.community.admob.models.AdOptions;
-import com.google.ads.mediation.admob.AdMobAdapter;
-import com.google.android.gms.ads.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,12 +23,12 @@ class RequestHelperTest {
                 AdOptions adOptions = new AdOptions.TesterAdOptionsBuilder().setNpa(true).build();
 
                 // Act
-                RequestHelper.createRequest(adOptions);
+                RequestHelper.createRequest(adOptions, "test-ad-unit");
 
                 Bundle mockedBundle = bundleMockedConstruction.constructed().get(0);
                 AdRequest.Builder adRequestBuilder = adRequestBuilderMockedConstruction.constructed().get(0);
-                verify(mockedBundle).putString("npa", "1");
-                verify(adRequestBuilder).addNetworkExtrasBundle(AdMobAdapter.class, mockedBundle);
+                verify(mockedBundle).putInt("npa", 1);
+                verify(adRequestBuilder).setGoogleExtrasBundle(mockedBundle);
             }
         }
     }
