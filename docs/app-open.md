@@ -42,7 +42,7 @@ if (isLoaded) {
 }
 ```
 
-[`AppOpenAdOptions`](../README.md#appopenadoptions)
+Request fields are defined on [`AppOpenAdOptions`](../README.md#appopenadoptions).
 
 There is no `isTesting` flag; during development set `adId` to Google's [App Open demo ad unit](https://developers.google.com/admob/android/test-ads#demo_ad_units).
 

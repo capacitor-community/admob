@@ -113,7 +113,7 @@ See [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and 
 
 ## Documentation
 
-Start with [Installation](./docs/installation.md), then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). Method signatures are in the API section below.
+Start with [Installation](./docs/installation.md), then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
 
 - [Installation](./docs/installation.md) — install commands, SDK versions, and Android/iOS native setup.
 - [Configuration](./docs/configuration.md) — `AdMob.initialize` and SDK options.
