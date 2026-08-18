@@ -45,7 +45,42 @@ public class BannerExecutor extends Executor {
     }
 
     public void initialize() {
-        mViewGroup = (ViewGroup) ((ViewGroup) activitySupplier.get().findViewById(android.R.id.content)).getChildAt(0);
+        resolveViewGroup();
+    }
+
+    /**
+     * Resolve the banner's parent view lazily, and never cache a failed lookup.
+     *
+     * android.R.id.content can still have no child when initialize() runs - for example when the app is
+     * relaunched quickly after being closed. Resolving once and caching the result meant a null was cached for
+     * the lifetime of the process, so every later showBanner() threw NullPointerException on it. Resolving on
+     * each use lets a later call succeed once the view hierarchy has settled.
+     *
+     * Callers must treat null as "no banner right now" rather than dereferencing it.
+     */
+    private ViewGroup resolveViewGroup() {
+        if (mViewGroup != null) {
+            return mViewGroup;
+        }
+        Activity activity = activitySupplier.get();
+        if (activity == null) {
+            Log.w(logTag, "Banner parent unresolved: no activity");
+            return null;
+        }
+        View content = activity.findViewById(android.R.id.content);
+        if (!(content instanceof ViewGroup)) {
+            Log.w(logTag, "Banner parent unresolved: android.R.id.content is not a ViewGroup");
+            return null;
+        }
+        // Must be content's first child: showBanner builds CoordinatorLayout.LayoutParams, which
+        // android.R.id.content (a FrameLayout) rejects with a ClassCastException while measuring.
+        View child = ((ViewGroup) content).getChildAt(0);
+        if (child instanceof ViewGroup) {
+            mViewGroup = (ViewGroup) child;
+        } else {
+            Log.w(logTag, "Banner parent unresolved: android.R.id.content has no ViewGroup child");
+        }
+        return mViewGroup;
     }
 
     public void showBanner(final PluginCall call) {
@@ -211,7 +246,10 @@ public class BannerExecutor extends Executor {
                     .get()
                     .runOnUiThread(() -> {
                         if (mAdView != null) {
-                            mViewGroup.removeView(mAdViewLayout);
+                            final ViewGroup bannerParent = resolveViewGroup();
+                            if (bannerParent != null) {
+                                bannerParent.removeView(mAdViewLayout);
+                            }
                             mAdViewLayout.removeView(mAdView);
                             mAdView.destroy();
                             mAdView = null;
@@ -296,7 +334,10 @@ public class BannerExecutor extends Executor {
                                 return;
                             }
 
-                            mViewGroup.removeView(mAdViewLayout);
+                            final ViewGroup bannerParent = resolveViewGroup();
+                            if (bannerParent != null) {
+                                bannerParent.removeView(mAdViewLayout);
+                            }
                             mAdViewLayout.removeView(adView);
                             adView.destroy();
                             mAdView = null;
@@ -347,7 +388,12 @@ public class BannerExecutor extends Executor {
                 });
 
                 // Add AdViewLayout top of the WebView
-                mViewGroup.addView(mAdViewLayout);
+                final ViewGroup bannerParent = resolveViewGroup();
+                if (bannerParent != null) {
+                    bannerParent.addView(mAdViewLayout);
+                } else {
+                    Log.w(logTag, "Banner not attached: parent unresolved");
+                }
             });
     }
 }
