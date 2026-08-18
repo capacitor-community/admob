@@ -20,13 +20,9 @@ npx cap sync
 
 Then add the Android and iOS application ID entries below. For `AdMob.initialize()` options, see [Configuration](./configuration.md).
 
-## Google Mobile Ads SDK compatibility
+## Google Mobile Ads SDK versions
 
-To preserve behavior for users of the current major version, this plugin continues to use Google Mobile Ads SDK APIs that are deprecated but still supported. Replacing those APIs can change banner sizing and age-restricted treatment behavior, so that migration is deferred until the next major release.
-
-Migration to the [GMA Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) is also deferred until the next major release because it requires breaking changes to SDK initialization, ad requests, and mediation integration.
-
-Android continues to use GMA SDK (Legacy) 25.4.x. On iOS, both Swift Package Manager and CocoaPods are fixed to GMA SDK 13.6.0 until CocoaPods support is removed in the next major release.
+This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](./migration.md) for the policy behind the pins.
 
 ## Android configuration
 
@@ -48,7 +44,7 @@ Replace `[APP_ID]` with your AdMob **application** ID, not an ad unit ID.
 
 ### Variables
 
-This plugin uses the following project variables (defined in your app's `variables.gradle` file):
+You can leave these unset. Override them in your app's `variables.gradle` only when you need a specific artifact version:
 
 | Variable                       | Artifact                                         | Default  |
 | ------------------------------ | ------------------------------------------------ | -------- |
@@ -77,6 +73,8 @@ Add the following inside the outermost `<dict>` in `ios/App/App/Info.plist`:
 ```
 
 Replace `[APP_ID]` with your AdMob application ID, and describe your actual tracking use in `NSUserTrackingUsageDescription`.
+
+The `SKAdNetworkItems` snippet includes Google's own identifier. Add the other IDs from Google's [iOS setup guide](https://developers.google.com/admob/ios/quick-start#update_your_infoplist).
 
 ## Troubleshooting
 

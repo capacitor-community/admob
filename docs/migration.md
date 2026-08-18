@@ -4,17 +4,15 @@ title: Migration Guide
 
 # Migration Guide
 
-This page is kept in the plugin repository for GitHub readers. Historical notes are not published on the documentation site.
+If you installed `@capacitor-community/admob` v8, you do not need the version-by-version steps below. They record public API changes from older releases.
 
-## SDK compatibility
+## Google Mobile Ads SDK versions
 
-### Google Mobile Ads SDK compatibility
+This major version keeps Google Mobile Ads SDK APIs that are deprecated but still supported. Replacing them can change banner sizing and age-restricted treatment, so that work waits for the next major.
 
-To preserve behavior for users of the current major version, this plugin continues to use Google Mobile Ads SDK APIs that are deprecated but still supported. Replacing those APIs can change banner sizing and age-restricted treatment behavior, so that migration is deferred until the next major release.
+Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) also waits for the next major: it changes SDK initialization, ad requests, and mediation.
 
-Migration to the [GMA Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) is also deferred until the next major release because it requires breaking changes to SDK initialization, ad requests, and mediation integration.
-
-Android continues to use GMA SDK (Legacy) 25.4.x. On iOS, both Swift Package Manager and CocoaPods are fixed to GMA SDK 13.6.0 until CocoaPods support is removed in the next major release.
+Pinned versions: Android 25.4.x, iOS 13.6.0 (Swift Package Manager and CocoaPods). CocoaPods support is planned to be removed in the next major.
 
 ## Breaking changes from earlier versions
 

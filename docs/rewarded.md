@@ -94,12 +94,15 @@ console.log(rewardItem);
 
 ## Server-side verification
 
-SSV callbacks fire only for production ads. Test ads do not invoke your SSV endpoint.
+Server-side verification (SSV) callbacks fire only for production ads. Test ads do not invoke your SSV endpoint.
 
-For local validation of the `ssv` payload, you can send a mock request after `RewardAdPluginEvents.Rewarded`:
+For local validation of the `ssv` payload, you can send a mock request after `RewardAdPluginEvents.Rewarded`. Replace `ENVIRONMENT_IS_DEVELOPMENT` with your own development flag:
 
 ```ts
-AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
+const userId = 'USER_ID';
+const customData = JSON.stringify({ placement: 'bonus' });
+
+await AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
   if (!ENVIRONMENT_IS_DEVELOPMENT) {
     return;
   }
