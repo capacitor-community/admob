@@ -46,32 +46,28 @@ const options: BannerAdOptions = {
 await AdMob.showBanner(options);
 ```
 
-Use `SizeChanged` to reserve layout space so the banner does not cover app content. A hidden, removed, or failed banner can report both dimensions as `0`.
+## Keep content out from under the banner
 
-## Ionic: keep content above the banner
+The banner is drawn on the native screen above the WebView. HTML layout does not move on its own. Inset your own root by `size.height` (logical pixels). Use padding or margin on the bottom for `BOTTOM_CENTER`, and on the top for `TOP_CENTER`.
 
-The banner is a native overlay above the WebView. Ionic does not shrink `ion-content` for you. The [Angular demo](../demo/angular) listens to `SizeChanged` and sets margin on `ion-router-outlet` ([`BannerViewportService`](../demo/angular/src/app/shared/banner-viewport.service.ts)):
+```html
+<main id="content">Your app</main>
+```
 
 ```ts
 import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
 
-const outlet = document.querySelector<HTMLElement>('ion-router-outlet');
+const content = document.getElementById('content');
 
 await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size) => {
-  if (!outlet) {
+  if (!content) {
     return;
   }
-  outlet.style.marginTop = '';
-  outlet.style.marginBottom = '';
-  if (size.height === 0) {
-    return;
-  }
-  const safeAreaBottom = window.getComputedStyle(document.body).getPropertyValue('--ion-safe-area-bottom');
-  outlet.style.marginBottom = `calc(${safeAreaBottom} + ${size.height}px)`;
+  content.style.paddingBottom = size.height > 0 ? `${size.height}px` : '';
 });
 ```
 
-That snippet matches the demo's bottom banner. For `TOP_CENTER`, the demo sets `marginTop` to `${size.height}px` instead. `hideBanner` / `removeBanner` clear the margin; `resumeBanner` restores it.
+When the height is `0` (hidden, removed, or failed), clear the inset. Apply the same idea to whatever element fills the WebView in your framework.
 
 Request fields are defined on [`BannerAdOptions`](../README.md#banneradoptions). See [Testing](./testing.md) for `isTesting`.
 
