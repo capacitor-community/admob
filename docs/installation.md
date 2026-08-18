@@ -4,6 +4,8 @@ title: Installation
 
 # Installation
 
+Add the Google Mobile Ads SDK and your AdMob app ID as described in Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start). This page covers the Capacitor plugin install and native config.
+
 This plugin targets `@capacitor-community/admob` **v8** and Capacitor 8. It supports iOS 15 or later and Android API 24 or later.
 
 ```bash

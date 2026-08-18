@@ -4,7 +4,9 @@ title: Banner Ads
 
 # Banner Ads
 
-Banner ads sit on the native screen (above your web view). Register listeners before calling `showBanner` so the first load and size events are not missed.
+Banner ads are rectangular ads that occupy a portion of an app's layout. They can stay on screen while the user interacts with the app, typically anchored at the top or bottom. Google's banner guides for [Android](https://developers.google.com/admob/android/banner) and [iOS](https://developers.google.com/admob/ios/banner) explain the format.
+
+This plugin draws the banner on the native screen (above the web view). Register listeners before calling `showBanner` so the first load and size events are not missed.
 
 ```ts
 import {

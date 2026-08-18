@@ -4,6 +4,8 @@ title: Configuration
 
 # Configuration
 
+Initialize the Google Mobile Ads SDK before requesting ads. Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start) explain SDK setup.
+
 Call `initialize` once before requesting consent information or loading ads. Native application IDs belong in AndroidManifest / Info.plist; see [Installation](./installation.md).
 
 ```ts
