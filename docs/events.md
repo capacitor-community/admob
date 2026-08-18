@@ -35,25 +35,11 @@ await handle.remove();
 
 ## Errors
 
-`FailedToLoad` and `FailedToShow` listeners receive an `AdMobError`:
-
-| Prop      | Type     | Description                     |
-| --------- | -------- | ------------------------------- |
-| `code`    | `number` | The error code from the SDK.    |
-| `message` | `string` | A message describing the error. |
+`FailedToLoad` and `FailedToShow` listeners receive an [`AdMobError`](../README.md#admoberror).
 
 ## Impression-level revenue
 
-Full-screen formats emit `AdMobRevenueData` on their `AdImpression` event. Banners emit the same payload on `AdPaid`. Banner `AdImpression` has no payload; it only signals that an impression was recorded.
-
-| Prop           | Type              | Description                                                                              |
-| -------------- | ----------------- | ---------------------------------------------------------------------------------------- |
-| `adUnitId`     | `string`          | Ad unit associated with the paid event.                                                  |
-| `valueMicros`  | `number`          | Value in micros; `1_000_000` micros equals one unit of `currencyCode`.                   |
-| `currencyCode` | `string`          | ISO 4217 currency code for `valueMicros`.                                                |
-| `precision`    | `AdValuePrecision` | How precise the reported value is (`Unknown`, `Estimated`, `PublisherProvided`, `Precise`). |
-| `networkName`  | `string`          | Mediation adapter class name, or an empty string when unavailable.                       |
-| `impressionId` | `string`          | Response identifier for the impression, or an empty string when unavailable.             |
+Full-screen formats emit [`AdMobRevenueData`](../README.md#admobrevenuedata) on their `AdImpression` event. Banners emit the same payload on `AdPaid`. Banner `AdImpression` has no payload; it only signals that an impression was recorded.
 
 ## Per-format guides
 

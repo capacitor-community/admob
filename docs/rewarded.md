@@ -82,15 +82,7 @@ const rewardItem: AdMobRewardInterstitialItem = await AdMob.showRewardInterstiti
 console.log(rewardItem);
 ```
 
-## Options
-
-| Option          | Description                                                                                          |
-| --------------- | ---------------------------------------------------------------------------------------------------- |
-| `adId`          | Rewarded ad unit ID.                                                                                 |
-| `isTesting`     | Request a Google test ad. See [Testing](./testing.md).                                               |
-| `npa`           | Request a non-personalized ad.                                                                       |
-| `immersiveMode` | Android only. Present the full-screen ad in immersive mode.                                          |
-| `ssv`           | Server-side verification. Provide at least one of `userId` or `customData`.                          |
+Request fields are defined on [`RewardAdOptions`](../README.md#rewardadoptions) and [`RewardInterstitialAdOptions`](../README.md#rewardinterstitialadoptions). See [Testing](./testing.md) for `isTesting`.
 
 ## Server-side verification
 

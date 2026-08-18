@@ -46,16 +46,7 @@ await AdMob.showBanner(options);
 
 Use `SizeChanged` to reserve layout space so the banner does not cover app content. A hidden, removed, or failed banner can report both dimensions as `0`.
 
-## Options
-
-| Option      | Description                                                                                          |
-| ----------- | ---------------------------------------------------------------------------------------------------- |
-| `adId`      | Banner ad unit ID.                                                                                   |
-| `adSize`    | Banner size. Prefer `ADAPTIVE_BANNER` for new integrations. Defaults to `ADAPTIVE_BANNER`.           |
-| `position`  | `TOP_CENTER`, `CENTER`, or `BOTTOM_CENTER`. Defaults to `TOP_CENTER`.                                |
-| `margin`    | Margin in logical units (dp / points). Bottom margin for `BOTTOM_CENTER`, top margin for `TOP_CENTER`. |
-| `isTesting` | Request a Google test ad. See [Testing](./testing.md).                                               |
-| `npa`       | Request a non-personalized ad.                                                                       |
+Request fields are defined on [`BannerAdOptions`](../README.md#banneradoptions). See [Testing](./testing.md) for `isTesting`.
 
 ## Lifecycle
 
