@@ -1,39 +1,52 @@
 ---
-title: Testing and Debugging
+title: Testing
 ---
 
-# Testing and Debugging
+# Testing
+
+Use Google demo ad units or registered test devices so development traffic is not flagged as invalid.
+
+## Demo ad units
+
+Google provides [demo ad units](https://developers.google.com/admob/android/test-ads#demo_ad_units) that always return test ads. Prefer these during development.
+
+You can also set `isTesting: true` on an ad request (`BannerAdOptions`, `AdOptions`, `RewardAdOptions`). App Open ads have no `isTesting` option; pass a demo ad unit as `adId`.
 
 ## Test devices
 
-Send an array of device Ids in `testingDevices` to use production like ads on your specified devices -> https://developers.google.com/admob/android/test-ads#enable_test_devices
+To request production-like ads on a physical device without generating invalid traffic, register the device with `AdMob.initialize()`:
 
-Register test devices in `AdMobInitializationOptions`:
+```ts
+await AdMob.initialize({
+  testingDevices: ['YOUR_TEST_DEVICE_ID'],
+  initializeForTesting: true,
+});
+```
 
-- `testingDevices` — an array of device IDs.
-- `initializeForTesting` — set to `true` to register the listed devices.
+Find the device ID in the native logs after the first ad request:
 
-Google provides [demo ad units](https://developers.google.com/admob/android/test-ads#demo_ad_units) that always return test ads.
+- Android: Logcat, typically on the `Ads` tag (`Use RequestConfiguration.Builder.setTestDeviceIds(...)`).
+- iOS: Xcode console (`To get test ads on this device, set:`).
 
-## UMP testing
+See Google's [enable test devices](https://developers.google.com/admob/android/test-ads#enable_test_devices) guide.
 
-If you testing on real device, you have to set `debugGeography` and add your device ID to `testDeviceIdentifiers`. You can find your device ID with logcat (Android) or XCode (iOS).
+## UMP debug geography
+
+On a real device, set `debugGeography` and include the device ID in `testDeviceIdentifiers`. Use this only on registered test devices.
 
 ```ts
 import { AdMob, AdmobConsentDebugGeography } from '@capacitor-community/admob';
 
 const consentInfo = await AdMob.requestConsentInfo({
   debugGeography: AdmobConsentDebugGeography.EEA,
-  testDeviceIdentifiers: ['YOUR_DEVICE_ID'],
+  testDeviceIdentifiers: ['YOUR_TEST_DEVICE_ID'],
 });
 ```
 
-## Consent testing
+If you decline consent in the test form (Manage → Confirm Choices), ads may not load. That is expected in a test environment and does not predict production behavior after a user consents.
 
-**Note**: When testing, if you choose not consent (Manage -> Confirm Choices). The ads may not load/show. Even on testing enviroment. This is normal. It will work on Production so don't worry.
+`resetConsentInfo()` is for tests only. See [Consent](./consent.md).
 
 ## Server-side verification
 
-SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
-
-For a mock SSV endpoint example, see [Rewarded Ads](./rewarded.md).
+SSV callbacks fire only for production ads. Test ads will not hit your SSV endpoint. For a mock request example, see [Rewarded Ads](./rewarded.md).

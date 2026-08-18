@@ -51,14 +51,14 @@ Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile
 
 ## Installation
 
-If you use Capacitor 7:
+This plugin targets Capacitor 8 (`@capacitor-community/admob` v8):
 
-```
-% npm install --save @capacitor-community/admob@7
-% npx cap update
+```bash
+npm install @capacitor-community/admob
+npx cap sync
 ```
 
-For platform configuration (AndroidManifest.xml, Info.plist, and SDK versions) see [Installation guide](./docs/installation.md).
+If you still use Capacitor 7, install `@capacitor-community/admob@7`. For AndroidManifest / Info.plist entries, SDK pinning, and Gradle variables, see the [Installation guide](./docs/installation.md).
 
 ## Features
 
@@ -70,6 +70,16 @@ For platform configuration (AndroidManifest.xml, Info.plist, and SDK versions) s
 - Google User Messaging Platform (UMP) consent support
 - App Tracking Transparency helpers on iOS
 
+### Choose by advertising goal
+
+| Goal                                                              | Ad format                 | Guide                                      |
+| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
+| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](./docs/banner.md)             |
+| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](./docs/interstitial.md) |
+| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](./docs/rewarded.md)         |
+| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](./docs/rewarded.md)         |
+| Monetize an app-open experience                                   | App Open                  | [App Open Ads](./docs/app-open.md)         |
+
 ## Quick start
 
 Initialize the SDK, request consent, and show a banner:
@@ -78,25 +88,20 @@ Initialize the SDK, request consent, and show a banner:
 import { AdMob, AdmobConsentStatus, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 
 async function startAdMob() {
-  await AdMob.initialize({
-  });
+  await AdMob.initialize();
 
-  const [trackingInfo, consentInfo] = await Promise.all([
-    AdMob.trackingAuthorizationStatus(),
-    AdMob.requestConsentInfo(),
-  ]);
-
-  if (trackingInfo.status === 'notDetermined') {
+  const tracking = await AdMob.trackingAuthorizationStatus();
+  if (tracking.status === 'notDetermined') {
     await AdMob.requestTrackingAuthorization();
   }
 
-  const authorizationStatus = await AdMob.trackingAuthorizationStatus();
-  if (
-    authorizationStatus.status === 'authorized' &&
-    consentInfo.isConsentFormAvailable &&
-    consentInfo.status === AdmobConsentStatus.REQUIRED
-  ) {
-    await AdMob.showConsentForm();
+  let consentInfo = await AdMob.requestConsentInfo();
+  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+    consentInfo = await AdMob.showConsentForm();
+  }
+
+  if (!consentInfo.canRequestAds) {
+    return;
   }
 
   const options: BannerAdOptions = {
@@ -109,19 +114,23 @@ async function startAdMob() {
 }
 ```
 
-See the [initialization guide](./docs/initialization.md) and per-format guides for details.
+See [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and the per-format guides for details.
 
 ## Documentation
 
-- [Installation](./docs/installation.md) — install commands, SDK compatibility, and Android/iOS configuration.
-- [Initialization](./docs/initialization.md) — `AdMob.initialize`, consent, tracking authorization, and testing flags.
-- [Banner Ads](./docs/banner.md) — banner options, sizing, and events.
-- [Interstitial Ads](./docs/interstitial.md) — load, show, and events.
-- [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and server-side verification.
-- [App Open Ads](./docs/app-open.md) — app open ad usage.
-- [Ad Events](./docs/events.md) — common event handling and errors.
-- [Testing and Debugging](./docs/testing.md) — test devices, demo ad units, and debugging.
-- [Migration Guide](./docs/migration.md) — migrating from earlier major versions.
+Guides in [`docs/`](./docs/) are the source material for the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob). Method signatures stay in the API section below.
+
+- [Installation](./docs/installation.md) — install commands, SDK compatibility, and Android/iOS native setup.
+- [Configuration](./docs/configuration.md) — `AdMob.initialize` and SDK options.
+- [Consent](./docs/consent.md) — UMP consent and App Tracking Transparency.
+- [Banner Ads](./docs/banner.md) — banner options, lifecycle, and events.
+- Full-screen ads:
+  - [Interstitial Ads](./docs/interstitial.md) — load, show, and multiple prepared ads.
+  - [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and SSV.
+- [App Open Ads](./docs/app-open.md) — load and present on foreground transitions.
+- [Ad Events](./docs/events.md) — shared lifecycle events, errors, and revenue data.
+- [Testing](./docs/testing.md) — demo ad units, test devices, and UMP debug geography.
+- [Migration Guide](./docs/migration.md) — repository-only history of earlier breaking changes; not published on the documentation site.
 
 ## API
 

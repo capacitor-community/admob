@@ -4,112 +4,121 @@ title: Rewarded Ads
 
 # Rewarded Ads
 
-Treat rewarded ads as a reward flow, not as another non-rewarded interstitial placement. Grant the reward only from the rewarded result or event.
+Treat rewarded ads as a reward flow, not as another non-rewarded interstitial. Grant the reward only from the returned result or the `Rewarded` event, not from `Dismissed`.
 
 ## Rewarded video
 
-Use a Rewarded ad for a dedicated reward flow.
+Use a rewarded ad for a dedicated reward flow.
 
 ```ts
-import { AdMob, RewardAdOptions, AdLoadInfo, RewardAdPluginEvents, AdMobRevenueData } from '@capacitor-community/admob';
+import {
+  AdLoadInfo,
+  AdMob,
+  AdMobRevenueData,
+  AdMobRewardItem,
+  RewardAdOptions,
+  RewardAdPluginEvents,
+} from '@capacitor-community/admob';
 
-export async function rewardVideo(): Promise<void> {
-  AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
-    // Subscribe prepared rewardVideo
-  });
+await AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
+  console.log('Rewarded ad loaded', info.adUnitId);
+});
+await AdMob.addListener(RewardAdPluginEvents.FailedToLoad, console.error);
+await AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward: AdMobRewardItem) => {
+  console.log('Reward earned', reward.amount, reward.type);
+});
+await AdMob.addListener(RewardAdPluginEvents.AdImpression, (data: AdMobRevenueData) => {
+  console.log(data);
+});
 
-  AdMob.addListener(RewardAdPluginEvents.AdImpression, (data: AdMobRevenueData) => {
-    // Forward impression-level revenue to your analytics provider.
-    console.log(data);
-  });
+const options: RewardAdOptions = {
+  adId: 'YOUR_AD_UNIT_ID',
+  // isTesting: true,
+  // npa: true,
+  // immersiveMode: true,
+  // ssv: {
+  //   userId: 'USER_ID',
+  //   customData: JSON.stringify({ placement: 'bonus' }),
+  // },
+};
+await AdMob.prepareRewardVideoAd(options);
+const rewardItem = await AdMob.showRewardVideoAd();
+// Grant the reward once, using this result or the Rewarded event — not both.
+console.log(rewardItem);
+```
 
-  const options: RewardAdOptions = {
-    adId: 'YOUR ADID',
-    // isTesting: true
-    // npa: true
-    // immersiveMode: true
-    // ssv: {
-    //   userId: "A user ID to send to your SSV"
-    //   customData: JSON.stringify({ ...MyCustomData })
-    //}
-  };
-  await AdMob.prepareRewardVideoAd(options);
-  const rewardItem = await AdMob.showRewardVideoAd();
-  // Grant the reward once, using this result.
-  console.log(rewardItem);
+When no `adId` is passed to `showRewardVideoAd()`, the most recently prepared ad is shown.
 
-  // You can also prepare multiple reward ads and show a specific one by passing its adId:
-  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
-  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-2' });
+### Prepare more than one ad
 
-  // Show a specific prepared ad
-  const reward = await AdMob.showRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
+```ts
+await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
+await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-2' });
 
-  // Or omit adId to show the most recently prepared one (default behavior)
-  const reward2 = await AdMob.showRewardVideoAd();
-}
+const reward = await AdMob.showRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
 ```
 
 ## Rewarded interstitial
 
-Use a Rewarded Interstitial ad when the rewarded experience belongs at a natural transition in the app.
+Use a rewarded interstitial when the rewarded experience belongs at a natural transition in the app.
 
 ```ts
 import {
   AdMob,
   AdMobRewardInterstitialItem,
-  AdMobRevenueData,
   RewardInterstitialAdOptions,
   RewardInterstitialAdPluginEvents,
 } from '@capacitor-community/admob';
 
-export async function rewardInterstitial(): Promise<void> {
-  AdMob.addListener(RewardInterstitialAdPluginEvents.AdImpression, (data: AdMobRevenueData) => {
-    // Forward impression-level revenue to your analytics provider.
-    console.log(data);
-  });
+await AdMob.addListener(RewardInterstitialAdPluginEvents.FailedToLoad, console.error);
 
-  const options: RewardInterstitialAdOptions = {
-    adId: 'YOUR ADID',
-  };
-  const { adUnitId } = await AdMob.prepareRewardInterstitialAd(options);
-  const rewardItem: AdMobRewardInterstitialItem = await AdMob.showRewardInterstitialAd({ adId: adUnitId });
-  // Grant the reward once, using this result.
-  console.log(rewardItem);
-}
+const options: RewardInterstitialAdOptions = {
+  adId: 'YOUR_AD_UNIT_ID',
+};
+const { adUnitId } = await AdMob.prepareRewardInterstitialAd(options);
+const rewardItem: AdMobRewardInterstitialItem = await AdMob.showRewardInterstitialAd({
+  adId: adUnitId,
+});
+console.log(rewardItem);
 ```
+
+## Options
+
+| Option          | Description                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------- |
+| `adId`          | Rewarded ad unit ID.                                                                                 |
+| `isTesting`     | Request a Google test ad. See [Testing](./testing.md).                                               |
+| `npa`           | Request a non-personalized ad.                                                                       |
+| `immersiveMode` | Android only. Present the full-screen ad in immersive mode.                                          |
+| `ssv`           | Server-side verification. Provide at least one of `userId` or `customData`.                          |
 
 ## Server-side verification
 
-SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
+SSV callbacks fire only for production ads. Test ads do not invoke your SSV endpoint.
 
-For E2E tests or just for validating the data in your `RewardAdOptions` work as expected, you can add a custom GET
-request to your mock endpoint after the `RewardAdPluginEvents.Rewarded` similar to this:
+For local validation of the `ssv` payload, you can send a mock request after `RewardAdPluginEvents.Rewarded`:
 
 ```ts
 AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
-  // ...
-  if (ENVIRONMENT_IS_DEVELOPMENT) {
-    try {
-      const url =
-        `https://your-staging-ssv-endpoint` +
-        new URLSearchParams({
-          ad_network: 'TEST',
-          ad_unit: 'TEST',
-          custom_data: customData, // <-- passed CustomData
-          reward_amount: 'TEST',
-          reward_item: 'TEST',
-          timestamp: 'TEST',
-          transaction_id: 'TEST',
-          user_id: userId, // <-- Passed UserID
-          signature: 'TEST',
-          key_id: 'TEST',
-        });
-      await fetch(url);
-    } catch (err) {
-      console.error(err);
-    }
+  if (!ENVIRONMENT_IS_DEVELOPMENT) {
+    return;
   }
-  // ...
+  try {
+    const params = new URLSearchParams({
+      ad_network: 'TEST',
+      ad_unit: 'TEST',
+      custom_data: customData,
+      reward_amount: 'TEST',
+      reward_item: 'TEST',
+      timestamp: 'TEST',
+      transaction_id: 'TEST',
+      user_id: userId,
+      signature: 'TEST',
+      key_id: 'TEST',
+    });
+    await fetch(`https://your-staging-ssv-endpoint?${params.toString()}`);
+  } catch (err) {
+    console.error(err);
+  }
 });
 ```

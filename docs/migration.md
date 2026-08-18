@@ -4,6 +4,8 @@ title: Migration Guide
 
 # Migration Guide
 
+This page is kept in the plugin repository for GitHub readers. Historical notes are not published on the documentation site.
+
 ## SDK compatibility
 
 ### Google Mobile Ads SDK compatibility

@@ -4,12 +4,21 @@ title: Installation
 
 # Installation
 
-If you use Capacitor 7:
+This plugin targets `@capacitor-community/admob` **v8** and Capacitor 8. It supports iOS 15 or later and Android API 24 or later.
 
+```bash
+npm install @capacitor-community/admob
+npx cap sync
 ```
-% npm install --save @capacitor-community/admob@7
-% npx cap update
+
+If you still use Capacitor 7, install the previous major:
+
+```bash
+npm install @capacitor-community/admob@7
+npx cap sync
 ```
+
+Then add the Android and iOS application ID entries below. For `AdMob.initialize()` options, see [Configuration](./configuration.md).
 
 ## Google Mobile Ads SDK compatibility
 
@@ -21,32 +30,35 @@ Android continues to use GMA SDK (Legacy) 25.4.x. On iOS, both Swift Package Man
 
 ## Android configuration
 
-In file `android/app/src/main/AndroidManifest.xml`, add the following XML elements under `<manifest><application>` :
+In `android/app/src/main/AndroidManifest.xml`, add the following under `<application>`:
 
 ```xml
 <meta-data
- android:name="com.google.android.gms.ads.APPLICATION_ID"
- android:value="@string/admob_app_id"/>
+  android:name="com.google.android.gms.ads.APPLICATION_ID"
+  android:value="@string/admob_app_id" />
 ```
 
-In file `android/app/src/main/res/values/strings.xml` add the following lines :
+In `android/app/src/main/res/values/strings.xml`:
 
 ```xml
 <string name="admob_app_id">[APP_ID]</string>
 ```
 
-Don't forget to replace `[APP_ID]` by your AdMob application Id.
+Replace `[APP_ID]` with your AdMob **application** ID, not an ad unit ID.
 
 ### Variables
 
-This plugin will use the following project variables (defined in your app's `variables.gradle` file):
+This plugin uses the following project variables (defined in your app's `variables.gradle` file):
 
-- `playServicesAdsVersion` version of `com.google.android.gms:play-services-ads` (default: `25.4.+`)
-- `androidxCoreKTXVersion`: version of `androidx.core:core-ktx` (default: `1.15.0`)
+| Variable                       | Artifact                                         | Default  |
+| ------------------------------ | ------------------------------------------------ | -------- |
+| `playServicesAdsVersion`       | `com.google.android.gms:play-services-ads`       | `25.4.+` |
+| `userMessagingPlatformVersion` | `com.google.android.ump:user-messaging-platform` | `4.0.0`  |
+| `androidxCoreKTXVersion`       | `androidx.core:core-ktx`                         | `1.15.0` |
 
 ## iOS configuration
 
-Add the following in the `ios/App/App/info.plist` file inside of the outermost `<dict>`:
+Add the following inside the outermost `<dict>` in `ios/App/App/Info.plist`:
 
 ```xml
 <key>GADIsAdManagerApp</key>
@@ -61,16 +73,18 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
   </dict>
 </array>
 <key>NSUserTrackingUsageDescription</key>
-<string>[Why you use NSUserTracking. ex: This identifier will be used to deliver personalized ads to you.]</string>
+<string>This identifier will be used to deliver personalized ads to you.</string>
 ```
 
-Don't forget to replace `[APP_ID]` by your AdMob application Id.
+Replace `[APP_ID]` with your AdMob application ID, and describe your actual tracking use in `NSUserTrackingUsageDescription`.
 
 ## Troubleshooting
 
-### If you have error:
+If CocoaPods cannot resolve `Google-Mobile-Ads-SDK`:
 
-> [error] Error running update: Analyzing dependencies
-> [!] CocoaPods could not find compatible versions for pod "Google-Mobile-Ads-SDK":
+```text
+[error] Error running update: Analyzing dependencies
+[!] CocoaPods could not find compatible versions for pod "Google-Mobile-Ads-SDK":
+```
 
-You should run `pod repo update` ;
+Run `pod repo update` in `ios/`, then `npx cap sync ios` again.
