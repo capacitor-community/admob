@@ -2,7 +2,7 @@
 
 App open ads monetize app-load screens and are designed to show when the user brings the app to the foreground. The user can close them at any time. Google's app open guides for [Android](https://developers.google.com/admob/android/app-open) and [iOS](https://developers.google.com/admob/ios/app-open) explain the format.
 
-Load the ad ahead of time and confirm it is available before presentation. Do not block app startup indefinitely while waiting for an ad to load.
+Call this after [initialize](./configuration.md) and [consent](./consent.md). Load the ad ahead of time and confirm it is available before presentation. Do not block app startup indefinitely while waiting for an ad to load.
 
 ```ts
 import {
