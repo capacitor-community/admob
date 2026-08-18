@@ -1,7 +1,3 @@
----
-title: Installation
----
-
 # Installation
 
 This plugin already ships Google Mobile Ads SDK. Install the package, then add your AdMob **application** ID in AndroidManifest / Info.plist. Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start) explain app IDs and SKAdNetwork identifiers; do not add a second Mobile Ads dependency.

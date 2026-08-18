@@ -1,7 +1,3 @@
----
-title: Consent
----
-
 # Consent
 
 Google's User Messaging Platform (UMP) SDK is the privacy and messaging tool for gathering consent before you request ads. Google's UMP guides for [Android](https://developers.google.com/admob/android/privacy) and [iOS](https://developers.google.com/admob/ios/privacy) explain the flow.
