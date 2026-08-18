@@ -44,13 +44,6 @@ await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
 await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
 ```
 
-## Options
-
-| Option          | Description                                                                 |
-| --------------- | --------------------------------------------------------------------------- |
-| `adId`          | Interstitial ad unit ID.                                                    |
-| `isTesting`     | Request a Google test ad. See [Testing](./testing.md).                      |
-| `npa`           | Request a non-personalized ad.                                              |
-| `immersiveMode` | Android only. Present the full-screen ad in immersive mode.                 |
+Request fields are defined on [`AdOptions`](../README.md#adoptions). See [Testing](./testing.md) for `isTesting`.
 
 Load, show, dismissal, and failure events are listed on [Ad Events](./events.md).
