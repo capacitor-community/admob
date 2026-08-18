@@ -6,9 +6,7 @@
 </p>
 
 <p align="center">
-  <strong>
-    <a href="https://docs.rdlabo.dev/projects/capacitor-admob">Read the full documentation</a>
-  </strong>
+  <strong><a href="https://docs.rdlabo.dev/projects/capacitor-admob">Read the full documentation</a></strong>
 </p>
 
 <p align="center">
