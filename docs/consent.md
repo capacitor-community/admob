@@ -4,9 +4,9 @@ title: Consent
 
 # Consent
 
-Request privacy information before loading ads. The plugin exposes Google's User Messaging Platform (UMP) and iOS App Tracking Transparency through one API.
+Google's User Messaging Platform (UMP) SDK is the privacy and messaging tool for gathering consent before you request ads. Google's UMP guides for [Android](https://developers.google.com/admob/android/privacy) and [iOS](https://developers.google.com/admob/ios/privacy) explain the flow.
 
-Before using UMP, [create your GDPR messages](https://support.google.com/admob/answer/10113207) in AdMob. You may also [set up Identifier for Advertisers (IDFA) messages](https://support.google.com/admob/answer/10115027). When IDFA messages are published, UMP presents them and the App Tracking Transparency prompt; do not also call `requestTrackingAuthorization()`.
+This plugin exposes UMP and iOS App Tracking Transparency through one API. Before using UMP, [create your GDPR messages](https://support.google.com/admob/answer/10113207) in AdMob. You may also [set up Identifier for Advertisers (IDFA) messages](https://support.google.com/admob/answer/10115027). When IDFA messages are published, UMP presents them and the App Tracking Transparency prompt; do not also call `requestTrackingAuthorization()`.
 
 ## Recommended order
 

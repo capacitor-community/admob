@@ -4,7 +4,9 @@ title: Ad Events
 
 # Ad Events
 
-Register event listeners before loading or showing an ad so that the first lifecycle and impression events are not missed.
+Google Mobile Ads SDK reports load, show, dismiss, impression, and paid events on each format. See [banner ad events](https://developers.google.com/admob/android/banner#ad_events) as an example, and [impression-level ad revenue](https://developers.google.com/admob/android/impression-level-ad-revenue) for the paid payload ([iOS](https://developers.google.com/admob/ios/impression-level-ad-revenue)).
+
+Register listeners before loading or showing an ad so that the first lifecycle and impression events are not missed.
 
 ## Adding and removing listeners
 

@@ -4,6 +4,8 @@ title: Rewarded Ads
 
 # Rewarded Ads
 
+Rewarded ads let you give in-app items for interacting with video ads, playable ads, or surveys. Google's rewarded guides for [Android](https://developers.google.com/admob/android/rewarded) and [iOS](https://developers.google.com/admob/ios/rewarded) explain the format.
+
 Treat rewarded ads as a reward flow, not as another non-rewarded interstitial. Grant the reward only from the returned result or the `Rewarded` event, not from `Dismissed`.
 
 ## Rewarded video
@@ -60,6 +62,8 @@ const reward = await AdMob.showRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' }
 
 ## Rewarded interstitial
 
+Rewarded interstitial ads are incentivized full-screen ads that appear during natural app transitions. Unlike rewarded video, the user does not opt in first. Google's rewarded interstitial guides for [Android](https://developers.google.com/admob/android/rewarded-interstitial) and [iOS](https://developers.google.com/admob/ios/rewarded-interstitial) explain the format.
+
 Use a rewarded interstitial when the rewarded experience belongs at a natural transition in the app.
 
 ```ts
@@ -86,7 +90,7 @@ Request fields are defined on [`RewardAdOptions`](../README.md#rewardadoptions) 
 
 ## Server-side verification
 
-Server-side verification (SSV) callbacks fire only for production ads. Test ads do not invoke your SSV endpoint.
+Server-side verification (SSV) lets your backend confirm that a reward was earned. See Google's [SSV documentation](https://support.google.com/admob/answer/9603226). Callbacks fire only for production ads; test ads do not invoke your SSV endpoint.
 
 For local validation of the `ssv` payload, you can send a mock request after `RewardAdPluginEvents.Rewarded`. Replace `ENVIRONMENT_IS_DEVELOPMENT` with your own development flag:
 
