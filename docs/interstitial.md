@@ -4,40 +4,53 @@ title: Interstitial Ads
 
 # Interstitial Ads
 
-## Loading and showing an interstitial
-
-Use an Interstitial ad at a natural break when the user should not receive an in-app reward.
+Use an interstitial at a natural break when the user should not receive an in-app reward. Prepare the ad ahead of time, register listeners first, and show it only when it is ready.
 
 ```ts
-import { AdMob, AdOptions, AdLoadInfo, AdMobRevenueData, InterstitialAdPluginEvents } from '@capacitor-community/admob';
+import {
+  AdLoadInfo,
+  AdMob,
+  AdMobRevenueData,
+  AdOptions,
+  InterstitialAdPluginEvents,
+} from '@capacitor-community/admob';
 
-export async function interstitial(): Promise<void> {
-  AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
-    // Subscribe prepared interstitial
-  });
+await AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
+  console.log('Interstitial loaded', info.adUnitId);
+});
+await AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, console.error);
+await AdMob.addListener(InterstitialAdPluginEvents.AdImpression, (data: AdMobRevenueData) => {
+  console.log(data);
+});
 
-  AdMob.addListener(InterstitialAdPluginEvents.AdImpression, (data: AdMobRevenueData) => {
-    // Forward impression-level revenue to your analytics provider.
-    console.log(data);
-  });
-
-  const options: AdOptions = {
-    adId: 'YOUR ADID',
-    // isTesting: true
-    // npa: true
-    // immersiveMode: true
-  };
-  await AdMob.prepareInterstitial(options);
-  await AdMob.showInterstitial();
-
-  // You can also prepare multiple interstitials and show a specific one by passing its adId:
-  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
-  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
-
-  // Show a specific prepared ad
-  await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
-
-  // Or omit adId to show the most recently prepared one (default behavior)
-  await AdMob.showInterstitial();
-}
+const options: AdOptions = {
+  adId: 'YOUR_AD_UNIT_ID',
+  // isTesting: true,
+  // npa: true,
+  // immersiveMode: true,
+};
+const { adUnitId } = await AdMob.prepareInterstitial(options);
+await AdMob.showInterstitial({ adId: adUnitId });
 ```
+
+When no `adId` is passed to `showInterstitial()`, the most recently prepared ad is shown.
+
+## Prepare more than one ad
+
+```ts
+await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
+await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
+
+await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
+```
+
+## Options
+
+| Option          | Description                                                                 |
+| --------------- | --------------------------------------------------------------------------- |
+| `adId`          | Interstitial ad unit ID.                                                    |
+| `isTesting`     | Request a Google test ad. See [Testing](./testing.md).                      |
+| `npa`           | Request a non-personalized ad.                                              |
+| `immersiveMode` | Android only. Present the full-screen ad in immersive mode.                 |
+
+Load, show, dismissal, and failure events are listed on [Ad Events](./events.md).
