@@ -48,6 +48,39 @@ await AdMob.showBanner(options);
 
 Use `SizeChanged` to reserve layout space so the banner does not cover app content. A hidden, removed, or failed banner can report both dimensions as `0`.
 
+## Ionic: keep content above the banner
+
+The banner is a native overlay above the WebView. Ionic does not shrink `ion-content` for you.
+
+For `BOTTOM_CENTER`, set `ion-router-outlet` `bottom` to `size.height`. Apply the same offset to `ion-modal` so sheets are not covered. When the height is `0`, clear the offset.
+
+```ts
+import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
+
+const outlet = document.querySelector<HTMLElement>('ion-router-outlet');
+
+await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size) => {
+  const offset = size.height > 0 ? `${size.height}px` : '0px';
+  if (outlet) {
+    outlet.style.bottom = offset;
+  }
+  document.querySelectorAll<HTMLElement>('ion-modal').forEach((modal) => {
+    modal.style.bottom = offset;
+  });
+  document.documentElement.style.setProperty('--admob-banner-height', offset);
+});
+```
+
+If `ion-tab-bar` is a sibling of the outlet (typical `ion-tabs` layout), raise it with the same variable so the banner does not cover the tabs:
+
+```css
+ion-tab-bar {
+  margin-bottom: var(--admob-banner-height, 0px);
+}
+```
+
+For `TOP_CENTER`, set `top` instead of `bottom`. When the keyboard opens, call `hideBanner()` and restore with `resumeBanner()` on close so the keyboard and banner do not stack.
+
 Request fields are defined on [`BannerAdOptions`](../README.md#banneradoptions). See [Testing](./testing.md) for `isTesting`.
 
 ## Lifecycle
