@@ -45,51 +45,109 @@ Made with [contributors-img](https://contrib.rocks).
 | **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) | ![](demo/screenshots/ios_open.png)  |
 | **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  | ![](demo/screenshots/md_open.png)   |
 
+## Overview
+
+Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile Ads SDK for iOS and Android so you can display banner, interstitial, rewarded, rewarded interstitial, and app open ads in Capacitor apps.
+
+## Features
+
+- Banner ads (including adaptive banners)
+- Interstitial ads
+- Rewarded video ads
+- Rewarded interstitial ads
+- App open ads
+- Google User Messaging Platform (UMP) consent support
+- App Tracking Transparency (iOS tracking permission) helpers
+
+### Choose by advertising goal
+
+| Goal                                                              | Ad format                 | Guide                                      |
+| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
+| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](./docs/banner.md)             |
+| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](./docs/interstitial.md) |
+| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](./docs/rewarded.md)         |
+| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](./docs/rewarded.md)         |
+| Monetize an app-open experience                                   | App Open                  | [App Open Ads](./docs/app-open.md)         |
+
+## Quick start
+
+After [Installation](#installation), initialize the SDK, request consent, and show a banner:
+
+```ts
+import { AdMob, AdmobConsentStatus, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
+
+async function startAdMob() {
+  await AdMob.initialize();
+
+  let consentInfo = await AdMob.requestConsentInfo();
+  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+    consentInfo = await AdMob.showConsentForm();
+  }
+
+  if (!consentInfo.canRequestAds) {
+    return;
+  }
+
+  const options: BannerAdOptions = {
+    adId: 'YOUR_AD_UNIT_ID',
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
+    position: BannerAdPosition.BOTTOM_CENTER,
+    margin: 0,
+  };
+  await AdMob.showBanner(options);
+}
+```
+
+The banner sits on the native screen above the WebView, so it can cover your HTML. See [Banner Ads](./docs/banner.md) to inset your layout. Details: [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and the per-format guides.
+
 ## Installation
 
-If you use Capacitor 7:
+This plugin already ships Google Mobile Ads SDK. Install the package, then add your AdMob **application** ID in AndroidManifest / Info.plist. Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start) explain app IDs and SKAdNetwork identifiers (Apple's ad conversion IDs); do not add a second Mobile Ads dependency.
 
+This plugin targets `@capacitor-community/admob` **v8** and Capacitor 8. It supports iOS 15 or later and Android API 24 or later.
+
+```bash
+npm install @capacitor-community/admob
+npx cap sync
 ```
-% npm install --save @capacitor-community/admob@7
-% npx cap update
-```
 
-### Google Mobile Ads SDK compatibility
+If you still use Capacitor 7, install `@capacitor-community/admob@7`.
 
-To preserve behavior for users of the current major version, this plugin continues to use Google Mobile Ads SDK APIs that are deprecated but still supported. Replacing those APIs can change banner sizing and age-restricted treatment behavior, so that migration is deferred until the next major release.
+### Google Mobile Ads SDK versions
 
-Migration to the [GMA Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) is also deferred until the next major release because it requires breaking changes to SDK initialization, ad requests, and mediation integration.
-
-Android continues to use GMA SDK (Legacy) 25.4.x. On iOS, both Swift Package Manager and CocoaPods are fixed to GMA SDK 13.6.0 until CocoaPods support is removed in the next major release.
+This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](./docs/migration.md) for the policy behind the pins.
 
 ### Android configuration
 
-In file `android/app/src/main/AndroidManifest.xml`, add the following XML elements under `<manifest><application>` :
+In `android/app/src/main/AndroidManifest.xml`, add the following under `<application>`:
 
 ```xml
 <meta-data
- android:name="com.google.android.gms.ads.APPLICATION_ID"
- android:value="@string/admob_app_id"/>
+  android:name="com.google.android.gms.ads.APPLICATION_ID"
+  android:value="@string/admob_app_id" />
 ```
 
-In file `android/app/src/main/res/values/strings.xml` add the following lines :
+In `android/app/src/main/res/values/strings.xml`:
 
 ```xml
 <string name="admob_app_id">[APP_ID]</string>
 ```
 
-Don't forget to replace `[APP_ID]` by your AdMob application Id.
+Replace `[APP_ID]` with your AdMob **application** ID, not an ad unit ID.
 
 #### Variables
 
-This plugin will use the following project variables (defined in your app's `variables.gradle` file):
+You can leave these unset. Override them in your app's `variables.gradle` only when you need a specific artifact version:
 
-- `playServicesAdsVersion` version of `com.google.android.gms:play-services-ads` (default: `25.4.+`)
-- `androidxCoreKTXVersion`: version of `androidx.core:core-ktx` (default: `1.15.0`)
+| Variable                       | Artifact                                         | Default  |
+| ------------------------------ | ------------------------------------------------ | -------- |
+| `playServicesAdsVersion`       | `com.google.android.gms:play-services-ads`       | `25.4.+` |
+| `userMessagingPlatformVersion` | `com.google.android.ump:user-messaging-platform` | `4.0.0`  |
+| `androidxCoreKTXVersion`       | `androidx.core:core-ktx`                         | `1.15.0` |
 
 ### iOS configuration
 
-Add the following in the `ios/App/App/info.plist` file inside of the outermost `<dict>`:
+Add the following inside the outermost `<dict>` in `ios/App/App/Info.plist`:
 
 ```xml
 <key>GADIsAdManagerApp</key>
@@ -104,388 +162,38 @@ Add the following in the `ios/App/App/info.plist` file inside of the outermost `
   </dict>
 </array>
 <key>NSUserTrackingUsageDescription</key>
-<string>[Why you use NSUserTracking. ex: This identifier will be used to deliver personalized ads to you.]</string>
+<string>This identifier will be used to deliver personalized ads to you.</string>
 ```
 
-Don't forget to replace `[APP_ID]` by your AdMob application Id.
+Replace `[APP_ID]` with your AdMob application ID, and describe your actual tracking use in `NSUserTrackingUsageDescription`.
 
-## Tutorial
+The `SKAdNetworkItems` snippet includes Google's own identifier. Add the other IDs from Google's [iOS setup guide](https://developers.google.com/admob/ios/quick-start#update_your_infoplist).
 
-Complete the common initialization and consent setup once before loading ads. Then follow the tutorial for each ad format you use.
+### Troubleshooting
 
-### Common setup
+If CocoaPods cannot resolve `Google-Mobile-Ads-SDK`:
 
-#### Initialize AdMob
-
-```ts
-import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
-
-export async function initialize(): Promise<void> {
-  await AdMob.initialize();
-
-  const [trackingInfo, consentInfo] = await Promise.all([
-    AdMob.trackingAuthorizationStatus(),
-    AdMob.requestConsentInfo(),
-  ]);
-
-  if (trackingInfo.status === 'notDetermined') {
-    /**
-     * If you want to explain TrackingAuthorization before showing the iOS dialog,
-     * you can show the modal here.
-     * ex)
-     * const modal = await this.modalCtrl.create({
-     *   component: RequestTrackingPage,
-     * });
-     * await modal.present();
-     * await modal.onDidDismiss();  // Wait for close modal
-     **/
-
-    await AdMob.requestTrackingAuthorization();
-  }
-
-  const authorizationStatus = await AdMob.trackingAuthorizationStatus();
-  if (
-    authorizationStatus.status === 'authorized' &&
-    consentInfo.isConsentFormAvailable &&
-    consentInfo.status === AdmobConsentStatus.REQUIRED
-  ) {
-    await AdMob.showConsentForm();
-  }
-}
+```text
+[error] Error running update: Analyzing dependencies
+[!] CocoaPods could not find compatible versions for pod "Google-Mobile-Ads-SDK":
 ```
 
-Send an array of device Ids in `testingDevices` to use production like ads on your specified devices -> https://developers.google.com/admob/android/test-ads#enable_test_devices
+Run `pod repo update` in `ios/`, then `npx cap sync ios` again.
 
-#### User Message Platform (UMP)
+## Documentation
 
-To use UMP, you must [create your GDPR messages](https://support.google.com/admob/answer/10113207?hl=en&ref_topic=10105230&sjid=6731900490614517032-AP).
+Start with [Installation](#installation) above, then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
 
-You may need to [setup IDFA messages](https://support.google.com/admob/answer/10115027?hl=en), it will work along with GDPR messages and will show when users are not in EEA and UK.
-
-Example of how to use UMP.
-
-```ts
-import { AdMob } from '@capacitor-community/admob';
-
-private canShowAds: boolean | null = null;
-
-async showConsent() {
-  let consentInfo = await AdMob.requestConsentInfo();
-  if (!consentInfo.canRequestAds) {
-    consentInfo = await AdMob.showConsentForm();
-    this.canShowAds = consentInfo.canRequestAds;
-  }
-}
-```
-
-To let users manage their privacy options at any time, show the privacy options form.
-```ts
-import { AdMob } from '@capacitor-community/admob';
-
-showPrivacyOptionsForm() {
-    AdMob.showPrivacyOptionsForm();
-}
-```
-
-If you testing on real device, you have to set `debugGeography` and add your device ID to `testDeviceIdentifiers`. You can find your device ID with logcat (Android) or XCode (iOS).
-
-```ts
-import { AdMob, AdmobConsentDebugGeography } from '@capacitor-community/admob';
-
-const consentInfo = await AdMob.requestConsentInfo({
-  debugGeography: AdmobConsentDebugGeography.EEA,
-  testDeviceIdentifiers: ['YOUR_DEVICE_ID'],
-});
-```
-
-**Note**: When testing, if you choose not consent (Manage -> Confirm Choices). The ads may not load/show. Even on testing enviroment. This is normal. It will work on Production so don't worry.
-
-Before requesting an ad, complete these steps in order:
-
-1. Call `AdMob.initialize()`.
-2. Call `AdMob.requestConsentInfo()`.
-3. If required, call `AdMob.showConsentForm()`.
-4. Load or show the ad format you need.
-
-### Choose by advertising goal
-
-Register event listeners before loading or showing an ad so that the first lifecycle and impression events are not missed.
-
-| Goal | Ad format |
-| --- | --- |
-| Monetize an app-open experience | App Open |
-| Keep an ad visible alongside app content | Banner |
-| Show a full-screen ad at a natural break without granting a reward | Interstitial |
-| Offer a dedicated rewarded experience | Rewarded |
-| Offer a reward at a natural transition | Rewarded Interstitial |
-
-#### Monetize an app-open experience
-
-Use an App Open ad when the app starts or returns to the foreground.
-
-```ts
-import {
-  AdMob,
-  AppOpenAdPluginEvents,
-  AppOpenAdOptions,
-  AdLoadInfo,
-  AdMobRevenueData,
-} from '@capacitor-community/admob';
-
-export async function showAppOpenAd(): Promise<void> {
-  // listen to events
-  AdMob.addListener(AppOpenAdPluginEvents.Loaded, (info: AdLoadInfo) => {
-    console.log('App Open Ad loaded', info.adUnitId);
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.FailedToLoad, (error) => {
-    console.log('Failed to load App Open Ad', error);
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.Opened, () => {
-    console.log('App Open Ad open');
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.Closed, () => {
-    console.log('App Open Ad close');
-  });
-  AdMob.addListener(AppOpenAdPluginEvents.FailedToShow, (error) => {
-    console.log('Failed to show App Open Ad', error);
-  });
-  AdMob.addListener(
-    AppOpenAdPluginEvents.AdImpression,
-    (data: AdMobRevenueData) => {
-      // Forward impression-level revenue to your analytics provider.
-      console.log(data);
-    },
-  );
-
-  const options: AppOpenAdOptions = {
-    adId: 'YOUR_AD_UNIT_ID',
-  };
-  const { adUnitId } = await AdMob.loadAppOpen(options);
-  const { value } = await AdMob.isAppOpenLoaded({ adId: adUnitId });
-  if (value) {
-    await AdMob.showAppOpen({ adId: adUnitId });
-  }
-}
-```
-
-#### Keep an ad visible alongside app content
-
-Use a Banner ad when the ad should remain visible without replacing the current screen.
-
-```ts
-import {
-  AdMob,
-  BannerAdOptions,
-  BannerAdSize,
-  BannerAdPosition,
-  BannerAdPluginEvents,
-  AdMobBannerSize,
-  AdMobRevenueData,
-} from '@capacitor-community/admob';
-
-export async function banner(): Promise<void> {
-  AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
-    // Subscribe Banner Event Listener
-  });
-
-  AdMob.addListener(
-    BannerAdPluginEvents.SizeChanged,
-    (size: AdMobBannerSize) => {
-      // Subscribe Change Banner Size
-    },
-  );
-
-  AdMob.addListener(
-    BannerAdPluginEvents.AdPaid,
-    (data: AdMobRevenueData) => {
-      // Forward impression-level revenue to your analytics provider.
-      console.log(data);
-    },
-  );
-
-  const options: BannerAdOptions = {
-    adId: 'YOUR ADID',
-    adSize: BannerAdSize.BANNER,
-    position: BannerAdPosition.BOTTOM_CENTER,
-    margin: 0,
-    // isTesting: true
-    // npa: true
-  };
-  AdMob.showBanner(options);
-}
-```
-
-#### Show a full-screen ad without a reward
-
-Use an Interstitial ad at a natural break when the user should not receive an in-app reward.
-
-```ts
-import {
-  AdMob,
-  AdOptions,
-  AdLoadInfo,
-  AdMobRevenueData,
-  InterstitialAdPluginEvents,
-} from '@capacitor-community/admob';
-
-export async function interstitial(): Promise<void> {
-  AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
-    // Subscribe prepared interstitial
-  });
-
-  AdMob.addListener(
-    InterstitialAdPluginEvents.AdImpression,
-    (data: AdMobRevenueData) => {
-      // Forward impression-level revenue to your analytics provider.
-      console.log(data);
-    },
-  );
-
-  const options: AdOptions = {
-    adId: 'YOUR ADID',
-    // isTesting: true
-    // npa: true
-    // immersiveMode: true
-  };
-  await AdMob.prepareInterstitial(options);
-  await AdMob.showInterstitial();
-
-  // You can also prepare multiple interstitials and show a specific one by passing its adId:
-  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
-  await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
-
-  // Show a specific prepared ad
-  await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
-
-  // Or omit adId to show the most recently prepared one (default behavior)
-  await AdMob.showInterstitial();
-}
-```
-
-#### Grant a reward after an ad experience
-
-Treat rewarded ads as a reward flow, not as another non-rewarded interstitial placement. Grant the reward only from the rewarded result or event.
-
-##### Rewarded video
-
-Use a Rewarded ad for a dedicated reward flow.
-
-```ts
-import {
-  AdMob,
-  RewardAdOptions,
-  AdLoadInfo,
-  RewardAdPluginEvents,
-  AdMobRevenueData,
-} from '@capacitor-community/admob';
-
-export async function rewardVideo(): Promise<void> {
-  AdMob.addListener(RewardAdPluginEvents.Loaded, (info: AdLoadInfo) => {
-    // Subscribe prepared rewardVideo
-  });
-
-  AdMob.addListener(
-    RewardAdPluginEvents.AdImpression,
-    (data: AdMobRevenueData) => {
-      // Forward impression-level revenue to your analytics provider.
-      console.log(data);
-    },
-  );
-
-  const options: RewardAdOptions = {
-    adId: 'YOUR ADID',
-    // isTesting: true
-    // npa: true
-    // immersiveMode: true
-    // ssv: {
-    //   userId: "A user ID to send to your SSV"
-    //   customData: JSON.stringify({ ...MyCustomData })
-    //}
-  };
-  await AdMob.prepareRewardVideoAd(options);
-  const rewardItem = await AdMob.showRewardVideoAd();
-  // Grant the reward once, using this result.
-  console.log(rewardItem);
-
-  // You can also prepare multiple reward ads and show a specific one by passing its adId:
-  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
-  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-2' });
-
-  // Show a specific prepared ad
-  const reward = await AdMob.showRewardVideoAd({ adId: 'ca-app-pub-xxx/reward-1' });
-
-  // Or omit adId to show the most recently prepared one (default behavior)
-  const reward2 = await AdMob.showRewardVideoAd();
-}
-```
-
-##### Rewarded interstitial
-
-Use a Rewarded Interstitial ad when the rewarded experience belongs at a natural transition in the app.
-
-```ts
-import {
-  AdMob,
-  AdMobRewardInterstitialItem,
-  AdMobRevenueData,
-  RewardInterstitialAdOptions,
-  RewardInterstitialAdPluginEvents,
-} from '@capacitor-community/admob';
-
-export async function rewardInterstitial(): Promise<void> {
-  AdMob.addListener(
-    RewardInterstitialAdPluginEvents.AdImpression,
-    (data: AdMobRevenueData) => {
-      // Forward impression-level revenue to your analytics provider.
-      console.log(data);
-    },
-  );
-
-  const options: RewardInterstitialAdOptions = {
-    adId: 'YOUR ADID',
-  };
-  const { adUnitId } = await AdMob.prepareRewardInterstitialAd(options);
-  const rewardItem: AdMobRewardInterstitialItem =
-    await AdMob.showRewardInterstitialAd({ adId: adUnitId });
-  // Grant the reward once, using this result.
-  console.log(rewardItem);
-}
-```
-
-##### Server-side verification
-
-SSV callbacks are only fired on Production Adverts, therefore test Ads will not fire off your SSV callback.
-
-For E2E tests or just for validating the data in your `RewardAdOptions` work as expected, you can add a custom GET
-request to your mock endpoint after the `RewardAdPluginEvents.Rewarded` similar to this:
-
-```ts
-AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
-  // ...
-  if (ENVIRONMENT_IS_DEVELOPMENT) {
-    try {
-      const url =
-        `https://your-staging-ssv-endpoint` +
-        new URLSearchParams({
-          ad_network: 'TEST',
-          ad_unit: 'TEST',
-          custom_data: customData, // <-- passed CustomData
-          reward_amount: 'TEST',
-          reward_item: 'TEST',
-          timestamp: 'TEST',
-          transaction_id: 'TEST',
-          user_id: userId, // <-- Passed UserID
-          signature: 'TEST',
-          key_id: 'TEST',
-        });
-      await fetch(url);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-  // ...
-});
-```
+- [Configuration](./docs/configuration.md) — `AdMob.initialize` and SDK options.
+- [Consent](./docs/consent.md) — privacy consent and iOS tracking authorization.
+- [Banner Ads](./docs/banner.md) — banner options, lifecycle, and events.
+- Full-screen ads:
+  - [Interstitial Ads](./docs/interstitial.md) — load, show, and multiple prepared ads.
+  - [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and server-side verification.
+- [App Open Ads](./docs/app-open.md) — load and present on foreground transitions.
+- [Ad Events](./docs/events.md) — shared lifecycle events, errors, and revenue data.
+- [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
+- [Migration Guide](./docs/migration.md) — historical notes when upgrading from older plugin versions.
 
 ## Index
 
@@ -1877,15 +1585,6 @@ From T, pick a set of properties whose keys are in the union K
 | **`AdImpression`** | <code>'onRewardedInterstitialAdImpression'</code>   | Emits impression-level ad revenue data when a paid event is recorded.                                                                                                           |
 
 </docgen-api>
-
-## TROUBLE SHOOTING
-
-### If you have error:
-
-> [error] Error running update: Analyzing dependencies
-> [!] CocoaPods could not find compatible versions for pod "Google-Mobile-Ads-SDK":
-
-You should run `pod repo update` ;
 
 ## License
 
