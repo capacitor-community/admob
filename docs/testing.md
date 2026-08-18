@@ -1,7 +1,3 @@
----
-title: Testing
----
-
 # Testing
 
 Use test ads during development so you can click ads without charging advertisers or flagging the account for invalid traffic. Google's test ads guides for [Android](https://developers.google.com/admob/android/test-ads) and [iOS](https://developers.google.com/admob/ios/test-ads) explain demo ad units and test devices.

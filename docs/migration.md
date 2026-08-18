@@ -1,7 +1,3 @@
----
-title: Migration Guide
----
-
 # Migration Guide
 
 If you installed `@capacitor-community/admob` v8, you do not need the version-by-version steps below. They record public API changes from older releases.

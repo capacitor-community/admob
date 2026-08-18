@@ -40,10 +40,10 @@ Made with [contributors-img](https://contrib.rocks).
 
 ### Screenshots
 
-|             |                Banner                |                Interstitial                |                Reward                |              App Open              |
-| :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: | :--------------------------------: |
-| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) | ![](demo/screenshots/ios_open.png) |
-| **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  | ![](demo/screenshots/md_open.png)  |
+|             |                Banner                |                Interstitial                |                Reward                |              App Open               |
+| :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: | :---------------------------------: |
+| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) | ![](demo/screenshots/ios_open.png)  |
+| **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  | ![](demo/screenshots/md_open.png)   |
 
 ## Overview
 
@@ -127,70 +127,72 @@ Start with [Installation](./docs/installation.md), then [Configuration](./docs/c
 - [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
 - [Migration Guide](./docs/migration.md) — historical notes when upgrading from older plugin versions.
 
-## API
+## Index
 
 <docgen-index>
 
-- [`initialize(...)`](#initialize)
-- [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
-- [`requestTrackingAuthorization()`](#requesttrackingauthorization)
-- [`setApplicationMuted(...)`](#setapplicationmuted)
-- [`setApplicationVolume(...)`](#setapplicationvolume)
-- [`loadAppOpen(...)`](#loadappopen)
-- [`showAppOpen(...)`](#showappopen)
-- [`isAppOpenLoaded(...)`](#isappopenloaded)
-- [`addListener(AppOpenAdPluginEvents.Loaded, ...)`](#addlistenerappopenadplugineventsloaded-)
-- [`addListener(AppOpenAdPluginEvents.FailedToLoad, ...)`](#addlistenerappopenadplugineventsfailedtoload-)
-- [`addListener(AppOpenAdPluginEvents.Opened, ...)`](#addlistenerappopenadplugineventsopened-)
-- [`addListener(AppOpenAdPluginEvents.Closed, ...)`](#addlistenerappopenadplugineventsclosed-)
-- [`addListener(AppOpenAdPluginEvents.FailedToShow, ...)`](#addlistenerappopenadplugineventsfailedtoshow-)
-- [`addListener(AppOpenAdPluginEvents.AdImpression, ...)`](#addlistenerappopenadplugineventsadimpression-)
-- [`showBanner(...)`](#showbanner)
-- [`hideBanner()`](#hidebanner)
-- [`resumeBanner()`](#resumebanner)
-- [`removeBanner()`](#removebanner)
-- [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
-- [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
-- [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
-- [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
-- [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
-- [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
-- [`addListener(BannerAdPluginEvents.AdPaid, ...)`](#addlistenerbanneradplugineventsadpaid-)
-- [`requestConsentInfo(...)`](#requestconsentinfo)
-- [`showPrivacyOptionsForm()`](#showprivacyoptionsform)
-- [`showConsentForm()`](#showconsentform)
-- [`resetConsentInfo()`](#resetconsentinfo)
-- [`prepareInterstitial(...)`](#prepareinterstitial)
-- [`showInterstitial(...)`](#showinterstitial)
-- [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
-- [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
-- [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
-- [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
-- [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
-- [`addListener(InterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerinterstitialadplugineventsadimpression-)
-- [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
-- [`showRewardVideoAd(...)`](#showrewardvideoad)
-- [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
-- [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
-- [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
-- [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
-- [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
-- [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
-- [`addListener(RewardAdPluginEvents.AdImpression, ...)`](#addlistenerrewardadplugineventsadimpression-)
-- [`prepareRewardInterstitialAd(...)`](#preparerewardinterstitialad)
-- [`showRewardInterstitialAd(...)`](#showrewardinterstitialad)
-- [`addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoload-)
-- [`addListener(RewardInterstitialAdPluginEvents.Loaded, ...)`](#addlistenerrewardinterstitialadplugineventsloaded-)
-- [`addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)`](#addlistenerrewardinterstitialadplugineventsrewarded-)
-- [`addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerrewardinterstitialadplugineventsdismissed-)
-- [`addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoshow-)
-- [`addListener(RewardInterstitialAdPluginEvents.Showed, ...)`](#addlistenerrewardinterstitialadplugineventsshowed-)
-- [`addListener(RewardInterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerrewardinterstitialadplugineventsadimpression-)
-- [Interfaces](#interfaces)
-- [Type Aliases](#type-aliases)
-- [Enums](#enums)
+* [`initialize(...)`](#initialize)
+* [`trackingAuthorizationStatus()`](#trackingauthorizationstatus)
+* [`requestTrackingAuthorization()`](#requesttrackingauthorization)
+* [`setApplicationMuted(...)`](#setapplicationmuted)
+* [`setApplicationVolume(...)`](#setapplicationvolume)
+* [`loadAppOpen(...)`](#loadappopen)
+* [`showAppOpen(...)`](#showappopen)
+* [`isAppOpenLoaded(...)`](#isappopenloaded)
+* [`addListener(AppOpenAdPluginEvents.Loaded, ...)`](#addlistenerappopenadplugineventsloaded-)
+* [`addListener(AppOpenAdPluginEvents.FailedToLoad, ...)`](#addlistenerappopenadplugineventsfailedtoload-)
+* [`addListener(AppOpenAdPluginEvents.Opened, ...)`](#addlistenerappopenadplugineventsopened-)
+* [`addListener(AppOpenAdPluginEvents.Closed, ...)`](#addlistenerappopenadplugineventsclosed-)
+* [`addListener(AppOpenAdPluginEvents.FailedToShow, ...)`](#addlistenerappopenadplugineventsfailedtoshow-)
+* [`addListener(AppOpenAdPluginEvents.AdImpression, ...)`](#addlistenerappopenadplugineventsadimpression-)
+* [`showBanner(...)`](#showbanner)
+* [`hideBanner()`](#hidebanner)
+* [`resumeBanner()`](#resumebanner)
+* [`removeBanner()`](#removebanner)
+* [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
+* [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
+* [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
+* [`addListener(BannerAdPluginEvents.Opened, ...)`](#addlistenerbanneradplugineventsopened-)
+* [`addListener(BannerAdPluginEvents.Closed, ...)`](#addlistenerbanneradplugineventsclosed-)
+* [`addListener(BannerAdPluginEvents.AdImpression, ...)`](#addlistenerbanneradplugineventsadimpression-)
+* [`addListener(BannerAdPluginEvents.AdPaid, ...)`](#addlistenerbanneradplugineventsadpaid-)
+* [`requestConsentInfo(...)`](#requestconsentinfo)
+* [`showPrivacyOptionsForm()`](#showprivacyoptionsform)
+* [`showConsentForm()`](#showconsentform)
+* [`resetConsentInfo()`](#resetconsentinfo)
+* [`prepareInterstitial(...)`](#prepareinterstitial)
+* [`showInterstitial(...)`](#showinterstitial)
+* [`addListener(InterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerinterstitialadplugineventsfailedtoload-)
+* [`addListener(InterstitialAdPluginEvents.Loaded, ...)`](#addlistenerinterstitialadplugineventsloaded-)
+* [`addListener(InterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerinterstitialadplugineventsdismissed-)
+* [`addListener(InterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerinterstitialadplugineventsfailedtoshow-)
+* [`addListener(InterstitialAdPluginEvents.Showed, ...)`](#addlistenerinterstitialadplugineventsshowed-)
+* [`addListener(InterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerinterstitialadplugineventsadimpression-)
+* [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
+* [`showRewardVideoAd(...)`](#showrewardvideoad)
+* [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
+* [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
+* [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
+* [`addListener(RewardAdPluginEvents.Dismissed, ...)`](#addlistenerrewardadplugineventsdismissed-)
+* [`addListener(RewardAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardadplugineventsfailedtoshow-)
+* [`addListener(RewardAdPluginEvents.Showed, ...)`](#addlistenerrewardadplugineventsshowed-)
+* [`addListener(RewardAdPluginEvents.AdImpression, ...)`](#addlistenerrewardadplugineventsadimpression-)
+* [`prepareRewardInterstitialAd(...)`](#preparerewardinterstitialad)
+* [`showRewardInterstitialAd(...)`](#showrewardinterstitialad)
+* [`addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoload-)
+* [`addListener(RewardInterstitialAdPluginEvents.Loaded, ...)`](#addlistenerrewardinterstitialadplugineventsloaded-)
+* [`addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)`](#addlistenerrewardinterstitialadplugineventsrewarded-)
+* [`addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)`](#addlistenerrewardinterstitialadplugineventsdismissed-)
+* [`addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)`](#addlistenerrewardinterstitialadplugineventsfailedtoshow-)
+* [`addListener(RewardInterstitialAdPluginEvents.Showed, ...)`](#addlistenerrewardinterstitialadplugineventsshowed-)
+* [`addListener(RewardInterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerrewardinterstitialadplugineventsadimpression-)
+* [Interfaces](#interfaces)
+* [Type Aliases](#type-aliases)
+* [Enums](#enums)
 
 </docgen-index>
+
+## API
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
@@ -209,7 +211,8 @@ Initializes the Google Mobile Ads SDK.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### trackingAuthorizationStatus()
 
@@ -224,7 +227,8 @@ Returns `authorized` on earlier iOS versions, Android, and web.
 
 **Since:** 3.1.0
 
----
+--------------------
+
 
 ### requestTrackingAuthorization()
 
@@ -237,7 +241,8 @@ Resolves without taking action on earlier iOS versions, Android, and web.
 
 **Since:** 5.2.0
 
----
+--------------------
+
 
 ### setApplicationMuted(...)
 
@@ -253,7 +258,8 @@ Reports whether the application audio is muted to the Google Mobile Ads SDK.
 
 **Since:** 4.1.1
 
----
+--------------------
+
 
 ### setApplicationVolume(...)
 
@@ -269,7 +275,8 @@ Reports the application audio volume to the Google Mobile Ads SDK.
 
 **Since:** 4.1.1
 
----
+--------------------
+
 
 ### loadAppOpen(...)
 
@@ -285,7 +292,8 @@ Loads an App Open ad and returns the loaded ad unit ID.
 
 **Returns:** <code>Promise&lt;<a href="#adloadinfo">AdLoadInfo</a>&gt;</code>
 
----
+--------------------
+
 
 ### showAppOpen(...)
 
@@ -299,7 +307,8 @@ Shows a loaded App Open ad.
 | ------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#adshowoptions">AdShowOptions</a></code> | Optional. Pass { adId } to show a specific prepared ad instead of the most recent one. |
 
----
+--------------------
+
 
 ### isAppOpenLoaded(...)
 
@@ -315,7 +324,8 @@ Checks whether an App Open ad is loaded.
 
 **Returns:** <code>Promise&lt;{ value: boolean; }&gt;</code>
 
----
+--------------------
+
 
 ### addListener(AppOpenAdPluginEvents.Loaded, ...)
 
@@ -332,7 +342,8 @@ Listens for App Open ad load events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(AppOpenAdPluginEvents.FailedToLoad, ...)
 
@@ -349,7 +360,8 @@ Listens for App Open ad load failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(AppOpenAdPluginEvents.Opened, ...)
 
@@ -366,7 +378,8 @@ Listens for App Open ad opened events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(AppOpenAdPluginEvents.Closed, ...)
 
@@ -383,7 +396,8 @@ Listens for App Open ad closed events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(AppOpenAdPluginEvents.FailedToShow, ...)
 
@@ -400,7 +414,8 @@ Listens for App Open ad show failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(AppOpenAdPluginEvents.AdImpression, ...)
 
@@ -417,7 +432,8 @@ Listens for App Open impression-level ad revenue events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### showBanner(...)
 
@@ -433,7 +449,8 @@ Displays a banner ad.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### hideBanner()
 
@@ -445,7 +462,8 @@ Hides the current banner without destroying it.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### resumeBanner()
 
@@ -457,7 +475,8 @@ Shows a previously hidden banner.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### removeBanner()
 
@@ -469,7 +488,8 @@ Destroys the current banner and removes it from the screen.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### addListener(BannerAdPluginEvents.SizeChanged, ...)
 
@@ -488,7 +508,8 @@ Listens for changes to the displayed banner dimensions.
 
 **Since:** 3.0.0
 
----
+--------------------
+
 
 ### addListener(BannerAdPluginEvents.Loaded, ...)
 
@@ -507,7 +528,8 @@ Listens for banner ad load events.
 
 **Since:** 3.0.0
 
----
+--------------------
+
 
 ### addListener(BannerAdPluginEvents.FailedToLoad, ...)
 
@@ -526,7 +548,8 @@ Listens for banner ad load failures.
 
 **Since:** 3.0.0
 
----
+--------------------
+
 
 ### addListener(BannerAdPluginEvents.Opened, ...)
 
@@ -545,7 +568,8 @@ Listens for banner overlay opened events.
 
 **Since:** 3.0.0
 
----
+--------------------
+
 
 ### addListener(BannerAdPluginEvents.Closed, ...)
 
@@ -564,7 +588,8 @@ Listens for banner overlay closed events.
 
 **Since:** 3.0.0
 
----
+--------------------
+
 
 ### addListener(BannerAdPluginEvents.AdImpression, ...)
 
@@ -583,7 +608,8 @@ Listens for banner impression events.
 
 **Since:** 3.0.0
 
----
+--------------------
+
 
 ### addListener(BannerAdPluginEvents.AdPaid, ...)
 
@@ -600,7 +626,8 @@ Listens for banner impression-level ad revenue events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### requestConsentInfo(...)
 
@@ -618,7 +645,8 @@ Request user consent information
 
 **Since:** 5.0.0
 
----
+--------------------
+
 
 ### showPrivacyOptionsForm()
 
@@ -630,7 +658,8 @@ Shows a google privacy options form (rendered from your GDPR message config).
 
 **Since:** 7.0.3
 
----
+--------------------
+
 
 ### showConsentForm()
 
@@ -644,7 +673,8 @@ Shows a google user consent form (rendered from your GDPR message config).
 
 **Since:** 5.0.0
 
----
+--------------------
+
 
 ### resetConsentInfo()
 
@@ -656,7 +686,8 @@ Resets the UMP SDK state. Call requestConsentInfo function again to allow user m
 
 **Since:** 5.0.0
 
----
+--------------------
+
 
 ### prepareInterstitial(...)
 
@@ -674,7 +705,8 @@ Loads an interstitial ad and returns the loaded ad unit ID.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### showInterstitial(...)
 
@@ -690,7 +722,8 @@ Shows a loaded interstitial ad.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### addListener(InterstitialAdPluginEvents.FailedToLoad, ...)
 
@@ -707,7 +740,8 @@ Listens for interstitial ad load failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(InterstitialAdPluginEvents.Loaded, ...)
 
@@ -724,7 +758,8 @@ Listens for interstitial ad load events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(InterstitialAdPluginEvents.Dismissed, ...)
 
@@ -741,7 +776,8 @@ Listens for interstitial ad dismissed events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(InterstitialAdPluginEvents.FailedToShow, ...)
 
@@ -758,7 +794,8 @@ Listens for interstitial ad show failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(InterstitialAdPluginEvents.Showed, ...)
 
@@ -775,7 +812,8 @@ Listens for interstitial ad shown events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(InterstitialAdPluginEvents.AdImpression, ...)
 
@@ -792,7 +830,8 @@ Listens for interstitial impression-level ad revenue events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### prepareRewardVideoAd(...)
 
@@ -810,7 +849,8 @@ Loads a rewarded ad and returns the loaded ad unit ID.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### showRewardVideoAd(...)
 
@@ -828,7 +868,8 @@ Shows a loaded rewarded ad and resolves when the user earns the reward.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### addListener(RewardAdPluginEvents.FailedToLoad, ...)
 
@@ -845,7 +886,8 @@ Listens for rewarded ad load failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardAdPluginEvents.Loaded, ...)
 
@@ -862,7 +904,8 @@ Listens for rewarded ad load events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardAdPluginEvents.Rewarded, ...)
 
@@ -879,7 +922,8 @@ Listens for earned reward events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardAdPluginEvents.Dismissed, ...)
 
@@ -896,7 +940,8 @@ Listens for rewarded ad dismissed events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardAdPluginEvents.FailedToShow, ...)
 
@@ -913,7 +958,8 @@ Listens for rewarded ad show failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardAdPluginEvents.Showed, ...)
 
@@ -930,7 +976,8 @@ Listens for rewarded ad shown events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardAdPluginEvents.AdImpression, ...)
 
@@ -947,7 +994,8 @@ Listens for rewarded impression-level ad revenue events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### prepareRewardInterstitialAd(...)
 
@@ -965,7 +1013,8 @@ Loads a rewarded interstitial ad and returns the loaded ad unit ID.
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### showRewardInterstitialAd(...)
 
@@ -983,7 +1032,8 @@ Shows a loaded rewarded interstitial ad and resolves when the user earns the rew
 
 **Since:** 1.1.2
 
----
+--------------------
+
 
 ### addListener(RewardInterstitialAdPluginEvents.FailedToLoad, ...)
 
@@ -1000,7 +1050,8 @@ Listens for rewarded interstitial ad load failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardInterstitialAdPluginEvents.Loaded, ...)
 
@@ -1017,7 +1068,8 @@ Listens for rewarded interstitial ad load events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardInterstitialAdPluginEvents.Rewarded, ...)
 
@@ -1034,7 +1086,8 @@ Listens for earned reward events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardInterstitialAdPluginEvents.Dismissed, ...)
 
@@ -1051,7 +1104,8 @@ Listens for rewarded interstitial ad dismissed events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardInterstitialAdPluginEvents.FailedToShow, ...)
 
@@ -1068,7 +1122,8 @@ Listens for rewarded interstitial ad show failures.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardInterstitialAdPluginEvents.Showed, ...)
 
@@ -1085,7 +1140,8 @@ Listens for rewarded interstitial ad shown events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### addListener(RewardInterstitialAdPluginEvents.AdImpression, ...)
 
@@ -1102,9 +1158,11 @@ Listens for rewarded interstitial impression-level ad revenue events.
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
----
+--------------------
+
 
 ### Interfaces
+
 
 #### AdMobInitializationOptions
 
@@ -1116,6 +1174,7 @@ Listens for rewarded interstitial impression-level ad revenue events.
 | **`tagForUnderAgeOfConsent`**      | <code>boolean</code>                                              | When using this feature, a Tag For Users under the Age of Consent in Europe (TFUA) parameter will be included in all future ad requests.                                                                                                        |                    | 3.1.0 |
 | **`maxAdContentRating`**           | <code><a href="#maxadcontentrating">MaxAdContentRating</a></code> | The maximum ad content rating applied to all ad requests. Ads with a higher rating are excluded.                                                                                                                                                |                    | 3.1.0 |
 
+
 #### TrackingAuthorizationStatusInterface
 
 The current iOS App Tracking Transparency authorization status.
@@ -1124,17 +1183,20 @@ The current iOS App Tracking Transparency authorization status.
 | ------------ | ------------------------------------------------------------------------ | --------------------------------------------------------------- |
 | **`status`** | <code>'authorized' \| 'denied' \| 'notDetermined' \| 'restricted'</code> | The authorization status reported by App Tracking Transparency. |
 
+
 #### ApplicationMutedOptions
 
 | Prop        | Type                 | Description                                                                                                                                                                                                                                                                                           | Since |
 | ----------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
 | **`muted`** | <code>boolean</code> | To inform the SDK that the app volume has been muted. Note: Video ads that are ineligible to be shown with muted audio are not returned for ad requests made, when the app volume is reported as muted or set to a value of 0. This may restrict a subset of the broader video ads pool from serving. | 4.1.1 |
 
+
 #### ApplicationVolumeOptions
 
 | Prop         | Type                                                                               | Description                                                                                                                                                                                                                                               | Since |
 | ------------ | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
 | **`volume`** | <code>0 \| 1 \| 0.1 \| 0.2 \| 0.3 \| 0.4 \| 0.5 \| 0.6 \| 0.7 \| 0.8 \| 0.9</code> | If your app has its own volume controls (such as custom music or sound effect volumes), disclosing app volume to the Google Mobile Ads SDK allows video ads to respect app volume settings. Use a supported value from 0.0 (silent) to 1.0 (full volume). | 4.1.1 |
+
 
 #### AdLoadInfo
 
@@ -1144,6 +1206,7 @@ Information returned after an ad loads successfully.
 | -------------- | ------------------- | -------------------------------- |
 | **`adUnitId`** | <code>string</code> | The ad unit ID of the loaded ad. |
 
+
 #### AppOpenAdOptions
 
 Options for loading an App Open ad.
@@ -1151,6 +1214,7 @@ Options for loading an App Open ad.
 | Prop       | Type                | Description                      |
 | ---------- | ------------------- | -------------------------------- |
 | **`adId`** | <code>string</code> | The App Open ad unit ID to load. |
+
 
 #### AdShowOptions
 
@@ -1160,11 +1224,13 @@ Options for selecting a previously loaded ad to show or inspect.
 | ---------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----- |
 | **`adId`** | <code>string</code> | The ad unit ID of a previously prepared ad to target. If omitted, the operation targets the most recently prepared ad. | 8.0.1 |
 
+
 #### PluginListenerHandle
 
 | Prop         | Type                                      |
 | ------------ | ----------------------------------------- |
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
 
 #### AdMobError
 
@@ -1174,6 +1240,7 @@ An error returned by the Google Mobile Ads SDK.
 | ------------- | ------------------- | -------------------------------------- |
 | **`code`**    | <code>number</code> | Gets the error's code.                 |
 | **`message`** | <code>string</code> | Gets the message describing the error. |
+
 
 #### AdMobRevenueData
 
@@ -1187,6 +1254,7 @@ Impression-level ad revenue data emitted by a paid event.
 | **`precision`**    | <code><a href="#advalueprecision">AdValuePrecision</a></code> | The precision of the reported ad value.                                                           |
 | **`networkName`**  | <code>string</code>                                           | The mediation adapter class name that served the impression, or an empty string when unavailable. |
 | **`impressionId`** | <code>string</code>                                           | The response identifier associated with the impression, or an empty string when unavailable.      |
+
 
 #### BannerAdOptions
 
@@ -1204,6 +1272,7 @@ This interface extends <a href="#adoptions">AdOptions</a>.
 | **`npa`**           | <code>boolean</code>                                          | Whether to request non-personalized ads.                                                                                                                                | <code>false</code>           | 1.2.0 |
 | **`immersiveMode`** | <code>boolean</code>                                          | Whether to display a full-screen ad in immersive mode on Android.                                                                                                       |                              | 7.0.3 |
 
+
 #### AdMobBannerSize
 
 The displayed banner dimensions in logical display units (dp on Android and points on iOS).
@@ -1214,6 +1283,7 @@ A hidden, removed, or failed banner can report both dimensions as `0`.
 | **`width`**  | <code>number</code> | The displayed banner width.  |
 | **`height`** | <code>number</code> | The displayed banner height. |
 
+
 #### AdmobConsentInfo
 
 | Prop                                  | Type                                                                                        | Description                                           | Since |
@@ -1223,6 +1293,7 @@ A hidden, removed, or failed banner can report both dimensions as `0`.
 | **`canRequestAds`**                   | <code>boolean</code>                                                                        | If `true` an ad can be shown.                         | 7.0.3 |
 | **`privacyOptionsRequirementStatus`** | <code><a href="#privacyoptionsrequirementstatus">PrivacyOptionsRequirementStatus</a></code> | Privacy options requirement status of the user.       | 7.0.3 |
 
+
 #### AdmobConsentRequestOptions
 
 | Prop                          | Type                                                                              | Description                                                                                                  | Default            | Since |
@@ -1230,6 +1301,7 @@ A hidden, removed, or failed banner can report both dimensions as `0`.
 | **`debugGeography`**          | <code><a href="#admobconsentdebuggeography">AdmobConsentDebugGeography</a></code> | Sets the debug geography to test the consent locally.                                                        |                    | 5.0.0 |
 | **`testDeviceIdentifiers`**   | <code>string[]</code>                                                             | An array of test device IDs to allow. Note: On iOS, the ID may renew if you uninstall and reinstall the app. |                    | 5.0.0 |
 | **`tagForUnderAgeOfConsent`** | <code>boolean</code>                                                              | Set to `true` to provide the option for the user to accept being shown personalized ads.                     | <code>false</code> | 5.0.0 |
+
 
 #### AdOptions
 
@@ -1243,18 +1315,20 @@ Common options for requesting an ad.
 | **`npa`**           | <code>boolean</code> | Whether to request non-personalized ads.                                                                                                                                | <code>false</code> | 1.2.0 |
 | **`immersiveMode`** | <code>boolean</code> | Whether to display a full-screen ad in immersive mode on Android.                                                                                                       |                    | 7.0.3 |
 
+
 #### RewardAdOptions
 
 Options for loading a rewarded ad.
 
 | Prop                | Type                                                                                                                                                                                                     | Description                                                                                                                                                             | Default            | Since |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----- |
-| **`ssv`**           | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** _ A user identifier passed to the SSV callback. _/ userId: string; /** _ Custom data passed to the SSV callback. _/ customData: string; }&gt;</code> | Server-side verification options for the rewarded ad. Provide at least one of `userId` or `customData`.                                                                 |                    |       |
+| **`ssv`**           | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** * A user identifier passed to the SSV callback. */ userId: string; /** * Custom data passed to the SSV callback. */ customData: string; }&gt;</code> | Server-side verification options for the rewarded ad. Provide at least one of `userId` or `customData`.                                                                 |                    |       |
 | **`adId`**          | <code>string</code>                                                                                                                                                                                      | The ad unit ID to load.                                                                                                                                                 |                    | 1.1.2 |
 | **`isTesting`**     | <code>boolean</code>                                                                                                                                                                                     | Whether to request a test ad.                                                                                                                                           | <code>false</code> | 1.1.2 |
 | **`margin`**        | <code>number</code>                                                                                                                                                                                      | The banner margin in logical display units (dp on Android and points on iOS). For `BOTTOM_CENTER`, this is the bottom margin. For `TOP_CENTER`, this is the top margin. | <code>0</code>     | 1.1.2 |
 | **`npa`**           | <code>boolean</code>                                                                                                                                                                                     | Whether to request non-personalized ads.                                                                                                                                | <code>false</code> | 1.2.0 |
 | **`immersiveMode`** | <code>boolean</code>                                                                                                                                                                                     | Whether to display a full-screen ad in immersive mode on Android.                                                                                                       |                    | 7.0.3 |
+
 
 #### AdMobRewardItem
 
@@ -1265,18 +1339,20 @@ The reward earned by the user after viewing a rewarded ad.
 | **`type`**   | <code>string</code> | The reward item type configured for the ad unit. |
 | **`amount`** | <code>number</code> | The reward amount earned by the user.            |
 
+
 #### RewardInterstitialAdOptions
 
 Options for loading a rewarded interstitial ad.
 
 | Prop                | Type                                                                                                                                                                                                     | Description                                                                                                                                                             | Default            | Since |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----- |
-| **`ssv`**           | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** _ A user identifier passed to the SSV callback. _/ userId: string; /** _ Custom data passed to the SSV callback. _/ customData: string; }&gt;</code> | Server-side verification options for the rewarded interstitial ad. Provide at least one of `userId` or `customData`.                                                    |                    |       |
+| **`ssv`**           | <code><a href="#atleastone">AtLeastOne</a>&lt;{ /** * A user identifier passed to the SSV callback. */ userId: string; /** * Custom data passed to the SSV callback. */ customData: string; }&gt;</code> | Server-side verification options for the rewarded interstitial ad. Provide at least one of `userId` or `customData`.                                                    |                    |       |
 | **`adId`**          | <code>string</code>                                                                                                                                                                                      | The ad unit ID to load.                                                                                                                                                 |                    | 1.1.2 |
 | **`isTesting`**     | <code>boolean</code>                                                                                                                                                                                     | Whether to request a test ad.                                                                                                                                           | <code>false</code> | 1.1.2 |
 | **`margin`**        | <code>number</code>                                                                                                                                                                                      | The banner margin in logical display units (dp on Android and points on iOS). For `BOTTOM_CENTER`, this is the bottom margin. For `TOP_CENTER`, this is the top margin. | <code>0</code>     | 1.1.2 |
 | **`npa`**           | <code>boolean</code>                                                                                                                                                                                     | Whether to request non-personalized ads.                                                                                                                                | <code>false</code> | 1.2.0 |
 | **`immersiveMode`** | <code>boolean</code>                                                                                                                                                                                     | Whether to display a full-screen ad in immersive mode on Android.                                                                                                       |                    | 7.0.3 |
+
 
 #### AdMobRewardInterstitialItem
 
@@ -1287,21 +1363,24 @@ The reward earned by the user after viewing a rewarded interstitial ad.
 | **`type`**   | <code>string</code> | The reward item type configured for the ad unit. |
 | **`amount`** | <code>number</code> | The reward amount earned by the user.            |
 
+
 ### Type Aliases
+
 
 #### AtLeastOne
 
 <code>{[K in keyof T]: <a href="#pick">Pick</a>&lt;T, K&gt;}[keyof T]</code>
 
+
 #### Pick
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{
- [P in K]: T[P];
- }</code>
+<code>{ [P in K]: T[P]; }</code>
+
 
 ### Enums
+
 
 #### MaxAdContentRating
 
@@ -1311,6 +1390,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`ParentalGuidance`** | <code>'ParentalGuidance'</code> | Content suitable for most audiences with parental guidance. |
 | **`Teen`**             | <code>'Teen'</code>             | Content suitable for teen and older audiences.              |
 | **`MatureAudience`**   | <code>'MatureAudience'</code>   | Content suitable only for mature audiences.                 |
+
 
 #### AppOpenAdPluginEvents
 
@@ -1323,6 +1403,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`FailedToShow`** | <code>'appOpenAdFailedToShow'</code> | Emits when a loaded App Open ad fails to show.                        |
 | **`AdImpression`** | <code>'appOpenAdImpression'</code>   | Emits impression-level ad revenue data when a paid event is recorded. |
 
+
 #### AdValuePrecision
 
 | Members                 | Value          | Description                                         |
@@ -1331,6 +1412,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`Estimated`**         | <code>1</code> | The ad value is estimated from aggregated data.     |
 | **`PublisherProvided`** | <code>2</code> | The ad value was provided by the publisher.         |
 | **`Precise`**           | <code>3</code> | The ad value is the precise value paid for this ad. |
+
 
 #### BannerAdSize
 
@@ -1344,6 +1426,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`ADAPTIVE_BANNER`**  | <code>'ADAPTIVE_BANNER'</code>  | A dynamically sized banner that is full-width and auto-height.                                                           |
 | **`SMART_BANNER`**     | <code>'SMART_BANNER'</code>     | A legacy smart banner sized to the screen width. Retained for compatibility; use `ADAPTIVE_BANNER` for new integrations. |
 
+
 #### BannerAdPosition
 
 | Members             | Value                        | Description                                              |
@@ -1351,6 +1434,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`TOP_CENTER`**    | <code>'TOP_CENTER'</code>    | Positions the banner at the top center of the screen.    |
 | **`CENTER`**        | <code>'CENTER'</code>        | Positions the banner at the center of the screen.        |
 | **`BOTTOM_CENTER`** | <code>'BOTTOM_CENTER'</code> | Positions the banner at the bottom center of the screen. |
+
 
 #### BannerAdPluginEvents
 
@@ -1364,6 +1448,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`AdImpression`** | <code>"bannerAdImpression"</code>   | Emits when an impression is recorded for the banner ad.               |
 | **`AdPaid`**       | <code>"bannerAdPaid"</code>         | Emits impression-level ad revenue data when a paid event is recorded. |
 
+
 #### AdmobConsentStatus
 
 | Members            | Value                       | Description                                                                           |
@@ -1373,6 +1458,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`REQUIRED`**     | <code>'REQUIRED'</code>     | User consent required but not yet obtained.                                           |
 | **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Unknown consent status, AdsConsent.requestInfoUpdate needs to be called to update it. |
 
+
 #### PrivacyOptionsRequirementStatus
 
 | Members            | Value                       | Description                                    |
@@ -1380,6 +1466,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`NOT_REQUIRED`** | <code>'NOT_REQUIRED'</code> | Privacy options entry point is not required.   |
 | **`REQUIRED`**     | <code>'REQUIRED'</code>     | Privacy options entry point is required.       |
 | **`UNKNOWN`**      | <code>'UNKNOWN'</code>      | Privacy options requirement status is unknown. |
+
 
 #### AdmobConsentDebugGeography
 
@@ -1390,6 +1477,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`NOT_EEA`**  | <code>2</code> | Geography appears as not in EEA for debug devices.            |
 | **`US`**       | <code>3</code> | Geography appears as in regulated US state for debug devices. |
 | **`OTHER`**    | <code>4</code> | Geography appears as OTHER state for debug devices.           |
+
 
 #### InterstitialAdPluginEvents
 
@@ -1402,6 +1490,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`Dismissed`**    | <code>'interstitialAdDismissed'</code>    | Emits when an interstitial ad is dismissed.                           |
 | **`AdImpression`** | <code>'interstitialAdImpression'</code>   | Emits impression-level ad revenue data when a paid event is recorded. |
 
+
 #### RewardAdPluginEvents
 
 | Members            | Value                                        | Description                                                                                                                                                        |
@@ -1413,6 +1502,7 @@ From T, pick a set of properties whose keys are in the union K
 | **`Dismissed`**    | <code>'onRewardedVideoAdDismissed'</code>    | Emits when a rewarded ad is dismissed. This event does not indicate whether the user earned a reward. Listen for `Rewarded` separately before granting the reward. |
 | **`Rewarded`**     | <code>'onRewardedVideoAdReward'</code>       | Emits when the user earns the advertised reward.                                                                                                                   |
 | **`AdImpression`** | <code>'onRewardedVideoAdImpression'</code>   | Emits impression-level ad revenue data when a paid event is recorded.                                                                                              |
+
 
 #### RewardInterstitialAdPluginEvents
 

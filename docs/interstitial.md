@@ -1,7 +1,3 @@
----
-title: Interstitial Ads
----
-
 # Interstitial Ads
 
 Interstitial ads are full-screen ads that cover the host app. Show them at a natural transition, such as between activities or game levels. The user can tap through or close the ad and return to the app. Google's interstitial guides for [Android](https://developers.google.com/admob/android/interstitial) and [iOS](https://developers.google.com/admob/ios/interstitial) explain the format.

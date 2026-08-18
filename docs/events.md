@@ -1,7 +1,3 @@
----
-title: Ad Events
----
-
 # Ad Events
 
 Google documents these lifecycle callbacks on each format page, for example [banner ad events](https://developers.google.com/admob/android/banner#ad_events). This plugin exposes the same moments under the names in the table below, not the native `AdListener` method names. For the paid payload, see [impression-level ad revenue](https://developers.google.com/admob/android/impression-level-ad-revenue) ([iOS](https://developers.google.com/admob/ios/impression-level-ad-revenue)).

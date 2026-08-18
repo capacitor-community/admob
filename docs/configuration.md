@@ -1,7 +1,3 @@
----
-title: Configuration
----
-
 # Configuration
 
 Call the plugin's `initialize` once before requesting ads. You do not start the native SDK yourself. Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start) explain the overall AdMob setup.

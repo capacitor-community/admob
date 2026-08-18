@@ -1,7 +1,3 @@
----
-title: Rewarded Ads
----
-
 # Rewarded Ads
 
 Rewarded ads let you give in-app items for interacting with video ads, playable ads, or surveys. Google's rewarded guides for [Android](https://developers.google.com/admob/android/rewarded) and [iOS](https://developers.google.com/admob/ios/rewarded) explain the format.
