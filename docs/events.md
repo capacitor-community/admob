@@ -62,4 +62,4 @@ Full-screen formats emit `AdMobRevenueData` on their `AdImpression` event. Banne
 - [Interstitial Ads](./interstitial.md)
 - [Rewarded Ads](./rewarded.md)
 
-Method and enum signatures live in the [API reference](../README.md#api) in this repository. The documentation site publishes the same reference as a dedicated API page.
+Method and enum signatures are in the [API reference](../README.md#api).

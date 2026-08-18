@@ -90,11 +90,6 @@ import { AdMob, AdmobConsentStatus, BannerAdOptions, BannerAdSize, BannerAdPosit
 async function startAdMob() {
   await AdMob.initialize();
 
-  const tracking = await AdMob.trackingAuthorizationStatus();
-  if (tracking.status === 'notDetermined') {
-    await AdMob.requestTrackingAuthorization();
-  }
-
   let consentInfo = await AdMob.requestConsentInfo();
   if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
     consentInfo = await AdMob.showConsentForm();
@@ -118,23 +113,21 @@ See [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and 
 
 ## Documentation
 
-Guides in [`docs/`](./docs/) are the source material for the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob). Method signatures stay in the API section below.
+Start with [Installation](./docs/installation.md), then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). Method signatures are in the API section below.
 
-- [Installation](./docs/installation.md) — install commands, SDK compatibility, and Android/iOS native setup.
+- [Installation](./docs/installation.md) — install commands, SDK versions, and Android/iOS native setup.
 - [Configuration](./docs/configuration.md) — `AdMob.initialize` and SDK options.
-- [Consent](./docs/consent.md) — UMP consent and App Tracking Transparency.
+- [Consent](./docs/consent.md) — privacy consent and iOS tracking authorization.
 - [Banner Ads](./docs/banner.md) — banner options, lifecycle, and events.
 - Full-screen ads:
   - [Interstitial Ads](./docs/interstitial.md) — load, show, and multiple prepared ads.
-  - [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and SSV.
+  - [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and server-side verification.
 - [App Open Ads](./docs/app-open.md) — load and present on foreground transitions.
 - [Ad Events](./docs/events.md) — shared lifecycle events, errors, and revenue data.
-- [Testing](./docs/testing.md) — demo ad units, test devices, and UMP debug geography.
-- [Migration Guide](./docs/migration.md) — repository-only history of earlier breaking changes; not published on the documentation site.
+- [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
+- [Migration Guide](./docs/migration.md) — historical notes when upgrading from older plugin versions.
 
 ## API
-
-## Index
 
 <docgen-index>
 
@@ -198,8 +191,6 @@ Guides in [`docs/`](./docs/) are the source material for the [documentation site
 - [Enums](#enums)
 
 </docgen-index>
-
-## API
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->

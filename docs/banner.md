@@ -4,7 +4,7 @@ title: Banner Ads
 
 # Banner Ads
 
-Banner ads occupy part of the native view. Register listeners before calling `showBanner` so the first load and size events are not missed.
+Banner ads sit on the native screen (above your web view). Register listeners before calling `showBanner` so the first load and size events are not missed.
 
 ```ts
 import {
