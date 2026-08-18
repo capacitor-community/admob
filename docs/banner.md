@@ -52,32 +52,22 @@ Use `SizeChanged` to reserve layout space so the banner does not cover app conte
 
 The banner is a native overlay above the WebView. Ionic does not shrink `ion-content` for you.
 
-For `BOTTOM_CENTER`, set `ion-router-outlet` `bottom` to `size.height`. Apply the same offset to `ion-modal` so sheets are not covered. When the height is `0`, clear the offset.
+`ion-app` is positioned with `bottom: 0`. For `BOTTOM_CENTER`, set that `bottom` to `size.height` so pages, tab bars, and overlays inside `ion-app` move up together. When the height is `0`, clear the inline style. Do not also add the same offset to `ion-router-outlet` or `ion-tab-bar`; that double-counts.
 
 ```ts
 import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
 
-const outlet = document.querySelector<HTMLElement>('ion-router-outlet');
+const app = document.querySelector<HTMLElement>('ion-app');
 
 await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size) => {
-  const offset = size.height > 0 ? `${size.height}px` : '0px';
-  if (outlet) {
-    outlet.style.bottom = offset;
+  if (!app) {
+    return;
   }
-  document.querySelectorAll<HTMLElement>('ion-modal').forEach((modal) => {
-    modal.style.bottom = offset;
-  });
-  document.documentElement.style.setProperty('--admob-banner-height', offset);
+  app.style.bottom = size.height > 0 ? `${size.height}px` : '';
 });
 ```
 
-If `ion-tab-bar` is a sibling of the outlet (typical `ion-tabs` layout), raise it with the same variable so the banner does not cover the tabs:
-
-```css
-ion-tab-bar {
-  margin-bottom: var(--admob-banner-height, 0px);
-}
-```
+If a modal is still covered because it is presented against the viewport, set that overlay's `bottom` as well.
 
 For `TOP_CENTER`, set `top` instead of `bottom`. When the keyboard opens, call `hideBanner()` and restore with `resumeBanner()` on close so the keyboard and banner do not stack.
 
