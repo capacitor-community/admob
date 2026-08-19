@@ -1,3 +1,4 @@
+<!-- rdlabo-docs-omit -->
 <p align="center"><br><img src="https://user-images.githubusercontent.com/236501/85893648-1c92e880-b7a8-11ea-926d-95355b8175c7.png" width="128" height="128" /></p>
 <h3 align="center">AdMob</h3>
 <p align="center"><strong><code>@capacitor-community/admob</code></strong></p>
@@ -44,6 +45,8 @@ Made with [contributors-img](https://contrib.rocks).
 | :---------- | :----------------------------------: | :----------------------------------------: | :----------------------------------: | :---------------------------------: |
 | **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) | ![](demo/screenshots/ios_open.png)  |
 | **Android** | ![](demo/screenshots/md_banner.png)  | ![](demo/screenshots/md_interstitial.png)  | ![](demo/screenshots/md_reward.png)  | ![](demo/screenshots/md_open.png)   |
+
+<!-- /rdlabo-docs-omit -->
 
 ## Overview
 
@@ -195,6 +198,7 @@ Start with [Installation](#installation) above, then [Configuration](./docs/conf
 - [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
 - [Migration Guide](./docs/migration.md) — historical notes when upgrading from older plugin versions.
 
+<!-- rdlabo-docs-omit -->
 ## Index
 
 <docgen-index>
@@ -1589,3 +1593,4 @@ From T, pick a set of properties whose keys are in the union K
 ## License
 
 Capacitor AdMob is [MIT licensed](./LICENSE).
+<!-- /rdlabo-docs-omit -->
