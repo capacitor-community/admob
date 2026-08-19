@@ -2,17 +2,19 @@ package com.getcapacitor.community.admob.rewarded
 
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
-import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
 import com.getcapacitor.community.admob.models.AdMobPluginError
 import com.getcapacitor.community.admob.models.AdMobRevenueData
 import com.getcapacitor.community.admob.models.AdOptions
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnUserEarnedRewardListener
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
-import com.google.android.gms.common.util.BiConsumer
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdValue
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.rewarded.ServerSideVerificationOptions
+import java.util.function.BiConsumer
 
 object RewardedAdCallbackAndListeners {
 
@@ -26,39 +28,39 @@ object RewardedAdCallbackAndListeners {
         }
     }
 
-    fun getRewardedAdLoadCallback(call: PluginCall, notifyListenersFunction: BiConsumer<String, JSObject>, adOptions: AdOptions): RewardedAdLoadCallback {
-        return object : RewardedAdLoadCallback() {
+    fun getRewardedAdLoadCallback(
+        call: PluginCall,
+        notifyListenersFunction: BiConsumer<String, JSObject>,
+        adOptions: AdOptions,
+        adUnitId: String,
+    ): AdLoadCallback<RewardedAd> {
+        return object : AdLoadCallback<RewardedAd> {
             override fun onAdLoaded(ad: RewardedAd) {
                 val immersiveMode = call.getBoolean("immersiveMode")
                 ad.setImmersiveMode(immersiveMode ?: false)
-                ad.fullScreenContentCallback = FullscreenPluginCallback(
-                        RewardAdPluginEvents, notifyListenersFunction)
-
-                ad.setOnPaidEventListener { adValue ->
-                    val responseInfo = ad.responseInfo
-                    val networkName = responseInfo?.mediationAdapterClassName ?: ""
-                    val impressionId = responseInfo?.responseId ?: ""
-                    val revenueData = AdMobRevenueData(adValue, ad.adUnitId, networkName, impressionId)
-                    notifyListenersFunction.accept(RewardAdPluginEvents.AdImpression, revenueData)
-                }
 
                 if(adOptions.ssvInfo.hasInfo){
-                    val ssvOptions = ServerSideVerificationOptions.Builder()
-                    adOptions.ssvInfo.customData?.let {
-                        ssvOptions.setCustomData(it)
-                    }
-
-                    adOptions.ssvInfo.userId?.let {
-                        ssvOptions.setUserId(it)
-                    }
-                    ad.setServerSideVerificationOptions(ssvOptions.build())
+                    ad.setServerSideVerificationOptions(
+                        ServerSideVerificationOptions(
+                            adOptions.ssvInfo.userId ?: "",
+                            adOptions.ssvInfo.customData ?: ""
+                        )
+                    )
                 }
 
-                AdRewardExecutor.preparedAds[ad.adUnitId] = ad
-                AdRewardExecutor.lastPreparedAdId = ad.adUnitId
+                ad.adEventCallback =
+                    object : RewardedAdEventCallback {
+                        override fun onAdPaid(value: AdValue) {
+                            val revenueData = AdMobRevenueData(value, adUnitId, "", "")
+                            notifyListenersFunction.accept(RewardAdPluginEvents.AdImpression, revenueData)
+                        }
+                    }
+
+                AdRewardExecutor.preparedAds[adUnitId] = ad
+                AdRewardExecutor.lastPreparedAdId = adUnitId
 
                 val adInfo = JSObject()
-                adInfo.put("adUnitId", ad.adUnitId)
+                adInfo.put("adUnitId", adUnitId)
                 call.resolve(adInfo)
 
                 notifyListenersFunction.accept(RewardAdPluginEvents.Loaded, adInfo)
@@ -69,6 +71,27 @@ object RewardedAdCallbackAndListeners {
 
                 notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad, adMobError)
                 call.reject(adError.message)
+            }
+        }
+    }
+
+    fun getRewardedAdEventCallback(
+        notifyListenersFunction: BiConsumer<String, JSObject>,
+        onCompleted: Runnable? = null,
+    ): RewardedAdEventCallback {
+        return object : RewardedAdEventCallback {
+            override fun onAdShowedFullScreenContent() {
+                notifyListenersFunction.accept(RewardAdPluginEvents.Showed, JSObject())
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                onCompleted?.run()
+                notifyListenersFunction.accept(RewardAdPluginEvents.Dismissed, JSObject())
+            }
+
+            override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
+                onCompleted?.run()
+                notifyListenersFunction.accept(RewardAdPluginEvents.FailedToShow, AdMobPluginError(fullScreenContentError))
             }
         }
     }

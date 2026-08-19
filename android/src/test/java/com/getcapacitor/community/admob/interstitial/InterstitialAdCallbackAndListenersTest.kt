@@ -4,12 +4,10 @@ import android.app.Activity
 import android.content.Context
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnPaidEventListener
-import com.google.android.gms.ads.ResponseInfo
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.common.util.BiConsumer
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.interstitial.InterstitialAdEventCallback
+import java.util.function.BiConsumer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -28,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 internal class InterstitialAdCallbackAndListenersTest {
+    private val adUnitId = "test-ad-unit-id"
 
 
 
@@ -56,21 +55,21 @@ internal class InterstitialAdCallbackAndListenersTest {
         @Nested
         inner class OnAdFailedToLoad {
             private var wantedMessage = "This is the reason"
-            private var wantedErrorCode: Int = 1
+            private var wantedErrorCode: Int = 0
 
             @Mock
             lateinit var loadAdErrorMock: LoadAdError
 
             @BeforeEach
             fun beforeEach() {
-                Mockito.`when`(loadAdErrorMock.code).thenReturn(wantedErrorCode)
+                Mockito.`when`(loadAdErrorMock.code).thenReturn(LoadAdError.ErrorCode.values().first())
                 Mockito.`when`(loadAdErrorMock.message).thenReturn(wantedMessage)
             }
 
             @Test
             fun `onAdFailedToLoad should emit the the error code and reason in a FailedToLoad event`() {
                 val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
-                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock, adUnitId)
 
                 // ACt
                 listener.onAdFailedToLoad(loadAdErrorMock)
@@ -85,7 +84,7 @@ internal class InterstitialAdCallbackAndListenersTest {
             @Test
             fun `onAdFailedToLoad should reject the error code and reason in a FailedToLoad event`() {
                 val argumentCaptor = ArgumentCaptor.forClass(String::class.java)
-                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock, adUnitId)
 
                 // ACt
                 listener.onAdFailedToLoad(loadAdErrorMock)
@@ -100,62 +99,59 @@ internal class InterstitialAdCallbackAndListenersTest {
         @Nested
         inner class AdLoaded {
             @Mock
-            lateinit var interstitialAdStub: InterstitialAdStub
+            lateinit var interstitialAdMock: InterstitialAd
 
             @BeforeEach
             fun beforeEach() {
-                interstitialAdStub = InterstitialAdStub()
+                Mockito.reset(interstitialAdMock)
             }
 
             @Test
             fun `onAdLoaded should emit an Loaded with the ad unit id`() {
                 val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
-                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock, adUnitId)
 
                 // ACt
-                listener.onAdLoaded(interstitialAdStub)
+                listener.onAdLoaded(interstitialAdMock)
 
                 Mockito.verify(notifierMock).accept(ArgumentMatchers.eq(InterstitialAdPluginPluginEvent.Loaded), argumentCaptor.capture())
                 val emittedAdInfo = argumentCaptor.value
 
-                assertEquals(interstitialAdStub.adUnitId, emittedAdInfo.getString("adUnitId"))
+                assertEquals(adUnitId, emittedAdInfo.getString("adUnitId"))
             }
 
             @Test
             fun `onAdLoaded should resolve  the ad unit id`() {
                 val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
-                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock, adUnitId)
 
                 // ACt
-                listener.onAdLoaded(interstitialAdStub)
+                listener.onAdLoaded(interstitialAdMock)
 
                 Mockito.verify(pluginCall).resolve(argumentCaptor.capture())
                 val resolvedInfo = argumentCaptor.value
-                assertEquals(interstitialAdStub.adUnitId, resolvedInfo.getString("adUnitId"))
+                assertEquals(adUnitId, resolvedInfo.getString("adUnitId"))
             }
 
             @Test
             fun `onAdLoaded should store the ad on the static reference`() {
                 AdInterstitialExecutor.preparedAds.clear()
                 val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
-                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock, adUnitId)
 
                 // ACt
-                listener.onAdLoaded(interstitialAdStub)
+                listener.onAdLoaded(interstitialAdMock)
                 Mockito.verify(pluginCall).resolve(argumentCaptor.capture())
-                assertEquals(AdInterstitialExecutor.preparedAds[interstitialAdStub.adUnitId], interstitialAdStub)
+                assertEquals(AdInterstitialExecutor.preparedAds[adUnitId], interstitialAdMock)
             }
 
             @Test
             fun `onAdLoaded should assign the content callback`() {
-                val interstitialStub = InterstitialAdStub()
-                assertNull(interstitialStub.fullScreenContentCallback)
-
-                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock)
+                val listener = InterstitialAdCallbackAndListeners.getInterstitialAdLoadCallback(pluginCall, notifierMock, adUnitId)
                 // ACt
-                listener.onAdLoaded(interstitialStub)
+                listener.onAdLoaded(interstitialAdMock)
 
-                assertNotNull(interstitialStub.fullScreenContentCallback)
+                Mockito.verify(interstitialAdMock).adEventCallback = any()
             }
         }
 
