@@ -3,15 +3,19 @@ package com.getcapacitor.community.admob.banner;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.util.Consumer;
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
@@ -44,8 +48,117 @@ public class BannerExecutor extends Executor {
         super(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "BannerExecutor");
     }
 
-    public void initialize() {
-        mViewGroup = (ViewGroup) ((ViewGroup) activitySupplier.get().findViewById(android.R.id.content)).getChildAt(0);
+    /**
+     * How long to wait for the banner parent to appear before giving up. Deliberately
+     * generous: the devices where the parent is late are the slow ones, and a premature
+     * timeout now fails AdMob.initialize() outright rather than only the banner.
+     */
+    private static final long PARENT_TIMEOUT_MS = 5000;
+
+    /**
+     * Resolve the banner parent, waiting for the layout pass that adds it when it is not
+     * there yet, and report the outcome to `onResult` on the UI thread.
+     *
+     * android.R.id.content can still have no child when initialize() runs - for example
+     * when the app is relaunched quickly after being closed - and the old code cached that
+     * null for the lifetime of the process, so every later showBanner() threw
+     * NullPointerException on it. Waiting here lets AdMob.initialize() mean what callers
+     * already read it as: ready to show a banner.
+     */
+    public void awaitViewGroup(final Consumer<Boolean> onResult) {
+        if (resolveViewGroup() != null) {
+            onResult.accept(true);
+            return;
+        }
+
+        Activity activity = liveActivity();
+        View content = activity == null ? null : activity.findViewById(android.R.id.content);
+        if (!(content instanceof ViewGroup)) {
+            Log.w(logTag, "Banner parent unavailable: no usable android.R.id.content");
+            onResult.accept(false);
+            return;
+        }
+
+        final View contentView = content;
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final boolean[] settled = { false };
+        final ViewTreeObserver.OnGlobalLayoutListener[] listener = new ViewTreeObserver.OnGlobalLayoutListener[1];
+        final Runnable[] timeout = new Runnable[1];
+
+        listener[0] = () -> {
+            if (settled[0] || resolveViewGroup() == null) {
+                return;
+            }
+            settled[0] = true;
+            handler.removeCallbacks(timeout[0]);
+            removeGlobalLayoutListener(contentView, listener[0]);
+            onResult.accept(true);
+        };
+
+        timeout[0] = () -> {
+            if (settled[0]) {
+                return;
+            }
+            settled[0] = true;
+            removeGlobalLayoutListener(contentView, listener[0]);
+            Log.w(logTag, "Banner parent never appeared within " + PARENT_TIMEOUT_MS + "ms");
+            onResult.accept(false);
+        };
+
+        contentView.getViewTreeObserver().addOnGlobalLayoutListener(listener[0]);
+
+        // A child added between the first attempt and registering the listener would not
+        // fire it, so try once more now that we are listening.
+        if (resolveViewGroup() != null) {
+            settled[0] = true;
+            removeGlobalLayoutListener(contentView, listener[0]);
+            onResult.accept(true);
+            return;
+        }
+
+        handler.postDelayed(timeout[0], PARENT_TIMEOUT_MS);
+    }
+
+    /**
+     * The banner's parent, or null while it is unavailable. Never caches a null: the
+     * lookup is retried on each use so a later call can succeed once layout has settled.
+     */
+    private ViewGroup resolveViewGroup() {
+        if (mViewGroup != null) {
+            return mViewGroup;
+        }
+        Activity activity = liveActivity();
+        if (activity == null) {
+            return null;
+        }
+        View content = activity.findViewById(android.R.id.content);
+        if (!(content instanceof ViewGroup)) {
+            return null;
+        }
+        // Must be content's first child: showBanner builds CoordinatorLayout.LayoutParams,
+        // which android.R.id.content (a FrameLayout) rejects with a ClassCastException
+        // while measuring.
+        View child = ((ViewGroup) content).getChildAt(0);
+        if (child instanceof ViewGroup) {
+            mViewGroup = (ViewGroup) child;
+        }
+        return mViewGroup;
+    }
+
+    /** The current activity, or null when it is gone or on its way out. */
+    private Activity liveActivity() {
+        Activity activity = activitySupplier.get();
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return null;
+        }
+        return activity;
+    }
+
+    private static void removeGlobalLayoutListener(View view, ViewTreeObserver.OnGlobalLayoutListener listener) {
+        ViewTreeObserver observer = view.getViewTreeObserver();
+        if (observer.isAlive()) {
+            observer.removeOnGlobalLayoutListener(listener);
+        }
     }
 
     public void showBanner(final PluginCall call) {
@@ -211,7 +324,10 @@ public class BannerExecutor extends Executor {
                     .get()
                     .runOnUiThread(() -> {
                         if (mAdView != null) {
-                            mViewGroup.removeView(mAdViewLayout);
+                            final ViewGroup bannerParent = resolveViewGroup();
+                            if (bannerParent != null) {
+                                bannerParent.removeView(mAdViewLayout);
+                            }
                             mAdViewLayout.removeView(mAdView);
                             mAdView.destroy();
                             mAdView = null;
@@ -296,7 +412,10 @@ public class BannerExecutor extends Executor {
                                 return;
                             }
 
-                            mViewGroup.removeView(mAdViewLayout);
+                            final ViewGroup bannerParent = resolveViewGroup();
+                            if (bannerParent != null) {
+                                bannerParent.removeView(mAdViewLayout);
+                            }
                             mAdViewLayout.removeView(adView);
                             adView.destroy();
                             mAdView = null;
@@ -347,7 +466,12 @@ public class BannerExecutor extends Executor {
                 });
 
                 // Add AdViewLayout top of the WebView
-                mViewGroup.addView(mAdViewLayout);
+                final ViewGroup bannerParent = resolveViewGroup();
+                if (bannerParent != null) {
+                    bannerParent.addView(mAdViewLayout);
+                } else {
+                    Log.w(logTag, "Banner not attached: parent unavailable");
+                }
             });
     }
 }
