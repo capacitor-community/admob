@@ -20,10 +20,10 @@
 
 ## Maintainers
 
-| Maintainer          | GitHub                                           | Social                                          |
-| ------------------- | ------------------------------------------------ | ----------------------------------------------- |
-| Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo)              | [@rdlabo](https://twitter.com/rdlabo)           |
-| Saninn Salas Diaz   | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) |
+| Maintainer          | GitHub                                           | Social                                          | Website                                         |
+| ------------------- | ------------------------------------------------ | ----------------------------------------------- | ----------------------------------------------- |
+| Masahiko Sakakibara | [rdlabo](https://github.com/rdlabo)              | [@rdlabo](https://twitter.com/rdlabo)           | [rdlabo.dev](https://rdlabo.dev/)               |
+| Saninn Salas Diaz   | [Saninn Salas Diaz](https://github.com/distante) | [@SaninnSalas](https://twitter.com/SaninnSalas) | —                                               |
 
 Maintenance Status: Actively Maintained
 
