@@ -29,6 +29,7 @@
   "bugs": {
     "url": "git@github.com:capacitor-community/admob.git/issues"
   },
+  "homepage": "https://docs.rdlabo.dev/projects/capacitor-admob",
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
     "verify:ios": "xcodebuild -scheme CapacitorCommunityAdmob -destination generic/platform=iOS",
