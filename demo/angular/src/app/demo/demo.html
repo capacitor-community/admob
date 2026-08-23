@@ -28,6 +28,19 @@
     </ion-item>
   </ion-list>
 
+  @if (vm.nativeAdsAvailable) {
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        Native feed ad (unsupported research preview; test ads only) @if (vm.lastNativeAdEvent(); as event) {
+        <br />(Last Event: {{ event.name }} | {{ event.value | json }}) }
+      </ion-label>
+    </ion-list-header>
+    <capacitor-admob-native feed-id="demo-native-feed" slot-key="demo-native-ad" />
+    <ion-item [button]="true" (click)="vm.reloadNativeAd()">Reload Native Ad</ion-item>
+  </ion-list>
+  }
+
   <ion-list>
     <ion-list-header>
       <ion-label>
