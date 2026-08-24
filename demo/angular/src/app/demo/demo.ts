@@ -1,12 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  inject,
-  signal,
-  WritableSignal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   AdMob,
@@ -19,12 +12,9 @@ import {
   BannerAdPluginEvents,
   BannerAdSize,
   InterstitialAdPluginEvents,
-  NativeAdFeed,
-  NativeAdPluginEvents,
-  NativeAdTemplate,
   RewardAdPluginEvents,
 } from '@capacitor-community/admob';
-import { Capacitor, PluginListenerHandle } from '@capacitor/core';
+import { PluginListenerHandle } from '@capacitor/core';
 import {
   IonContent,
   IonFooter,
@@ -77,7 +67,6 @@ interface AdEvent {
     IonSelectOption,
     IonFooter,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Demo implements ViewWillEnter, ViewWillLeave {
@@ -96,8 +85,6 @@ class ViewModel extends ViewModelStore<Demo> {
   readonly #toastController = inject(ToastController);
   readonly #bannerViewport = inject(BannerViewportService);
   readonly #listenerHandlers: PluginListenerHandle[] = [];
-  #nativeAdFeed?: NativeAdFeed;
-
   #appMargin = 0;
   #bannerPosition: 'top' | 'bottom' = 'bottom';
 
@@ -106,8 +93,6 @@ class ViewModel extends ViewModelStore<Demo> {
   readonly lastBannerEvent = signal<AdEvent | undefined>(undefined);
   readonly lastRewardEvent = signal<AdEvent | undefined>(undefined);
   readonly lastInterstitialEvent = signal<AdEvent | undefined>(undefined);
-  readonly lastNativeAdEvent = signal<AdEvent | undefined>(undefined);
-  readonly nativeAdsAvailable = Capacitor.isNativePlatform();
   readonly lastAppOpenEvent = signal<AdEvent | undefined>(undefined);
   readonly isConsentAvailable = signal(false);
   readonly isBannerPrepared = signal(false);
@@ -123,30 +108,16 @@ class ViewModel extends ViewModelStore<Demo> {
     });
     this.#listenerHandlers.push(resizeHandler);
 
-    const setupTasks = [
+    await Promise.all([
       this.#registerBannerListeners(),
       this.#registerRewardListeners(),
       this.#registerInterstitialListeners(),
       this.#registerAppOpenListeners(),
-    ];
-    if (this.nativeAdsAvailable) {
-      setupTasks.push(this.#createNativeAdFeed());
-    }
-    await Promise.all(setupTasks);
+    ]);
   }
 
   async leave(): Promise<void> {
-    await Promise.all([
-      ...this.#listenerHandlers.splice(0).map((handler) => handler.remove()),
-      this.#nativeAdFeed?.destroy(),
-    ]);
-    this.#nativeAdFeed = undefined;
-  }
-
-  async reloadNativeAd(): Promise<void> {
-    await this.#didSucceed(
-      this.#nativeAdFeed?.reload('demo-native-ad') ?? Promise.reject(new Error('Feed unavailable')),
-    );
+    await Promise.all(this.#listenerHandlers.splice(0).map((handler) => handler.remove()));
   }
 
   async requestConsentInfo(): Promise<void> {
@@ -278,30 +249,6 @@ class ViewModel extends ViewModelStore<Demo> {
       AdMob.addListener(BannerAdPluginEvents.Opened, () => this.#setEvent(target, 'Opened')),
       AdMob.addListener(BannerAdPluginEvents.Closed, () => this.#setEvent(target, 'Closed')),
       AdMob.addListener(BannerAdPluginEvents.AdImpression, () => this.#setEvent(target, 'AdImpression')),
-    ]);
-    this.#listenerHandlers.push(...handlers);
-  }
-
-  async #createNativeAdFeed(): Promise<void> {
-    this.#nativeAdFeed = await NativeAdFeed.create({
-      feedId: 'demo-native-feed',
-      template: NativeAdTemplate.Medium,
-      isTesting: true,
-    });
-    const target = this.lastNativeAdEvent;
-    const handlers = await Promise.all([
-      this.#nativeAdFeed.addListener(NativeAdPluginEvents.Loaded, (value) =>
-        this.#setEvent(target, NativeAdPluginEvents.Loaded, value),
-      ),
-      this.#nativeAdFeed.addListener(NativeAdPluginEvents.FailedToLoad, (value) =>
-        this.#setEvent(target, NativeAdPluginEvents.FailedToLoad, value),
-      ),
-      this.#nativeAdFeed.addListener(NativeAdPluginEvents.Clicked, (value) =>
-        this.#setEvent(target, NativeAdPluginEvents.Clicked, value),
-      ),
-      this.#nativeAdFeed.addListener(NativeAdPluginEvents.AdImpression, (value) =>
-        this.#setEvent(target, NativeAdPluginEvents.AdImpression, value),
-      ),
     ]);
     this.#listenerHandlers.push(...handlers);
   }
