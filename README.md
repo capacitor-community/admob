@@ -66,11 +66,11 @@ Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile
 
 | Goal                                                              | Ad format                 | Guide                                      |
 | ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
-| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](./docs/banner.md)             |
-| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](./docs/interstitial.md) |
-| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](./docs/rewarded.md)         |
-| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](./docs/rewarded.md)         |
-| Monetize an app-open experience                                   | App Open                  | [App Open Ads](./docs/app-open.md)         |
+| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner)             |
+| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) |
+| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
+| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
+| Monetize an app-open experience                                   | App Open                  | [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open)         |
 
 ## Quick start
 
@@ -101,7 +101,7 @@ async function startAdMob() {
 }
 ```
 
-The banner sits on the native screen above the WebView, so it can cover your HTML. See [Banner Ads](./docs/banner.md) to inset your layout. Details: [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and the per-format guides.
+The banner sits on the native screen above the WebView, so it can cover your HTML. See [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) to inset your layout. Details: [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration), [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent), and the per-format guides.
 
 ## Installation
 
@@ -118,7 +118,7 @@ If you still use Capacitor 7, install `@capacitor-community/admob@7`.
 
 ### Google Mobile Ads SDK versions
 
-This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](./docs/migration.md) for the policy behind the pins.
+This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) for the policy behind the pins.
 
 ### Android configuration
 
@@ -185,18 +185,18 @@ Run `pod repo update` in `ios/`, then `npx cap sync ios` again.
 
 ## Documentation
 
-Start with [Installation](#installation) above, then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
+Start with [Installation](#installation) above, then [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
 
-- [Configuration](./docs/configuration.md) — `AdMob.initialize` and SDK options.
-- [Consent](./docs/consent.md) — privacy consent and iOS tracking authorization.
-- [Banner Ads](./docs/banner.md) — banner options, lifecycle, and events.
+- [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) — `AdMob.initialize` and SDK options.
+- [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) — privacy consent and iOS tracking authorization.
+- [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) — banner options, lifecycle, and events.
 - Full-screen ads:
-  - [Interstitial Ads](./docs/interstitial.md) — load, show, and multiple prepared ads.
-  - [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and server-side verification.
-- [App Open Ads](./docs/app-open.md) — load and present on foreground transitions.
-- [Ad Events](./docs/events.md) — shared lifecycle events, errors, and revenue data.
-- [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
-- [Migration Guide](./docs/migration.md) — historical notes when upgrading from older plugin versions.
+  - [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) — load, show, and multiple prepared ads.
+  - [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded) — rewarded video, rewarded interstitial, and server-side verification.
+- [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open) — load and present on foreground transitions.
+- [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events) — shared lifecycle events, errors, and revenue data.
+- [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) — demo ad units, test devices, and consent testing.
+- [Migration Guide](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) — historical notes when upgrading from older plugin versions.
 
 <!-- rdlabo-docs-omit -->
 ## Index
