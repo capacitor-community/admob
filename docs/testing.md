@@ -21,6 +21,10 @@ await AdMob.initialize({
 });
 ```
 
+<!-- !::initialize:: -->
+
+<!-- !::AdMobInitializationOptions:: -->
+
 Find the device ID in the native logs after the first ad request:
 
 - Android: Logcat, typically on the `Ads` tag (`Use RequestConfiguration.Builder.setTestDeviceIds(...)`).
@@ -40,6 +44,12 @@ const consentInfo = await AdMob.requestConsentInfo({
   testDeviceIdentifiers: ['YOUR_TEST_DEVICE_ID'],
 });
 ```
+
+<!-- !::requestConsentInfo:: -->
+
+<!-- !::AdmobConsentRequestOptions:: -->
+
+<!-- !::AdmobConsentDebugGeography:: -->
 
 If you decline consent in the test form (Manage → Confirm Choices), ads may not load. That is expected in a test environment and does not predict production behavior after a user consents.
 
