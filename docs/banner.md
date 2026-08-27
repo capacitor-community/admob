@@ -43,6 +43,14 @@ const options: BannerAdOptions = {
 await AdMob.showBanner(options);
 ```
 
+<!-- !::showBanner:: -->
+
+<!-- !::BannerAdOptions:: -->
+
+<!-- !::BannerAdSize:: -->
+
+<!-- !::BannerAdPosition:: -->
+
 ## Keep content out from under the banner
 
 The banner is drawn on the native screen above the WebView. HTML layout does not move on its own. Inset your own root by `size.height` (logical pixels). Use padding or margin on the bottom for `BOTTOM_CENTER`, and on the top for `TOP_CENTER`.
@@ -66,13 +74,19 @@ await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size) => {
 
 When the height is `0` (hidden, removed, or failed), clear the inset. Apply the same idea to whatever element fills the WebView in your framework.
 
-Request fields are defined on [`BannerAdOptions`](../README.md#banneradoptions). See [Testing](./testing.md) for `isTesting`.
+See [Testing](./testing.md) for `isTesting`.
 
 ## Lifecycle
 
 - `hideBanner()` temporarily hides the current banner.
 - `resumeBanner()` shows a hidden banner again.
 - `removeBanner()` destroys it. Call `showBanner()` to create another one.
+
+<!-- !::hideBanner:: -->
+
+<!-- !::resumeBanner:: -->
+
+<!-- !::removeBanner:: -->
 
 Release listener handles when the owning screen is destroyed:
 

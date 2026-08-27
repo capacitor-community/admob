@@ -18,6 +18,8 @@ const handle = await AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
 await handle.remove();
 ```
 
+<!-- !::PluginListenerHandle:: -->
+
 ## Common lifecycle events
 
 | Event                     | Emitted when                                           |
@@ -33,11 +35,15 @@ await handle.remove();
 
 ## Errors
 
-`FailedToLoad` and `FailedToShow` listeners receive an [`AdMobError`](../README.md#admoberror).
+`FailedToLoad` and `FailedToShow` listeners receive an `AdMobError` payload.
+
+<!-- !::AdMobError:: -->
 
 ## Impression-level revenue
 
-Full-screen formats emit [`AdMobRevenueData`](../README.md#admobrevenuedata) on their `AdImpression` event. Banners emit the same payload on `AdPaid`. Banner `AdImpression` has no payload; it only signals that an impression was recorded.
+Full-screen formats emit `AdMobRevenueData` on their `AdImpression` event. Banners emit the same payload on `AdPaid`. Banner `AdImpression` has no payload; it only signals that an impression was recorded.
+
+<!-- !::AdMobRevenueData:: -->
 
 ## Per-format guides
 
@@ -46,4 +52,22 @@ Full-screen formats emit [`AdMobRevenueData`](../README.md#admobrevenuedata) on 
 - [Interstitial Ads](./interstitial.md)
 - [Rewarded Ads](./rewarded.md)
 
-Method and enum signatures are in the [API reference](../README.md#api).
+<!-- !::addListener.AppOpenAdPluginEvents:: -->
+
+<!-- !::AppOpenAdPluginEvents:: -->
+
+<!-- !::addListener.BannerAdPluginEvents:: -->
+
+<!-- !::BannerAdPluginEvents:: -->
+
+<!-- !::addListener.InterstitialAdPluginEvents:: -->
+
+<!-- !::InterstitialAdPluginEvents:: -->
+
+<!-- !::addListener.RewardAdPluginEvents:: -->
+
+<!-- !::RewardAdPluginEvents:: -->
+
+<!-- !::addListener.RewardInterstitialAdPluginEvents:: -->
+
+<!-- !::RewardInterstitialAdPluginEvents:: -->
