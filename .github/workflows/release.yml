@@ -4,6 +4,10 @@ on:
   push:
     tags:
       - 'v*'
+  pull_request:
+    types: [synchronize]
+  pull_request_review:
+    types: [submitted]
 
 permissions:
   id-token: write
@@ -11,6 +15,7 @@ permissions:
 
 jobs:
   release:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +50,7 @@ jobs:
         run: |
           VERSION="${{ steps.tag_version.outputs.version }}"
           IS_STABLE=$(echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' && echo true || echo false)
-          
+
           echo "Publishing... $IS_STABLE"
           if [ "$IS_STABLE" = "true" ]; then
             npm publish --provenance --access public
@@ -53,3 +58,204 @@ jobs:
             npm publish --provenance --access public --tag next
           fi
 
+  build-pr-beta:
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      ((github.event_name == 'pull_request_review' &&
+      github.event.review.state == 'approved' &&
+      github.event.review.commit_id == github.event.pull_request.head.sha) ||
+      (github.event_name == 'pull_request' && github.event.action == 'synchronize'))
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-beta-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+      cancel-in-progress: false
+    outputs:
+      allowed: ${{ steps.authorize.outputs.allowed }}
+      artifact: ${{ steps.pack.outputs.artifact }}
+      package: ${{ steps.pack.outputs.package }}
+      version: ${{ steps.pack.outputs.version }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+
+    steps:
+      - name: Authorize beta publishing
+        id: authorize
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const marker = '<!-- npm-pr-beta-enabled -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            if (context.eventName === 'pull_request_review') {
+              const reviewer = context.payload.review.user.login;
+              const { data } = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner,
+                repo,
+                username: reviewer,
+              });
+              if (data.permission !== 'admin') {
+                core.notice(`@${reviewer} is not a repository administrator; beta publishing remains disabled.`);
+                core.setOutput('allowed', 'false');
+                return;
+              }
+
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number,
+                per_page: 100,
+              });
+              const enabledComment = comments.find(
+                (comment) => comment.user?.login === 'github-actions[bot]' && comment.body?.includes(marker),
+              );
+              const body = `${marker}\n🔐 npm beta auto-publishing was enabled by repository administrator @${reviewer}. Every new commit on this PR will be published until this comment is deleted.`;
+              if (enabledComment) {
+                await github.rest.issues.updateComment({ owner, repo, comment_id: enabledComment.id, body });
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              }
+              core.setOutput('allowed', 'true');
+              return;
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const enabled = comments.some(
+              (comment) => comment.user?.login === 'github-actions[bot]' && comment.body?.includes(marker),
+            );
+            core.setOutput('allowed', String(enabled));
+
+      - name: Checkout approved PR commit
+        if: steps.authorize.outputs.allowed == 'true'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Setup Node.js
+        if: steps.authorize.outputs.allowed == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Update npm
+        if: steps.authorize.outputs.allowed == 'true'
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        if: steps.authorize.outputs.allowed == 'true'
+        run: npm ci
+
+      - name: Set PR beta version
+        if: steps.authorize.outputs.allowed == 'true'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          BASE_VERSION=$(node -p "require('./package.json').version.split('-')[0]")
+          VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.${HEAD_SHA:0:12}"
+          npm version "$VERSION" --no-git-tag-version --ignore-scripts
+
+      - name: Build package
+        if: steps.authorize.outputs.allowed == 'true'
+        run: npm run build
+
+      - name: Pack PR beta
+        if: steps.authorize.outputs.allowed == 'true'
+        id: pack
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          ARTIFACT_NAME="npm-pr-beta-${PR_NUMBER}-${HEAD_SHA}"
+          PACK_DIR="$RUNNER_TEMP/npm-pr-beta"
+          mkdir -p "$PACK_DIR"
+          npm pack --ignore-scripts --pack-destination "$PACK_DIR"
+          echo "artifact=$ARTIFACT_NAME" >> "$GITHUB_OUTPUT"
+          echo "package=$PACKAGE_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Upload packed package
+        if: steps.authorize.outputs.allowed == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.pack.outputs.artifact }}
+          path: ${{ runner.temp }}/npm-pr-beta/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  publish-pr-beta:
+    needs: build-pr-beta
+    if: needs.build-pr-beta.outputs.allowed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Download packed package
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.build-pr-beta.outputs.artifact }}
+          path: ${{ runner.temp }}/npm-pr-beta
+
+      - name: Publish PR beta
+        run: |
+          PACKAGE_NAME="${{ needs.build-pr-beta.outputs.package }}"
+          VERSION="${{ needs.build-pr-beta.outputs.version }}"
+          if npm view "${PACKAGE_NAME}@${VERSION}" version >/dev/null 2>&1; then
+            echo "${PACKAGE_NAME}@${VERSION} already exists; skipping publish."
+          else
+            npm publish "$RUNNER_TEMP"/npm-pr-beta/*.tgz --ignore-scripts --provenance --access public --tag beta
+          fi
+
+      - name: Comment exact install command
+        uses: actions/github-script@v8
+        env:
+          PACKAGE_NAME: ${{ needs.build-pr-beta.outputs.package }}
+          VERSION: ${{ needs.build-pr-beta.outputs.version }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        with:
+          script: |
+            const shortSha = process.env.HEAD_SHA.slice(0, 12);
+            const marker = `<!-- npm-pr-beta:${process.env.HEAD_SHA} -->`;
+            const body = `${marker}\n### npm beta published\n\nCommit \`${shortSha}\` is available as:\n\n\`\`\`sh\nnpm install ${process.env.PACKAGE_NAME}@${process.env.VERSION}\n\`\`\``;
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (comment) => comment.user?.login === 'github-actions[bot]' && comment.body?.includes(marker),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
