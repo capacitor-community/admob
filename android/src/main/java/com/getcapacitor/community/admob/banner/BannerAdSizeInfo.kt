@@ -1,9 +1,7 @@
 package com.getcapacitor.community.admob.banner
 
 import com.getcapacitor.JSObject
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdView
-import java.util.*
+import com.google.android.libraries.ads.mobile.sdk.banner.AdView
 
 data class BannerAdSizeInfo(val width: Int, val height: Int) : JSObject() {
     override fun put(key: String, value: Int): JSObject {
@@ -13,5 +11,5 @@ data class BannerAdSizeInfo(val width: Int, val height: Int) : JSObject() {
         super.put("width", width)
         super.put("height", height)
     }
-    constructor(mAdView: AdView): this(Objects.requireNonNull(mAdView.adSize)!!.width, Objects.requireNonNull(mAdView.adSize)!!.height)
+    constructor(mAdView: AdView): this(mAdView.width, mAdView.height)
 }

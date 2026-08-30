@@ -2,16 +2,18 @@ package com.getcapacitor.community.admob.rewardedinterstitial
 
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
-import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
 import com.getcapacitor.community.admob.models.AdMobPluginError
 import com.getcapacitor.community.admob.models.AdMobRevenueData
 import com.getcapacitor.community.admob.models.AdOptions
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnUserEarnedRewardListener
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
-import com.google.android.gms.common.util.BiConsumer
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.AdValue
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAdEventCallback
+import java.util.function.BiConsumer
 
 object RewardedInterstitialAdCallbackAndListeners {
 
@@ -25,25 +27,27 @@ object RewardedInterstitialAdCallbackAndListeners {
         }
     }
 
-    fun getRewardedAdLoadCallback(call: PluginCall, notifyListenersFunction: BiConsumer<String, JSObject>, adOptions: AdOptions): RewardedInterstitialAdLoadCallback {
-        return object : RewardedInterstitialAdLoadCallback() {
+    fun getRewardedAdLoadCallback(
+        call: PluginCall,
+        notifyListenersFunction: BiConsumer<String, JSObject>,
+        adOptions: AdOptions,
+        adUnitId: String,
+    ): AdLoadCallback<RewardedInterstitialAd> {
+        return object : AdLoadCallback<RewardedInterstitialAd> {
             override fun onAdLoaded(ad: RewardedInterstitialAd) {
-                ad.fullScreenContentCallback = FullscreenPluginCallback(
-                        RewardInterstitialAdPluginEvents, notifyListenersFunction)
+                ad.adEventCallback =
+                    object : RewardedInterstitialAdEventCallback {
+                        override fun onAdPaid(value: AdValue) {
+                            val revenueData = AdMobRevenueData(value, adUnitId, "", "")
+                            notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.AdImpression, revenueData)
+                        }
+                    }
 
-                ad.setOnPaidEventListener { adValue ->
-                    val responseInfo = ad.responseInfo
-                    val networkName = responseInfo?.mediationAdapterClassName ?: ""
-                    val impressionId = responseInfo?.responseId ?: ""
-                    val revenueData = AdMobRevenueData(adValue, ad.adUnitId, networkName, impressionId)
-                    notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.AdImpression, revenueData)
-                }
-
-                AdRewardInterstitialExecutor.preparedAds[ad.adUnitId] = ad
-                AdRewardInterstitialExecutor.lastPreparedAdId = ad.adUnitId
+                AdRewardInterstitialExecutor.preparedAds[adUnitId] = ad
+                AdRewardInterstitialExecutor.lastPreparedAdId = adUnitId
 
                 val adInfo = JSObject()
-                adInfo.put("adUnitId", ad.adUnitId)
+                adInfo.put("adUnitId", adUnitId)
                 call.resolve(adInfo)
 
                 notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.Loaded, adInfo)
@@ -54,6 +58,30 @@ object RewardedInterstitialAdCallbackAndListeners {
 
                 notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.FailedToLoad, adMobError)
                 call.reject(adError.message)
+            }
+        }
+    }
+
+    fun getRewardedInterstitialAdEventCallback(
+        notifyListenersFunction: BiConsumer<String, JSObject>,
+        onCompleted: Runnable? = null,
+    ): RewardedInterstitialAdEventCallback {
+        return object : RewardedInterstitialAdEventCallback {
+            override fun onAdShowedFullScreenContent() {
+                notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.Showed, JSObject())
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                onCompleted?.run()
+                notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.Dismissed, JSObject())
+            }
+
+            override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
+                onCompleted?.run()
+                notifyListenersFunction.accept(
+                    RewardInterstitialAdPluginEvents.FailedToShow,
+                    AdMobPluginError(fullScreenContentError),
+                )
             }
         }
     }

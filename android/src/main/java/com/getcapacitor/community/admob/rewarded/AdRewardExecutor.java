@@ -7,16 +7,15 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
-import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.common.util.BiConsumer;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class AdRewardExecutor extends Executor {
 
@@ -40,13 +39,11 @@ public class AdRewardExecutor extends Executor {
             .get()
             .runOnUiThread(() -> {
                 try {
-                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                    final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+                    final String id = AdViewIdHelper.getFinalAdId(adOptions, logTag, contextSupplier.get());
+                    final AdRequest adRequest = RequestHelper.createRequest(adOptions, id);
                     RewardedAd.load(
-                        contextSupplier.get(),
-                        id,
                         adRequest,
-                        RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
+                        RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions, id)
                     );
                 } catch (Exception ex) {
                     call.reject(ex.getLocalizedMessage(), ex);
@@ -72,8 +69,8 @@ public class AdRewardExecutor extends Executor {
             activitySupplier
                 .get()
                 .runOnUiThread(() -> {
-                    ad.setFullScreenContentCallback(
-                        new FullscreenPluginCallback(RewardAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
+                    ad.setAdEventCallback(
+                        RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdEventCallback(notifyListenersFunction, () -> {
                             preparedAds.remove(adId);
                             if (adId != null && adId.equals(lastPreparedAdId)) {
                                 lastPreparedAdId = null;
