@@ -8,6 +8,10 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches: [main]
+
+permissions:
+  contents: read
+
 concurrency:
   group: validation-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -59,7 +63,6 @@ jobs:
       - run: npm run build
       - run: npm ci && npm run test:ci
         working-directory: demo/angular
-
 
   verify-web:
     runs-on: ubuntu-latest
