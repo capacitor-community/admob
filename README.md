@@ -190,6 +190,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 - [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) — `AdMob.initialize` and SDK options.
 - [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) — privacy consent and iOS tracking authorization.
 - [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) — banner options, lifecycle, and events.
+- [Native Ads research preview](./docs/native-ads.md) — unsupported, test-ads-only API for device validation; not production-ready. Its API may change or be removed in a minor release until it is promoted to stable.
 - Full-screen ads:
   - [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) — load, show, and multiple prepared ads.
   - [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded) — rewarded video, rewarded interstitial, and server-side verification.

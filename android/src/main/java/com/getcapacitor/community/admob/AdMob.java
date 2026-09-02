@@ -17,6 +17,7 @@ import com.getcapacitor.community.admob.consent.AdConsentExecutor;
 import com.getcapacitor.community.admob.helpers.AuthorizationStatusEnum;
 import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndListeners;
+import com.getcapacitor.community.admob.nativeads.NativeAdExecutor;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.getcapacitor.community.admob.rewardedinterstitial.AdRewardInterstitialExecutor;
 import com.google.android.gms.ads.MobileAds;
@@ -69,6 +70,14 @@ public class AdMob extends Plugin {
     );
 
     private final AppOpenAdPlugin appOpenAdPlugin = new AppOpenAdPlugin();
+
+    private final NativeAdExecutor nativeAdExecutor = new NativeAdExecutor(
+        this::getContext,
+        this::getActivity,
+        () -> getBridge().getWebView(),
+        this::notifyListeners,
+        getLogTag()
+    );
 
     @PluginMethod
     public void loadAppOpen(final PluginCall call) {
@@ -211,6 +220,35 @@ public class AdMob extends Plugin {
     }
 
     // ---------------------------------------------------------
+    // NATIVE ADS
+    // ---------------------------------------------------------
+
+    @PluginMethod
+    public void startNativeAdFeed(final PluginCall call) {
+        nativeAdExecutor.startFeed(call);
+    }
+
+    @PluginMethod
+    public void destroyNativeAdFeed(final PluginCall call) {
+        nativeAdExecutor.destroyFeed(call);
+    }
+
+    @PluginMethod
+    public void loadNativeAd(final PluginCall call) {
+        nativeAdExecutor.load(call);
+    }
+
+    @PluginMethod
+    public void updateNativeAdPlacements(final PluginCall call) {
+        nativeAdExecutor.updatePlacements(call);
+    }
+
+    @PluginMethod
+    public void removeNativeAd(final PluginCall call) {
+        nativeAdExecutor.remove(call);
+    }
+
+    // ---------------------------------------------------------
     // INTERSTITIAL ADS
     // ---------------------------------------------------------
 
@@ -315,5 +353,11 @@ public class AdMob extends Plugin {
         } catch (JSONException error) {
             call.reject(error.toString());
         }
+    }
+
+    @Override
+    protected void handleOnDestroy() {
+        nativeAdExecutor.destroyAll();
+        super.handleOnDestroy();
     }
 }

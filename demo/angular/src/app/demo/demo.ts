@@ -85,7 +85,6 @@ class ViewModel extends ViewModelStore<Demo> {
   readonly #toastController = inject(ToastController);
   readonly #bannerViewport = inject(BannerViewportService);
   readonly #listenerHandlers: PluginListenerHandle[] = [];
-
   #appMargin = 0;
   #bannerPosition: 'top' | 'bottom' = 'bottom';
 
