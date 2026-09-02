@@ -105,7 +105,7 @@ public class AdMob extends Plugin {
                 );
                 // Resolve only once the banner parent actually exists, so a resolved
                 // initialize() means what callers already read it as. See #451.
-                bannerExecutor.awaitViewGroup(found -> {
+                bannerExecutor.awaitViewGroup((found) -> {
                     if (found) {
                         call.resolve();
                     } else {
