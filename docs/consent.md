@@ -26,6 +26,16 @@ if (consentInfo.canRequestAds) {
 }
 ```
 
+<!-- !::requestConsentInfo:: -->
+
+<!-- !::AdmobConsentRequestOptions:: -->
+
+<!-- !::AdmobConsentInfo:: -->
+
+<!-- !::AdmobConsentStatus:: -->
+
+<!-- !::showConsentForm:: -->
+
 Use `canRequestAds` as the decision point. A consent form may be unavailable or unnecessary depending on the user and the messages you configured.
 
 ## iOS tracking authorization
@@ -45,6 +55,12 @@ if (tracking.status === 'notDetermined') {
 
 `requestTrackingAuthorization()` does nothing on Android, web, and iOS versions before 14.
 
+<!-- !::trackingAuthorizationStatus:: -->
+
+<!-- !::TrackingAuthorizationStatusInterface:: -->
+
+<!-- !::requestTrackingAuthorization:: -->
+
 ## Privacy options
 
 If your privacy message requires an in-app entry point, expose a settings action that calls:
@@ -53,8 +69,12 @@ If your privacy message requires an in-app entry point, expose a settings action
 await AdMob.showPrivacyOptionsForm();
 ```
 
+<!-- !::showPrivacyOptionsForm:: -->
+
 ## Reset consent
 
 `resetConsentInfo()` is intended for testing. Do not use it to clear a production user's consent choice.
+
+<!-- !::resetConsentInfo:: -->
 
 For debug geography and test device IDs, see [Testing](./testing.md).

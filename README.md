@@ -67,7 +67,7 @@ If you still use Capacitor 7, install `@capacitor-community/admob@7`.
 
 ### Google Mobile Ads SDK versions
 
-This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](./docs/migration.md) for the policy behind the pins.
+This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) for the policy behind the pins.
 
 ### Android configuration
 
@@ -134,7 +134,7 @@ Run `pod repo update` in `ios/`, then `npx cap sync ios` again.
 
 ## First test banner
 
-After installation and platform setup, initialize the SDK, request consent, and show a Google demo banner. Use the platform banner IDs from [Testing](./docs/testing.md)—do not create your own ad unit for this first check.
+After installation and platform setup, initialize the SDK, request consent, and show a Google demo banner. Use the platform banner IDs from [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing)—do not create your own ad unit for this first check.
 
 Call `startAdMob` from a user action or after the UI is ready (for example a button or post-navigation hook), not only at module evaluation time.
 
@@ -170,32 +170,32 @@ async function startAdMob() {
 }
 ```
 
-Expected result: when `canRequestAds` is true, a Google test banner appears at the bottom of the native screen. When `canRequestAds` is false, the function returns and no banner is shown. The banner sits above the WebView and can cover HTML—see [Banner Ads](./docs/banner.md) to inset your layout. Details: [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and [Testing](./docs/testing.md).
+Expected result: when `canRequestAds` is true, a Google test banner appears at the bottom of the native screen. When `canRequestAds` is false, the function returns and no banner is shown. The banner sits above the WebView and can cover HTML—see [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) to inset your layout. Details: [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration), [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent), and [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing).
 
 ## Choose by advertising goal
 
 | Goal                                                              | Ad format                 | Guide                                      |
 | ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
-| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](./docs/banner.md)             |
-| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](./docs/interstitial.md) |
-| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](./docs/rewarded.md)         |
-| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](./docs/rewarded.md)         |
-| Monetize an app-open experience                                   | App Open                  | [App Open Ads](./docs/app-open.md)         |
+| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner)             |
+| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) |
+| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
+| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
+| Monetize an app-open experience                                   | App Open                  | [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open)         |
 
 ## Documentation
 
-Start with [Installation](#installation) above, then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md). Run the first test banner, then use [Testing](./docs/testing.md) for demo units and devices. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
+Start with [Installation](#installation) above, then [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Run the first test banner, then use [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for demo units and devices. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
 
-- [Configuration](./docs/configuration.md) — `AdMob.initialize` and SDK options.
-- [Consent](./docs/consent.md) — privacy consent and iOS tracking authorization.
-- [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
-- [Banner Ads](./docs/banner.md) — banner options, lifecycle, and events.
+- [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) — `AdMob.initialize` and SDK options.
+- [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) — privacy consent and iOS tracking authorization.
+- [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) — demo ad units, test devices, and consent testing.
+- [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) — banner options, lifecycle, and events.
 - Full-screen ads:
-  - [Interstitial Ads](./docs/interstitial.md) — load, show, and multiple prepared ads.
-  - [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and server-side verification.
-- [App Open Ads](./docs/app-open.md) — load and present on foreground transitions.
-- [Ad Events](./docs/events.md) — shared lifecycle events, errors, and revenue data.
-- [Migration Guide](./docs/migration.md) — historical notes when upgrading from older plugin versions.
+  - [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) — load, show, and multiple prepared ads.
+  - [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded) — rewarded video, rewarded interstitial, and server-side verification.
+- [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open) — load and present on foreground transitions.
+- [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events) — shared lifecycle events, errors, and revenue data.
+- [Migration Guide](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) — historical notes when upgrading from older plugin versions.
 
 <!-- rdlabo-docs-omit -->
 ## Index
@@ -1447,7 +1447,9 @@ The reward earned by the user after viewing a rewarded interstitial ad.
 
 From T, pick a set of properties whose keys are in the union K
 
-<code>{ [P in K]: T[P]; }</code>
+<code>{
+ [P in K]: T[P];
+ }</code>
 
 
 ### Enums
@@ -1588,6 +1590,22 @@ From T, pick a set of properties whose keys are in the union K
 | **`AdImpression`** | <code>'onRewardedInterstitialAdImpression'</code>   | Emits impression-level ad revenue data when a paid event is recorded.                                                                                                           |
 
 </docgen-api>
+
+## Prerelease channels
+
+An open, non-draft pull request can be published to the npm `beta` dist-tag after its `Validation` and `Package Candidate` workflows pass. A repository owner or maintainer must add a comment whose entire body is:
+
+```text
+/beta
+```
+
+The request authorizes only the pull request head SHA that existed when the comment was added. The workflow revalidates the owner or maintainer permission and head SHA immediately before publishing. Any new commit requires CI to pass again and a fresh owner or maintainer `/beta` comment. Fork pull requests are supported. Pull requests that change a release-gating workflow cannot be beta-published until those workflow changes land on `main`.
+
+Beta versions use `<base>-beta.pr<PR number>.sha<12-character SHA>`. The candidate is built in a read-only workflow without npm publishing credentials. The privileged release workflow publishes only the validated immutable package artifact with lifecycle scripts disabled. A notification failure cannot invalidate a successful npm publish.
+
+When a pull request is merged into `main`, it is automatically published to `beta` only after the required CI and `Package Candidate` succeed for that exact merge commit. Direct pushes to `main` do not publish a candidate.
+
+Only `npm run release` creates a release tag. Stable `vX.Y.Z` tags publish to npm `latest`; revision/prerelease tags publish to `next`. Neither `beta` nor `next` publishing changes the npm `latest` dist-tag.
 
 ## License
 

@@ -45,6 +45,14 @@ const rewardItem = await AdMob.showRewardVideoAd();
 console.log(rewardItem);
 ```
 
+<!-- !::prepareRewardVideoAd:: -->
+
+<!-- !::showRewardVideoAd:: -->
+
+<!-- !::RewardAdOptions:: -->
+
+<!-- !::AdMobRewardItem:: -->
+
 When no `adId` is passed to `showRewardVideoAd()`, the most recently prepared ad is shown.
 
 ### Prepare more than one ad
@@ -82,7 +90,15 @@ const rewardItem: AdMobRewardInterstitialItem = await AdMob.showRewardInterstiti
 console.log(rewardItem);
 ```
 
-Request fields are defined on [`RewardAdOptions`](../README.md#rewardadoptions) and [`RewardInterstitialAdOptions`](../README.md#rewardinterstitialadoptions). See [Testing](./testing.md) for `isTesting`.
+<!-- !::prepareRewardInterstitialAd:: -->
+
+<!-- !::showRewardInterstitialAd:: -->
+
+<!-- !::RewardInterstitialAdOptions:: -->
+
+<!-- !::AdMobRewardInterstitialItem:: -->
+
+See [Testing](./testing.md) for `isTesting`.
 
 ## Server-side verification
 

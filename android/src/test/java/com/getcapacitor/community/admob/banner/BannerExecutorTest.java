@@ -106,9 +106,9 @@ class BannerExecutorTest {
     }
 
     @Test
-    @DisplayName("#Initialize gets the reference of the reference of the viewGroup where the banner ad will go")
-    void initialize() {
-        sut.initialize();
+    @DisplayName("#awaitViewGroup gets the reference of the viewGroup where the banner ad will go")
+    void awaitViewGroup() {
+        sut.awaitViewGroup((found) -> {});
         verify(viewGroupMock).getChildAt(0);
     }
 
@@ -157,7 +157,7 @@ class BannerExecutorTest {
             when(contextMock.getResources()).thenReturn(resourcesMock);
             when(resourcesMock.getDisplayMetrics()).thenReturn(displayMetricsMock);
 
-            sut.initialize();
+            sut.awaitViewGroup((found) -> {});
         }
 
         @AfterEach
@@ -244,7 +244,7 @@ class BannerExecutorTest {
             when(contextMock.getResources()).thenReturn(resourcesMock);
             when(resourcesMock.getDisplayMetrics()).thenReturn(displayMetricsMock);
 
-            sut.initialize();
+            sut.awaitViewGroup((found) -> {});
         }
 
         @AfterEach

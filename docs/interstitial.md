@@ -5,13 +5,7 @@ Interstitial ads are full-screen ads that cover the host app. Show them at a nat
 Use an interstitial when the user should not receive an in-app reward. Call this after [initialize](./configuration.md) and [consent](./consent.md). Prepare the ad ahead of time, register listeners first, and show it only when it is ready.
 
 ```ts
-import {
-  AdLoadInfo,
-  AdMob,
-  AdMobRevenueData,
-  AdOptions,
-  InterstitialAdPluginEvents,
-} from '@capacitor-community/admob';
+import { AdLoadInfo, AdMob, AdMobRevenueData, AdOptions, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 
 await AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
   console.log('Interstitial loaded', info.adUnitId);
@@ -31,6 +25,12 @@ const { adUnitId } = await AdMob.prepareInterstitial(options);
 await AdMob.showInterstitial({ adId: adUnitId });
 ```
 
+<!-- !::prepareInterstitial:: -->
+
+<!-- !::showInterstitial:: -->
+
+<!-- !::AdOptions:: -->
+
 When no `adId` is passed to `showInterstitial()`, the most recently prepared ad is shown.
 
 ## Prepare more than one ad
@@ -42,6 +42,6 @@ await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
 await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
 ```
 
-Request fields are defined on [`AdOptions`](../README.md#adoptions). See [Testing](./testing.md) for `isTesting`.
+See [Testing](./testing.md) for `isTesting`.
 
 Load, show, dismissal, and failure events are listed on [Ad Events](./events.md).

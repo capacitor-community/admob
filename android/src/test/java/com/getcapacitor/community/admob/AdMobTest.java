@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Consumer;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
@@ -126,8 +127,8 @@ public class AdMobTest {
         }
 
         @Test
-        @DisplayName("Initializes the banner executor")
-        public void bannerExecutorInitialize() {
+        @DisplayName("Awaits the banner parent view group")
+        public void bannerExecutorAwaitViewGroup() {
             when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(false);
             doAnswer((invocation) -> {
                 ((Runnable) invocation.getArgument(0)).run();
@@ -136,10 +137,17 @@ public class AdMobTest {
                 .when(mockedActivity)
                 .runOnUiThread(any(Runnable.class));
 
+            BannerExecutor bannerExecutor = bannerExecutorMockedConstruction.constructed().get(0);
+            doAnswer((invocation) -> {
+                ((Consumer<Boolean>) invocation.getArgument(0)).accept(true);
+                return null;
+            })
+                .when(bannerExecutor)
+                .awaitViewGroup(any());
+
             sut.initialize(pluginCallMock);
 
-            BannerExecutor bannerExecutor = bannerExecutorMockedConstruction.constructed().get(0);
-            verify(bannerExecutor).initialize();
+            verify(bannerExecutor).awaitViewGroup(any());
         }
     }
 }
