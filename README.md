@@ -50,58 +50,7 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## Overview
 
-Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile Ads SDK for iOS and Android so you can display banner, interstitial, rewarded, rewarded interstitial, and app open ads in Capacitor apps.
-
-## Features
-
-- Banner ads (including adaptive banners)
-- Interstitial ads
-- Rewarded video ads
-- Rewarded interstitial ads
-- App open ads
-- Google User Messaging Platform (UMP) consent support
-- App Tracking Transparency (iOS tracking permission) helpers
-
-### Choose by advertising goal
-
-| Goal                                                              | Ad format                 | Guide                                      |
-| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
-| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](./docs/banner.md)             |
-| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](./docs/interstitial.md) |
-| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](./docs/rewarded.md)         |
-| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](./docs/rewarded.md)         |
-| Monetize an app-open experience                                   | App Open                  | [App Open Ads](./docs/app-open.md)         |
-
-## Quick start
-
-After [Installation](#installation), initialize the SDK, request consent, and show a banner:
-
-```ts
-import { AdMob, AdmobConsentStatus, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
-
-async function startAdMob() {
-  await AdMob.initialize();
-
-  let consentInfo = await AdMob.requestConsentInfo();
-  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
-    consentInfo = await AdMob.showConsentForm();
-  }
-
-  if (!consentInfo.canRequestAds) {
-    return;
-  }
-
-  const options: BannerAdOptions = {
-    adId: 'YOUR_AD_UNIT_ID',
-    adSize: BannerAdSize.ADAPTIVE_BANNER,
-    position: BannerAdPosition.BOTTOM_CENTER,
-    margin: 0,
-  };
-  await AdMob.showBanner(options);
-}
-```
-
-The banner sits on the native screen above the WebView, so it can cover your HTML. See [Banner Ads](./docs/banner.md) to inset your layout. Details: [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and the per-format guides.
+Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile Ads SDK for iOS and Android so you can display banner, interstitial, rewarded, rewarded interstitial, and app open ads in Capacitor apps. It also covers Google User Messaging Platform (UMP) consent and App Tracking Transparency helpers on iOS.
 
 ## Installation
 
@@ -183,19 +132,69 @@ If CocoaPods cannot resolve `Google-Mobile-Ads-SDK`:
 
 Run `pod repo update` in `ios/`, then `npx cap sync ios` again.
 
+## First test banner
+
+After installation and platform setup, initialize the SDK, request consent, and show a Google demo banner. Use the platform banner IDs from [Testing](./docs/testing.md)—do not create your own ad unit for this first check.
+
+Call `startAdMob` from a user action or after the UI is ready (for example a button or post-navigation hook), not only at module evaluation time.
+
+```ts
+import { Capacitor } from '@capacitor/core';
+import { AdMob, AdmobConsentStatus, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
+
+const bannerAdId =
+  Capacitor.getPlatform() === 'ios'
+    ? 'ca-app-pub-3940256099942544/2934735716'
+    : 'ca-app-pub-3940256099942544/6300978111';
+
+async function startAdMob() {
+  await AdMob.initialize();
+
+  let consentInfo = await AdMob.requestConsentInfo();
+  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+    consentInfo = await AdMob.showConsentForm();
+  }
+
+  if (!consentInfo.canRequestAds) {
+    // Consent not ready — no banner is shown.
+    return;
+  }
+
+  const options: BannerAdOptions = {
+    adId: bannerAdId,
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
+    position: BannerAdPosition.BOTTOM_CENTER,
+    margin: 0,
+  };
+  await AdMob.showBanner(options);
+}
+```
+
+Expected result: when `canRequestAds` is true, a Google test banner appears at the bottom of the native screen. When `canRequestAds` is false, the function returns and no banner is shown. The banner sits above the WebView and can cover HTML—see [Banner Ads](./docs/banner.md) to inset your layout. Details: [Configuration](./docs/configuration.md), [Consent](./docs/consent.md), and [Testing](./docs/testing.md).
+
+## Choose by advertising goal
+
+| Goal                                                              | Ad format                 | Guide                                      |
+| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
+| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](./docs/banner.md)             |
+| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](./docs/interstitial.md) |
+| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](./docs/rewarded.md)         |
+| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](./docs/rewarded.md)         |
+| Monetize an app-open experience                                   | App Open                  | [App Open Ads](./docs/app-open.md)         |
+
 ## Documentation
 
-Start with [Installation](#installation) above, then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
+Start with [Installation](#installation) above, then [Configuration](./docs/configuration.md) and [Consent](./docs/consent.md). Run the first test banner, then use [Testing](./docs/testing.md) for demo units and devices. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
 
 - [Configuration](./docs/configuration.md) — `AdMob.initialize` and SDK options.
 - [Consent](./docs/consent.md) — privacy consent and iOS tracking authorization.
+- [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
 - [Banner Ads](./docs/banner.md) — banner options, lifecycle, and events.
 - Full-screen ads:
   - [Interstitial Ads](./docs/interstitial.md) — load, show, and multiple prepared ads.
   - [Rewarded Ads](./docs/rewarded.md) — rewarded video, rewarded interstitial, and server-side verification.
 - [App Open Ads](./docs/app-open.md) — load and present on foreground transitions.
 - [Ad Events](./docs/events.md) — shared lifecycle events, errors, and revenue data.
-- [Testing](./docs/testing.md) — demo ad units, test devices, and consent testing.
 - [Migration Guide](./docs/migration.md) — historical notes when upgrading from older plugin versions.
 
 <!-- rdlabo-docs-omit -->
