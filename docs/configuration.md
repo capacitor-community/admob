@@ -2,7 +2,7 @@
 
 Call the plugin's `initialize` once before requesting ads. You do not start the native SDK yourself.
 
-Native application IDs belong in AndroidManifest / Info.plist; see [Installation](../README.md#installation).
+Native application IDs belong in AndroidManifest / Info.plist; see [Installation](https://docs.rdlabo.dev/projects/capacitor-admob/docs/readme#installation).
 
 ```ts
 import { AdMob } from '@capacitor-community/admob';
@@ -14,8 +14,8 @@ await AdMob.initialize();
 
 <!-- !::AdMobInitializationOptions:: -->
 
-During development, prefer Google [demo ad units](https://developers.google.com/admob/android/test-ads#demo_ad_units). To test production-like ads on a physical device, register that device as described in [Testing](./testing.md). Do not ship `initializeForTesting: true` in production.
+During development, prefer Google [demo ad units](https://developers.google.com/admob/android/test-ads#demo_ad_units). To test production-like ads on a physical device, register that device as described in [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing). Do not ship `initializeForTesting: true` in production.
 
 Per-ad options such as `isTesting`, `npa` (non-personalized ads), and `immersiveMode` (hide Android system bars on a full-screen ad) are set on each ad request, not on `initialize`. See the per-format guides.
 
-After initialization, request privacy consent before loading ads. See [Consent](./consent.md).
+After initialization, request privacy consent before loading ads. See [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent).

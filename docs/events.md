@@ -47,10 +47,10 @@ Full-screen formats emit `AdMobRevenueData` on their `AdImpression` event. Banne
 
 ## Per-format guides
 
-- [App Open Ads](./app-open.md)
-- [Banner Ads](./banner.md)
-- [Interstitial Ads](./interstitial.md)
-- [Rewarded Ads](./rewarded.md)
+- [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open)
+- [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner)
+- [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial)
+- [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)
 
 <!-- !::addListener.AppOpenAdPluginEvents:: -->
 

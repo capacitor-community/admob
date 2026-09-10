@@ -2,7 +2,7 @@
 
 Rewarded ads let you give in-app items for interacting with video ads, playable ads, or surveys. Google's rewarded guides for [Android](https://developers.google.com/admob/android/rewarded) and [iOS](https://developers.google.com/admob/ios/rewarded) explain the format.
 
-Treat rewarded ads as a reward flow, not as another non-rewarded interstitial. Call this after [initialize](./configuration.md) and [consent](./consent.md). Grant the reward only from the returned result or the `Rewarded` event, not from `Dismissed`.
+Treat rewarded ads as a reward flow, not as another non-rewarded interstitial. Call this after [initialize](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Grant the reward only from the returned result or the `Rewarded` event, not from `Dismissed`.
 
 ## Rewarded video
 
@@ -98,7 +98,7 @@ console.log(rewardItem);
 
 <!-- !::AdMobRewardInterstitialItem:: -->
 
-See [Testing](./testing.md) for `isTesting`.
+See [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for `isTesting`.
 
 ## Server-side verification
 

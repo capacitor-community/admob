@@ -2,7 +2,7 @@
 
 App open ads monetize app-load screens and are designed to show when the user brings the app to the foreground. The user can close them at any time. Google's app open guides for [Android](https://developers.google.com/admob/android/app-open) and [iOS](https://developers.google.com/admob/ios/app-open) explain the format.
 
-Call this after [initialize](./configuration.md) and [consent](./consent.md). Load the ad ahead of time and confirm it is available before presentation. Do not block app startup indefinitely while waiting for an ad to load.
+Call this after [initialize](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Load the ad ahead of time and confirm it is available before presentation. Do not block app startup indefinitely while waiting for an ad to load.
 
 ```ts
 import {
@@ -50,4 +50,4 @@ There is no `isTesting` flag; during development set `adId` to Google's [App Ope
 
 Use the `Closed` event to resume your app flow and begin loading the next ad.
 
-When no `adId` is passed to `showAppOpen()` or `isAppOpenLoaded()`, the most recently loaded ad is targeted. See [Ad Events](./events.md) for the event list.
+When no `adId` is passed to `showAppOpen()` or `isAppOpenLoaded()`, the most recently loaded ad is targeted. See [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events) for the event list.

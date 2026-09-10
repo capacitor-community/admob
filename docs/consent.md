@@ -6,7 +6,7 @@ This plugin exposes UMP and iOS App Tracking Transparency through one API. Befor
 
 ## Recommended order
 
-1. Call `AdMob.initialize()`. See [Configuration](./configuration.md).
+1. Call `AdMob.initialize()`. See [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration).
 2. Call `AdMob.requestConsentInfo()`.
 3. If required, call `AdMob.showConsentForm()`.
 4. Load ads only when `consentInfo.canRequestAds` is `true`.
@@ -77,4 +77,4 @@ await AdMob.showPrivacyOptionsForm();
 
 <!-- !::resetConsentInfo:: -->
 
-For debug geography and test device IDs, see [Testing](./testing.md).
+For debug geography and test device IDs, see [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing).

@@ -60,8 +60,8 @@ const consentInfo = await AdMob.requestConsentInfo({
 
 If you decline consent in the test form (Manage → Confirm Choices), ads may not load. That is expected in a test environment and does not predict production behavior after a user consents.
 
-`resetConsentInfo()` is for tests only. See [Consent](./consent.md).
+`resetConsentInfo()` is for tests only. See [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent).
 
 ## Server-side verification
 
-Server-side verification (SSV) callbacks fire only for production ads. Test ads will not hit your SSV endpoint. For a mock request example, see [Rewarded Ads](./rewarded.md).
+Server-side verification (SSV) callbacks fire only for production ads. Test ads will not hit your SSV endpoint. For a mock request example, see [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded).
