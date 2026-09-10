@@ -21,8 +21,6 @@ import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.getcapacitor.community.admob.rewardedinterstitial.AdRewardInterstitialExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import org.json.JSONException;
 
 @CapacitorPlugin(
@@ -93,35 +91,36 @@ public class AdMob extends Plugin {
     public void initialize(final PluginCall call) {
         this.setRequestConfiguration(call);
 
-        // Same as banner/interstitial: bridge thread is not the UI thread — MobileAds + view setup must run on main.
-        Runnable initOnMain = () -> {
+        // Capacitor's executor runs on the plugin thread, keeping SDK class loading
+        // and initialization off the UI thread. Only view setup belongs on main.
+        execute(() -> {
             try {
-                MobileAds.initialize(
-                    getContext(),
-                    new OnInitializationCompleteListener() {
-                        @Override
-                        public void onInitializationComplete(InitializationStatus initializationStatus) {}
-                    }
-                );
-                // Resolve only once the banner parent actually exists, so a resolved
-                // initialize() means what callers already read it as. See #451.
-                bannerExecutor.awaitViewGroup((found) -> {
-                    if (found) {
-                        call.resolve();
+                MobileAds.initialize(getContext(), (initializationStatus) -> {
+                    Runnable prepareBanner = () -> {
+                        try {
+                            // Preserve the banner readiness guarantee before resolving.
+                            bannerExecutor.awaitViewGroup((found) -> {
+                                if (found) {
+                                    call.resolve();
+                                } else {
+                                    call.reject("AdMob initialized, but the banner parent view never appeared");
+                                }
+                            });
+                        } catch (Exception ex) {
+                            call.reject(ex.getLocalizedMessage(), ex);
+                        }
+                    };
+                    Activity activity = getActivity();
+                    if (activity != null) {
+                        activity.runOnUiThread(prepareBanner);
                     } else {
-                        call.reject("AdMob initialized, but the banner parent view never appeared");
+                        new Handler(Looper.getMainLooper()).post(prepareBanner);
                     }
                 });
             } catch (Exception ex) {
                 call.reject(ex.getLocalizedMessage(), ex);
             }
-        };
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(initOnMain);
-        } else {
-            new Handler(Looper.getMainLooper()).post(initOnMain);
-        }
+        });
     }
 
     @PluginMethod
