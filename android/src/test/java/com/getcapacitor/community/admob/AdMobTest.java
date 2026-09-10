@@ -3,6 +3,8 @@ package com.getcapacitor.community.admob;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +18,9 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,12 +51,19 @@ public class AdMobTest {
     MockedConstruction<BannerExecutor> bannerExecutorMockedConstruction;
 
     AdMob sut;
+    Queue<Runnable> backgroundTasks;
 
     @BeforeEach
     public void beforeEach() {
         reset(pluginCallMock, mockedContext);
 
+        backgroundTasks = new ArrayDeque<>();
         sut = new AdMob() {
+            @Override
+            public void execute(Runnable runnable) {
+                backgroundTasks.add(runnable);
+            }
+
             @Override
             public Context getContext() {
                 return mockedContext;
@@ -147,7 +159,67 @@ public class AdMobTest {
 
             sut.initialize(pluginCallMock);
 
+            verify(bannerExecutor, never()).awaitViewGroup(any());
+            verify(pluginCallMock, never()).resolve();
+            mobileAdsMockedStatic.verify(() -> MobileAds.initialize(any(), any()), never());
+
+            backgroundTasks.remove().run();
+            ArgumentCaptor<OnInitializationCompleteListener> callback = ArgumentCaptor.forClass(OnInitializationCompleteListener.class);
+            mobileAdsMockedStatic.verify(() -> MobileAds.initialize(any(), callback.capture()));
+            verify(bannerExecutor, never()).awaitViewGroup(any());
+            verify(pluginCallMock, never()).resolve();
+
+            callback.getValue().onInitializationComplete(null);
+            verify(mockedActivity).runOnUiThread(any(Runnable.class));
             verify(bannerExecutor).awaitViewGroup(any());
+            verify(pluginCallMock).resolve();
+        }
+
+        @Test
+        public void sdkFailureRejectsWithoutPreparingBanner() {
+            RuntimeException failure = new RuntimeException("SDK initialization failed");
+            mobileAdsMockedStatic.when(() -> MobileAds.initialize(any(), any())).thenThrow(failure);
+            sut.initialize(pluginCallMock);
+            backgroundTasks.remove().run();
+            verify(pluginCallMock).reject(failure.getMessage(), failure);
+            verify(pluginCallMock, never()).resolve();
+            verify(mockedActivity, never()).runOnUiThread(any());
+        }
+
+        @Test
+        public void waitsForMainThreadAndRejectsMissingBannerParent() {
+            sut.initialize(pluginCallMock);
+            backgroundTasks.remove().run();
+            ArgumentCaptor<OnInitializationCompleteListener> callback = ArgumentCaptor.forClass(OnInitializationCompleteListener.class);
+            mobileAdsMockedStatic.verify(() -> MobileAds.initialize(any(), callback.capture()));
+            callback.getValue().onInitializationComplete(null);
+            ArgumentCaptor<Runnable> uiTask = ArgumentCaptor.forClass(Runnable.class);
+            verify(mockedActivity).runOnUiThread(uiTask.capture());
+            BannerExecutor banner = bannerExecutorMockedConstruction.constructed().get(0);
+            verify(banner, never()).awaitViewGroup(any());
+            uiTask.getValue().run();
+            ArgumentCaptor<Consumer<Boolean>> ready = ArgumentCaptor.forClass(Consumer.class);
+            verify(banner).awaitViewGroup(ready.capture());
+            verify(pluginCallMock, never()).resolve();
+            ready.getValue().accept(false);
+            verify(pluginCallMock).reject("AdMob initialized, but the banner parent view never appeared");
+        }
+
+        @Test
+        public void bannerSetupFailureRejects() {
+            BannerExecutor banner = bannerExecutorMockedConstruction.constructed().get(0);
+            RuntimeException failure = new RuntimeException("View setup failed");
+            doThrow(failure).when(banner).awaitViewGroup(any());
+            sut.initialize(pluginCallMock);
+            backgroundTasks.remove().run();
+            ArgumentCaptor<OnInitializationCompleteListener> callback = ArgumentCaptor.forClass(OnInitializationCompleteListener.class);
+            mobileAdsMockedStatic.verify(() -> MobileAds.initialize(any(), callback.capture()));
+            callback.getValue().onInitializationComplete(null);
+            ArgumentCaptor<Runnable> uiTask = ArgumentCaptor.forClass(Runnable.class);
+            verify(mockedActivity).runOnUiThread(uiTask.capture());
+            uiTask.getValue().run();
+            verify(pluginCallMock).reject(failure.getMessage(), failure);
+            verify(pluginCallMock, never()).resolve();
         }
     }
 }
