@@ -16,6 +16,10 @@ export const routes: Routes = [
           import('./validation/banner-validation/banner-validation').then(({ BannerValidation }) => BannerValidation),
       },
       {
+        path: 'native',
+        loadComponent: () => import('./native-ad-demo/native-ad-demo').then(({ NativeAdDemo }) => NativeAdDemo),
+      },
+      {
         path: 'interstitial',
         loadComponent: () =>
           import('./validation/interstitial-validation/interstitial-validation').then(

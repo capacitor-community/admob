@@ -1,0 +1,53 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>NATIVE</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Native ads</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list [inset]="true">
+    <ion-list-header><ion-label>Research preview</ion-label></ion-list-header>
+    <ion-item lines="none">
+      <ion-note>
+        This sample uses Google test ads in a standard Ionic scroll container. Virtual scrolling is still experimental
+        and is not claimed as supported.
+      </ion-note>
+    </ion-item>
+    @if (vm.lastEvent(); as event) {
+    <ion-item>
+      <ion-label class="ion-text-wrap">Last event: {{ event.name }}<br />{{ event.value | json }}</ion-label>
+    </ion-item>
+    } @if (vm.errorMessage(); as errorMessage) {
+    <ion-item color="danger">
+      <ion-label class="ion-text-wrap">{{ errorMessage }}</ion-label>
+    </ion-item>
+    }
+  </ion-list>
+
+  @if (!vm.isNativePlatform) {
+  <ion-card>
+    <ion-card-header><ion-card-title>Native device required</ion-card-title></ion-card-header>
+    <ion-card-content>Native ads are available only in the iOS and Android demo apps.</ion-card-content>
+  </ion-card>
+  } @else {
+  <section class="feed" aria-label="Native ad example feed">
+    @for (item of vm.feedItems; track item.id) { @if (item.kind === 'article') {
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ item.title }}</ion-card-title></ion-card-header>
+      <ion-card-content>{{ item.summary }}</ion-card-content>
+    </ion-card>
+    } @else {
+    <article class="native-ad-row" aria-label="Sponsored content">
+      <capacitor-admob-native feed-id="native-ad-demo-feed" [attr.slot-key]="item.slotKey"></capacitor-admob-native>
+      <ion-item [button]="true" lines="none" (click)="vm.reload(item.slotKey)">Reload test ad</ion-item>
+    </article>
+    } }
+  </section>
+  }
+</ion-content>

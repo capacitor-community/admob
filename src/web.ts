@@ -10,11 +10,14 @@ import type {
 import type { AppOpenAdOptions } from './app-open/app-open-ad-options.interface';
 import { AdmobConsentStatus } from './consent/consent-status.enum';
 import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
+import type { NativeAdDefinitions } from './native-ads/native-ad-definitions.interface';
+import type { NativeAdCommandIdentity, NativeAdFeedSession } from './native-ads/native-ad-options.interface';
+import type { NativeAdPlacementBatch } from './native-ads/native-ad-placement.interface';
 import type { AdMobRewardItem } from './reward';
 import type { AdOptions, AdLoadInfo, AdShowOptions } from './shared';
 import type { TrackingAuthorizationStatusInterface } from './shared/tracking-authorization-status.interface';
 
-export class AdMobWeb extends WebPlugin implements AdMobPlugin {
+export class AdMobWeb extends WebPlugin implements AdMobPlugin, NativeAdDefinitions {
   async initialize(): Promise<void> {
     console.log('initialize');
   }
@@ -80,6 +83,26 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     console.log('removeBanner');
   }
 
+  async startNativeAdFeed(): Promise<void> {
+    throw new Error('Native ads are only available on iOS and Android');
+  }
+
+  async destroyNativeAdFeed(options: NativeAdFeedSession): Promise<void> {
+    console.log('destroyNativeAdFeed', options);
+  }
+
+  async loadNativeAd(): Promise<void> {
+    throw new Error('Native ads are only available on iOS and Android');
+  }
+
+  async updateNativeAdPlacements(options: NativeAdPlacementBatch): Promise<void> {
+    console.log('updateNativeAdPlacements', options);
+  }
+
+  async removeNativeAd(options: NativeAdCommandIdentity): Promise<void> {
+    console.log('removeNativeAd', options);
+  }
+
   async prepareInterstitial(options: AdOptions): Promise<AdLoadInfo> {
     console.log('prepareInterstitial', options);
     return {
@@ -136,7 +159,10 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin {
     return { value: false };
   }
 
-  addListener(eventName: string, listenerFunc: (...args: any[]) => void): Promise<{ remove: () => Promise<void> }> {
+  override addListener(
+    eventName: string,
+    listenerFunc: (...args: any[]) => void,
+  ): Promise<{ remove: () => Promise<void> }> {
     void listenerFunc;
     console.log('addListener', eventName);
     return Promise.resolve({ remove: () => Promise.resolve() });

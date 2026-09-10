@@ -1,0 +1,17 @@
+.feed {
+  padding-bottom: 16px;
+}
+
+.native-ad-row {
+  margin: 12px 16px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--ion-card-background, var(--ion-background-color));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+}
+
+capacitor-admob-native {
+  display: block;
+  width: 100%;
+  height: 320px;
+}
