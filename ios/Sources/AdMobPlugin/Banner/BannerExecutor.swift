@@ -55,7 +55,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                 let impressionId = self.bannerView.responseInfo?.responseIdentifier ?? ""
                 self.plugin?.notifyListeners(BannerAdPluginEvents.AdPaid.rawValue, data: [
                     "adUnitId": self.bannerView.adUnitID ?? "",
-                    "valueMicros": adValue.value.int64Value,
+                    "valueMicros": adValue.value.multiplying(byPowerOf10: 6).int64Value,
                     "currencyCode": adValue.currencyCode,
                     "precision": adValue.precision.rawValue,
                     "networkName": networkName,
