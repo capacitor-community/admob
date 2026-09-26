@@ -2,7 +2,6 @@ package com.getcapacitor.community.admob.banner;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
@@ -243,23 +242,21 @@ public class BannerExecutor extends Executor {
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
             }
 
-            // set Safe Area only for Android 15+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                View rootView = activitySupplier.get().getWindow().getDecorView();
-                rootView.setOnApplyWindowInsetsListener((v, insets) -> {
-                    int bottomInset = insets.getSystemWindowInsetBottom();
-                    int topInset = insets.getSystemWindowInsetTop();
+            mAdViewLayout.setOnApplyWindowInsetsListener((v, insets) -> {
+                int bottomInset = insets.getSystemWindowInsetBottom();
+                int topInset = insets.getSystemWindowInsetTop();
 
-                    if ("TOP_CENTER".equals(adOptions.position)) {
-                        mAdViewLayoutParams.setMargins(margins[0], margins[1] + topInset, margins[2], margins[3]);
-                    } else {
-                        mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
-                    }
+                if ("TOP_CENTER".equals(adOptions.position)) {
+                    mAdViewLayoutParams.setMargins(margins[0], margins[1] + topInset, margins[2], margins[3]);
+                } else {
+                    mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
+                }
 
-                    mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-                    return insets;
-                });
-            }
+                mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
+                return insets;
+            });
+
+            mAdViewLayout.requestApplyInsets();
 
             createNewAdView(adOptions);
 
