@@ -69,6 +69,14 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         self.consentExecutor.plugin = self
     }
 
+    /// Pauses all web media while a full-screen ad is up, so WebKit releases its audio before the ad plays
+    /// and sets it up again afterwards, instead of leaving web audio silent until the app restarts.
+    func setWebMediaSuspended(_ suspended: Bool) {
+        Task { @MainActor [weak self] in
+            self?.bridge?.webView?.setAllMediaPlaybackSuspended(suspended, completionHandler: nil)
+        }
+    }
+
     /**
      * Enable SKAdNetwork to track conversions
      * https://developers.google.com/admob/ios/ios14
