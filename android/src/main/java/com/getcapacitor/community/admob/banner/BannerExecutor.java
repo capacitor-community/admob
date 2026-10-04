@@ -14,8 +14,11 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.graphics.Insets;
 import androidx.core.util.Consumer;
 import androidx.core.util.Supplier;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
@@ -219,6 +222,7 @@ public class BannerExecutor extends Executor {
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
             int densityMargin = (int) (adOptions.margin * density);
+            int[] margins = new int[] { 0, densityMargin, 0, densityMargin };
 
             // Center Banner Ads
             int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
@@ -228,16 +232,67 @@ public class BannerExecutor extends Executor {
                 if (fullscreen) {
                     margin = (realWidthPixels - defaultWidthPixels) / 2;
                 }
+                margins[0] = margin;
+                margins[2] = margin;
                 mAdViewLayoutParams.setMargins(margin, densityMargin, margin, densityMargin);
             } else {
                 int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
                 if (fullscreen) {
                     sideMargin = (realWidthPixels - adWidth) / 2;
                 }
+                margins[0] = sideMargin;
+                margins[2] = sideMargin;
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
             }
 
-            BannerInsets.observe(mAdViewLayout, adOptions.position, densityMargin, systemBarsHandlesInsets);
+            // Read window insets even when older Capacitor consumes them at the parent.
+            final View banner = mAdViewLayout;
+            final int[] rootLocation = new int[2];
+            final int[] parentLocation = new int[2];
+            ViewTreeObserver.OnGlobalLayoutListener applyInsets = () -> {
+                WindowInsetsCompat compat = ViewCompat.getRootWindowInsets(banner);
+                if (compat == null || !(banner.getParent() instanceof View)) {
+                    return;
+                }
+                View parent = (View) banner.getParent();
+                View root = banner.getRootView();
+                root.getLocationInWindow(rootLocation);
+                parent.getLocationInWindow(parentLocation);
+                Insets safeArea = compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+                boolean keyboardVisible =
+                    compat.isVisible(WindowInsetsCompat.Type.ime()) && compat.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0;
+                // Subtract the space already provided by the parent; never add IME height.
+                int top = margins[1];
+                int bottom = margins[3];
+                if ("TOP_CENTER".equals(adOptions.position)) {
+                    top += Math.max(0, rootLocation[1] + safeArea.top - parentLocation[1] - parent.getPaddingTop());
+                } else if (!keyboardVisible || !systemBarsHandlesInsets) {
+                    bottom += Math.max(
+                        0,
+                        parentLocation[1] +
+                            parent.getHeight() -
+                            parent.getPaddingBottom() -
+                            (rootLocation[1] + root.getHeight() - safeArea.bottom)
+                    );
+                }
+                if (mAdViewLayoutParams.topMargin != top || mAdViewLayoutParams.bottomMargin != bottom) {
+                    mAdViewLayoutParams.setMargins(margins[0], top, margins[2], bottom);
+                    banner.setLayoutParams(mAdViewLayoutParams);
+                }
+            };
+            banner.addOnAttachStateChangeListener(
+                new View.OnAttachStateChangeListener() {
+                    @Override
+                    public void onViewAttachedToWindow(View view) {
+                        view.getViewTreeObserver().addOnGlobalLayoutListener(applyInsets);
+                    }
+
+                    @Override
+                    public void onViewDetachedFromWindow(View view) {
+                        removeGlobalLayoutListener(view, applyInsets);
+                    }
+                }
+            );
 
             createNewAdView(adOptions);
 

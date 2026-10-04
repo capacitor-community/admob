@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -17,11 +18,16 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
@@ -38,6 +44,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -200,11 +208,114 @@ class BannerExecutorTest {
             verify(adViewMocked, times(2)).loadAd(any());
         }
 
+        @ParameterizedTest
+        @CsvSource({
+            "BOTTOM_CENTER, false, true,  24,   0, 7, 31, 0",
+            "BOTTOM_CENTER, false, true, 24, 0, 7, 7, 24",
+            "TOP_CENTER, false, true, 24, 0, 7, 7, 32",
+            "BOTTOM_CENTER, true,  true,  24, 300, 7, 7, 0",
+            "BOTTOM_CENTER, true,  true,  24,   0, 7, 31, 0",
+            "BOTTOM_CENTER, false, true,   0,   0, 7, 7, 0",
+            "BOTTOM_CENTER, true,  true,   0, 300, 7, 7, 0",
+            "BOTTOM_CENTER, false, false, 24,   0, 7, 31, 0",
+            "BOTTOM_CENTER, true,  false, 24, 300, 7, 31, 0",
+            "TOP_CENTER,    false, true,  24,   0, 39, 7, 0",
+            "TOP_CENTER,    true,  true,  24, 300, 39, 7, 0"
+        })
+        void appliesOnlyRemainingSafeAreaInsets(
+            String position,
+            boolean keyboardVisible,
+            boolean systemBarsHandlesInsets,
+            int safeBottom,
+            int imeBottom,
+            int expectedTop,
+            int expectedBottom,
+            int parentPadding
+        ) {
+            adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().setPosition(position).setMargin(7).build();
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
+            sut.showBanner(mock(PluginCall.class), systemBarsHandlesInsets);
+
+            RelativeLayout banner = relativeLayoutMockedConstruction.constructed().get(0);
+            CoordinatorLayout.LayoutParams params = layoutParamsMockedConstruction.constructed().get(0);
+            ViewTreeObserver.OnGlobalLayoutListener listener = captureInsetsListener(banner);
+            Mockito.lenient().when(viewGroupMock.getPaddingTop()).thenReturn(parentPadding);
+            Mockito.lenient().when(viewGroupMock.getPaddingBottom()).thenReturn(parentPadding);
+            verify(viewGroupMock, never()).setOnApplyWindowInsetsListener(any());
+            WindowInsetsCompat compat = mock(WindowInsetsCompat.class);
+            when(compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout())).thenReturn(
+                Insets.of(0, 32, 0, safeBottom)
+            );
+            when(compat.isVisible(WindowInsetsCompat.Type.ime())).thenReturn(keyboardVisible);
+            if (keyboardVisible) {
+                when(compat.getInsets(WindowInsetsCompat.Type.ime())).thenReturn(Insets.of(0, 0, 0, imeBottom));
+            }
+            try (MockedStatic<ViewCompat> conversion = Mockito.mockStatic(ViewCompat.class)) {
+                conversion.when(() -> ViewCompat.getRootWindowInsets(banner)).thenReturn(compat);
+                clearInvocations(params);
+                listener.onGlobalLayout();
+                verify(params).setMargins(0, expectedTop, 0, expectedBottom);
+            }
+        }
+
+        @Test
+        void restoresMarginsAfterKeyboardClosesWithoutAccumulatingInsets() {
+            adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().setPosition("BOTTOM_CENTER").setMargin(7).build();
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
+            sut.showBanner(mock(PluginCall.class), true);
+            RelativeLayout banner = relativeLayoutMockedConstruction.constructed().get(0);
+            CoordinatorLayout.LayoutParams params = layoutParamsMockedConstruction.constructed().get(0);
+            ViewTreeObserver.OnGlobalLayoutListener listener = captureInsetsListener(banner);
+            Mockito.doAnswer((invocation) -> {
+                params.topMargin = invocation.getArgument(1);
+                params.bottomMargin = invocation.getArgument(3);
+                return null;
+            })
+                .when(params)
+                .setMargins(anyInt(), anyInt(), anyInt(), anyInt());
+            WindowInsetsCompat compat = mock(WindowInsetsCompat.class);
+            when(compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout())).thenReturn(
+                Insets.of(0, 32, 0, 24)
+            );
+            when(compat.isVisible(WindowInsetsCompat.Type.ime())).thenReturn(false, true, false, false);
+            when(compat.getInsets(WindowInsetsCompat.Type.ime())).thenReturn(Insets.of(0, 0, 0, 300));
+            try (MockedStatic<ViewCompat> conversion = Mockito.mockStatic(ViewCompat.class)) {
+                conversion.when(() -> ViewCompat.getRootWindowInsets(banner)).thenReturn(compat);
+                clearInvocations(params);
+                for (int i = 0; i < 4; i++) {
+                    listener.onGlobalLayout();
+                }
+                var order = inOrder(params);
+                order.verify(params).setMargins(0, 7, 0, 31);
+                order.verify(params).setMargins(0, 7, 0, 7);
+                order.verify(params).setMargins(0, 7, 0, 31);
+                verify(params, times(3)).setMargins(anyInt(), anyInt(), anyInt(), anyInt());
+            }
+        }
+
+        private ViewTreeObserver.OnGlobalLayoutListener captureInsetsListener(RelativeLayout banner) {
+            ViewTreeObserver observer = mock(ViewTreeObserver.class);
+            when(banner.getViewTreeObserver()).thenReturn(observer);
+            when(banner.getParent()).thenReturn(viewGroupMock);
+            when(banner.getRootView()).thenReturn(viewGroupMock);
+            Mockito.lenient().when(viewGroupMock.getHeight()).thenReturn(1000);
+            ArgumentCaptor<View.OnAttachStateChangeListener> attach = ArgumentCaptor.forClass(View.OnAttachStateChangeListener.class);
+            verify(banner).addOnAttachStateChangeListener(attach.capture());
+            attach.getValue().onViewAttachedToWindow(banner);
+            ArgumentCaptor<ViewTreeObserver.OnGlobalLayoutListener> layout = ArgumentCaptor.forClass(
+                ViewTreeObserver.OnGlobalLayoutListener.class
+            );
+            verify(observer).addOnGlobalLayoutListener(layout.capture());
+            when(observer.isAlive()).thenReturn(true);
+            attach.getValue().onViewDetachedFromWindow(banner);
+            verify(observer).removeOnGlobalLayoutListener(layout.getValue());
+            return layout.getValue();
+        }
+
         @Test
         void requestsInsetsAfterAttachingBanner() {
             sut.showBanner(mock(PluginCall.class), true);
             RelativeLayout banner = relativeLayoutMockedConstruction.constructed().get(0);
-            verify(banner).addOnAttachStateChangeListener(any());
             verify(banner, never()).requestApplyInsets();
             verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
             runnableArgumentCaptor.getValue().run();
