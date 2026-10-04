@@ -118,19 +118,20 @@ class ViewModel extends ViewModelStore<BannerValidation> {
     await this.#record('hideBanner', AdMob.hideBanner());
     await this.#record('resumeBanner', AdMob.resumeBanner());
     await this.#record('removeBanner', AdMob.removeBanner());
-    await this.#record('showBannerFailed', AdMob.showBanner({ adId: 'showBannerFailed' }), true);
+    // Loading failures arrive through FailedToLoad; showBanner resolves when the request starts.
+    await this.#record('showBannerFailed', AdMob.showBanner({ adId: 'showBannerFailed' }));
   }
 
   async leave(): Promise<void> {
     await Promise.all(this.#listenerHandlers.splice(0).map((handler) => handler.remove()));
   }
 
-  async #record(name: string, operation: Promise<unknown>, expectFailure = false): Promise<void> {
+  async #record(name: string, operation: Promise<unknown>): Promise<void> {
     const succeeded = await operation.then(
       () => true,
       () => false,
     );
-    await this.#resultService.update(this.eventItems, name, expectFailure ? !succeeded : succeeded);
+    await this.#resultService.update(this.eventItems, name, succeeded);
   }
 
   #recordEvent(name: BannerAdPluginEvents, value?: unknown): void {
