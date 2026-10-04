@@ -6,6 +6,7 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -14,7 +15,7 @@ import {
   ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, notificationsCircleOutline, playOutline } from 'ionicons/icons';
 import { rewardOptions } from '../../shared/ad.options';
@@ -37,7 +38,18 @@ const testItems: ValidationTestItem[] = [
   selector: 'app-reward-validation',
   templateUrl: 'reward-validation.html',
   styleUrl: 'reward-validation.scss',
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonLabel, IonItem, IonIcon],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonListHeader,
+    IonLabel,
+    IonItem,
+    IonItemGroup,
+    IonIcon,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RewardValidation implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
