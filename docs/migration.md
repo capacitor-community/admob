@@ -1,20 +1,6 @@
 # Migration Guide
 
-## Changes after 8.1.0 (unreleased)
-
-### Android initialization can reject
-
-`AdMob.initialize()` now waits for the native banner parent view. If it does not appear within 5 seconds, initialization rejects; an unavailable activity/content view can fail immediately. This also applies to apps that only use full-screen ads. Previously, a missing child view could let initialization resolve and cause later banner requests to crash.
-
-Handle initialization errors without blocking app startup. Retry when the native view is available. See [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) for an example.
-
-### iOS revenue values now use micros
-
-The `valueMicros` field now correctly reports millionths of a currency unit for banners, interstitials, rewarded ads, rewarded interstitials, and app-open ads. For example, a value of `0.0012` currency units previously produced `0`; it now produces `1200`. Android values and event names are unchanged.
-
-Divide `valueMicros` by `1_000_000` to obtain currency units on either platform. Review any iOS-specific workarounds in your analytics pipeline. Historical iOS values were truncated before conversion, so multiplying those stored values cannot recover the lost fractional revenue.
-
-The version-by-version steps under “Breaking changes from earlier versions” apply to releases before v8.
+If you installed `@capacitor-community/admob` v8, you do not need the version-by-version steps below. They record public API changes from older releases.
 
 ## Google Mobile Ads SDK versions
 

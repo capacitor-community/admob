@@ -7,17 +7,8 @@ Native application IDs belong in AndroidManifest / Info.plist; see [Installation
 ```ts
 import { AdMob } from '@capacitor-community/admob';
 
-try {
-  await AdMob.initialize();
-} catch (error) {
-  console.error('AdMob initialization failed', error);
-  // Skip ad requests for now. Retry after the app's native view is available.
-}
+await AdMob.initialize();
 ```
-
-On Android, initialization also waits for the native banner parent view, even if your app only uses full-screen ads. It rejects if the activity/content view is unavailable, or if the parent does not appear within 5 seconds. Handle this rejection so an ad initialization failure does not prevent the rest of your app from starting. You can retry once the native view is available.
-
-A resolved `initialize()` does not mean an ad has loaded. Use each format's load method and events to check ad readiness.
 
 <!-- !::initialize:: -->
 
