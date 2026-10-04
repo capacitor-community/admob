@@ -20,6 +20,7 @@ import {
   IonFooter,
   IonHeader,
   IonItem,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -31,7 +32,7 @@ import {
   ToastController,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import {
   appOpenOptions,
   bannerBottomOptions,
@@ -63,6 +64,7 @@ interface AdEvent {
     IonListHeader,
     IonLabel,
     IonItem,
+    IonItemGroup,
     IonSelect,
     IonSelectOption,
     IonFooter,

@@ -6,6 +6,7 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -14,7 +15,7 @@ import {
   ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, notificationsCircleOutline, playOutline } from 'ionicons/icons';
 import { bannerBottomOptions } from '../../shared/ad.options';
@@ -45,7 +46,18 @@ const testItems: ValidationTestItem[] = [
   selector: 'app-banner-validation',
   templateUrl: 'banner-validation.html',
   styleUrl: 'banner-validation.scss',
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonLabel, IonItem, IonIcon],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonListHeader,
+    IonLabel,
+    IonItem,
+    IonItemGroup,
+    IonIcon,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BannerValidation implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
