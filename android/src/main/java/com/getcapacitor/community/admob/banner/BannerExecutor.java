@@ -14,10 +14,8 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.graphics.Insets;
 import androidx.core.util.Consumer;
 import androidx.core.util.Supplier;
-import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
@@ -221,7 +219,6 @@ public class BannerExecutor extends Executor {
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
             int densityMargin = (int) (adOptions.margin * density);
-            int[] margins = new int[] { 0, densityMargin, 0, densityMargin };
 
             // Center Banner Ads
             int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
@@ -231,40 +228,16 @@ public class BannerExecutor extends Executor {
                 if (fullscreen) {
                     margin = (realWidthPixels - defaultWidthPixels) / 2;
                 }
-                margins[0] = margin;
-                margins[2] = margin;
                 mAdViewLayoutParams.setMargins(margin, densityMargin, margin, densityMargin);
             } else {
                 int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
                 if (fullscreen) {
                     sideMargin = (realWidthPixels - adWidth) / 2;
                 }
-                margins[0] = sideMargin;
-                margins[2] = sideMargin;
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
             }
 
-            // Use the insets remaining after Capacitor's parent layout has handled them.
-            // Replacing the decor-view listener would override SystemBars' safe-area handling.
-            mAdViewLayout.setOnApplyWindowInsetsListener((v, insets) -> {
-                WindowInsetsCompat compat = WindowInsetsCompat.toWindowInsetsCompat(insets, v);
-                Insets safeArea = compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-                boolean keyboardVisible =
-                    compat.isVisible(WindowInsetsCompat.Type.ime()) && compat.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0;
-                // SystemBars already pads the parent for the keyboard. Neither the IME
-                // height nor the navigation bar belongs in the banner's margin then.
-                // With insetsHandling=disable, the host app owns keyboard avoidance.
-                int bottomInset = keyboardVisible && systemBarsHandlesInsets ? 0 : safeArea.bottom;
-
-                if ("TOP_CENTER".equals(adOptions.position)) {
-                    mAdViewLayoutParams.setMargins(margins[0], margins[1] + safeArea.top, margins[2], margins[3]);
-                } else {
-                    mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
-                }
-
-                v.setLayoutParams(mAdViewLayoutParams);
-                return insets;
-            });
+            BannerInsets.observe(mAdViewLayout, adOptions.position, densityMargin, systemBarsHandlesInsets);
 
             createNewAdView(adOptions);
 
