@@ -2,7 +2,6 @@ package com.getcapacitor.community.admob.banner;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
@@ -15,8 +14,10 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.graphics.Insets;
 import androidx.core.util.Consumer;
 import androidx.core.util.Supplier;
+import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
@@ -161,7 +162,7 @@ public class BannerExecutor extends Executor {
         }
     }
 
-    public void showBanner(final PluginCall call) {
+    public void showBanner(final PluginCall call, boolean systemBarsHandlesInsets) {
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
         float density = contextSupplier.get().getResources().getDisplayMetrics().density;
 
@@ -243,23 +244,27 @@ public class BannerExecutor extends Executor {
                 mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
             }
 
-            // set Safe Area only for Android 15+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                View rootView = activitySupplier.get().getWindow().getDecorView();
-                rootView.setOnApplyWindowInsetsListener((v, insets) -> {
-                    int bottomInset = insets.getSystemWindowInsetBottom();
-                    int topInset = insets.getSystemWindowInsetTop();
+            // Use the insets remaining after Capacitor's parent layout has handled them.
+            // Replacing the decor-view listener would override SystemBars' safe-area handling.
+            mAdViewLayout.setOnApplyWindowInsetsListener((v, insets) -> {
+                WindowInsetsCompat compat = WindowInsetsCompat.toWindowInsetsCompat(insets, v);
+                Insets safeArea = compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+                boolean keyboardVisible =
+                    compat.isVisible(WindowInsetsCompat.Type.ime()) && compat.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0;
+                // SystemBars already pads the parent for the keyboard. Neither the IME
+                // height nor the navigation bar belongs in the banner's margin then.
+                // With insetsHandling=disable, the host app owns keyboard avoidance.
+                int bottomInset = keyboardVisible && systemBarsHandlesInsets ? 0 : safeArea.bottom;
 
-                    if ("TOP_CENTER".equals(adOptions.position)) {
-                        mAdViewLayoutParams.setMargins(margins[0], margins[1] + topInset, margins[2], margins[3]);
-                    } else {
-                        mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
-                    }
+                if ("TOP_CENTER".equals(adOptions.position)) {
+                    mAdViewLayoutParams.setMargins(margins[0], margins[1] + safeArea.top, margins[2], margins[3]);
+                } else {
+                    mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
+                }
 
-                    mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-                    return insets;
-                });
-            }
+                v.setLayoutParams(mAdViewLayoutParams);
+                return insets;
+            });
 
             createNewAdView(adOptions);
 
@@ -469,6 +474,7 @@ public class BannerExecutor extends Executor {
                 final ViewGroup bannerParent = resolveViewGroup();
                 if (bannerParent != null) {
                     bannerParent.addView(mAdViewLayout);
+                    mAdViewLayout.requestApplyInsets();
                 } else {
                     Log.w(logTag, "Banner not attached: parent unavailable");
                 }
