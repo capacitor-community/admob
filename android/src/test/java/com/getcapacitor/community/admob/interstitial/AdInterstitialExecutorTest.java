@@ -107,7 +107,7 @@ class AdInterstitialExecutorTest {
         @Mock
         AdOptions adOptionsMock;
 
-        AdRequest adRequestFromHelper = (new AdRequest.Builder()).build();
+        AdRequest adRequestFromHelper = new AdRequest.Builder().build();
 
         final String idFromViewHelper = "The Id From The View Helper";
 
