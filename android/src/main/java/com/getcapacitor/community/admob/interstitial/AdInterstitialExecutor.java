@@ -40,18 +40,16 @@ public class AdInterstitialExecutor extends Executor {
         final AdOptions adOptions = factory.createInterstitialOptions(call);
 
         try {
-            activitySupplier
-                .get()
-                .runOnUiThread(() -> {
-                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                    final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                    InterstitialAd.load(
-                        activitySupplier.get(),
-                        id,
-                        adRequest,
-                        adCallbackAndListeners.getInterstitialAdLoadCallback(call, notifyListenersFunction)
-                    );
-                });
+            activitySupplier.get().runOnUiThread(() -> {
+                final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+                InterstitialAd.load(
+                    activitySupplier.get(),
+                    id,
+                    adRequest,
+                    adCallbackAndListeners.getInterstitialAdLoadCallback(call, notifyListenersFunction)
+                );
+            });
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
@@ -71,24 +69,22 @@ public class AdInterstitialExecutor extends Executor {
         }
 
         final InterstitialAd adToShow = ad;
-        activitySupplier
-            .get()
-            .runOnUiThread(() -> {
-                try {
-                    adToShow.setFullScreenContentCallback(
-                        new FullscreenPluginCallback(InterstitialAdPluginPluginEvent.INSTANCE, notifyListenersFunction, () -> {
-                            preparedAds.remove(adId);
-                            if (adId != null && adId.equals(lastPreparedAdId)) {
-                                lastPreparedAdId = null;
-                                for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
-                            }
-                        })
-                    );
-                    adToShow.show(activitySupplier.get());
-                    call.resolve();
-                } catch (Exception ex) {
-                    call.reject(ex.getLocalizedMessage(), ex);
-                }
-            });
+        activitySupplier.get().runOnUiThread(() -> {
+            try {
+                adToShow.setFullScreenContentCallback(
+                    new FullscreenPluginCallback(InterstitialAdPluginPluginEvent.INSTANCE, notifyListenersFunction, () -> {
+                        preparedAds.remove(adId);
+                        if (adId != null && adId.equals(lastPreparedAdId)) {
+                            lastPreparedAdId = null;
+                            for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
+                        }
+                    })
+                );
+                adToShow.show(activitySupplier.get());
+                call.resolve();
+            } catch (Exception ex) {
+                call.reject(ex.getLocalizedMessage(), ex);
+            }
+        });
     }
 }

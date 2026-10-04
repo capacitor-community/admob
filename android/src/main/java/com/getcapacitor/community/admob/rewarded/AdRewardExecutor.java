@@ -36,22 +36,20 @@ public class AdRewardExecutor extends Executor {
     public void prepareRewardVideoAd(final PluginCall call, BiConsumer<String, JSObject> notifyListenersFunction) {
         final AdOptions adOptions = AdOptions.getFactory().createRewardVideoOptions(call);
 
-        activitySupplier
-            .get()
-            .runOnUiThread(() -> {
-                try {
-                    final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-                    final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
-                    RewardedAd.load(
-                        contextSupplier.get(),
-                        id,
-                        adRequest,
-                        RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
-                    );
-                } catch (Exception ex) {
-                    call.reject(ex.getLocalizedMessage(), ex);
-                }
-            });
+        activitySupplier.get().runOnUiThread(() -> {
+            try {
+                final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                final String id = AdViewIdHelper.getFinalAdId(adOptions, adRequest, logTag, contextSupplier.get());
+                RewardedAd.load(
+                    contextSupplier.get(),
+                    id,
+                    adRequest,
+                    RewardedAdCallbackAndListeners.INSTANCE.getRewardedAdLoadCallback(call, notifyListenersFunction, adOptions)
+                );
+            } catch (Exception ex) {
+                call.reject(ex.getLocalizedMessage(), ex);
+            }
+        });
     }
 
     @PluginMethod
@@ -69,23 +67,21 @@ public class AdRewardExecutor extends Executor {
         }
 
         try {
-            activitySupplier
-                .get()
-                .runOnUiThread(() -> {
-                    ad.setFullScreenContentCallback(
-                        new FullscreenPluginCallback(RewardAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
-                            preparedAds.remove(adId);
-                            if (adId != null && adId.equals(lastPreparedAdId)) {
-                                lastPreparedAdId = null;
-                                for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
-                            }
-                        })
-                    );
-                    ad.show(
-                        activitySupplier.get(),
-                        RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
-                    );
-                });
+            activitySupplier.get().runOnUiThread(() -> {
+                ad.setFullScreenContentCallback(
+                    new FullscreenPluginCallback(RewardAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
+                        preparedAds.remove(adId);
+                        if (adId != null && adId.equals(lastPreparedAdId)) {
+                            lastPreparedAdId = null;
+                            for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
+                        }
+                    })
+                );
+                ad.show(
+                    activitySupplier.get(),
+                    RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
+                );
+            });
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }

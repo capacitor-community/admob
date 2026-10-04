@@ -209,19 +209,17 @@ class BannerExecutorTest {
         }
 
         @ParameterizedTest
-        @CsvSource(
-            {
-                "BOTTOM_CENTER, false, true,  24,   0, 7, 31",
-                "BOTTOM_CENTER, true,  true,  24, 300, 7, 7",
-                "BOTTOM_CENTER, true,  true,  24,   0, 7, 31",
-                "BOTTOM_CENTER, false, true,   0,   0, 7, 7",
-                "BOTTOM_CENTER, true,  true,   0, 300, 7, 7",
-                "BOTTOM_CENTER, false, false, 24,   0, 7, 31",
-                "BOTTOM_CENTER, true,  false, 24, 300, 7, 31",
-                "TOP_CENTER,    false, true,  24,   0, 39, 7",
-                "TOP_CENTER,    true,  true,  24, 300, 39, 7"
-            }
-        )
+        @CsvSource({
+            "BOTTOM_CENTER, false, true,  24,   0, 7, 31",
+            "BOTTOM_CENTER, true,  true,  24, 300, 7, 7",
+            "BOTTOM_CENTER, true,  true,  24,   0, 7, 31",
+            "BOTTOM_CENTER, false, true,   0,   0, 7, 7",
+            "BOTTOM_CENTER, true,  true,   0, 300, 7, 7",
+            "BOTTOM_CENTER, false, false, 24,   0, 7, 31",
+            "BOTTOM_CENTER, true,  false, 24, 300, 7, 31",
+            "TOP_CENTER,    false, true,  24,   0, 39, 7",
+            "TOP_CENTER,    true,  true,  24, 300, 39, 7"
+        })
         void appliesOnlyRemainingSafeAreaInsets(
             String position,
             boolean keyboardVisible,
