@@ -17,6 +17,9 @@ export interface RewardDefinitions {
   /**
    * Loads a rewarded ad and returns the loaded ad unit ID.
    *
+   * SDK load failures reject with the native error message and a string `code`.
+   * Codes are platform-specific; FailedToLoad events expose the same code as a number.
+   *
    * @group RewardVideo
    * @param options RewardAdOptions
    * @since 1.1.2

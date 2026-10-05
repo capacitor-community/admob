@@ -16,10 +16,10 @@ class AdRewardInterstitialExecutor: NSObject, FullScreenContentDelegate {
                 if let error = error {
                     NSLog("Rewarded interstitial ad failed to load with error: \(error.localizedDescription)")
                     self.plugin?.notifyListeners(RewardInterstitialAdPluginEvents.FailedToLoad.rawValue, data: [
-                        "code": 0,
+                        "code": (error as NSError).code,
                         "message": error.localizedDescription
                     ])
-                    call.reject("Loading failed")
+                    call.reject(error.localizedDescription, String((error as NSError).code), error)
                     return
                 }
 
