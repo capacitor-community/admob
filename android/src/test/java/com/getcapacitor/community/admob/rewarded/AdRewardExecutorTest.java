@@ -144,7 +144,7 @@ class AdRewardExecutorTest {
             rewardListener.getValue().onUserEarnedReward(reward);
             callback.getValue().onAdClicked();
 
-            verify(notifierMock, times(2)).accept(ArgumentMatchers.eq(RewardAdPluginEvents.INSTANCE.getClicked()), any());
+            verify(notifierMock, times(2)).accept(ArgumentMatchers.eq(RewardAdPluginEvents.INSTANCE.getAdClicked()), any());
             verify(pluginCallMock, times(1)).resolve(any());
             org.junit.jupiter.api.Assertions.assertSame(ad, AdRewardExecutor.preparedAds.get("test-ad-id"));
             callback.getValue().onAdDismissedFullScreenContent();

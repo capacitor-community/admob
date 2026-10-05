@@ -111,7 +111,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adDidRecordClick(_ advertisement: FullScreenPresentingAd) {
-        self.plugin?.notifyListeners(RewardAdPluginEvents.clicked.rawValue, data: [:])
+        self.plugin?.notifyListeners(RewardAdPluginEvents.adClicked.rawValue, data: [:])
     }
 
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {

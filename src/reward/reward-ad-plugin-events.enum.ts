@@ -3,7 +3,7 @@ export enum RewardAdPluginEvents {
   /**
    * Emits when the SDK records a click on a rewarded ad.
    */
-  Clicked = 'onRewardedVideoAdClicked',
+  adClicked = 'onRewardedVideoAdClicked',
   /**
    * Emits when a rewarded ad has loaded and is ready to show.
    */

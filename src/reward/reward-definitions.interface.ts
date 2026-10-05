@@ -36,7 +36,7 @@ export interface RewardDefinitions {
    * Listens for clicks recorded by the rewarded ad SDK, including after a reward is earned.
    * A click does not indicate that the user earned a reward.
    */
-  addListener(eventName: RewardAdPluginEvents.Clicked, listenerFunc: () => void): Promise<PluginListenerHandle>;
+  addListener(eventName: RewardAdPluginEvents.adClicked, listenerFunc: () => void): Promise<PluginListenerHandle>;
 
   /**
    * Listens for rewarded ad load failures.

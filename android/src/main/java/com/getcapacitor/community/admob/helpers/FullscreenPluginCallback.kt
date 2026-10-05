@@ -14,7 +14,7 @@ class FullscreenPluginCallback(
 ): FullScreenContentCallback() {
 
     override fun onAdClicked() {
-        loadPluginObject.Clicked?.let { notifyListenersFunction.accept(it, JSObject()) }
+        loadPluginObject.adClicked?.let { notifyListenersFunction.accept(it, JSObject()) }
     }
 
     override fun onAdShowedFullScreenContent() {

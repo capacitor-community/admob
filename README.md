@@ -241,7 +241,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 * [`addListener(InterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerinterstitialadplugineventsadimpression-)
 * [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
 * [`showRewardVideoAd(...)`](#showrewardvideoad)
-* [`addListener(RewardAdPluginEvents.Clicked, ...)`](#addlistenerrewardadplugineventsclicked-)
+* [`addListener(RewardAdPluginEvents.adClicked, ...)`](#addlistenerrewardadplugineventsadclicked-)
 * [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
 * [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
 * [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
@@ -943,19 +943,19 @@ Shows a loaded rewarded ad and resolves when the user earns the reward.
 --------------------
 
 
-### addListener(RewardAdPluginEvents.Clicked, ...)
+### addListener(RewardAdPluginEvents.adClicked, ...)
 
 ```typescript
-addListener(eventName: RewardAdPluginEvents.Clicked, listenerFunc: () => void) => Promise<PluginListenerHandle>
+addListener(eventName: RewardAdPluginEvents.adClicked, listenerFunc: () => void) => Promise<PluginListenerHandle>
 ```
 
 Listens for clicks recorded by the rewarded ad SDK, including after a reward is earned.
 A click does not indicate that the user earned a reward.
 
-| Param              | Type                                                                          |
-| ------------------ | ----------------------------------------------------------------------------- |
-| **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.Clicked</a></code> |
-| **`listenerFunc`** | <code>() =&gt; void</code>                                                    |
+| Param              | Type                                                                            |
+| ------------------ | ------------------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.adClicked</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                      |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
@@ -1586,7 +1586,7 @@ From T, pick a set of properties whose keys are in the union K
 
 | Members            | Value                                        | Description                                                                                                                                                        |
 | ------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`Clicked`**      | <code>'onRewardedVideoAdClicked'</code>      | Emits when the SDK records a click on a rewarded ad.                                                                                                               |
+| **`adClicked`**    | <code>'onRewardedVideoAdClicked'</code>      | Emits when the SDK records a click on a rewarded ad.                                                                                                               |
 | **`Loaded`**       | <code>'onRewardedVideoAdLoaded'</code>       | Emits when a rewarded ad has loaded and is ready to show.                                                                                                          |
 | **`FailedToLoad`** | <code>'onRewardedVideoAdFailedToLoad'</code> | Emits when a rewarded ad fails to load.                                                                                                                            |
 | **`Showed`**       | <code>'onRewardedVideoAdShowed'</code>       | Emits when a rewarded ad is shown.                                                                                                                                 |
