@@ -1,6 +1,6 @@
 # Configuration
 
-Call the plugin's `initialize` once before requesting ads. You do not start the native SDK yourself.
+After collecting consent and checking `canRequestAds`, call the plugin's `initialize` once before requesting ads. You do not start the native SDK yourself.
 
 Native application IDs belong in AndroidManifest / Info.plist; see [Installation](https://docs.rdlabo.dev/projects/capacitor-admob/docs/readme#installation).
 
@@ -27,4 +27,4 @@ During development, prefer Google [demo ad units](https://developers.google.com/
 
 Per-ad options such as `isTesting`, `npa` (non-personalized ads), and `immersiveMode` (hide Android system bars on a full-screen ad) are set on each ad request, not on `initialize`. See the per-format guides.
 
-After initialization, request privacy consent before loading ads. See [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent).
+Collect privacy consent before initialization and loading ads. See [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent).

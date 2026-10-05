@@ -1,6 +1,6 @@
 # Migration Guide
 
-## Changes in 8.1.0
+## Changes in 8.2.0
 
 ### Capacitor 8.5 or later is required
 
@@ -19,6 +19,24 @@ Handle initialization errors without blocking app startup. Retry when the native
 The `valueMicros` field now correctly reports millionths of a currency unit for banners, interstitials, rewarded ads, rewarded interstitials, and app-open ads. For example, a value of `0.0012` currency units previously produced `0`; it now produces `1200`. Android values and event names are unchanged.
 
 Divide `valueMicros` by `1_000_000` to obtain currency units on either platform. Review any iOS-specific workarounds in your analytics pipeline. Historical iOS values were truncated before conversion, so multiplying those stored values cannot recover the lost fractional revenue.
+
+### Consent before SDK initialization
+
+On iOS, `showConsentForm()` and `showPrivacyOptionsForm()` can now be called before `AdMob.initialize()`, matching Android. Request consent information, present a form if required, then initialize the Mobile Ads SDK and load ads only when `canRequestAds` is true. See [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) for the complete sequence. Existing initialize-first integrations remain callable, but should adopt this order.
+
+### Ad load errors preserve native codes
+
+`prepareInterstitial()`, `prepareRewardVideoAd()`, and `prepareRewardInterstitialAd()` now reject SDK load failures with a string `code` and the native error message. Codes are platform-specific, not normalized across Android and iOS. `FailedToLoad` event codes remain numbers; on iOS they now contain the actual SDK code instead of a fixed `0`.
+
+Update error handlers that match the iOS message `Loading failed` or assume an event code of `0`. Use the platform's SDK error definitions when handling no-fill and other failures.
+
+### Rewarded ad click event
+
+`RewardAdPluginEvents.adClicked` is a new optional listener for rewarded ads on Android and iOS. Its event string is `onRewardedVideoAdClicked`. Clicks are separate from earned rewards; continue granting rewards only from the `Rewarded` event or the show result, once. See [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded).
+
+### AGP 9 build compatibility
+
+The Android library now references `proguard-android-optimize.txt`, avoiding AGP 9's rejection of the older default file. This does not enable library minification or upgrade your project's AGP. Other AGP 9 migration steps still apply to the host app.
 
 The version-by-version steps under “Breaking changes from earlier versions” apply to releases before v8.
 

@@ -56,7 +56,7 @@ Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile
 
 This plugin already ships Google Mobile Ads SDK. Install the package, then add your AdMob **application** ID in AndroidManifest / Info.plist. Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start) explain app IDs and SKAdNetwork identifiers (Apple's ad conversion IDs); do not add a second Mobile Ads dependency.
 
-This plugin targets `@capacitor-community/admob` **v8** and Capacitor 8.5 or later (within v8). It supports iOS 15 or later and Android API 24 or later.
+This plugin targets `@capacitor-community/admob` **v8.2.0** and Capacitor 8.5 or later (within v8). It supports iOS 15 or later and Android API 24 or later.
 
 ```bash
 npm install @capacitor-community/admob
@@ -134,7 +134,7 @@ Run `pod repo update` in `ios/`, then `npx cap sync ios` again.
 
 ## First test banner
 
-After installation and platform setup, initialize the SDK, request consent, and show a Google demo banner. Use the platform banner IDs from [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing)—do not create your own ad unit for this first check.
+After installation and platform setup, request consent, initialize the SDK when ads may be requested, and show a Google demo banner. Use the platform banner IDs from [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing)—do not create your own ad unit for this first check.
 
 Call `startAdMob` from a user action or after the UI is ready (for example a button or post-navigation hook), not only at module evaluation time.
 
@@ -148,8 +148,6 @@ const bannerAdId =
     : 'ca-app-pub-3940256099942544/6300978111';
 
 async function startAdMob() {
-  await AdMob.initialize();
-
   let consentInfo = await AdMob.requestConsentInfo();
   if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
     consentInfo = await AdMob.showConsentForm();
@@ -159,6 +157,8 @@ async function startAdMob() {
     // Consent not ready — no banner is shown.
     return;
   }
+
+  await AdMob.initialize();
 
   const options: BannerAdOptions = {
     adId: bannerAdId,
@@ -184,7 +184,7 @@ Expected result: when `canRequestAds` is true, a Google test banner appears at t
 
 ## Documentation
 
-Start with [Installation](#installation) above, then [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Run the first test banner, then use [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for demo units and devices. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
+Start with [Installation](#installation) above, then [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Run the first test banner, then use [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for demo units and devices. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files are also included in the package. Method signatures are in the API section below.
 
 - [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) — `AdMob.initialize` and SDK options.
 - [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) — privacy consent and iOS tracking authorization.
@@ -195,7 +195,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
   - [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded) — rewarded video, rewarded interstitial, and server-side verification.
 - [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open) — load and present on foreground transitions.
 - [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events) — shared lifecycle events, errors, and revenue data.
-- [Migration Guide](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) — historical notes when upgrading from older plugin versions.
+- [Migration Guide](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) — upgrade steps and behavior changes in v8.2.0 and earlier versions.
 
 <!-- rdlabo-docs-omit -->
 ## Index

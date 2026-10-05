@@ -29,13 +29,14 @@ await handle.remove();
 | `Showed` / `Opened`       | The ad became visible to the user.                     |
 | `FailedToShow`            | A loaded ad failed to display.                         |
 | `Dismissed` / `Closed`    | The user closed the full-screen ad or overlay.         |
+| `adClicked`               | The SDK recorded a click on a rewarded ad (since 8.2.0). |
 | `Rewarded`                | The user earned the advertised reward.                 |
 | `SizeChanged`             | Banner dimensions changed.                             |
 | `AdImpression` / `AdPaid` | An impression was recorded. See revenue events below.  |
 
 ## Errors
 
-`FailedToLoad` and `FailedToShow` listeners receive an `AdMobError` payload.
+`FailedToLoad` and `FailedToShow` listeners receive an `AdMobError` payload. Codes are native, platform-specific numbers. Since 8.2.0, SDK load failures from interstitial, rewarded, and rewarded-interstitial prepare methods also reject with the same code as a string; iOS load failure events now report the actual code instead of `0`.
 
 <!-- !::AdMobError:: -->
 
@@ -43,7 +44,7 @@ await handle.remove();
 
 Full-screen formats emit `AdMobRevenueData` on their `AdImpression` event. Banners emit the same payload on `AdPaid`. Banner `AdImpression` has no payload; it only signals that an impression was recorded.
 
-`valueMicros` is an integer in millionths of the currency identified by `currencyCode`: divide by `1_000_000` for currency units. The iOS conversion was corrected in 8.1.0; see [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) if your analytics compensates for the previous values.
+`valueMicros` is an integer in millionths of the currency identified by `currencyCode`: divide by `1_000_000` for currency units. The iOS conversion was corrected in 8.2.0; see [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) if your analytics compensates for the previous values.
 
 <!-- !::AdMobRevenueData:: -->
 

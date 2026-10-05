@@ -55,6 +55,19 @@ console.log(rewardItem);
 
 When no `adId` is passed to `showRewardVideoAd()`, the most recently prepared ad is shown.
 
+### Click events (since 8.2.0)
+
+Register `adClicked` before showing a rewarded ad. This forwards clicks recorded by the SDK, including after a reward is earned while the ad remains displayed. It does not indicate that a reward was earned and does not apply to rewarded interstitials.
+
+```ts
+const clickListener = await AdMob.addListener(RewardAdPluginEvents.adClicked, () => {
+  console.log('Rewarded ad clicked');
+});
+
+// When the owning screen is destroyed:
+await clickListener.remove();
+```
+
 ### Prepare more than one ad
 
 ```ts
