@@ -67,7 +67,7 @@ If you still use Capacitor 7, install `@capacitor-community/admob@7`.
 
 ### Google Mobile Ads SDK versions
 
-This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) for the policy behind the pins.
+This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.11.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) for the policy behind the pins.
 
 ### Android configuration
 

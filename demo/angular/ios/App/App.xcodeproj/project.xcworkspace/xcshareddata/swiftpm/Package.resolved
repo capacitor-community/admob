@@ -1,5 +1,5 @@
 {
-  "originHash" : "c7bb1381c3e0db11b5a7a523cfc56903afb9c5151dffa9616686b7f962ec5946",
+  "originHash" : "63c2b4dc8f127b0a4181337fafdede00169ab52b1bb53c8f3ffe54112bcbf17b",
   "pins" : [
     {
       "identity" : "capacitor-swift-pm",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/googleads/swift-package-manager-google-mobile-ads.git",
       "state" : {
-        "revision" : "7651abff585dc8dacd1744222d5f03bdd2a8532a",
-        "version" : "13.6.0"
+        "revision" : "d1fa1f5c1dfe3b43d56c73f4de388ad3316618bc",
+        "version" : "13.11.0"
       }
     },
     {
