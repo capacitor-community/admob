@@ -97,7 +97,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        self.plugin?.setWebMediaSuspended(false)
+        self.plugin?.resumeWebMedia(for: ad)
         removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
@@ -107,7 +107,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
-        self.plugin?.setWebMediaSuspended(true)
+        self.plugin?.suspendWebMedia(for: ad)
         NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
     }
@@ -117,7 +117,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        self.plugin?.setWebMediaSuspended(false)
+        self.plugin?.resumeWebMedia(for: ad)
         removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Dismissed.rawValue, data: [:])
