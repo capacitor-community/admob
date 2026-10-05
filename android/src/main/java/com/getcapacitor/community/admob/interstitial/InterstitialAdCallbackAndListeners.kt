@@ -43,7 +43,7 @@ object InterstitialAdCallbackAndListeners {
                 val adMobError = AdMobPluginError(adError)
 
                 notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.FailedToLoad, adMobError)
-                call.reject(adError.message)
+                call.reject(adError.message, adError.code.toString())
             }
         }
     }

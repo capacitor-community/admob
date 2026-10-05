@@ -68,7 +68,7 @@ object RewardedAdCallbackAndListeners {
                 val adMobError = AdMobPluginError(adError)
 
                 notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad, adMobError)
-                call.reject(adError.message)
+                call.reject(adError.message, adError.code.toString())
             }
         }
     }

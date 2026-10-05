@@ -769,6 +769,9 @@ prepareInterstitial(options: AdOptions) => Promise<AdLoadInfo>
 
 Loads an interstitial ad and returns the loaded ad unit ID.
 
+SDK load failures reject with the native error message and a string `code`.
+Codes are platform-specific; FailedToLoad events expose the same code as a number.
+
 | Param         | Type                                            | Description                        |
 | ------------- | ----------------------------------------------- | ---------------------------------- |
 | **`options`** | <code><a href="#adoptions">AdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
@@ -912,6 +915,9 @@ prepareRewardVideoAd(options: RewardAdOptions) => Promise<AdLoadInfo>
 ```
 
 Loads a rewarded ad and returns the loaded ad unit ID.
+
+SDK load failures reject with the native error message and a string `code`.
+Codes are platform-specific; FailedToLoad events expose the same code as a number.
 
 | Param         | Type                                                        | Description                                    |
 | ------------- | ----------------------------------------------------------- | ---------------------------------------------- |
@@ -1095,6 +1101,9 @@ prepareRewardInterstitialAd(options: RewardInterstitialAdOptions) => Promise<AdL
 ```
 
 Loads a rewarded interstitial ad and returns the loaded ad unit ID.
+
+SDK load failures reject with the native error message and a string `code`.
+Codes are platform-specific; FailedToLoad events expose the same code as a number.
 
 | Param         | Type                                                                                | Description                                                            |
 | ------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
