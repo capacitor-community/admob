@@ -1,6 +1,6 @@
 # Migration Guide
 
-## Changes after 8.1.0 (unreleased)
+## Changes in 8.1.0
 
 ### Android initialization can reject
 

@@ -43,7 +43,7 @@ await handle.remove();
 
 Full-screen formats emit `AdMobRevenueData` on their `AdImpression` event. Banners emit the same payload on `AdPaid`. Banner `AdImpression` has no payload; it only signals that an impression was recorded.
 
-`valueMicros` is an integer in millionths of the currency identified by `currencyCode`: divide by `1_000_000` for currency units. The iOS conversion was corrected after 8.1.0; see [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) if your analytics compensates for the previous values.
+`valueMicros` is an integer in millionths of the currency identified by `currencyCode`: divide by `1_000_000` for currency units. The iOS conversion was corrected in 8.1.0; see [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) if your analytics compensates for the previous values.
 
 <!-- !::AdMobRevenueData:: -->
 
