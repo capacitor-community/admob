@@ -13,6 +13,10 @@ class FullscreenPluginCallback(
     private val onCompleted: Runnable? = null
 ): FullScreenContentCallback() {
 
+    override fun onAdClicked() {
+        loadPluginObject.Clicked?.let { notifyListenersFunction.accept(it, JSObject()) }
+    }
+
     override fun onAdShowedFullScreenContent() {
         notifyListenersFunction.accept(loadPluginObject.Showed, JSObject())
     }

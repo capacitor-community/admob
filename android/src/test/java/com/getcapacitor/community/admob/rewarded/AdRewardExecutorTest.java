@@ -119,6 +119,39 @@ class AdRewardExecutorTest {
         }
 
         @Test
+        void reportsClicksBeforeAndAfterRewardWithoutCompletingTheAd() {
+            RewardedAd ad = mock(RewardedAd.class);
+            AdRewardExecutor.preparedAds.put("test-ad-id", ad);
+            AdRewardExecutor.lastPreparedAdId = "test-ad-id";
+            sut.showRewardVideoAd(pluginCallMock, notifierMock);
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            ArgumentCaptor<com.google.android.gms.ads.FullScreenContentCallback> callback = ArgumentCaptor.forClass(
+                com.google.android.gms.ads.FullScreenContentCallback.class
+            );
+            ArgumentCaptor<com.google.android.gms.ads.OnUserEarnedRewardListener> rewardListener = ArgumentCaptor.forClass(
+                com.google.android.gms.ads.OnUserEarnedRewardListener.class
+            );
+            verify(ad).setFullScreenContentCallback(callback.capture());
+            verify(ad).show(any(), rewardListener.capture());
+
+            callback.getValue().onAdClicked();
+            verify(pluginCallMock, times(0)).resolve(any());
+            com.google.android.gms.ads.rewarded.RewardItem reward = mock(com.google.android.gms.ads.rewarded.RewardItem.class);
+            when(reward.getType()).thenReturn("coin");
+            when(reward.getAmount()).thenReturn(1);
+            rewardListener.getValue().onUserEarnedReward(reward);
+            callback.getValue().onAdClicked();
+
+            verify(notifierMock, times(2)).accept(ArgumentMatchers.eq(RewardAdPluginEvents.INSTANCE.getClicked()), any());
+            verify(pluginCallMock, times(1)).resolve(any());
+            org.junit.jupiter.api.Assertions.assertSame(ad, AdRewardExecutor.preparedAds.get("test-ad-id"));
+            callback.getValue().onAdDismissedFullScreenContent();
+            org.junit.jupiter.api.Assertions.assertFalse(AdRewardExecutor.preparedAds.containsKey("test-ad-id"));
+        }
+
+        @Test
         @DisplayName("Should show a specific reward ad when adId is provided")
         void shouldShowSpecificAdWhenAdIdProvided() {
             RewardedAd adOne = mock(RewardedAd.class);

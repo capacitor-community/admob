@@ -33,6 +33,12 @@ export interface RewardDefinitions {
   showRewardVideoAd(options?: AdShowOptions): Promise<AdMobRewardItem>;
 
   /**
+   * Listens for clicks recorded by the rewarded ad SDK, including after a reward is earned.
+   * A click does not indicate that the user earned a reward.
+   */
+  addListener(eventName: RewardAdPluginEvents.Clicked, listenerFunc: () => void): Promise<PluginListenerHandle>;
+
+  /**
    * Listens for rewarded ad load failures.
    */
   addListener(

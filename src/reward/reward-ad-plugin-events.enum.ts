@@ -1,6 +1,10 @@
 // This enum should be keep in sync with their native equivalents with the same name
 export enum RewardAdPluginEvents {
   /**
+   * Emits when the SDK records a click on a rewarded ad.
+   */
+  Clicked = 'onRewardedVideoAdClicked',
+  /**
    * Emits when a rewarded ad has loaded and is ready to show.
    */
   Loaded = 'onRewardedVideoAdLoaded',
