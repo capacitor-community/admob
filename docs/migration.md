@@ -2,6 +2,12 @@
 
 ## Changes in 8.1.0
 
+### Capacitor 8.5 or later is required
+
+Update `@capacitor/core`, `@capacitor/cli`, and the native platform packages you use (`@capacitor/android` / `@capacitor/ios`) to 8.5 or later within v8, then run `npx cap sync`.
+
+Older Capacitor versions can consume Android window insets before they reach a banner. Update Capacitor to use its current safe-area handling. Follow the [Capacitor 8.5 update guide](https://capacitorjs.com/docs/updating/8-5) for native project migration steps.
+
 ### Android initialization can reject
 
 `AdMob.initialize()` now waits for the native banner parent view. If it does not appear within 5 seconds, initialization rejects; an unavailable activity/content view can fail immediately. This also applies to apps that only use full-screen ads. Previously, a missing child view could let initialization resolve and cause later banner requests to crash.
