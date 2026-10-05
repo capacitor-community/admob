@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob.rewarded
 import com.getcapacitor.community.admob.models.LoadPluginEventNames
 
 object RewardAdPluginEvents: LoadPluginEventNames {
+    override val adClicked = "onRewardedVideoAdClicked"
     const val Loaded = "onRewardedVideoAdLoaded"
     const val FailedToLoad = "onRewardedVideoAdFailedToLoad"
     const val Rewarded = "onRewardedVideoAdReward"

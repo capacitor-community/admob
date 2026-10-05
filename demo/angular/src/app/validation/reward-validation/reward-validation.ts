@@ -29,6 +29,7 @@ const testItems: ValidationTestItem[] = [
   { type: 'event', name: RewardAdPluginEvents.Loaded },
   { type: 'event', name: RewardAdPluginEvents.Showed },
   { type: 'event', name: RewardAdPluginEvents.Rewarded },
+  { type: 'event', name: RewardAdPluginEvents.adClicked },
   { type: 'event', name: RewardAdPluginEvents.Dismissed },
   { type: 'method', name: 'prepareRewardVideoAdFailed' },
   { type: 'event', name: RewardAdPluginEvents.FailedToLoad, expect: 'error' },
@@ -99,6 +100,7 @@ class ViewModel extends ViewModelStore<RewardValidation> {
         this.#recordEvent(RewardAdPluginEvents.FailedToShow, value),
       ),
       AdMob.addListener(RewardAdPluginEvents.Showed, () => this.#recordEvent(RewardAdPluginEvents.Showed)),
+      AdMob.addListener(RewardAdPluginEvents.adClicked, () => this.#recordEvent(RewardAdPluginEvents.adClicked)),
     ]);
     this.#listenerHandlers.push(...handlers);
   }
