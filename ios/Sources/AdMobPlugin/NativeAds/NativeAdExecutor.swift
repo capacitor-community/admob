@@ -171,6 +171,15 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
         let identifier = ObjectIdentifier(adLoader)
         guard let request = pending.removeValue(forKey: identifier) else { return }
 
+        if request.template == "small", nativeAd.mediaContent.hasVideoContent {
+            let message = "Small native ad template does not support video ads; use Medium"
+            var event = NativeAdValues.identity(request.feedId, request.sessionId, request.slotKey)
+            event["code"] = -1
+            event["message"] = message
+            plugin?.notifyListeners(NativeAdPluginEvents.failedToLoad.rawValue, data: event)
+            request.call.reject(message, "-1")
+            return
+        }
         nativeAd.delegate = self
         let adView = PluginNativeAdView(nativeAd: nativeAd, template: request.template, style: request.style)
         let clippingView = UIView(frame: .zero)

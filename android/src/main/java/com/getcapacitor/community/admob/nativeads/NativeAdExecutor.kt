@@ -202,6 +202,17 @@ class NativeAdExecutor(
             return
         }
         pendingLoads.remove(stateKey)
+        if (template == "small" && nativeAd.mediaContent?.hasVideoContent() == true) {
+            nativeAd.destroy()
+            val message = "Small native ad template does not support video ads; use Medium"
+            val event = identity(feedId, sessionId, slotKey).apply {
+                put("code", -1)
+                put("message", message)
+            }
+            notifyListeners(NativeAdPluginEvents.FAILED_TO_LOAD, event)
+            pendingLoad.call.reject(message, "-1", event)
+            return
+        }
         val adView = PluginNativeAdView.create(contextSupplier.get(), nativeAd, template, style)
         val clippingContainer = FrameLayout(contextSupplier.get()).apply {
             clipChildren = true
@@ -284,6 +295,19 @@ class NativeAdExecutor(
         val minimumWidth = (if (state.isSmall) 120 else 144) * density
         val minimumHeight = (if (state.isSmall) 120 else 300) * density
         if (value.rectWidth < minimumWidth.roundToInt() || value.rectHeight < minimumHeight.roundToInt()) return null
+
+        if (!state.isSmall) {
+            val adView = state.adView
+            if (adView.isLayoutRequested || adView.measuredWidth != value.rectWidth || adView.measuredHeight != value.rectHeight) {
+                adView.measure(
+                    View.MeasureSpec.makeMeasureSpec(value.rectWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(value.rectHeight, View.MeasureSpec.EXACTLY),
+                )
+                adView.layout(0, 0, value.rectWidth, value.rectHeight)
+            }
+            val media = adView.mediaView ?: return null
+            if (media.measuredWidth < 120 * density || media.measuredHeight < 120 * density) return null
+        }
 
         val webView = webViewSupplier.get() ?: return null
         val wasVisible = state.clippingContainer.visibility == View.VISIBLE

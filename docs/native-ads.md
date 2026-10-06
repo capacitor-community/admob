@@ -38,7 +38,9 @@ Use the framework-independent element in ordinary or virtualized markup. `slot-k
 <capacitor-admob-native feed-id="home-feed" slot-key="sponsored-after-article-42"></capacitor-admob-native>
 ```
 
-The element reserves `320px` for `Medium` and `120px` for `Small` only when author CSS does not provide a height. Author `display: none` and explicit height rules are respected. `Small` slots must be at least `120×120px`; `Medium` slots must be at least `144×300px`, leaving a policy-compliant `120×120` media area after template padding. Smaller slots are not loaded. Do not animate or dynamically measure the slot height.
+The element reserves `320px` for `Medium` and `120px` for `Small` only when author CSS does not provide a height. Author `display: none` and explicit height rules are respected. `Small` slots must be at least `120×120px`; `Medium` slots must be at least `144×300px`. Smaller slots are not loaded. These are lower bounds, not a guarantee that every creative and font size will fit. On Android, `Medium` stays hidden if its measured media area is smaller than `120×120dp`; increase the slot size to accommodate text, device font scaling, and pixel rounding. Do not animate or dynamically measure the slot height.
+
+`Small` has no video area. If the SDK returns a video ad for this template, the load fails with `NativeAdPluginEvents.FailedToLoad` (code `-1`); it is not displayed or automatically retried. Use `Medium` for ad units that serve video ads.
 
 If a framework does not accept custom elements, attach an ordinary element instead:
 

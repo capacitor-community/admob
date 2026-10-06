@@ -151,7 +151,7 @@ final class PluginNativeAdView: NativeAdView {
     private func configureMedia(_ nativeAd: NativeAd) {
         guard !isSmall else { return }
         nativeMediaView.mediaContent = nativeAd.mediaContent
-        nativeMediaView.contentMode = .scaleAspectFill
+        nativeMediaView.contentMode = .scaleAspectFit
         nativeMediaView.clipsToBounds = true
         addSubview(nativeMediaView)
         mediaView = nativeMediaView
