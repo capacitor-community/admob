@@ -8,6 +8,13 @@ export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa'> {
   /** Unique ID for this feed manager. */
   feedId: string;
 
+  /**
+   * Experimental iOS native tracking for a single scroll container.
+   * For Ionic, pass the result of ion-content.getScrollElement().
+   * Other platforms retain JavaScript placement updates.
+   */
+  scrollElement?: HTMLElement;
+
   /** Plugin-owned layout used for every native ad in this feed. */
   template?: NativeAdTemplate;
 

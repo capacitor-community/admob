@@ -51,6 +51,7 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
     private var states: [String: State] = [:]
     private var pending: [ObjectIdentifier: Pending] = [:]
     private let feedSessions = NativeAdFeedSessions()
+    private var scrollTrackers: [String: NativeAdScrollTracker] = [:]
 
     func startFeed(_ call: CAPPluginCall) {
         guard let session = NativeAdValues.session(call) else { return }
@@ -125,7 +126,10 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
             call.resolve()
             return
         }
+        scrollTrackers.removeValue(forKey: feedId)
         states.values.filter { $0.feedId == feedId }.forEach { $0.clippingView.isHidden = true }
+
+        if updateTrackedPlacements(call, feedId: feedId) { return }
 
         for case let placement as [String: Any] in call.getArray("placements") ?? [] {
             applyPlacement(placement, expectedFeedId: feedId)
@@ -149,6 +153,7 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
     }
 
     func destroyAll() {
+        scrollTrackers.removeAll()
         for request in pending.values { request.call.reject("Native ad load was cancelled") }
         for stateKey in Array(states.keys) { destroyState(stateKey) }
         pending.removeAll()
@@ -211,8 +216,12 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
     }
 
     private func applyPlacement(_ placement: [String: Any], expectedFeedId: String) {
+        guard let value = NativeAdPlacementValue(placement, expectedFeedId: expectedFeedId) else { return }
+        applyPlacement(value)
+    }
+
+    private func applyPlacement(_ placement: NativeAdPlacementValue) {
         guard
-            let placement = NativeAdPlacementValue(placement, expectedFeedId: expectedFeedId),
             let state = states[NativeAdValues.key(placement.feedId, placement.slotKey)],
             placement.generation >= state.generation,
             placement.rect.width >= (state.isSmall ? 120 : 144),
@@ -259,6 +268,7 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
     }
 
     private func clearFeed(_ feedId: String) {
+        scrollTrackers.removeValue(forKey: feedId)
         let requests = pending.filter { $0.value.feedId == feedId }
         for (identifier, request) in requests {
             pending.removeValue(forKey: identifier)
@@ -272,6 +282,31 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
 }
 
 extension NativeAdExecutor {
+    private func updateTrackedPlacements(_ call: CAPPluginCall, feedId: String) -> Bool {
+        guard let container = call.getObject("scrollContainer") else { return false }
+        let placements = (call.getArray("placements") ?? []).compactMap { value -> NativeAdPlacementValue? in
+            guard let value = value as? [String: Any] else { return nil }
+            return NativeAdPlacementValue(value, expectedFeedId: feedId)
+        }
+        if placements.isEmpty {
+            call.resolve()
+            return true
+        }
+        guard let webView = plugin?.bridge?.webView,
+              let tracker = NativeAdScrollTracker(container: container, webView: webView, placements: placements, render: { [weak self] values in
+                  guard let self else { return }
+                  self.states.values.filter { $0.feedId == feedId }.forEach { $0.clippingView.isHidden = true }
+                  values.forEach { self.applyPlacement($0) }
+              }) else {
+            call.reject("Cannot uniquely bind native ad scroll container")
+            return true
+        }
+        scrollTrackers[feedId] = tracker
+        tracker.update()
+        call.resolve()
+        return true
+    }
+
     func adLoader(_ adLoader: AdLoader, didFailToReceiveAdWithError error: Error) {
         let identifier = ObjectIdentifier(adLoader)
         guard let request = pending.removeValue(forKey: identifier) else { return }

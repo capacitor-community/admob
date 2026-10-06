@@ -1,5 +1,12 @@
 import { JsonPipe } from '@angular/common';
-import { afterRenderEffect, ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import {
+  afterRenderEffect,
+  ChangeDetectionStrategy,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { NativeAdFeed, NativeAdPluginEvents, NativeAdTemplate } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 import {
@@ -92,6 +99,7 @@ const feedItems: FeedItem[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NativeAdDemo implements ViewWillEnter, ViewWillLeave {
+  readonly content = viewChild.required(IonContent);
   readonly vm = new ViewModel(this);
 
   constructor() {
@@ -150,7 +158,10 @@ class ViewModel extends ViewModelStore<NativeAdDemo> {
 
   async #startFeed(generation: number): Promise<void> {
     if (generation !== this.#generation) return;
+    const scrollElement = Capacitor.getPlatform() === 'ios' ? await this.host.content().getScrollElement() : undefined;
+    if (generation !== this.#generation) return;
     const feed = await NativeAdFeed.create({
+      scrollElement,
       feedId: 'native-ad-demo-feed',
       template: NativeAdTemplate.Medium,
       isTesting: true,

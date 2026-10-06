@@ -19,4 +19,11 @@ export interface NativeAdPlacementBatch extends NativeAdFeedSession {
   /** Monotonically increasing sequence used to reject stale bridge calls. */
   sequence: number;
   placements: NativeAdPlacement[];
+  /** iOS-only binding; placements use this element's content coordinates. */
+  scrollContainer?: {
+    rect: NativeAdRect;
+    clipRect: NativeAdRect;
+    contentWidth: number;
+    contentHeight: number;
+  };
 }

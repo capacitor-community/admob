@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const bridge = {
@@ -192,6 +193,65 @@ describe('NativeAdFeed', () => {
     bridge.updateNativeAdPlacements.mockClear();
     await settle();
     expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+  });
+
+  it('keeps iOS placements in scroll-content coordinates and pauses native tracking', async () => {
+    vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('ios');
+    const scroller = document.createElement('div');
+    scroller.style.overflow = 'auto';
+    scroller.getBoundingClientRect = () => new DOMRect(0, 100, 300, 500);
+    Object.defineProperties(scroller, {
+      scrollWidth: { value: 300 },
+      scrollHeight: { value: 1200 },
+    });
+    const element = document.createElement('div');
+    scroller.appendChild(element);
+    document.body.appendChild(scroller);
+    scroller.scrollTop = 400;
+    element.getBoundingClientRect = () => new DOMRect(10, 80, 280, 320);
+    const feed = await NativeAdFeed.create({ feedId: 'ios-scroll', isTesting: true, scrollElement: scroller });
+    createdFeeds.push(feed);
+    feed.attach('tracked', element);
+    await settle();
+
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        scrollContainer: {
+          rect: { x: 0, y: 100, width: 300, height: 500 },
+          clipRect: { x: 0, y: 100, width: 300, height: 500 },
+          contentWidth: 300,
+          contentHeight: 1200,
+        },
+        placements: [
+          expect.objectContaining({
+            visible: true,
+            rect: { x: 10, y: 380, width: 280, height: 320 },
+            clipRect: { x: 10, y: 380, width: 280, height: 320 },
+          }),
+        ],
+      }),
+    );
+    bridge.updateNativeAdPlacements.mockClear();
+    scroller.scrollTop = 800;
+    element.getBoundingClientRect = () => new DOMRect(10, -320, 280, 320);
+    scroller.dispatchEvent(new Event('scroll'));
+    await settle();
+    expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+
+    await feed.pause();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        placements: [expect.objectContaining({ visible: false })],
+      }),
+    );
+    feed.resume();
+    await settle();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        placements: [expect.objectContaining({ visible: true })],
+      }),
+    );
+    expect(bridge.loadNativeAd).toHaveBeenCalledOnce();
   });
 
   it('detaches the old logical slot before a recycled element uses a new slotKey', async () => {

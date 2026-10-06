@@ -1,4 +1,4 @@
-import type { NativeAdRect } from './native-ad-placement.interface';
+import type { NativeAdPlacementBatch, NativeAdRect } from './native-ad-placement.interface';
 
 export interface MeasuredNativeAdSlot {
   rect: NativeAdRect;
@@ -42,7 +42,10 @@ export function* nativeAdAncestors(element: HTMLElement): Generator<HTMLElement>
   }
 }
 
-export const measureNativeAdSlot = (element: HTMLElement): MeasuredNativeAdSlot | undefined => {
+export const measureNativeAdSlot = (
+  element: HTMLElement,
+  scrollElement?: HTMLElement,
+): MeasuredNativeAdSlot | undefined => {
   const style = window.getComputedStyle(element);
   const domRect = element.getBoundingClientRect();
   if (
@@ -57,19 +60,52 @@ export const measureNativeAdSlot = (element: HTMLElement): MeasuredNativeAdSlot 
   }
 
   const rect = toNativeRect(domRect);
-  let clipRect: NativeAdRect = {
-    x: window.visualViewport?.offsetLeft ?? 0,
-    y: window.visualViewport?.offsetTop ?? 0,
-    width: window.visualViewport?.width ?? window.innerWidth,
-    height: window.visualViewport?.height ?? window.innerHeight,
-  };
+  let clipRect: NativeAdRect = scrollElement
+    ? rect
+    : {
+        x: window.visualViewport?.offsetLeft ?? 0,
+        y: window.visualViewport?.offsetTop ?? 0,
+        width: window.visualViewport?.width ?? window.innerWidth,
+        height: window.visualViewport?.height ?? window.innerHeight,
+      };
 
+  let foundScrollElement = !scrollElement;
   for (const ancestor of nativeAdAncestors(element)) {
+    if (ancestor === scrollElement) {
+      foundScrollElement = true;
+      break;
+    }
     if (clipsDescendants(ancestor)) {
       clipRect = intersectRects(clipRect, toNativeRect(ancestor.getBoundingClientRect()));
     }
   }
 
   clipRect = intersectRects(rect, clipRect);
-  return clipRect.width > 0 && clipRect.height > 0 ? { rect, clipRect } : undefined;
+  if (!foundScrollElement || clipRect.width <= 0 || clipRect.height <= 0) return undefined;
+  if (scrollElement) {
+    const origin = scrollElement.getBoundingClientRect();
+    const translate = (value: NativeAdRect): NativeAdRect => ({
+      ...value,
+      x: value.x - origin.left + scrollElement.scrollLeft,
+      y: value.y - origin.top + scrollElement.scrollTop,
+    });
+    return { rect: translate(rect), clipRect: translate(clipRect) };
+  }
+  return { rect, clipRect };
+};
+
+export const measureNativeAdScrollContainer = (element: HTMLElement): NativeAdPlacementBatch['scrollContainer'] => {
+  const rect = toNativeRect(element.getBoundingClientRect());
+  let clipRect = intersectRects(rect, {
+    x: window.visualViewport?.offsetLeft ?? 0,
+    y: window.visualViewport?.offsetTop ?? 0,
+    width: window.visualViewport?.width ?? window.innerWidth,
+    height: window.visualViewport?.height ?? window.innerHeight,
+  });
+  for (const ancestor of nativeAdAncestors(element)) {
+    if (clipsDescendants(ancestor)) {
+      clipRect = intersectRects(clipRect, toNativeRect(ancestor.getBoundingClientRect()));
+    }
+  }
+  return { rect, clipRect, contentWidth: element.scrollWidth, contentHeight: element.scrollHeight };
 };

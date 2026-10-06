@@ -139,3 +139,19 @@ The `Small` and `Medium` templates, attribution, AdChoices, media, and clickable
 Style colors use CSS-style `#RRGGBB` or `#RRGGBBAA` values on both platforms. Dimensions use logical pixels; font sizes use points on iOS and `sp` on Android. Invalid colors fall back to the template defaults. Negative dimensions are clamped to zero; headline, body, and call-to-action fonts are clamped to `12–24`, `10–18`, and `12–18` respectively.
 
 Follow Google's native ad policies and implementation guidance for [Android](https://developers.google.com/admob/android/native/advanced) and [iOS](https://developers.google.com/admob/ios/native/advanced).
+
+### iOS native scroll tracking
+
+For a single Ionic scroll container, pass its actual scroll element when creating the feed:
+
+```ts
+const feed = await NativeAdFeed.create({
+  feedId: 'articles',
+  isTesting: true,
+  scrollElement: await ionContent.getScrollElement(),
+});
+```
+
+On iOS, loaded ads follow the corresponding native scroll view without per-frame JavaScript placement updates. Layout changes still require remeasurement; call `invalidateLayout()` after application-driven changes. Clipping inside the scroll container and at its visible bounds is retained. `pause()` and `destroy()` stop tracking. Other platforms ignore this option and retain JavaScript coordinate updates.
+
+This remains a research preview: the binding depends on WebKit's view hierarchy, although it does not reference private class names. A missing or ambiguous match hides the ads instead of binding another container. Use one untransformed, unzoomed overflow scroll container; nested scrolling, document scrolling through this option, and virtual-scroll integrations are not supported. This does not change gesture routing for swipes that begin on an ad.

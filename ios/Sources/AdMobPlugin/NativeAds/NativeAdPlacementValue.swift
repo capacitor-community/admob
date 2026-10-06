@@ -4,8 +4,8 @@ struct NativeAdPlacementValue {
     let feedId: String
     let slotKey: String
     let generation: Int
-    let rect: CGRect
-    let clip: CGRect
+    var rect: CGRect
+    var clip: CGRect
 
     init?(_ value: [String: Any], expectedFeedId: String) {
         guard
@@ -31,7 +31,14 @@ struct NativeAdPlacementValue {
         self.clip = clip
     }
 
-    private static func rect(_ value: [String: Any]) -> CGRect? {
+    func projected(origin: CGPoint, viewport: CGRect) -> Self? {
+        var result = self
+        result.rect = rect.offsetBy(dx: origin.x, dy: origin.y)
+        result.clip = clip.offsetBy(dx: origin.x, dy: origin.y).intersection(viewport)
+        return result.clip.isNull || result.clip.isEmpty ? nil : result
+    }
+
+    static func rect(_ value: [String: Any]) -> CGRect? {
         guard
             let originX = (value["x"] as? NSNumber)?.doubleValue,
             let originY = (value["y"] as? NSNumber)?.doubleValue,

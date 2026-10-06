@@ -1,9 +1,10 @@
+import { Capacitor } from '@capacitor/core';
 import type { PluginListenerHandle } from '@capacitor/core';
 
 import type { NativeAdDefinitions } from './native-ad-definitions.interface';
 import { connectNativeAdElements, defineNativeAdElement } from './native-ad-element';
 import type { NativeAdEvent, NativeAdErrorEvent, NativeAdRevenueEvent } from './native-ad-event.interface';
-import { measureNativeAdSlot, nativeAdAncestors } from './native-ad-geometry';
+import { measureNativeAdSlot, measureNativeAdScrollContainer, nativeAdAncestors } from './native-ad-geometry';
 import type { MeasuredNativeAdSlot } from './native-ad-geometry';
 import type { NativeAdFeedOptions } from './native-ad-options.interface';
 import type { NativeAdPlacement } from './native-ad-placement.interface';
@@ -70,6 +71,7 @@ type NativeAdListener =
  */
 export class NativeAdFeed {
   private readonly options: NativeAdFeedOptions;
+  private readonly nativeScrollElement?: HTMLElement;
   private readonly sessionId = createSessionId();
   private readonly slots = new Map<string, SlotState>();
   private readonly elementSlots = new Map<HTMLElement, string>();
@@ -102,6 +104,7 @@ export class NativeAdFeed {
       throw new Error(`At most ${MAX_ACTIVE_FEEDS} native ad feeds can be active`);
     }
     this.options = { ...options, feedId: id };
+    this.nativeScrollElement = Capacitor.getPlatform() === 'ios' ? options.scrollElement : undefined;
 
     if (typeof IntersectionObserver !== 'undefined') {
       this.intersectionObserver = new IntersectionObserver((entries) => {
@@ -118,6 +121,7 @@ export class NativeAdFeed {
     }
     if (typeof ResizeObserver !== 'undefined') {
       this.resizeObserver = new ResizeObserver(this.handleViewportMotion);
+      if (this.nativeScrollElement) this.resizeObserver.observe(this.nativeScrollElement);
     }
 
     document.addEventListener('scroll', this.handleViewportMotion, true);
@@ -348,11 +352,17 @@ export class NativeAdFeed {
     }
   }
 
-  private readonly handleViewportMotion = (): void => {
+  private readonly handleViewportMotion = (event?: Event | ResizeObserverEntry[]): void => {
     if (this.destroyed) {
       return;
     }
-    this.schedulePlacementUpdate();
+    if (!(
+      this.nativeScrollElement &&
+      event instanceof Event &&
+      ['scroll', 'touchmove', 'wheel'].includes(event.type)
+    )) {
+      this.schedulePlacementUpdate();
+    }
     this.scheduleEvaluation();
   };
 
@@ -566,7 +576,7 @@ export class NativeAdFeed {
         const placements = [...this.slots.values()]
           .filter((state) => state.status === 'loaded')
           .map((state): NativeAdPlacement => {
-            const measured = state.element ? measureNativeAdSlot(state.element) : undefined;
+            const measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
             const visible = Boolean(
               !this.paused && !this.layoutInvalidated && measured && this.isSupportedSize(measured) && !document.hidden,
             );
@@ -579,7 +589,10 @@ export class NativeAdFeed {
               clipRect: measured?.clipRect,
             };
           });
-        const serializedPlacements = JSON.stringify(placements);
+        const scrollContainer = this.nativeScrollElement
+          ? measureNativeAdScrollContainer(this.nativeScrollElement)
+          : undefined;
+        const serializedPlacements = JSON.stringify({ placements, scrollContainer });
         if (serializedPlacements === this.lastPlacements) {
           continue;
         }
@@ -589,9 +602,11 @@ export class NativeAdFeed {
             sessionId: this.sessionId,
             sequence: ++this.placementSequence,
             placements,
+            ...(scrollContainer ? { scrollContainer } : {}),
           });
           this.lastPlacements = serializedPlacements;
         } catch {
+          this.lastPlacements = undefined;
           // Retry on the next scroll, resize, or lifecycle update without
           // creating an unhandled rejection from this fire-and-forget task.
           this.updateDirty = true;
