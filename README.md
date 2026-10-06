@@ -190,6 +190,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 - [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) — privacy consent and iOS tracking authorization.
 - [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) — demo ad units, test devices, and consent testing.
 - [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) — banner options, lifecycle, and events.
+- [Native Ads (Preview)](./docs/native-ads.md) — available for testing and production use. Its API may change in a minor release while in Preview.
 - Full-screen ads:
   - [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) — load, show, and multiple prepared ads.
   - [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded) — rewarded video, rewarded interstitial, and server-side verification.

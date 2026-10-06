@@ -18,6 +18,13 @@
   }
 
   <ion-list>
+    <ion-list-header><ion-label>Native ads</ion-label></ion-list-header>
+    <ion-item-group>
+      <ion-item routerLink="/native" routerDirection="forward">Native Ads (Preview)</ion-item>
+    </ion-item-group>
+  </ion-list>
+
+  <ion-list>
     <ion-list-header><ion-label>Consent</ion-label></ion-list-header>
     <ion-item-group>
       <ion-item [button]="true" (click)="vm.requestConsentInfo()">Request Consent Info</ion-item>

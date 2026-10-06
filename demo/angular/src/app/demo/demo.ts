@@ -1,6 +1,7 @@
 import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   AdMob,
   AdMobBannerSize,
@@ -16,6 +17,7 @@ import {
 } from '@capacitor-community/admob';
 import { PluginListenerHandle } from '@capacitor/core';
 import {
+  IonRouterLink,
   IonContent,
   IonFooter,
   IonHeader,
@@ -54,6 +56,8 @@ interface AdEvent {
   styleUrl: 'demo.scss',
   imports: [
     FormsModule,
+    RouterLink,
+    IonRouterLink,
     JsonPipe,
     IonHeader,
     IonToolbar,
@@ -87,7 +91,6 @@ class ViewModel extends ViewModelStore<Demo> {
   readonly #toastController = inject(ToastController);
   readonly #bannerViewport = inject(BannerViewportService);
   readonly #listenerHandlers: PluginListenerHandle[] = [];
-
   #appMargin = 0;
   #bannerPosition: 'top' | 'bottom' = 'bottom';
 
