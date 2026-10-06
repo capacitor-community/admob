@@ -46,7 +46,9 @@ This major version keeps Google Mobile Ads SDK APIs that are deprecated but stil
 
 Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) also waits for the next major: it changes SDK initialization, ad requests, and mediation.
 
-Pinned versions: Android 25.4.x, iOS 13.6.0 (Swift Package Manager and CocoaPods). CocoaPods support is planned to be removed in the next major.
+Pinned versions: Android 25.4.x, iOS 13.11.0 (Swift Package Manager and CocoaPods). CocoaPods support is planned to be removed in the next major.
+
+Android remains on 25.4.x because [SDK 25.5.0 raises the minimum Android API level](https://developers.google.com/admob/android/rel-notes). The iOS update from 13.6.0 to 13.11.0 keeps the plugin's existing platform and toolchain requirements; no public plugin API changes are required.
 
 ## Breaking changes from earlier versions
 
