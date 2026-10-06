@@ -73,6 +73,7 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        self.plugin?.resumeWebMedia(for: ad)
         removeCurrentlyShowingAd()
         NSLog("InterstitialFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.FailedToShow.rawValue, data: [
@@ -82,11 +83,13 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
+        self.plugin?.suspendWebMedia(for: ad)
         NSLog("InterstitialFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Showed.rawValue, data: [:])
     }
 
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        self.plugin?.resumeWebMedia(for: ad)
         removeCurrentlyShowingAd()
         NSLog("InterstitialFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(InterstitialAdPluginEvents.Dismissed.rawValue, data: [:])
