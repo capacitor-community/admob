@@ -79,7 +79,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
             guard let self, self.webMediaSuspenders.insert(ObjectIdentifier(owner)).inserted,
                 self.webMediaSuspenders.count == 1
             else { return }
-            self.bridge?.webView?.setAllMediaPlaybackSuspended(true, completionHandler: nil)
+            self.setWebMediaPlaybackSuspended(true)
         }
     }
 
@@ -90,8 +90,13 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
             guard let self, self.webMediaSuspenders.remove(ObjectIdentifier(owner)) != nil,
                 self.webMediaSuspenders.isEmpty
             else { return }
-            self.bridge?.webView?.setAllMediaPlaybackSuspended(false, completionHandler: nil)
+            self.setWebMediaPlaybackSuspended(false)
         }
+    }
+
+    @MainActor
+    func setWebMediaPlaybackSuspended(_ suspended: Bool) {
+        self.bridge?.webView?.setAllMediaPlaybackSuspended(suspended, completionHandler: nil)
     }
 
     /**
