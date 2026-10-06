@@ -79,7 +79,9 @@ export class NativeAdFeed {
   private destroyed = false;
   private nativeStarted = false;
   private paused = false;
-  private scrolling = false;
+  private layoutInvalidated = false;
+  private placementFrame?: number;
+  private lastPlacements?: string;
   private settleTimer?: ReturnType<typeof setTimeout>;
   private placementUpdateTask?: Promise<boolean>;
   private operationTask: Promise<void> = Promise.resolve();
@@ -110,6 +112,7 @@ export class NativeAdFeed {
             state.intersecting = entry.isIntersecting;
           }
         }
+        this.schedulePlacementUpdate();
         this.scheduleEvaluation();
       });
     }
@@ -286,7 +289,7 @@ export class NativeAdFeed {
   async pause(): Promise<void> {
     this.assertActive();
     this.paused = true;
-    this.scrolling = true;
+    this.layoutInvalidated = true;
     if (!(await this.requestPlacementUpdate())) {
       throw new Error('Failed to hide native ad placements');
     }
@@ -302,7 +305,7 @@ export class NativeAdFeed {
   /** Hides stale overlays and remeasures after an application-driven layout change. */
   async invalidateLayout(): Promise<void> {
     this.assertActive();
-    this.scrolling = true;
+    this.layoutInvalidated = true;
     this.scheduleEvaluation();
     if (!(await this.requestPlacementUpdate())) {
       throw new Error('Failed to hide native ad placements');
@@ -327,6 +330,10 @@ export class NativeAdFeed {
       if (this.settleTimer) {
         clearTimeout(this.settleTimer);
       }
+      if (this.placementFrame !== undefined) {
+        cancelAnimationFrame(this.placementFrame);
+        this.placementFrame = undefined;
+      }
       this.intersectionObserver?.disconnect();
       this.resizeObserver?.disconnect();
     }
@@ -345,10 +352,19 @@ export class NativeAdFeed {
     if (this.destroyed) {
       return;
     }
-    this.scrolling = true;
-    void this.requestPlacementUpdate();
+    this.schedulePlacementUpdate();
     this.scheduleEvaluation();
   };
+
+  private schedulePlacementUpdate(): void {
+    if (this.destroyed || this.placementFrame !== undefined) {
+      return;
+    }
+    this.placementFrame = requestAnimationFrame(() => {
+      this.placementFrame = undefined;
+      void this.requestPlacementUpdate();
+    });
+  }
 
   private updateScrollRoots(): void {
     const roots = new Set<ShadowRoot>();
@@ -378,7 +394,7 @@ export class NativeAdFeed {
       return;
     }
     if (document.hidden) {
-      this.scrolling = true;
+      this.layoutInvalidated = true;
       void this.requestPlacementUpdate();
       return;
     }
@@ -393,7 +409,7 @@ export class NativeAdFeed {
       clearTimeout(this.settleTimer);
     }
     this.settleTimer = setTimeout(() => {
-      this.scrolling = false;
+      this.layoutInvalidated = false;
       void this.runOperation(() => this.evaluate());
     }, SCROLL_SETTLE_MS);
   }
@@ -535,7 +551,7 @@ export class NativeAdFeed {
   private requestPlacementUpdate(): Promise<boolean> {
     this.updateDirty = true;
     if (!this.placementUpdateTask) {
-      this.placementUpdateTask = this.flushPlacementUpdates();
+      this.placementUpdateTask = Promise.resolve().then(() => this.flushPlacementUpdates());
     }
     return this.placementUpdateTask;
   }
@@ -552,12 +568,7 @@ export class NativeAdFeed {
           .map((state): NativeAdPlacement => {
             const measured = state.element ? measureNativeAdSlot(state.element) : undefined;
             const visible = Boolean(
-              !this.paused &&
-              !this.scrolling &&
-              state.intersecting &&
-              measured &&
-              this.isSupportedSize(measured) &&
-              !document.hidden,
+              !this.paused && !this.layoutInvalidated && measured && this.isSupportedSize(measured) && !document.hidden,
             );
             return {
               feedId: this.options.feedId,
@@ -568,6 +579,10 @@ export class NativeAdFeed {
               clipRect: measured?.clipRect,
             };
           });
+        const serializedPlacements = JSON.stringify(placements);
+        if (serializedPlacements === this.lastPlacements) {
+          continue;
+        }
         try {
           await bridge.updateNativeAdPlacements({
             feedId: this.options.feedId,
@@ -575,6 +590,7 @@ export class NativeAdFeed {
             sequence: ++this.placementSequence,
             placements,
           });
+          this.lastPlacements = serializedPlacements;
         } catch {
           // Retry on the next scroll, resize, or lifecycle update without
           // creating an unhandled rejection from this fire-and-forget task.

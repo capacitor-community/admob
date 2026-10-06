@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { easel, newspaper, phonePortrait, play, reader, videocam } from 'ionicons/icons';
+import { easel, phonePortrait, play, reader, videocam } from 'ionicons/icons';
 import { ViewModelStore } from '../../shared/view-model-store';
 
 @Component({
@@ -15,7 +15,7 @@ export class ValidationShell {
   readonly vm = new ViewModel(this);
 
   constructor() {
-    addIcons({ play, easel, newspaper, reader, videocam, phonePortrait });
+    addIcons({ play, easel, reader, videocam, phonePortrait });
   }
 }
 

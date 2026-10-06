@@ -110,29 +110,88 @@ describe('NativeAdFeed', () => {
     );
   });
 
-  it('fails closed while scrolling and shows the slot after settling', async () => {
+  it('follows scrolling once per frame, clips the ad, and skips unchanged placements', async () => {
     const feed = await NativeAdFeed.create({ feedId: 'feed-scroll', isTesting: true });
     createdFeeds.push(feed);
-    const element = document.createElement('capacitor-admob-native');
-    element.setAttribute('feed-id', feed.feedId);
-    element.setAttribute('slot-key', 'feed-ad-1');
+    const element = document.createElement('div');
     document.body.appendChild(element);
+    feed.attach('feed-ad-1', element);
     await settle();
+    bridge.updateNativeAdPlacements.mockClear();
+
+    let top = -20;
+    element.getBoundingClientRect = () => new DOMRect(10, top, 300, 320);
+    document.dispatchEvent(new Event('scroll'));
+    top = -40;
+    document.dispatchEvent(new Event('scroll'));
+    expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(20);
+    expect(bridge.updateNativeAdPlacements).toHaveBeenCalledOnce();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        placements: [
+          expect.objectContaining({
+            visible: true,
+            rect: { x: 10, y: -40, width: 300, height: 320 },
+            clipRect: { x: 10, y: 0, width: 300, height: 280 },
+          }),
+        ],
+      }),
+    );
+    document.dispatchEvent(new Event('scroll'));
+    await settle();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenCalledOnce();
+    expect(bridge.loadNativeAd).toHaveBeenCalledOnce();
+
+    top = -400;
+    document.dispatchEvent(new Event('scroll'));
+    await vi.advanceTimersByTimeAsync(20);
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({ placements: [expect.objectContaining({ visible: false })] }),
+    );
+  });
+
+  it('coalesces motion while a bridge update is pending and cancels frames on destroy', async () => {
+    const feed = await NativeAdFeed.create({ feedId: 'feed-pending-scroll', isTesting: true });
+    createdFeeds.push(feed);
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+    feed.attach('pending-ad', element);
+    await settle();
+    bridge.updateNativeAdPlacements.mockClear();
+
+    let finishUpdate!: () => void;
+    bridge.updateNativeAdPlacements.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finishUpdate = resolve;
+        }),
+    );
+    let top = 30;
+    element.getBoundingClientRect = () => new DOMRect(10, top, 300, 320);
+    document.dispatchEvent(new Event('scroll'));
+    await vi.advanceTimersByTimeAsync(20);
+    top = 40;
+    document.dispatchEvent(new Event('scroll'));
+    await vi.advanceTimersByTimeAsync(20);
+    top = 50;
+    document.dispatchEvent(new Event('scroll'));
+    await vi.advanceTimersByTimeAsync(20);
+    expect(bridge.updateNativeAdPlacements).toHaveBeenCalledOnce();
+    finishUpdate();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(bridge.updateNativeAdPlacements).toHaveBeenCalledTimes(2);
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        placements: [expect.objectContaining({ rect: { x: 10, y: 50, width: 300, height: 320 } })],
+      }),
+    );
 
     document.dispatchEvent(new Event('scroll'));
-    await vi.advanceTimersByTimeAsync(0);
-    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        placements: [expect.objectContaining({ visible: false })],
-      }),
-    );
-
+    await feed.destroy();
+    bridge.updateNativeAdPlacements.mockClear();
     await settle();
-    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        placements: [expect.objectContaining({ visible: true })],
-      }),
-    );
+    expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
   });
 
   it('detaches the old logical slot before a recycled element uses a new slotKey', async () => {
@@ -192,10 +251,18 @@ describe('NativeAdFeed', () => {
       }),
     );
 
+    element.getBoundingClientRect = () => new DOMRect(10, 150, 300, 320);
     scroller.dispatchEvent(new Event('scroll'));
-    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(20);
     expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
-      expect.objectContaining({ placements: [expect.objectContaining({ visible: false })] }),
+      expect.objectContaining({
+        placements: [
+          expect.objectContaining({
+            visible: true,
+            clipRect: { x: 10, y: 150, width: 300, height: 150 },
+          }),
+        ],
+      }),
     );
     await settle();
     expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
@@ -255,6 +322,7 @@ describe('NativeAdFeed', () => {
     document.body.appendChild(element);
     await settle();
 
+    element.getBoundingClientRect = () => new DOMRect(10, 30, 300, 320);
     bridge.updateNativeAdPlacements.mockRejectedValueOnce(new Error('bridge unavailable'));
     document.dispatchEvent(new Event('scroll'));
     await settle();
@@ -390,6 +458,11 @@ describe('NativeAdFeed', () => {
       expect.objectContaining({ placements: [expect.objectContaining({ visible: false })] }),
     );
 
+    document.dispatchEvent(new Event('scroll'));
+    await settle();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({ placements: [expect.objectContaining({ visible: false })] }),
+    );
     feed.resume();
     await settle();
     expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(

@@ -3,6 +3,8 @@ import { afterRenderEffect, ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_
 import { NativeAdFeed, NativeAdPluginEvents, NativeAdTemplate } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 import {
+  IonBackButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -70,6 +72,8 @@ const feedItems: FeedItem[] = [
   styleUrl: 'native-ad-demo.scss',
   imports: [
     JsonPipe,
+    IonBackButton,
+    IonButtons,
     IonCard,
     IonCardContent,
     IonCardHeader,

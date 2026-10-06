@@ -2,7 +2,7 @@
 
 Native ads are rendered with Google Mobile Ads SDK views owned by this plugin. Your app reserves an HTML slot and supplies a stable key; it does not implement a `NativeAdView` in Kotlin or Swift and does not render ad assets in JavaScript.
 
-This API is an unsupported research preview for iOS and Android device validation. Do not ship it in production and do not describe virtual scrolling as supported yet. A native ad is placed above the WebView, so a pan beginning on the ad may not reach the WebView's scroll container. The implementation hides overlays after the WebView reports motion, but that cannot solve the initial gesture-routing problem. Production support is gated on real-device acceptance tests for this behavior.
+This API is an unsupported research preview for iOS and Android device validation. Do not ship it in production and do not describe virtual scrolling as supported yet. A native ad is placed above the WebView, so a pan beginning on the ad may not reach the WebView's scroll container. The implementation updates overlay coordinates as the WebView scrolls, but that cannot solve the initial gesture-routing problem. Production support is gated on real-device acceptance tests for this behavior.
 
 Promotion from research preview also requires VoiceOver and TalkBack ordering tests, fast-fling/recycling tests, modal/tab/background lifecycle tests, rotation and keyboard tests, and Google Native Ad Validator checks on both platforms.
 
@@ -100,7 +100,7 @@ vue({
 <capacitor-admob-native feed-id="home-feed" :slot-key="item.stableAdKey" />
 ```
 
-Placement updates are batched and scoped to a feed session. Native overlays are hidden after WebView scrolling begins and restored after the viewport settles. A feed keeps at most three native ads, including attached offscreen slots; additional visible slots wait for capacity. At most two feed managers may be active, which bounds the plugin-wide total at six native ads. Ads are not automatically refreshed. Failed loads are not silently retried. Call `reload(slotKey)` only at an explicit product-defined retry or refresh point.
+Placement updates are batched and scoped to a feed session. While the WebView scrolls, loaded native overlays follow the measured slot coordinates and clipping bounds. Measurements are scheduled once per animation frame, unchanged placements are skipped, and pending updates are coalesced to the latest state. New ads are loaded after the viewport settles. Native rendering may lag behind WebView scrolling. A feed keeps at most three native ads, including attached offscreen slots; additional visible slots wait for capacity. At most two feed managers may be active, which bounds the plugin-wide total at six native ads. Ads are not automatically refreshed. Failed loads are not silently retried. Call `reload(slotKey)` only at an explicit product-defined retry or refresh point.
 
 ## Layout and overlay lifecycle
 
