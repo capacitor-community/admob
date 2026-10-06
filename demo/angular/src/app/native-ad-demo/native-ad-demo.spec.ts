@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideIonicAngular } from '@ionic/angular';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { NativeAdDemo } from './native-ad-demo';
 

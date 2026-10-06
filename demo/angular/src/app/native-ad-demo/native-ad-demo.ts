@@ -18,7 +18,7 @@ import {
   IonToolbar,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { ViewModelStore } from '../shared/view-model-store';
 
 interface ArticleItem {

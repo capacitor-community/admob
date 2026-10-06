@@ -16,10 +16,10 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                 if let error = error {
                     NSLog("Rewarded ad failed to load with error: \(error.localizedDescription)")
                     self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToLoad.rawValue, data: [
-                        "code": 0,
+                        "code": (error as NSError).code,
                         "message": error.localizedDescription
                     ])
-                    call.reject("Loading failed")
+                    call.reject(error.localizedDescription, String((error as NSError).code), error)
                     return
                 }
 
@@ -50,7 +50,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                     let impressionId = ad.responseInfo.responseIdentifier ?? ""
                     self.plugin?.notifyListeners(RewardAdPluginEvents.AdImpression.rawValue, data: [
                         "adUnitId": adUnitID,
-                        "valueMicros": adValue.value.int64Value,
+                        "valueMicros": adValue.value.multiplying(byPowerOf10: 6).int64Value,
                         "currencyCode": adValue.currencyCode,
                         "precision": adValue.precision.rawValue,
                         "networkName": networkName,
@@ -97,6 +97,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        self.plugin?.resumeWebMedia(for: ad)
         removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
@@ -106,11 +107,17 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     }
 
     func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
+        self.plugin?.suspendWebMedia(for: ad)
         NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
     }
 
+    func adDidRecordClick(_ advertisement: FullScreenPresentingAd) {
+        self.plugin?.notifyListeners(RewardAdPluginEvents.adClicked.rawValue, data: [:])
+    }
+
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        self.plugin?.resumeWebMedia(for: ad)
         removeCurrentlyShowingAd()
         NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Dismissed.rawValue, data: [:])

@@ -17,6 +17,9 @@ export interface RewardDefinitions {
   /**
    * Loads a rewarded ad and returns the loaded ad unit ID.
    *
+   * SDK load failures reject with the native error message and a string `code`.
+   * Codes are platform-specific; FailedToLoad events expose the same code as a number.
+   *
    * @group RewardVideo
    * @param options RewardAdOptions
    * @since 1.1.2
@@ -31,6 +34,12 @@ export interface RewardDefinitions {
    * @since 1.1.2
    */
   showRewardVideoAd(options?: AdShowOptions): Promise<AdMobRewardItem>;
+
+  /**
+   * Listens for clicks recorded by the rewarded ad SDK, including after a reward is earned.
+   * A click does not indicate that the user earned a reward.
+   */
+  addListener(eventName: RewardAdPluginEvents.adClicked, listenerFunc: () => void): Promise<PluginListenerHandle>;
 
   /**
    * Listens for rewarded ad load failures.

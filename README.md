@@ -50,64 +50,13 @@ Made with [contributors-img](https://contrib.rocks).
 
 ## Overview
 
-Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile Ads SDK for iOS and Android so you can display banner, interstitial, rewarded, rewarded interstitial, and app open ads in Capacitor apps.
-
-## Features
-
-- Banner ads (including adaptive banners)
-- Interstitial ads
-- Rewarded video ads
-- Rewarded interstitial ads
-- App open ads
-- Google User Messaging Platform (UMP) consent support
-- App Tracking Transparency (iOS tracking permission) helpers
-
-### Choose by advertising goal
-
-| Goal                                                              | Ad format                 | Guide                                      |
-| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
-| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner)             |
-| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) |
-| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
-| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
-| Monetize an app-open experience                                   | App Open                  | [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open)         |
-
-## Quick start
-
-After [Installation](#installation), initialize the SDK, request consent, and show a banner:
-
-```ts
-import { AdMob, AdmobConsentStatus, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
-
-async function startAdMob() {
-  await AdMob.initialize();
-
-  let consentInfo = await AdMob.requestConsentInfo();
-  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
-    consentInfo = await AdMob.showConsentForm();
-  }
-
-  if (!consentInfo.canRequestAds) {
-    return;
-  }
-
-  const options: BannerAdOptions = {
-    adId: 'YOUR_AD_UNIT_ID',
-    adSize: BannerAdSize.ADAPTIVE_BANNER,
-    position: BannerAdPosition.BOTTOM_CENTER,
-    margin: 0,
-  };
-  await AdMob.showBanner(options);
-}
-```
-
-The banner sits on the native screen above the WebView, so it can cover your HTML. See [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) to inset your layout. Details: [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration), [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent), and the per-format guides.
+Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile Ads SDK for iOS and Android so you can display banner, interstitial, rewarded, rewarded interstitial, and app open ads in Capacitor apps. It also covers Google User Messaging Platform (UMP) consent and App Tracking Transparency helpers on iOS.
 
 ## Installation
 
 This plugin already ships Google Mobile Ads SDK. Install the package, then add your AdMob **application** ID in AndroidManifest / Info.plist. Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start) explain app IDs and SKAdNetwork identifiers (Apple's ad conversion IDs); do not add a second Mobile Ads dependency.
 
-This plugin targets `@capacitor-community/admob` **v8** and Capacitor 8. It supports iOS 15 or later and Android API 24 or later.
+This plugin targets `@capacitor-community/admob` **v8.2.0** and Capacitor 8.5 or later (within v8). It supports iOS 15 or later and Android API 24 or later.
 
 ```bash
 npm install @capacitor-community/admob
@@ -118,7 +67,7 @@ If you still use Capacitor 7, install `@capacitor-community/admob@7`.
 
 ### Google Mobile Ads SDK versions
 
-This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.6.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) for the policy behind the pins.
+This major version pins Google Mobile Ads SDK **25.4.x** on Android and **13.11.0** on iOS (Swift Package Manager and CocoaPods). Leave those versions unless you have a specific need. Google's [Next-Gen SDK for Android](https://developers.google.com/admob/android/next-gen) waits until the next plugin major. See [Migration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) for the policy behind the pins.
 
 ### Android configuration
 
@@ -183,12 +132,63 @@ If CocoaPods cannot resolve `Google-Mobile-Ads-SDK`:
 
 Run `pod repo update` in `ios/`, then `npx cap sync ios` again.
 
+## First test banner
+
+After installation and platform setup, request consent, initialize the SDK when ads may be requested, and show a Google demo banner. Use the platform banner IDs from [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing)—do not create your own ad unit for this first check.
+
+Call `startAdMob` from a user action or after the UI is ready (for example a button or post-navigation hook), not only at module evaluation time.
+
+```ts
+import { Capacitor } from '@capacitor/core';
+import { AdMob, AdmobConsentStatus, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
+
+const bannerAdId =
+  Capacitor.getPlatform() === 'ios'
+    ? 'ca-app-pub-3940256099942544/2934735716'
+    : 'ca-app-pub-3940256099942544/6300978111';
+
+async function startAdMob() {
+  let consentInfo = await AdMob.requestConsentInfo();
+  if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+    consentInfo = await AdMob.showConsentForm();
+  }
+
+  if (!consentInfo.canRequestAds) {
+    // Consent not ready — no banner is shown.
+    return;
+  }
+
+  await AdMob.initialize();
+
+  const options: BannerAdOptions = {
+    adId: bannerAdId,
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
+    position: BannerAdPosition.BOTTOM_CENTER,
+    margin: 0,
+  };
+  await AdMob.showBanner(options);
+}
+```
+
+Expected result: when `canRequestAds` is true, a Google test banner appears at the bottom of the native screen. When `canRequestAds` is false, the function returns and no banner is shown. The banner sits above the WebView and can cover HTML—see [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) to inset your layout. Details: [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration), [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent), and [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing).
+
+## Choose by advertising goal
+
+| Goal                                                              | Ad format                 | Guide                                      |
+| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------ |
+| Keep an ad visible alongside app content                          | Banner                    | [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner)             |
+| Show a full-screen ad at a natural break without granting a reward | Interstitial              | [Interstitial Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/interstitial) |
+| Offer a dedicated rewarded experience                             | Rewarded                  | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
+| Offer a reward at a natural transition                            | Rewarded interstitial     | [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded)         |
+| Monetize an app-open experience                                   | App Open                  | [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open)         |
+
 ## Documentation
 
-Start with [Installation](#installation) above, then [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) before loading ads. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files live in the GitHub repository. Method signatures are in the API section below.
+Start with [Installation](#installation) above, then [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Run the first test banner, then use [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for demo units and devices. Pick an ad format from the table above. The same guides are also on the [documentation site](https://docs.rdlabo.dev/projects/capacitor-admob) (English and Japanese). If you opened this README on npm, use that site for the guides — the `docs/` files are also included in the package. Method signatures are in the API section below.
 
 - [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) — `AdMob.initialize` and SDK options.
 - [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent) — privacy consent and iOS tracking authorization.
+- [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) — demo ad units, test devices, and consent testing.
 - [Banner Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/banner) — banner options, lifecycle, and events.
 - [Native Ads research preview](./docs/native-ads.md) — unsupported, test-ads-only API for device validation; not production-ready. Its API may change or be removed in a minor release until it is promoted to stable.
 - Full-screen ads:
@@ -196,8 +196,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
   - [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded) — rewarded video, rewarded interstitial, and server-side verification.
 - [App Open Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/app-open) — load and present on foreground transitions.
 - [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events) — shared lifecycle events, errors, and revenue data.
-- [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) — demo ad units, test devices, and consent testing.
-- [Migration Guide](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) — historical notes when upgrading from older plugin versions.
+- [Migration Guide](https://docs.rdlabo.dev/projects/capacitor-admob/docs/migration) — upgrade steps and behavior changes in v8.2.0 and earlier versions.
 
 <!-- rdlabo-docs-omit -->
 ## Index
@@ -243,6 +242,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 * [`addListener(InterstitialAdPluginEvents.AdImpression, ...)`](#addlistenerinterstitialadplugineventsadimpression-)
 * [`prepareRewardVideoAd(...)`](#preparerewardvideoad)
 * [`showRewardVideoAd(...)`](#showrewardvideoad)
+* [`addListener(RewardAdPluginEvents.adClicked, ...)`](#addlistenerrewardadplugineventsadclicked-)
 * [`addListener(RewardAdPluginEvents.FailedToLoad, ...)`](#addlistenerrewardadplugineventsfailedtoload-)
 * [`addListener(RewardAdPluginEvents.Loaded, ...)`](#addlistenerrewardadplugineventsloaded-)
 * [`addListener(RewardAdPluginEvents.Rewarded, ...)`](#addlistenerrewardadplugineventsrewarded-)
@@ -770,6 +770,9 @@ prepareInterstitial(options: AdOptions) => Promise<AdLoadInfo>
 
 Loads an interstitial ad and returns the loaded ad unit ID.
 
+SDK load failures reject with the native error message and a string `code`.
+Codes are platform-specific; FailedToLoad events expose the same code as a number.
+
 | Param         | Type                                            | Description                        |
 | ------------- | ----------------------------------------------- | ---------------------------------- |
 | **`options`** | <code><a href="#adoptions">AdOptions</a></code> | <a href="#adoptions">AdOptions</a> |
@@ -914,6 +917,9 @@ prepareRewardVideoAd(options: RewardAdOptions) => Promise<AdLoadInfo>
 
 Loads a rewarded ad and returns the loaded ad unit ID.
 
+SDK load failures reject with the native error message and a string `code`.
+Codes are platform-specific; FailedToLoad events expose the same code as a number.
+
 | Param         | Type                                                        | Description                                    |
 | ------------- | ----------------------------------------------------------- | ---------------------------------------------- |
 | **`options`** | <code><a href="#rewardadoptions">RewardAdOptions</a></code> | <a href="#rewardadoptions">RewardAdOptions</a> |
@@ -940,6 +946,25 @@ Shows a loaded rewarded ad and resolves when the user earns the reward.
 **Returns:** <code>Promise&lt;<a href="#admobrewarditem">AdMobRewardItem</a>&gt;</code>
 
 **Since:** 1.1.2
+
+--------------------
+
+
+### addListener(RewardAdPluginEvents.adClicked, ...)
+
+```typescript
+addListener(eventName: RewardAdPluginEvents.adClicked, listenerFunc: () => void) => Promise<PluginListenerHandle>
+```
+
+Listens for clicks recorded by the rewarded ad SDK, including after a reward is earned.
+A click does not indicate that the user earned a reward.
+
+| Param              | Type                                                                            |
+| ------------------ | ------------------------------------------------------------------------------- |
+| **`eventName`**    | <code><a href="#rewardadpluginevents">RewardAdPluginEvents.adClicked</a></code> |
+| **`listenerFunc`** | <code>() =&gt; void</code>                                                      |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt;</code>
 
 --------------------
 
@@ -1077,6 +1102,9 @@ prepareRewardInterstitialAd(options: RewardInterstitialAdOptions) => Promise<AdL
 ```
 
 Loads a rewarded interstitial ad and returns the loaded ad unit ID.
+
+SDK load failures reject with the native error message and a string `code`.
+Codes are platform-specific; FailedToLoad events expose the same code as a number.
 
 | Param         | Type                                                                                | Description                                                            |
 | ------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -1568,6 +1596,7 @@ From T, pick a set of properties whose keys are in the union K
 
 | Members            | Value                                        | Description                                                                                                                                                        |
 | ------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`adClicked`**    | <code>'onRewardedVideoAdClicked'</code>      | Emits when the SDK records a click on a rewarded ad.                                                                                                               |
 | **`Loaded`**       | <code>'onRewardedVideoAdLoaded'</code>       | Emits when a rewarded ad has loaded and is ready to show.                                                                                                          |
 | **`FailedToLoad`** | <code>'onRewardedVideoAdFailedToLoad'</code> | Emits when a rewarded ad fails to load.                                                                                                                            |
 | **`Showed`**       | <code>'onRewardedVideoAdShowed'</code>       | Emits when a rewarded ad is shown.                                                                                                                                 |

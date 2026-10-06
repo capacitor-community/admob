@@ -2,7 +2,7 @@
 
 Banner ads are rectangular ads that occupy a portion of an app's layout. They can stay on screen while the user interacts with the app, typically anchored at the top or bottom. Google's banner guides for [Android](https://developers.google.com/admob/android/banner) and [iOS](https://developers.google.com/admob/ios/banner) explain the format.
 
-Call this after [initialize](./configuration.md) and [consent](./consent.md). This plugin draws the banner on the native screen (above the web view). Register listeners before calling `showBanner` so the first load and size events are not missed.
+Call this after [initialize](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). This plugin draws the banner on the native screen (above the web view). Register listeners before calling `showBanner` so the first load and size events are not missed.
 
 ```ts
 import {
@@ -74,7 +74,7 @@ await AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size) => {
 
 When the height is `0` (hidden, removed, or failed), clear the inset. Apply the same idea to whatever element fills the WebView in your framework.
 
-See [Testing](./testing.md) for `isTesting`.
+See [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for `isTesting`.
 
 ## Lifecycle
 
@@ -97,4 +97,4 @@ for (const handle of handles) {
 await AdMob.removeBanner();
 ```
 
-Banner impression-level revenue is emitted on `BannerAdPluginEvents.AdPaid`. Full-screen formats emit the same `AdMobRevenueData` through their `AdImpression` event. See [Ad Events](./events.md).
+Banner impression-level revenue is emitted on `BannerAdPluginEvents.AdPaid`. Full-screen formats emit the same `AdMobRevenueData` through their `AdImpression` event. See [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).

@@ -5,16 +5,19 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <p class="ion-padding-horizontal">Tap the test ad to verify the click event. You can also tap its end card after earning the reward.</p>
   <ion-list>
     <ion-list-header><ion-label>PROGRESS</ion-label></ion-list-header>
-    @for (item of vm.eventItems(); track $index) {
-    <ion-item [lines]="$last ? 'full' : undefined">
-      <ion-icon slot="start" [name]="item.type === 'method' ? 'play-outline' : 'notifications-circle-outline'" />
-      <ion-label>{{ item.name }}</ion-label>
-      @if (item.result !== undefined) {
-      <ion-icon slot="end" name="checkmark-circle" [color]="item.result ? 'success' : 'danger'" />
+    <ion-item-group>
+      @for (item of vm.eventItems(); track $index) {
+      <ion-item [lines]="$last ? 'full' : undefined">
+        <ion-icon slot="start" [name]="item.type === 'method' ? 'play-outline' : 'notifications-circle-outline'" />
+        <ion-label>{{ item.name }}</ion-label>
+        @if (item.result !== undefined) {
+        <ion-icon slot="end" name="checkmark-circle" [color]="item.result ? 'success' : 'danger'" />
+        }
+      </ion-item>
       }
-    </ion-item>
-    }
+    </ion-item-group>
   </ion-list>
 </ion-content>

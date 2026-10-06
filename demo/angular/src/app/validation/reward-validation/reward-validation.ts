@@ -6,6 +6,7 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -14,7 +15,7 @@ import {
   ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, notificationsCircleOutline, playOutline } from 'ionicons/icons';
 import { rewardOptions } from '../../shared/ad.options';
@@ -28,6 +29,7 @@ const testItems: ValidationTestItem[] = [
   { type: 'event', name: RewardAdPluginEvents.Loaded },
   { type: 'event', name: RewardAdPluginEvents.Showed },
   { type: 'event', name: RewardAdPluginEvents.Rewarded },
+  { type: 'event', name: RewardAdPluginEvents.adClicked },
   { type: 'event', name: RewardAdPluginEvents.Dismissed },
   { type: 'method', name: 'prepareRewardVideoAdFailed' },
   { type: 'event', name: RewardAdPluginEvents.FailedToLoad, expect: 'error' },
@@ -37,7 +39,18 @@ const testItems: ValidationTestItem[] = [
   selector: 'app-reward-validation',
   templateUrl: 'reward-validation.html',
   styleUrl: 'reward-validation.scss',
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonLabel, IonItem, IonIcon],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonListHeader,
+    IonLabel,
+    IonItem,
+    IonItemGroup,
+    IonIcon,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RewardValidation implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
@@ -87,6 +100,7 @@ class ViewModel extends ViewModelStore<RewardValidation> {
         this.#recordEvent(RewardAdPluginEvents.FailedToShow, value),
       ),
       AdMob.addListener(RewardAdPluginEvents.Showed, () => this.#recordEvent(RewardAdPluginEvents.Showed)),
+      AdMob.addListener(RewardAdPluginEvents.adClicked, () => this.#recordEvent(RewardAdPluginEvents.adClicked)),
     ]);
     this.#listenerHandlers.push(...handlers);
   }

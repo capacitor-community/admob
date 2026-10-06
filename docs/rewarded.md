@@ -2,7 +2,7 @@
 
 Rewarded ads let you give in-app items for interacting with video ads, playable ads, or surveys. Google's rewarded guides for [Android](https://developers.google.com/admob/android/rewarded) and [iOS](https://developers.google.com/admob/ios/rewarded) explain the format.
 
-Treat rewarded ads as a reward flow, not as another non-rewarded interstitial. Call this after [initialize](./configuration.md) and [consent](./consent.md). Grant the reward only from the returned result or the `Rewarded` event, not from `Dismissed`.
+Treat rewarded ads as a reward flow, not as another non-rewarded interstitial. Call this after [initialize](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Grant the reward only from the returned result or the `Rewarded` event, not from `Dismissed`.
 
 ## Rewarded video
 
@@ -55,6 +55,19 @@ console.log(rewardItem);
 
 When no `adId` is passed to `showRewardVideoAd()`, the most recently prepared ad is shown.
 
+### Click events (since 8.2.0)
+
+Register `adClicked` before showing a rewarded ad. This forwards clicks recorded by the SDK, including after a reward is earned while the ad remains displayed. It does not indicate that a reward was earned and does not apply to rewarded interstitials.
+
+```ts
+const clickListener = await AdMob.addListener(RewardAdPluginEvents.adClicked, () => {
+  console.log('Rewarded ad clicked');
+});
+
+// When the owning screen is destroyed:
+await clickListener.remove();
+```
+
 ### Prepare more than one ad
 
 ```ts
@@ -98,7 +111,7 @@ console.log(rewardItem);
 
 <!-- !::AdMobRewardInterstitialItem:: -->
 
-See [Testing](./testing.md) for `isTesting`.
+See [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for `isTesting`.
 
 ## Server-side verification
 

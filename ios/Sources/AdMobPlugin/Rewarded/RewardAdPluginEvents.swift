@@ -1,4 +1,5 @@
 public enum RewardAdPluginEvents: String {
+    case adClicked = "onRewardedVideoAdClicked"
     case Loaded = "onRewardedVideoAdLoaded"
     case FailedToLoad = "onRewardedVideoAdFailedToLoad"
     case Showed = "onRewardedVideoAdShowed"

@@ -153,7 +153,7 @@ internal class RewardedAdCallbackAndListenersTest {
                 // ACt
                 listener.onAdFailedToLoad(loadAdErrorMock)
 
-                Mockito.verify(pluginCall).reject(argumentCaptor.capture())
+                Mockito.verify(pluginCall).reject(argumentCaptor.capture(), ArgumentMatchers.eq(wantedErrorCode.toString()))
                 val resolvedError = argumentCaptor.value
                 assertEquals(wantedReason, resolvedError)
             }

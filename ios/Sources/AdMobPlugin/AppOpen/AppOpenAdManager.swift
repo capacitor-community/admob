@@ -38,7 +38,7 @@ import UIKit
                         let networkName = ad.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
                         let impressionId = ad.responseInfo.responseIdentifier ?? ""
                         onPaidEvent(
-                            adValue.value.int64Value,
+                            adValue.value.multiplying(byPowerOf10: 6).int64Value,
                             adValue.currencyCode,
                             adValue.precision.rawValue,
                             networkName,
