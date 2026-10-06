@@ -3,7 +3,7 @@ import type { PluginListenerHandle } from '@capacitor/core';
 import type { NativeAdDefinitions } from './native-ad-definitions.interface';
 import { connectNativeAdElements, defineNativeAdElement } from './native-ad-element';
 import type { NativeAdEvent, NativeAdErrorEvent, NativeAdRevenueEvent } from './native-ad-event.interface';
-import { measureNativeAdSlot } from './native-ad-geometry';
+import { measureNativeAdSlot, nativeAdAncestors } from './native-ad-geometry';
 import type { MeasuredNativeAdSlot } from './native-ad-geometry';
 import type { NativeAdFeedOptions } from './native-ad-options.interface';
 import type { NativeAdPlacement } from './native-ad-placement.interface';
@@ -17,6 +17,25 @@ const MIN_SMALL_SLOT_WIDTH = 120;
 const MIN_MEDIUM_SLOT_WIDTH = 144;
 const MIN_MEDIUM_SLOT_HEIGHT = 300;
 const MIN_SMALL_SLOT_HEIGHT = 120;
+const TEMPLATE_ATTRIBUTE = 'data-capacitor-admob-template';
+
+const applySlotDefaults = (element: HTMLElement, template: NativeAdTemplate): void => {
+  const root = element.getRootNode();
+  const container = root instanceof ShadowRoot ? root : element.ownerDocument.head;
+  if (!container.querySelector('style[data-capacitor-admob-defaults]')) {
+    const style = element.ownerDocument.createElement('style');
+    style.setAttribute('data-capacitor-admob-defaults', '');
+    // Prefer the first cascade layer; older WebViews use zero-specificity rules.
+    const defaults = `
+      :where([${TEMPLATE_ATTRIBUTE}]) { display: block; height: 320px; }
+      :where([${TEMPLATE_ATTRIBUTE}="small"]) { height: 120px; }
+    `;
+    style.textContent =
+      'CSSLayerBlockRule' in globalThis ? `@layer capacitor-admob-defaults { ${defaults} }` : defaults;
+    container.prepend(style);
+  }
+  element.setAttribute(TEMPLATE_ATTRIBUTE, template);
+};
 
 type SlotStatus = 'idle' | 'loading' | 'loaded' | 'failed' | 'removing' | 'removeFailed';
 
@@ -39,9 +58,7 @@ const createSessionId = (): string =>
   globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${++sessionSequence}-${Math.random().toString(36).slice(2)}`;
 
 type NativeAdListener =
-  | ((event: NativeAdEvent) => void)
-  | ((event: NativeAdErrorEvent) => void)
-  | ((event: NativeAdRevenueEvent) => void);
+  ((event: NativeAdEvent) => void) | ((event: NativeAdErrorEvent) => void) | ((event: NativeAdRevenueEvent) => void);
 
 /**
  * Experimental manager for native-ad integration research.
@@ -56,6 +73,7 @@ export class NativeAdFeed {
   private readonly sessionId = createSessionId();
   private readonly slots = new Map<string, SlotState>();
   private readonly elementSlots = new Map<HTMLElement, string>();
+  private readonly scrollRoots = new Set<ShadowRoot>();
   private readonly intersectionObserver?: IntersectionObserver;
   private readonly resizeObserver?: ResizeObserver;
   private destroyed = false;
@@ -213,19 +231,13 @@ export class NativeAdFeed {
       lastUsed: Date.now(),
       loadVersion: 0,
     };
-    const computedStyle = window.getComputedStyle(element);
-    if (computedStyle.display === 'inline') {
-      element.style.display = 'block';
-    }
-    if (computedStyle.height === 'auto') {
-      element.style.height =
-        (this.options.template ?? NativeAdTemplate.Medium) === NativeAdTemplate.Small ? '120px' : '320px';
-    }
+    applySlotDefaults(element, this.options.template ?? NativeAdTemplate.Medium);
     state.element = element;
     state.generation += 1;
     state.lastUsed = Date.now();
     this.slots.set(normalizedKey, state);
     this.elementSlots.set(element, normalizedKey);
+    this.updateScrollRoots();
     this.intersectionObserver?.observe(element);
     this.resizeObserver?.observe(element);
     this.scheduleEvaluation();
@@ -246,6 +258,7 @@ export class NativeAdFeed {
     this.intersectionObserver?.unobserve(element);
     this.resizeObserver?.unobserve(element);
     this.elementSlots.delete(element);
+    this.updateScrollRoots();
     void this.requestPlacementUpdate();
     this.scheduleEvaluation();
   }
@@ -301,6 +314,10 @@ export class NativeAdFeed {
       this.destroyed = true;
       feeds.delete(this.options.feedId);
       document.removeEventListener('scroll', this.handleViewportMotion, true);
+      for (const root of this.scrollRoots) {
+        root.removeEventListener('scroll', this.handleViewportMotion, true);
+      }
+      this.scrollRoots.clear();
       document.removeEventListener('touchmove', this.handleViewportMotion, true);
       document.removeEventListener('wheel', this.handleViewportMotion, true);
       window.removeEventListener('resize', this.handleViewportMotion);
@@ -332,6 +349,29 @@ export class NativeAdFeed {
     void this.requestPlacementUpdate();
     this.scheduleEvaluation();
   };
+
+  private updateScrollRoots(): void {
+    const roots = new Set<ShadowRoot>();
+    for (const element of this.elementSlots.keys()) {
+      for (const ancestor of [element, ...nativeAdAncestors(element)]) {
+        const root = ancestor.getRootNode();
+        if (root instanceof ShadowRoot) roots.add(root);
+      }
+    }
+    for (const root of this.scrollRoots) {
+      if (!roots.has(root)) {
+        root.removeEventListener('scroll', this.handleViewportMotion, true);
+        this.scrollRoots.delete(root);
+      }
+    }
+    for (const root of roots) {
+      if (!this.scrollRoots.has(root)) {
+        // Element scroll events do not cross a shadow boundary.
+        root.addEventListener('scroll', this.handleViewportMotion, true);
+        this.scrollRoots.add(root);
+      }
+    }
+  }
 
   private readonly handleVisibilityChange = (): void => {
     if (this.destroyed) {

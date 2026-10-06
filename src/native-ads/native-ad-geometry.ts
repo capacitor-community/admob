@@ -32,6 +32,16 @@ const clipsDescendants = (element: HTMLElement): boolean => {
   );
 };
 
+export function* nativeAdAncestors(element: HTMLElement): Generator<HTMLElement> {
+  let current: HTMLElement | null = element;
+  while (current) {
+    const root: Node = current.getRootNode();
+    current =
+      current.assignedSlot ?? current.parentElement ?? (root instanceof ShadowRoot ? (root.host as HTMLElement) : null);
+    if (current) yield current;
+  }
+}
+
 export const measureNativeAdSlot = (element: HTMLElement): MeasuredNativeAdSlot | undefined => {
   const style = window.getComputedStyle(element);
   const domRect = element.getBoundingClientRect();
@@ -54,12 +64,10 @@ export const measureNativeAdSlot = (element: HTMLElement): MeasuredNativeAdSlot 
     height: window.visualViewport?.height ?? window.innerHeight,
   };
 
-  let ancestor = element.parentElement;
-  while (ancestor) {
+  for (const ancestor of nativeAdAncestors(element)) {
     if (clipsDescendants(ancestor)) {
       clipRect = intersectRects(clipRect, toNativeRect(ancestor.getBoundingClientRect()));
     }
-    ancestor = ancestor.parentElement;
   }
 
   clipRect = intersectRects(rect, clipRect);

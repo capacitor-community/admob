@@ -156,6 +156,60 @@ describe('NativeAdFeed', () => {
     expect(bridge.loadNativeAd).toHaveBeenCalledWith(expect.objectContaining({ slotKey: 'second-item' }));
   });
 
+  it('tracks and clips a slotted ad inside a shadow scroll container, then removes its listener', async () => {
+    const feed = await NativeAdFeed.create({ feedId: 'feed-shadow-scroll', isTesting: true });
+    createdFeeds.push(feed);
+    const host = document.createElement('div');
+    const root = host.attachShadow({ mode: 'open' });
+    const scroller = document.createElement('div');
+    scroller.style.overflow = 'auto';
+    scroller.appendChild(document.createElement('slot'));
+    root.appendChild(scroller);
+    scroller.getBoundingClientRect = () => ({
+      x: 0,
+      y: 100,
+      top: 100,
+      left: 0,
+      right: 400,
+      bottom: 300,
+      width: 400,
+      height: 200,
+      toJSON: () => ({}),
+    });
+    const element = document.createElement('div');
+    host.appendChild(element);
+    document.body.appendChild(host);
+    feed.attach('shadow-ad', element);
+    await settle();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        placements: [
+          expect.objectContaining({
+            visible: true,
+            clipRect: { x: 10, y: 100, width: 300, height: 200 },
+          }),
+        ],
+      }),
+    );
+
+    scroller.dispatchEvent(new Event('scroll'));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({ placements: [expect.objectContaining({ visible: false })] }),
+    );
+    await settle();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
+      expect.objectContaining({ placements: [expect.objectContaining({ visible: true })] }),
+    );
+
+    feed.detach(element);
+    await settle();
+    bridge.updateNativeAdPlacements.mockClear();
+    scroller.dispatchEvent(new Event('scroll'));
+    await settle();
+    expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+  });
+
   it('does not retry a failed load until the app explicitly reloads the slot', async () => {
     bridge.loadNativeAd.mockRejectedValueOnce(new Error('network'));
     const feed = await NativeAdFeed.create({ feedId: 'feed-retry', isTesting: true });
@@ -436,20 +490,25 @@ describe('NativeAdFeed', () => {
     expect(bridge.loadNativeAd).not.toHaveBeenCalled();
   });
 
-  it('preserves author CSS for the custom element', async () => {
+  it('preserves author heights and display for custom and ordinary slots', async () => {
     const feed = await NativeAdFeed.create({ feedId: 'styled-feed', isTesting: true });
     createdFeeds.push(feed);
     const style = document.createElement('style');
-    style.textContent = '.native-slot { display: none; height: 280px; }';
+    style.textContent = '.native-slot { display: none; height: 280px; } .native-slot.zero { height: 0; }';
     document.head.appendChild(style);
-    const element = document.createElement('capacitor-admob-native');
-    element.className = 'native-slot';
-    element.setAttribute('feed-id', feed.feedId);
-    element.setAttribute('slot-key', 'styled-slot');
-    document.body.appendChild(element);
+    for (const tag of ['capacitor-admob-native', 'div']) {
+      for (const zero of [false, true]) {
+        const element = document.createElement(tag);
+        element.className = zero ? 'native-slot zero' : 'native-slot';
+        document.body.appendChild(element);
+        feed.attach(`${tag}-${zero}`, element);
 
-    expect(element.style.display).toBe('');
-    expect(element.style.height).toBe('');
+        expect(element.style.display).toBe('');
+        expect(element.style.height).toBe('');
+        expect(getComputedStyle(element).display).toBe('none');
+        expect(getComputedStyle(element).height).toBe(zero ? '0px' : '280px');
+      }
+    }
     style.remove();
   });
 

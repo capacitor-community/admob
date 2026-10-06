@@ -130,7 +130,7 @@ class NativeAdExecutor(
     fun updatePlacements(call: PluginCall) {
         val feedId = requiredString(call, "feedId") ?: return
         val sessionId = requiredString(call, "sessionId") ?: return
-        val sequence = call.getLong("sequence", -1L) ?: -1L
+        val sequence = call.data.optLong("sequence", -1L)
         val placements = call.getArray("placements", JSArray()) ?: JSArray()
         activitySupplier.get().runOnUiThread {
             if (!isCurrentSession(feedId, sessionId) || !feedSessions.accepts(feedId, sequence)) {

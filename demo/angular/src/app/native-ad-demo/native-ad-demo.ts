@@ -1,5 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import { afterRenderEffect, ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
 import { NativeAdFeed, NativeAdPluginEvents, NativeAdTemplate } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 import {
@@ -89,14 +89,21 @@ const feedItems: FeedItem[] = [
 })
 export class NativeAdDemo implements ViewWillEnter, ViewWillLeave {
   readonly vm = new ViewModel(this);
-  #setup?: Promise<void>;
+
+  constructor() {
+    afterRenderEffect(() => {
+      this.vm.lastEvent();
+      this.vm.errorMessage();
+      void this.vm.invalidateLayout();
+    });
+  }
 
   ionViewWillEnter(): void {
-    this.#setup = this.vm.enter();
+    void this.vm.enter();
   }
 
   ionViewWillLeave(): void {
-    void this.#setup?.then(() => this.vm.leave());
+    void this.vm.leave();
   }
 }
 
@@ -107,11 +114,22 @@ class ViewModel extends ViewModelStore<NativeAdDemo> {
   readonly errorMessage = signal<string | undefined>(undefined);
 
   #feed?: NativeAdFeed;
+  #generation = 0;
+  #setup?: Promise<void>;
+
+  async invalidateLayout(): Promise<void> {
+    await this.#feed?.invalidateLayout().catch((error: unknown) => console.error(error));
+  }
 
   async enter(): Promise<void> {
     if (!this.isNativePlatform) return;
+    const generation = ++this.#generation;
     this.errorMessage.set(undefined);
-    await this.#startFeed().catch((error: unknown) => this.#setError(error));
+    const start = () => this.#startFeed(generation);
+    this.#setup = (this.#setup?.then(start) ?? start()).catch((error: unknown) => {
+      if (generation === this.#generation) this.#setError(error);
+    });
+    await this.#setup;
   }
 
   async reload(slotKey: string): Promise<void> {
@@ -120,12 +138,14 @@ class ViewModel extends ViewModelStore<NativeAdDemo> {
   }
 
   async leave(): Promise<void> {
+    ++this.#generation;
     const feed = this.#feed;
     this.#feed = undefined;
     await feed?.destroy().catch((error: unknown) => this.#setError(error));
   }
 
-  async #startFeed(): Promise<void> {
+  async #startFeed(generation: number): Promise<void> {
+    if (generation !== this.#generation) return;
     const feed = await NativeAdFeed.create({
       feedId: 'native-ad-demo-feed',
       template: NativeAdTemplate.Medium,
@@ -139,6 +159,10 @@ class ViewModel extends ViewModelStore<NativeAdDemo> {
         callToActionBackgroundColor: '#3880ff',
       },
     });
+    if (generation !== this.#generation) {
+      await feed.destroy();
+      return;
+    }
     this.#feed = feed;
 
     await Promise.all([

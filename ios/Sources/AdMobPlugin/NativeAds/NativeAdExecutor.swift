@@ -195,7 +195,7 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
                 "sessionId": sessionId,
                 "slotKey": slotKey,
                 "adUnitId": adUnitID,
-                "valueMicros": adValue.value.int64Value,
+                "valueMicros": adValue.value.multiplying(byPowerOf10: 6).int64Value,
                 "currencyCode": adValue.currencyCode,
                 "precision": adValue.precision.rawValue,
                 "networkName": nativeAd.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? "",
