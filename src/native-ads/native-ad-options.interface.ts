@@ -4,7 +4,7 @@ import type { NativeAdStyle } from './native-ad-style.interface';
 import type { NativeAdTemplate } from './native-ad-template.enum';
 
 /** @experimental Native feed ads are not yet covered by the stable API contract. */
-export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa'> {
+export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa' | 'isTesting'> {
   /** Unique ID for this feed manager. */
   feedId: string;
 
@@ -21,8 +21,8 @@ export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa'> {
   /** Cross-platform styling applied to the plugin-owned layout. */
   style?: NativeAdStyle;
 
-  /** Required while this research preview is restricted to Google's test ads. */
-  isTesting: true;
+  /** Native ad unit ID. Required unless isTesting is true. */
+  adId?: string;
 }
 
 export interface NativeAdFeedSession {
@@ -30,11 +30,11 @@ export interface NativeAdFeedSession {
   sessionId: string;
 }
 
-export interface NativeAdLoadOptions extends Pick<AdOptions, 'npa'>, NativeAdFeedSession {
+export interface NativeAdLoadOptions extends Pick<AdOptions, 'npa' | 'isTesting'>, NativeAdFeedSession {
   slotKey: string;
   template: NativeAdTemplate;
   style?: NativeAdStyle;
-  isTesting: true;
+  adId?: string;
 }
 
 export interface NativeAdIdentity {

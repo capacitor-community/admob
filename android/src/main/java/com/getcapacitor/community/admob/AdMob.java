@@ -79,6 +79,31 @@ public class AdMob extends Plugin {
         getLogTag()
     );
 
+    private boolean nativeAdPlacementChannelRegistered;
+
+    @Override
+    public void load() {
+        super.load();
+        if (
+            androidx.webkit.WebViewFeature.isFeatureSupported(androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER) &&
+            !getBridge().getConfig().isUsingLegacyBridge()
+        ) {
+            try {
+                androidx.webkit.WebViewCompat.addWebMessageListener(
+                    getBridge().getWebView(),
+                    "capacitorAdMobPlacements",
+                    getBridge().getAllowedOriginRules(),
+                    (view, message, origin, mainFrame, reply) -> {
+                        if (mainFrame) nativeAdExecutor.updateDirectPlacements(message.getData());
+                    }
+                );
+                nativeAdPlacementChannelRegistered = true;
+            } catch (RuntimeException ignored) {
+                // Placement updates retain the regular Capacitor bridge as a fallback.
+            }
+        }
+    }
+
     @PluginMethod
     public void loadAppOpen(final PluginCall call) {
         appOpenAdPlugin.loadAppOpen(getContext(), getActivity(), call, this::notifyListeners);
@@ -360,6 +385,10 @@ public class AdMob extends Plugin {
 
     @Override
     protected void handleOnDestroy() {
+        if (nativeAdPlacementChannelRegistered) {
+            androidx.webkit.WebViewCompat.removeWebMessageListener(getBridge().getWebView(), "capacitorAdMobPlacements");
+            nativeAdPlacementChannelRegistered = false;
+        }
         nativeAdExecutor.destroyAll();
         super.handleOnDestroy();
     }

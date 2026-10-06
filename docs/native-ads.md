@@ -1,10 +1,10 @@
-# Native ads research preview
+# Native Ads (Preview)
+
+**Native Ads is a Preview feature.** You can use it for testing and in production. Its API may change in a minor release while in Preview.
 
 Native ads are rendered with Google Mobile Ads SDK views owned by this plugin. Your app reserves an HTML slot and supplies a stable key; it does not implement a `NativeAdView` in Kotlin or Swift and does not render ad assets in JavaScript.
 
-This API is an unsupported research preview for iOS and Android device validation. Do not ship it in production and do not describe virtual scrolling as supported yet. A native ad is placed above the WebView, so a pan beginning on the ad may not reach the WebView's scroll container. The implementation updates overlay coordinates as the WebView scrolls, but that cannot solve the initial gesture-routing problem. Production support is gated on real-device acceptance tests for this behavior.
-
-Promotion from research preview also requires VoiceOver and TalkBack ordering tests, fast-fling/recycling tests, modal/tab/background lifecycle tests, rotation and keyboard tests, and Google Native Ad Validator checks on both platforms.
+Native Ads is available on iOS and Android. Virtual scrolling is not yet supported. A native ad is placed above the WebView, so a pan beginning on the ad may not reach the WebView's scroll container. The implementation updates overlay coordinates as the WebView scrolls, but that cannot solve the initial gesture-routing problem.
 
 Browsers and PWAs are unsupported. `NativeAdFeed.create()` rejects instead of leaving an empty ad slot.
 
@@ -100,7 +100,9 @@ vue({
 <capacitor-admob-native feed-id="home-feed" :slot-key="item.stableAdKey" />
 ```
 
-Placement updates are batched and scoped to a feed session. While the WebView scrolls, loaded native overlays follow the measured slot coordinates and clipping bounds. Measurements are scheduled once per animation frame, unchanged placements are skipped, and pending updates are coalesced to the latest state. New ads are loaded after the viewport settles. Native rendering may lag behind WebView scrolling. A feed keeps at most three native ads, including attached offscreen slots; additional visible slots wait for capacity. At most two feed managers may be active, which bounds the plugin-wide total at six native ads. Ads are not automatically refreshed. Failed loads are not silently retried. Call `reload(slotKey)` only at an explicit product-defined retry or refresh point.
+Use a normal HTML `overflow: auto` container or Ionic `ion-content`; Android requires no scroll-specific option. Ads follow the slot and its clipping bounds, but can lag behind fast scrolling. New ads load after scrolling settles.
+
+A feed keeps at most three native ads, including attached offscreen slots; additional visible slots wait for capacity. At most two feed managers may be active. Ads are not automatically refreshed, and failed loads are not silently retried. Call `reload(slotKey)` only at an explicit product-defined retry or refresh point.
 
 ## Layout and overlay lifecycle
 
@@ -130,7 +132,7 @@ Call `destroy()` when leaving a screen. Await `pause()` before presenting an ove
 | `invalidateLayout(): Promise<void>`            | Hides and remeasures after an application-driven reflow.       |
 | `destroy()`                                    | Removes listeners and all native resources for the session.    |
 
-`NativeAdFeedOptions` contains only `feedId`, `template`, `style`, `isTesting`, and `npa`. `isTesting: true` is required, and both native implementations always use Google's platform test ad unit during this preview. `feedId` and every `slotKey` must be non-empty and stable; reuse the same feed IDs across WebView reloads so stale native sessions can be replaced safely.
+`NativeAdFeedOptions` contains `feedId`, `adId`, `template`, `style`, `isTesting`, `npa`, and the optional iOS `scrollElement`. Set `isTesting: true` to use Google's platform test ad unit. For production ads, set your platform-specific native ad unit ID in `adId` and omit `isTesting` or set it to `false`. `adId` is required unless `isTesting` is `true`. `feedId` and every `slotKey` must be non-empty and stable; reuse the same feed IDs across WebView reloads so stale native sessions can be replaced safely.
 
 ## Rendering and policy boundary
 
@@ -140,7 +142,7 @@ Style colors use CSS-style `#RRGGBB` or `#RRGGBBAA` values on both platforms. Di
 
 Follow Google's native ad policies and implementation guidance for [Android](https://developers.google.com/admob/android/native/advanced) and [iOS](https://developers.google.com/admob/ios/native/advanced).
 
-### iOS native scroll tracking
+## iOS scroll container
 
 For a single Ionic scroll container, pass its actual scroll element when creating the feed:
 
@@ -152,6 +154,6 @@ const feed = await NativeAdFeed.create({
 });
 ```
 
-On iOS, loaded ads follow the corresponding native scroll view without per-frame JavaScript placement updates. Layout changes still require remeasurement; call `invalidateLayout()` after application-driven changes. Clipping inside the scroll container and at its visible bounds is retained. `pause()` and `destroy()` stop tracking. Other platforms ignore this option and retain JavaScript coordinate updates.
+On iOS, specifying `scrollElement` enables experimental native scroll tracking for that container. Layout changes still require remeasurement; call `invalidateLayout()` after application-driven changes. Clipping inside the scroll container and at its visible bounds is retained. `pause()` and `destroy()` stop tracking. Other platforms ignore this option and retain JavaScript coordinate updates.
 
-This remains a research preview: the binding depends on WebKit's view hierarchy, although it does not reference private class names. A missing or ambiguous match hides the ads instead of binding another container. Use one untransformed, unzoomed overflow scroll container; nested scrolling, document scrolling through this option, and virtual-scroll integrations are not supported. This does not change gesture routing for swipes that begin on an ad.
+If the specified container cannot be identified unambiguously, the update fails and its ads stay hidden. Use one untransformed, unzoomed overflow scroll container; nested scrolling, document scrolling through this option, and virtual-scroll integrations are not supported. This does not change gesture routing for swipes that begin on an ad.

@@ -84,6 +84,8 @@ export class NativeAdFeed {
   private layoutInvalidated = false;
   private placementFrame?: number;
   private lastPlacements?: string;
+  private lastPlacementWasDirect = false;
+  private placementAcknowledgementRequired = false;
   private settleTimer?: ReturnType<typeof setTimeout>;
   private placementUpdateTask?: Promise<boolean>;
   private operationTask: Promise<void> = Promise.resolve();
@@ -141,8 +143,8 @@ export class NativeAdFeed {
     if (typeof document === 'undefined' || typeof window === 'undefined') {
       throw new Error('NativeAdFeed can only be created in a browser environment');
     }
-    if (options.isTesting !== true) {
-      throw new Error('Native ads are restricted to test ads during the research preview');
+    if (options.isTesting !== true && !options.adId?.trim()) {
+      throw new Error('adId is required unless isTesting is true');
     }
     const feed = new NativeAdFeed(options);
     try {
@@ -372,7 +374,7 @@ export class NativeAdFeed {
     }
     this.placementFrame = requestAnimationFrame(() => {
       this.placementFrame = undefined;
-      void this.requestPlacementUpdate();
+      void this.requestPlacementUpdate(true);
     });
   }
 
@@ -455,7 +457,8 @@ export class NativeAdFeed {
         slotKey: state.slotKey,
         template: this.options.template ?? NativeAdTemplate.Medium,
         style: this.options.style,
-        isTesting: true,
+        adId: this.options.adId,
+        isTesting: this.options.isTesting,
         npa: this.options.npa,
       });
       if (state.loadVersion === loadVersion) {
@@ -558,8 +561,9 @@ export class NativeAdFeed {
     this.elementSlots.clear();
   }
 
-  private requestPlacementUpdate(): Promise<boolean> {
+  private requestPlacementUpdate(allowDirect = false): Promise<boolean> {
     this.updateDirty = true;
+    this.placementAcknowledgementRequired ||= !allowDirect;
     if (!this.placementUpdateTask) {
       this.placementUpdateTask = Promise.resolve().then(() => this.flushPlacementUpdates());
     }
@@ -573,6 +577,8 @@ export class NativeAdFeed {
     try {
       while (this.updateDirty && !this.destroyed) {
         this.updateDirty = false;
+        const allowDirect = !this.placementAcknowledgementRequired;
+        this.placementAcknowledgementRequired = false;
         const placements = [...this.slots.values()]
           .filter((state) => state.status === 'loaded')
           .map((state): NativeAdPlacement => {
@@ -593,17 +599,33 @@ export class NativeAdFeed {
           ? measureNativeAdScrollContainer(this.nativeScrollElement)
           : undefined;
         const serializedPlacements = JSON.stringify({ placements, scrollContainer });
-        if (serializedPlacements === this.lastPlacements) {
+        if (serializedPlacements === this.lastPlacements && (allowDirect || !this.lastPlacementWasDirect)) {
           continue;
         }
         try {
-          await bridge.updateNativeAdPlacements({
+          const batch = {
             feedId: this.options.feedId,
             sessionId: this.sessionId,
             sequence: ++this.placementSequence,
             placements,
             ...(scrollContainer ? { scrollContainer } : {}),
-          });
+          };
+          const channel =
+            Capacitor.getPlatform() === 'android'
+              ? (window as Window & { capacitorAdMobPlacements?: { postMessage(message: string): void } })
+                  .capacitorAdMobPlacements
+              : undefined;
+          let sentDirectly = false;
+          if (allowDirect && channel) {
+            try {
+              channel.postMessage(JSON.stringify(batch));
+              sentDirectly = true;
+            } catch {
+              // Keep the acknowledged bridge available if the direct channel fails.
+            }
+          }
+          if (!sentDirectly) await bridge.updateNativeAdPlacements(batch);
+          this.lastPlacementWasDirect = sentDirectly;
           this.lastPlacements = serializedPlacements;
         } catch {
           this.lastPlacements = undefined;

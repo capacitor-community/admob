@@ -82,6 +82,7 @@ class NativeAdExecutor(
         val sessionId = requiredString(call, "sessionId") ?: return
         val slotKey = requiredString(call, "slotKey") ?: return
         val options = AdOptions.getFactory().createGenericOptions(call, NATIVE_TESTER_ID)
+        val adId = if (options.isTesting) NATIVE_TESTER_ID else requiredString(call, "adId") ?: return
         val template = call.getString("template", "medium") ?: "medium"
         val style = call.getObject("style", JSObject()) ?: JSObject()
         val stateKey = stateKey(feedId, slotKey)
@@ -101,10 +102,11 @@ class NativeAdExecutor(
                 return@runOnUiThread
             }
             pendingLoads[stateKey] = pendingLoad
-            val adLoader = AdLoader.Builder(contextSupplier.get(), NATIVE_TESTER_ID)
+            val adLoader = AdLoader.Builder(contextSupplier.get(), adId)
                 .forNativeAd { nativeAd ->
                     handleLoadedAd(
                         nativeAd = nativeAd,
+                        adId = adId,
                         stateKey = stateKey,
                         pendingLoad = pendingLoad,
                         finished = finished,
@@ -127,25 +129,39 @@ class NativeAdExecutor(
         }
     }
 
+    // WebMessageListener delivers on the UI thread; lifecycle calls still use PluginCall.
+    fun updateDirectPlacements(raw: String?) {
+        try {
+            applyPlacements(JSONObject(raw ?: return))
+        } catch (_: JSONException) {
+            // Ignore malformed messages without affecting another feed.
+        }
+    }
+
     fun updatePlacements(call: PluginCall) {
-        val feedId = requiredString(call, "feedId") ?: return
-        val sessionId = requiredString(call, "sessionId") ?: return
-        val sequence = call.data.optLong("sequence", -1L)
-        val placements = call.getArray("placements", JSArray()) ?: JSArray()
+        requiredString(call, "feedId") ?: return
+        requiredString(call, "sessionId") ?: return
         activitySupplier.get().runOnUiThread {
-            if (!isCurrentSession(feedId, sessionId) || !feedSessions.accepts(feedId, sequence)) {
-                call.resolve()
-                return@runOnUiThread
-            }
-            states.values.filter { it.feedId == feedId }.forEach { it.clippingContainer.visibility = View.GONE }
-            repeat(placements.length()) { index ->
-                try {
-                    applyPlacement(feedId, placements.getJSONObject(index))
-                } catch (_: JSONException) {
-                    // Invalid entries fail closed: every state was hidden above.
-                }
-            }
+            applyPlacements(call.data)
             call.resolve()
+        }
+    }
+
+    private fun applyPlacements(batch: JSONObject) {
+        val feedId = batch.optString("feedId")
+        val sessionId = batch.optString("sessionId")
+        if (!isCurrentSession(feedId, sessionId) || !feedSessions.accepts(feedId, batch.optLong("sequence", -1L))) return
+        val shown = mutableSetOf<String>()
+        val placements = batch.optJSONArray("placements") ?: JSArray()
+        repeat(placements.length()) { index ->
+            try {
+                applyPlacement(feedId, placements.getJSONObject(index))?.let { shown.add(it) }
+            } catch (_: JSONException) {
+                // Invalid entries fail closed below.
+            }
+        }
+        states.filter { it.value.feedId == feedId && it.key !in shown }.values.forEach {
+            it.clippingContainer.visibility = View.GONE
         }
     }
 
@@ -171,6 +187,7 @@ class NativeAdExecutor(
 
     private fun handleLoadedAd(
         nativeAd: NativeAd,
+        adId: String,
         stateKey: String,
         pendingLoad: PendingLoad,
         finished: AtomicBoolean,
@@ -208,7 +225,7 @@ class NativeAdExecutor(
             val responseInfo = nativeAd.responseInfo
             val data = AdMobRevenueData(
                 adValue,
-                NATIVE_TESTER_ID,
+                adId,
                 responseInfo?.mediationAdapterClassName ?: "",
                 responseInfo?.responseId ?: "",
             ).apply {
@@ -259,28 +276,36 @@ class NativeAdExecutor(
         }
     }
 
-    private fun applyPlacement(expectedFeedId: String, placement: JSONObject) {
+    private fun applyPlacement(expectedFeedId: String, placement: JSONObject): String? {
         val density = contextSupplier.get().resources.displayMetrics.density
-        val value = NativeAdPlacementValue.parse(expectedFeedId, placement, density) ?: return
-        val state = states[stateKey(value.feedId, value.slotKey)] ?: return
-        if (value.generation < state.generation) return
+        val value = NativeAdPlacementValue.parse(expectedFeedId, placement, density) ?: return null
+        val state = states[stateKey(value.feedId, value.slotKey)] ?: return null
+        if (value.generation < state.generation) return null
         val minimumWidth = (if (state.isSmall) 120 else 144) * density
         val minimumHeight = (if (state.isSmall) 120 else 300) * density
-        if (value.rectWidth < minimumWidth.roundToInt() || value.rectHeight < minimumHeight.roundToInt()) return
+        if (value.rectWidth < minimumWidth.roundToInt() || value.rectHeight < minimumHeight.roundToInt()) return null
 
-        val webView = webViewSupplier.get() ?: return
-        state.clippingContainer.layoutParams = state.clippingContainer.layoutParams.apply {
-            width = value.clipWidth
-            height = value.clipHeight
+        val webView = webViewSupplier.get() ?: return null
+        val wasVisible = state.clippingContainer.visibility == View.VISIBLE
+        val clipParams = state.clippingContainer.layoutParams
+        if (clipParams.width != value.clipWidth || clipParams.height != value.clipHeight) {
+            state.clippingContainer.layoutParams = clipParams.apply {
+                width = value.clipWidth
+                height = value.clipHeight
+            }
         }
         state.clippingContainer.x = webView.x + value.clipX
         state.clippingContainer.y = webView.y + value.clipY
-        state.adView.layoutParams = FrameLayout.LayoutParams(value.rectWidth, value.rectHeight)
+        val adParams = state.adView.layoutParams
+        if (adParams.width != value.rectWidth || adParams.height != value.rectHeight) {
+            state.adView.layoutParams = FrameLayout.LayoutParams(value.rectWidth, value.rectHeight)
+        }
         state.adView.x = (value.rectX - value.clipX).toFloat()
         state.adView.y = (value.rectY - value.clipY).toFloat()
         state.generation = value.generation
         state.clippingContainer.visibility = View.VISIBLE
-        state.clippingContainer.bringToFront()
+        if (!wasVisible) state.clippingContainer.bringToFront()
+        return stateKey(value.feedId, value.slotKey)
     }
 
     private fun overlayParent(): ViewGroup? = webViewSupplier.get()?.parent as? ViewGroup

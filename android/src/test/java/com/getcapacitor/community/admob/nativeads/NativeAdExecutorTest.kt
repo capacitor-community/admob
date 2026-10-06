@@ -24,8 +24,8 @@ class NativeAdExecutorTest {
         val data = JSObject("""{"feedId":"feed","sessionId":"session","sequence":1}""")
         executor.startFeed(PluginCall(handler, "AdMob", "1", "startNativeAdFeed", data))
         val placements = mock(JSArray::class.java)
-        val call = spy(PluginCall(handler, "AdMob", "2", "updateNativeAdPlacements", data))
-        doReturn(placements).`when`(call).getArray(org.mockito.ArgumentMatchers.eq("placements"), any(JSArray::class.java))
+        data.put("placements", placements)
+        val call = PluginCall(handler, "AdMob", "2", "updateNativeAdPlacements", data)
 
         executor.updatePlacements(call)
 

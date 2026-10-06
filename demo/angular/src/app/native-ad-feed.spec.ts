@@ -84,11 +84,15 @@ describe('NativeAdFeed', () => {
     observers.length = 0;
   });
 
-  it('loads only after the stable slot is visible and scroll has settled', async () => {
+  it.each([
+    { isTesting: true, adId: undefined },
+    { isTesting: false, adId: 'native-unit-id' },
+    { isTesting: undefined, adId: 'native-unit-id' },
+  ])('loads the requested ad only after the slot is visible and scrolling settles: %j', async (adOptions) => {
     const feed = await NativeAdFeed.create({
       feedId: 'feed-visible',
       template: NativeAdTemplate.Medium,
-      isTesting: true,
+      ...adOptions,
     });
     createdFeeds.push(feed);
     const element = document.createElement('capacitor-admob-native');
@@ -100,10 +104,7 @@ describe('NativeAdFeed', () => {
     await settle();
 
     expect(bridge.loadNativeAd).toHaveBeenCalledOnce();
-    expect(bridge.loadNativeAd).toHaveBeenCalledWith(
-      expect.objectContaining({ slotKey: 'article-42', isTesting: true }),
-    );
-    expect(bridge.loadNativeAd.mock.calls[0][0]).not.toHaveProperty('adId');
+    expect(bridge.loadNativeAd).toHaveBeenCalledWith(expect.objectContaining({ slotKey: 'article-42', ...adOptions }));
     expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(
       expect.objectContaining({
         placements: [expect.objectContaining({ slotKey: 'article-42', visible: true })],

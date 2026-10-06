@@ -84,8 +84,15 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
             call.reject("Native ad feed session is no longer active")
             return
         }
+        let adUnitID: String
+        if call.getBool("isTesting") == true {
+            adUnitID = Self.testAdUnitID
+        } else {
+            guard let requestedID = NativeAdValues.requiredString(call, "adId") else { return }
+            adUnitID = requestedID
+        }
         let loader = AdLoader(
-            adUnitID: Self.testAdUnitID,
+            adUnitID: adUnitID,
             rootViewController: plugin?.getRootVC(),
             adTypes: [.native],
             options: nil
