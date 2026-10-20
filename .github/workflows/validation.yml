@@ -19,8 +19,14 @@ concurrency:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   lint:
+    if: "${{ (needs.ci-reuse.result != 'success' && !cancelled()) || ((success()) && needs.ci-reuse.outputs.reuse != 'true') }}"
+    needs:
+      - ci-reuse
     runs-on: macos-14
     steps:
+      - name: Fail if tree verification failed
+        if: needs.ci-reuse.result != 'success'
+        run: exit 1
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
@@ -31,8 +37,14 @@ jobs:
       - run: npm run lint
 
   test:
+    if: "${{ (needs.ci-reuse.result != 'success' && !cancelled()) || ((success()) && needs.ci-reuse.outputs.reuse != 'true') }}"
+    needs:
+      - ci-reuse
     runs-on: ubuntu-latest
     steps:
+      - name: Fail if tree verification failed
+        if: needs.ci-reuse.result != 'success'
+        run: exit 1
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
@@ -43,8 +55,14 @@ jobs:
       - run: npm run lint
 
   test-demo:
+    if: "${{ (needs.ci-reuse.result != 'success' && !cancelled()) || ((success()) && needs.ci-reuse.outputs.reuse != 'true') }}"
+    needs:
+      - ci-reuse
     runs-on: ubuntu-latest
     steps:
+      - name: Fail if tree verification failed
+        if: needs.ci-reuse.result != 'success'
+        run: exit 1
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
@@ -65,8 +83,14 @@ jobs:
         working-directory: demo/angular
 
   verify-web:
+    if: "${{ (needs.ci-reuse.result != 'success' && !cancelled()) || ((success()) && needs.ci-reuse.outputs.reuse != 'true') }}"
+    needs:
+      - ci-reuse
     runs-on: ubuntu-latest
     steps:
+      - name: Fail if tree verification failed
+        if: needs.ci-reuse.result != 'success'
+        run: exit 1
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
@@ -77,8 +101,14 @@ jobs:
       - run: npm run verify:web
 
   verify-android:
+    if: "${{ (needs.ci-reuse.result != 'success' && !cancelled()) || ((success()) && needs.ci-reuse.outputs.reuse != 'true') }}"
+    needs:
+      - ci-reuse
     runs-on: ubuntu-latest
     steps:
+      - name: Fail if tree verification failed
+        if: needs.ci-reuse.result != 'success'
+        run: exit 1
       - name: set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -94,11 +124,17 @@ jobs:
       - run: npm run verify:android
 
   verify-ios:
+    if: "${{ (needs.ci-reuse.result != 'success' && !cancelled()) || ((success()) && needs.ci-reuse.outputs.reuse != 'true') }}"
+    needs:
+      - ci-reuse
     runs-on: macos-15
     timeout-minutes: 20
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
     steps:
+      - name: Fail if tree verification failed
+        if: needs.ci-reuse.result != 'success'
+        run: exit 1
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
@@ -115,3 +151,101 @@ jobs:
           path: ${{ runner.temp }}/ios-tests.xcresult
           if-no-files-found: ignore
           retention-days: 7
+
+  ci-reuse:
+    name: Verify tested tree
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      reuse: ${{ steps.lookup.outputs.reuse }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Test CI reuse guards
+        run: node --test .github/scripts/ci-tree-reuse.test.mjs
+      - name: Record the actual complete checkout
+        id: tree
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const { execFileSync } = await import('node:child_process');
+            const { writeFileSync } = await import('node:fs');
+            const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
+            const tree = git('rev-parse', 'HEAD^{tree}');
+            const commit = git('rev-parse', 'HEAD');
+            core.setOutput('tree', tree);
+            core.setOutput('commit', commit);
+            writeFileSync(`${process.env.RUNNER_TEMP}/ci-tree.txt`, `${commit}\n${tree}\n`);
+      - name: Reuse only the latest successful PR CI for this tree
+        id: lookup
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        env:
+          TREE: ${{ steps.tree.outputs.tree }}
+        with:
+          script: |
+            const { resolveReuse } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/ci-tree-reuse.mjs`);
+            const result = await resolveReuse(github, context, process.env.TREE, 'validation.yml');
+            core.setOutput('reuse', String(result.reuse));
+            if (result.reuse) {
+              await core.summary.addHeading('Reused PR validation').addLink('Latest successful PR CI', result.url)
+                .addRaw(`\n\nComplete repository tree: ${result.tree}\n`).write();
+            } else {
+              core.info(result.reason);
+            }
+  ci-result:
+    name: CI result
+    if: ${{ always() }}
+    needs:
+      - ci-reuse
+      - lint
+      - test
+      - test-demo
+      - verify-web
+      - verify-android
+      - verify-ios
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Require executed tests or verified reuse
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          REUSE: ${{ needs.ci-reuse.outputs.reuse }}
+        with:
+          script: |
+            const { requireResults } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/ci-tree-reuse.mjs`);
+            requireResults(process.env.REUSE === 'true', JSON.parse(process.env.NEEDS), ["lint", "test", "test-demo", "verify-web", "verify-android", "verify-ios"], []);
+      - name: Record the actual complete checkout
+        id: tree
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const { execFileSync } = await import('node:child_process');
+            const { writeFileSync } = await import('node:fs');
+            const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
+            const tree = git('rev-parse', 'HEAD^{tree}');
+            const commit = git('rev-parse', 'HEAD');
+            core.setOutput('tree', tree);
+            core.setOutput('commit', commit);
+            writeFileSync(`${process.env.RUNNER_TEMP}/ci-tree.txt`, `${commit}\n${tree}\n`);
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && !contains(needs.*.result, 'skipped')
+      - name: Record PR checkout evidence
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && !contains(needs.*.result, 'skipped')
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name:
+            ci-tree-pr-${{ github.event.pull_request.number }}-${{ steps.tree.outputs.tree }}-${{ steps.tree.outputs.commit
+            }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ci-tree.txt
+          if-no-files-found: error
+          retention-days: 30
