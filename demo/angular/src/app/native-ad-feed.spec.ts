@@ -2,6 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const bridge = {
+  captureNativeAdSnapshot: vi.fn().mockResolvedValue({ dataUrl: 'data:image/png;base64,AA==' }),
   startNativeAdFeed: vi.fn().mockResolvedValue(undefined),
   destroyNativeAdFeed: vi.fn().mockResolvedValue(undefined),
   loadNativeAd: vi.fn().mockResolvedValue(undefined),
@@ -670,5 +671,163 @@ describe('NativeAdFeed', () => {
   it('rejects native feed startup on the web implementation', async () => {
     const web = new AdMobWeb();
     await expect(web.startNativeAdFeed()).rejects.toThrow('only available on iOS and Android');
+  });
+  describe('Android scroll snapshots', () => {
+    const setup = async () => {
+      vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
+      Object.defineProperty(HTMLImageElement.prototype, 'decode', {
+        configurable: true,
+        value: vi.fn().mockResolvedValue(undefined),
+      });
+      bridge.captureNativeAdSnapshot.mockReset().mockResolvedValue({ dataUrl: 'data:image/png;base64,AA==' });
+      const feed = await NativeAdFeed.create({ feedId: 'snapshot-test', isTesting: true, androidScrollSnapshot: true });
+      createdFeeds.push(feed);
+      const element = document.createElement('div');
+      document.body.append(element);
+      feed.attach('slot', element);
+      await vi.advanceTimersByTimeAsync(600);
+      return { feed, element };
+    };
+
+    it('prepares a hidden image, swaps during scrolling, and restores the native view after settling', async () => {
+      const { element } = await setup();
+      const image = element.querySelector('img')!;
+      expect(image).not.toBeNull();
+      expect(image.hidden).toBe(true);
+      document.dispatchEvent(new Event('scroll'));
+      await vi.advanceTimersByTimeAsync(20);
+      expect(image.hidden).toBe(false);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([]);
+      await settle();
+      expect(image.hidden).toBe(true);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
+    });
+
+    it('clears visible proxies on pause, detach and destruction', async () => {
+      const { feed, element } = await setup();
+      document.dispatchEvent(new Event('scroll'));
+      await feed.pause();
+      expect(element.querySelector('img')).toBeNull();
+      feed.resume();
+      await vi.advanceTimersByTimeAsync(600);
+      expect(element.querySelector('img')).not.toBeNull();
+      feed.detach(element);
+      expect(element.querySelector('img')).toBeNull();
+      feed.attach('slot', element);
+      await vi.advanceTimersByTimeAsync(600);
+      await feed.destroy();
+      expect(element.querySelector('img')).toBeNull();
+    });
+
+    it('keeps native tracking when capture fails', async () => {
+      const { feed, element } = await setup();
+      await feed.pause();
+      bridge.captureNativeAdSnapshot.mockRejectedValue(new Error('unavailable'));
+      feed.resume();
+      await vi.advanceTimersByTimeAsync(600);
+      document.dispatchEvent(new Event('scroll'));
+      await vi.advanceTimersByTimeAsync(20);
+      expect(element.querySelector('img')).toBeNull();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
+    });
+
+    it('discards capture results that arrive after destruction', async () => {
+      const { feed, element } = await setup();
+      await feed.pause();
+      let complete!: (result: { dataUrl: string }) => void;
+      bridge.captureNativeAdSnapshot.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            complete = resolve;
+          }),
+      );
+      feed.resume();
+      await vi.advanceTimersByTimeAsync(600);
+      expect(complete).toBeDefined();
+      await feed.destroy();
+      complete({ dataUrl: 'data:image/png;base64,AA==' });
+      await vi.advanceTimersByTimeAsync(1);
+      expect(element.querySelector('img')).toBeNull();
+    });
+
+    it('does not end a new scroll when an earlier restore acknowledgement arrives', async () => {
+      const { element } = await setup();
+      document.dispatchEvent(new Event('scroll'));
+      await vi.advanceTimersByTimeAsync(20);
+      let acknowledge!: () => void;
+      bridge.updateNativeAdPlacements.mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            acknowledge = resolve;
+          }),
+      );
+      await vi.advanceTimersByTimeAsync(110);
+      expect(acknowledge).toBeDefined();
+      document.dispatchEvent(new Event('scroll'));
+      acknowledge();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(element.querySelector('img')!.hidden).toBe(false);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([]);
+      await settle();
+      expect(element.querySelector('img')!.hidden).toBe(true);
+    });
+
+    it.each([false, true])('keeps fallback placement updates frame-batched (mixed proxies: %s)', async (mixed) => {
+      const { feed, element } = await setup();
+      bridge.captureNativeAdSnapshot.mockRejectedValue(new Error('unavailable'));
+      if (mixed) {
+        const fallback = document.createElement('div');
+        document.body.append(fallback);
+        feed.attach('fallback', fallback);
+      } else {
+        await feed.pause();
+        feed.resume();
+      }
+      await vi.advanceTimersByTimeAsync(600);
+      const frames: FrameRequestCallback[] = [];
+      vi.spyOn(globalThis, 'requestAnimationFrame').mockImplementation((callback) => {
+        frames.push(callback);
+        return 123;
+      });
+      const rect = element.getBoundingClientRect();
+      bridge.updateNativeAdPlacements.mockClear();
+      for (let index = 1; index <= 3; index++) {
+        vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockReturnValue({
+          ...rect,
+          y: rect.y - index,
+          top: rect.top - index,
+          bottom: rect.bottom - index,
+        });
+        document.dispatchEvent(new Event('scroll'));
+        await vi.advanceTimersByTimeAsync(1);
+        expect(bridge.updateNativeAdPlacements).toHaveBeenCalledTimes(mixed ? 1 : 0);
+      }
+      expect(frames).toHaveLength(1);
+      frames[0](performance.now());
+      await vi.advanceTimersByTimeAsync(1);
+      expect(bridge.updateNativeAdPlacements).toHaveBeenCalledTimes(mixed ? 2 : 1);
+    });
+
+    it('positions the proxy over the slot border box', async () => {
+      const { feed, element } = await setup();
+      element.style.borderLeft = '4px solid';
+      element.style.borderTop = '6px solid';
+      await feed.invalidateLayout();
+      await vi.advanceTimersByTimeAsync(600);
+      const image = element.querySelector('img')!;
+      expect(image.style.left).toBe('-4px');
+      expect(image.style.top).toBe('-6px');
+      expect(image.style.width).toBe('300px');
+      expect(image.style.height).toBe('320px');
+      expect(image.style.maxWidth).toBe('none');
+      expect(image.style.boxSizing).toBe('border-box');
+    });
+
+    it('rejects production ads for this experiment', async () => {
+      vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
+      await expect(
+        NativeAdFeed.create({ feedId: 'production', adId: 'unit', androidScrollSnapshot: true }),
+      ).rejects.toThrow('Android test ads');
+    });
   });
 });

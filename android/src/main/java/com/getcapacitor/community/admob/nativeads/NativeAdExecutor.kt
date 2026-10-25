@@ -2,6 +2,9 @@ package com.getcapacitor.community.admob.nativeads
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.util.Base64
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -23,6 +26,7 @@ import com.google.android.gms.common.util.BiConsumer
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicBoolean
+import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
 class NativeAdExecutor(
@@ -39,6 +43,7 @@ class NativeAdExecutor(
         val nativeAd: NativeAd,
         val adView: NativeAdView,
         val clippingContainer: FrameLayout,
+        val isTesting: Boolean,
         var generation: Int = -1,
     )
 
@@ -228,7 +233,8 @@ class NativeAdExecutor(
             return
         }
 
-        val state = NativeAdState(feedId, template == "small", pendingLoad.token, nativeAd, adView, clippingContainer)
+        val state = NativeAdState(feedId, template == "small", pendingLoad.token, nativeAd, adView, clippingContainer,
+            pendingLoad.call.getBoolean("isTesting", false) == true)
         states[stateKey] = state
         overlayParent.addView(clippingContainer)
         nativeAd.setOnPaidEventListener { adValue ->
@@ -333,6 +339,50 @@ class NativeAdExecutor(
     }
 
     private fun overlayParent(): ViewGroup? = webViewSupplier.get()?.parent as? ViewGroup
+
+    // Experimental visual proxy only. SDK views remain responsible for all ad interactions.
+    fun captureSnapshot(call: PluginCall) {
+        val feedId = requiredString(call, "feedId") ?: return
+        val sessionId = requiredString(call, "sessionId") ?: return
+        val slotKey = requiredString(call, "slotKey") ?: return
+        activitySupplier.get().runOnUiThread {
+            val state = states[stateKey(feedId, slotKey)]
+            if (!isCurrentSession(feedId, sessionId) || state == null || !state.isTesting) {
+                call.reject("Snapshots require an active test ad")
+                return@runOnUiThread
+            }
+            if (state.nativeAd.mediaContent?.hasVideoContent() == true) {
+                call.reject("Video ads retain native tracking in the snapshot experiment")
+                return@runOnUiThread
+            }
+            val view = state.adView
+            if (!view.isShown || view.isLayoutRequested || view.width <= 0 || view.height <= 0 ||
+                view.width.toLong() * view.height > 2_000_000) {
+                call.reject("Native ad is not ready for a bounded snapshot")
+                return@runOnUiThread
+            }
+            val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+            try {
+                view.draw(Canvas(bitmap))
+                // Compression must not block the UI thread when the next gesture begins.
+                Thread {
+                    try {
+                        val bytes = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes)
+                        call.resolve(JSObject().put("dataUrl", "data:image/png;base64," +
+                            Base64.encodeToString(bytes.toByteArray(), Base64.NO_WRAP)))
+                    } catch (error: Exception) {
+                        call.reject("Could not encode native ad snapshot", error)
+                    } finally {
+                        bitmap.recycle()
+                    }
+                }.start()
+            } catch (error: Exception) {
+                bitmap.recycle()
+                call.reject("Could not draw native ad snapshot", error)
+            }
+        }
+    }
 
     private fun destroyState(stateKey: String) {
         val state = states.remove(stateKey) ?: return

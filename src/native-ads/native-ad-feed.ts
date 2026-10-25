@@ -48,6 +48,7 @@ interface SlotState {
   status: SlotStatus;
   lastUsed: number;
   loadVersion: number;
+  snapshot?: { image: HTMLImageElement; width: number; height: number; position: string };
 }
 
 let bridge: NativeAdDefinitions | undefined;
@@ -78,6 +79,10 @@ export class NativeAdFeed {
   private readonly scrollRoots = new Set<ShadowRoot>();
   private readonly intersectionObserver?: IntersectionObserver;
   private readonly resizeObserver?: ResizeObserver;
+  private snapshotScrolling = false;
+  private snapshotEpoch = 0;
+  private snapshotTimer?: ReturnType<typeof setTimeout>;
+  private snapshotCapturePending = false;
   private destroyed = false;
   private nativeStarted = false;
   private paused = false;
@@ -104,6 +109,9 @@ export class NativeAdFeed {
     }
     if (feeds.size >= MAX_ACTIVE_FEEDS) {
       throw new Error(`At most ${MAX_ACTIVE_FEEDS} native ad feeds can be active`);
+    }
+    if (options.androidScrollSnapshot && (Capacitor.getPlatform() !== 'android' || options.isTesting !== true)) {
+      throw new Error('androidScrollSnapshot requires Android test ads');
     }
     this.options = { ...options, feedId: id };
     this.nativeScrollElement = Capacitor.getPlatform() === 'ios' ? options.scrollElement : undefined;
@@ -259,6 +267,7 @@ export class NativeAdFeed {
     }
     const state = this.slots.get(slotKey);
     if (state?.element === element) {
+      this.clearSnapshot(state);
       state.element = undefined;
       state.intersecting = false;
       state.generation += 1;
@@ -295,6 +304,7 @@ export class NativeAdFeed {
   async pause(): Promise<void> {
     this.assertActive();
     this.paused = true;
+    this.resetSnapshots();
     this.layoutInvalidated = true;
     if (!(await this.requestPlacementUpdate())) {
       throw new Error('Failed to hide native ad placements');
@@ -311,6 +321,7 @@ export class NativeAdFeed {
   /** Hides stale overlays and remeasures after an application-driven layout change. */
   async invalidateLayout(): Promise<void> {
     this.assertActive();
+    this.resetSnapshots();
     this.layoutInvalidated = true;
     this.scheduleEvaluation();
     if (!(await this.requestPlacementUpdate())) {
@@ -321,6 +332,7 @@ export class NativeAdFeed {
   async destroy(): Promise<void> {
     if (!this.destroyed) {
       this.destroyed = true;
+      this.resetSnapshots();
       feeds.delete(this.options.feedId);
       document.removeEventListener('scroll', this.handleViewportMotion, true);
       for (const root of this.scrollRoots) {
@@ -357,6 +369,20 @@ export class NativeAdFeed {
   private readonly handleViewportMotion = (event?: Event | ResizeObserverEntry[]): void => {
     if (this.destroyed) {
       return;
+    }
+    if (
+      event instanceof Event &&
+      event.type === 'load' &&
+      event.target instanceof HTMLImageElement &&
+      event.target.dataset['admobSnapshot'] !== undefined
+    )
+      return;
+    if (this.options.androidScrollSnapshot) {
+      if (event instanceof Event && ['scroll', 'touchmove', 'wheel'].includes(event.type)) {
+        this.beginSnapshotScroll();
+      } else {
+        this.resetSnapshots();
+      }
     }
     if (!(
       this.nativeScrollElement &&
@@ -406,6 +432,7 @@ export class NativeAdFeed {
       return;
     }
     if (document.hidden) {
+      this.resetSnapshots();
       this.layoutInvalidated = true;
       void this.requestPlacementUpdate();
       return;
@@ -420,9 +447,13 @@ export class NativeAdFeed {
     if (this.settleTimer) {
       clearTimeout(this.settleTimer);
     }
+    const epoch = this.snapshotEpoch;
     this.settleTimer = setTimeout(() => {
       this.layoutInvalidated = false;
-      void this.runOperation(() => this.evaluate());
+      void this.runOperation(async () => {
+        if (this.options.androidScrollSnapshot && epoch !== this.snapshotEpoch) return;
+        await this.evaluate();
+      });
     }, SCROLL_SETTLE_MS);
   }
 
@@ -431,6 +462,14 @@ export class NativeAdFeed {
       return;
     }
 
+    if (this.options.androidScrollSnapshot) {
+      const epoch = this.snapshotEpoch;
+      this.snapshotScrolling = false;
+      const restored = await this.requestPlacementUpdate();
+      if (this.snapshotEpoch === epoch && !this.snapshotScrolling && restored) {
+        for (const state of this.slots.values()) if (state.snapshot) state.snapshot.image.hidden = true;
+      }
+    }
     const visibleStates = this.getVisibleStates();
     for (const state of visibleStates) {
       state.lastUsed = Date.now();
@@ -441,7 +480,105 @@ export class NativeAdFeed {
       .filter((state) => state.status === 'idle')
       .slice(0, Math.max(0, MAX_NATIVE_ADS - occupied));
     await Promise.allSettled(loadable.map((state) => this.loadState(state)));
-    void this.requestPlacementUpdate();
+    await this.requestPlacementUpdate();
+    this.scheduleSnapshots();
+  }
+
+  private beginSnapshotScroll(): void {
+    ++this.snapshotEpoch;
+    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
+    if (this.paused || document.hidden || this.snapshotScrolling) return;
+    this.snapshotScrolling = true;
+    let hasVisibleSnapshot = false;
+    for (const state of this.slots.values()) {
+      if (!state.snapshot || !state.element) continue;
+      const rect = state.element.getBoundingClientRect();
+      if (Math.abs(rect.width - state.snapshot.width) > 1 || Math.abs(rect.height - state.snapshot.height) > 1) {
+        this.clearSnapshot(state);
+      } else {
+        state.snapshot.image.hidden = false;
+        hasVisibleSnapshot = true;
+      }
+    }
+    // Bypass rAF for the one-time handoff. Subsequent image motion is entirely DOM scrolling.
+    if (hasVisibleSnapshot) void this.requestPlacementUpdate(true);
+  }
+
+  private scheduleSnapshots(): void {
+    if (!this.options.androidScrollSnapshot || this.destroyed) return;
+    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
+    this.snapshotTimer = setTimeout(() => void this.captureSnapshots(), 300);
+  }
+
+  private async captureSnapshots(): Promise<void> {
+    if (this.snapshotCapturePending || this.snapshotScrolling || this.destroyed || this.paused || document.hidden)
+      return;
+    this.snapshotCapturePending = true;
+    const epoch = this.snapshotEpoch;
+    try {
+      for (const state of this.getVisibleStates()) {
+        const element = state.element;
+        if (!element || state.status !== 'loaded' || !bridge?.captureNativeAdSnapshot) continue;
+        const version = state.loadVersion;
+        const generation = state.generation;
+        const rect = element.getBoundingClientRect();
+        try {
+          const { dataUrl } = await bridge.captureNativeAdSnapshot({
+            feedId: this.feedId,
+            sessionId: this.sessionId,
+            slotKey: state.slotKey,
+          });
+          const image = new Image();
+          image.dataset['admobSnapshot'] = '';
+          image.src = dataUrl;
+          await image.decode();
+          if (
+            epoch !== this.snapshotEpoch ||
+            this.destroyed ||
+            this.paused ||
+            state.element !== element ||
+            state.loadVersion !== version ||
+            state.generation !== generation ||
+            state.status !== 'loaded'
+          )
+            return;
+          this.clearSnapshot(state);
+          const position = element.style.position;
+          const style = getComputedStyle(element);
+          if (style.position === 'static') element.style.position = 'relative';
+          const borderLeft = Number.parseFloat(style.borderLeftWidth) || 0;
+          const borderTop = Number.parseFloat(style.borderTopWidth) || 0;
+          image.alt = '';
+          image.setAttribute('aria-hidden', 'true');
+          image.draggable = false;
+          image.hidden = true;
+          // Native placements use the border box, while absolute children start at the padding box.
+          image.style.cssText = `position:absolute;left:${-borderLeft}px;top:${-borderTop}px;
+            width:${rect.width}px;height:${rect.height}px;box-sizing:border-box;
+            border:0;padding:0;margin:0;min-width:0;min-height:0;max-width:none;max-height:none;pointer-events:none;`;
+          element.append(image);
+          state.snapshot = { image, width: rect.width, height: rect.height, position };
+        } catch {
+          // A missing/unsupported capture keeps the normal native placement path.
+        }
+      }
+    } finally {
+      this.snapshotCapturePending = false;
+    }
+  }
+
+  private clearSnapshot(state: SlotState): void {
+    if (!state.snapshot) return;
+    state.snapshot.image.remove();
+    if (state.element) state.element.style.position = state.snapshot.position;
+    state.snapshot = undefined;
+  }
+
+  private resetSnapshots(): void {
+    ++this.snapshotEpoch;
+    this.snapshotScrolling = false;
+    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
+    for (const state of this.slots.values()) this.clearSnapshot(state);
   }
 
   private async loadState(state: SlotState): Promise<void> {
@@ -522,6 +659,7 @@ export class NativeAdFeed {
       state.status = 'idle';
       return;
     }
+    this.clearSnapshot(state);
     state.status = 'removing';
     const removeVersion = ++state.loadVersion;
     await this.requestPlacementUpdate();
@@ -580,7 +718,7 @@ export class NativeAdFeed {
         const allowDirect = !this.placementAcknowledgementRequired;
         this.placementAcknowledgementRequired = false;
         const placements = [...this.slots.values()]
-          .filter((state) => state.status === 'loaded')
+          .filter((state) => state.status === 'loaded' && !(this.snapshotScrolling && state.snapshot))
           .map((state): NativeAdPlacement => {
             const measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
             const visible = Boolean(

@@ -159,3 +159,41 @@ const feed = await NativeAdFeed.create({
 On iOS, specifying `scrollElement` enables experimental native scroll tracking for that container. Layout changes still require remeasurement; call `invalidateLayout()` after application-driven changes. Clipping inside the scroll container and at its visible bounds is retained. `pause()` and `destroy()` stop tracking. Other platforms ignore this option and retain JavaScript coordinate updates.
 
 If the specified container cannot be identified unambiguously, the update fails and its ads stay hidden. Use one untransformed, unzoomed overflow scroll container; nested scrolling, document scrolling through this option, and virtual-scroll integrations are not supported. This does not change gesture routing for swipes that begin on an ad.
+
+### Android scroll snapshot experiment (test ads only)
+
+Set `androidScrollSnapshot: true` together with `isTesting: true` in
+`NativeAdFeed.create()` on Android. The demo enables this option at
+`/native?snapshot`; `/native` retains the normal overlay implementation.
+
+After layout settles, the plugin captures the native view into a PNG and decodes
+it in advance in the HTML slot. On `scroll`, `touchmove`, or `wheel`, the feed shows
+that image and hides the corresponding native overlay through the placement
+channel. The image scrolls and clips with the DOM. After 120 ms without motion,
+the feed restores native placements and hides the image after acknowledgement.
+It refreshes snapshots after another 300 ms at rest. Pause, layout invalidation,
+detach, reload, and destruction discard the images; stale asynchronous results
+cannot reattach them. No clicks or impressions are synthesized for the image.
+
+This is a visual experiment, not a production ad rendering mode. Native views
+still handle interactions at rest. The Android bridge rejects snapshot requests
+for production ads and video creatives. Missing, failed, oversized (over two
+million pixels), or not-yet-ready captures retain native tracking. Newly visible
+ads may therefore use the original tracking path until they have settled once.
+The initial hide and final restore still cross the native/Web boundary, so this
+mode does not promise a frame-perfect handoff. A cached image can also precede
+later changes to SDK overlays. Gestures starting on the native ad, video,
+accessibility, physical-device performance, and production-policy suitability
+remain outside the validated scope.
+
+Google's native display integration expects registered `NativeAdView` assets and
+SDK-managed clicks: <https://developers.google.com/admob/android/native/advanced>.
+Do not replace that with JavaScript click forwarding.
+
+Local verification on 2026-10-26: Android 16 / API 36 emulator, Medium Google
+static test ads, two slots, upward and downward swipes starting in the page
+margin. All 178 sampled animation frames with the image visible had a 0 CSS px
+vertical difference between the image and its HTML slot; both images were hidden
+again after settling. This measures DOM alignment during the image phase, not
+native handoff latency or dropped frames. Android unit tests (80) and the demo's
+Web tests (45) passed.

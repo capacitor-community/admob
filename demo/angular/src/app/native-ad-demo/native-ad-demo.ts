@@ -19,6 +19,7 @@ import {
   IonContent,
   IonHeader,
   IonItem,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -88,6 +89,7 @@ const feedItems: FeedItem[] = [
     IonContent,
     IonHeader,
     IonItem,
+    IonItemGroup,
     IonLabel,
     IonList,
     IonListHeader,
@@ -163,6 +165,8 @@ class ViewModel extends ViewModelStore<NativeAdDemo> {
     const feed = await NativeAdFeed.create({
       scrollElement,
       feedId: 'native-ad-demo-feed',
+      androidScrollSnapshot:
+        Capacitor.getPlatform() === 'android' && new URLSearchParams(location.search).has('snapshot'),
       template: NativeAdTemplate.Medium,
       isTesting: true,
       style: {

@@ -15,6 +15,9 @@ export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa' | 'isTesting'
    */
   scrollElement?: HTMLElement;
 
+  /** Android test-ad experiment: use a cached DOM image while scrolling. */
+  androidScrollSnapshot?: boolean;
+
   /** Plugin-owned layout used for every native ad in this feed. */
   template?: NativeAdTemplate;
 
