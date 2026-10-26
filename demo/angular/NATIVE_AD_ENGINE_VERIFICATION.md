@@ -127,6 +127,13 @@ final changed Feed spec: 32 passed; Android unit tests: 81 passed (including the
 passed. Manager and independent reviewer approved the final native deferral change,
 including the active-image release regression test.
 
+Latest-main integration exposed a Swift initializer forwarding error in CI. The fix
+forwards `failedFallback` through the new convenience/internal initializer split;
+the npm-distributed CocoaPods build and all 9 Swift tests passed locally, including
+an explicit `.native` policy regression test. Engine commit `5b127d1` contains this
+integration fix; its Android sources, TypeScript and generated runtime are unchanged
+from measured Engine commit `1523547`.
+
 Raw recordings, CPU profiles, captures and traces are retained locally under
 `/private/tmp/admob-final-proof`. Per-trial final performance data is in
 [the benchmark summary](tools/native-ad-engine-benchmark-results.json).
