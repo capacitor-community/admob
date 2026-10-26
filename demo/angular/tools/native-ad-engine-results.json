@@ -114,5 +114,6 @@
     "minimumPixels": 2373,
     "blankRuns": [],
     "blocksMs": [450, 900, 450, 900]
-  }
+  },
+  "status": "Exploratory, uncontrolled creatives; superseded by native-ad-engine-benchmark-results.json"
 }

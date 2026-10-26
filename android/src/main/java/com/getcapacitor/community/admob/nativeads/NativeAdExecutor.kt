@@ -57,6 +57,7 @@ class NativeAdExecutor(
         var projection: NativeUIProjection? = null,
         var projectionIdentity: JSObject? = null,
         var projectionVisible: Boolean = true,
+        var deferredPlacement: JSONObject? = null,
 
     )
 
@@ -182,6 +183,7 @@ class NativeAdExecutor(
         }
         val hiding = mutableListOf<NativeUIProjection>()
         states.filter { it.value.feedId == feedId && it.key !in shown }.values.forEach {
+            it.deferredPlacement = null
             it.clippingContainer.visibility = View.GONE
             if (it.projectionVisible || complete != null) it.projection?.let(hiding::add)
             if (it.projectionVisible) {
@@ -292,8 +294,13 @@ class NativeAdExecutor(
                         ),
                         failedFallback = NativeUIProjection.FailedFallback.NATIVE,
                         captureMode = NativeUIProjection.CaptureMode.VIEW,
+                        beforeNativeReveal = {
+                            val placement = state.deferredPlacement
+                            state.deferredPlacement = null
+                            if (states[stateKey] === state && placement != null) applyPlacement(feedId, placement, defer = false)
+                        },
                         canCapture = { states[stateKey] === state && state.isTesting && state.opaqueBackground &&
-                            nativeAd.mediaContent?.hasVideoContent() != true },
+                            nativeAd.mediaContent?.hasVideoContent() != true && isSnapshotSizeSupported(adView.width, adView.height) },
                         view = { if (states[stateKey] === state) adView else null }
                     )
                 }.onFailure { android.util.Log.w("AdMob", "Native ad projection unavailable; retaining native tracking", it) }.getOrNull()
@@ -355,7 +362,7 @@ class NativeAdExecutor(
         }
     }
 
-    private fun applyPlacement(expectedFeedId: String, placement: JSONObject): String? {
+    private fun applyPlacement(expectedFeedId: String, placement: JSONObject, defer: Boolean = true): String? {
         val density = contextSupplier.get().resources.displayMetrics.density
         val value = NativeAdPlacementValue.parse(expectedFeedId, placement, density) ?: return null
         val state = states[stateKey(value.feedId, value.slotKey)] ?: return null
@@ -363,6 +370,14 @@ class NativeAdExecutor(
         val minimumWidth = (if (state.isSmall) 120 else 144) * density
         val minimumHeight = (if (state.isSmall) 120 else 300) * density
         if (value.rectWidth < minimumWidth.roundToInt() || value.rectHeight < minimumHeight.roundToInt()) return null
+
+        if (defer && state.projection?.isProjecting == true &&
+            state.adView.width == value.rectWidth && state.adView.height == value.rectHeight) {
+            state.deferredPlacement = JSONObject(placement.toString())
+            state.generation = value.generation
+            return stateKey(value.feedId, value.slotKey)
+        }
+        state.deferredPlacement = null
 
         if (!state.isSmall) {
             val adView = state.adView
@@ -429,8 +444,7 @@ class NativeAdExecutor(
                 return@runOnUiThread
             }
             val view = state.adView
-            if (!view.isShown || view.isLayoutRequested || view.width <= 0 || view.height <= 0 ||
-                view.width.toLong() * view.height > 2_000_000) {
+            if (!view.isShown || view.isLayoutRequested || !isSnapshotSizeSupported(view.width, view.height)) {
                 call.reject("Native ad is not ready for a bounded snapshot")
                 return@runOnUiThread
             }
@@ -569,5 +583,7 @@ class NativeAdExecutor(
     companion object {
         const val NATIVE_TESTER_ID = "ca-app-pub-3940256099942544/2247696110"
         private const val MAX_ADS_PER_FEED = 3
+        internal fun isSnapshotSizeSupported(width: Int, height: Int): Boolean =
+            width > 0 && height > 0 && width.toLong() * height <= 2_000_000
     }
 }

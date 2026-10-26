@@ -1,0 +1,44 @@
+{
+  "engineCommit": "1523547",
+  "localMavenVersion": "2.0.3-admob.13",
+  "finalApkSha256": "ab183bc80f6aefd3551f877dc944f917464b2d842cd4669e9f448484f9ca737c",
+  "finalBuildRuns": ["verified4", "verified-stress"],
+  "placementDeferralBeforePixelGuardRuns": ["verified1", "verified2", "verified3"],
+  "runs": [
+    {
+      "name": "verified1",
+      "frames": 222,
+      "eligible": 209,
+      "minimumPixels": 415,
+      "blankRuns": []
+    },
+    {
+      "name": "verified2",
+      "frames": 220,
+      "eligible": 210,
+      "minimumPixels": 401,
+      "blankRuns": []
+    },
+    {
+      "name": "verified3",
+      "frames": 218,
+      "eligible": 206,
+      "minimumPixels": 749,
+      "blankRuns": []
+    },
+    {
+      "name": "verified4",
+      "frames": 204,
+      "eligible": 204,
+      "minimumPixels": 1312,
+      "blankRuns": []
+    },
+    {
+      "name": "verified-stress",
+      "frames": 22,
+      "eligible": 22,
+      "minimumPixels": 5372,
+      "blankRuns": []
+    }
+  ]
+}
