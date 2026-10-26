@@ -281,6 +281,11 @@ public class AdMob extends Plugin {
         nativeAdExecutor.captureSnapshot(call);
     }
 
+    @PluginMethod
+    public void prepareNativeAdSnapshot(final PluginCall call) {
+        nativeAdExecutor.prepareSnapshot(call);
+    }
+
     // ---------------------------------------------------------
     // INTERSTITIAL ADS
     // ---------------------------------------------------------

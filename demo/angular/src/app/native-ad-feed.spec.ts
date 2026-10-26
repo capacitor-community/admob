@@ -2,6 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const bridge = {
+  prepareNativeAdSnapshot: vi.fn().mockResolvedValue(undefined),
   captureNativeAdSnapshot: vi.fn().mockResolvedValue({ dataUrl: 'data:image/png;base64,AA==' }),
   startNativeAdFeed: vi.fn().mockResolvedValue(undefined),
   destroyNativeAdFeed: vi.fn().mockResolvedValue(undefined),
@@ -679,6 +680,7 @@ describe('NativeAdFeed', () => {
         configurable: true,
         value: vi.fn().mockResolvedValue(undefined),
       });
+      bridge.prepareNativeAdSnapshot.mockReset().mockResolvedValue(undefined);
       bridge.captureNativeAdSnapshot.mockReset().mockResolvedValue({ dataUrl: 'data:image/png;base64,AA==' });
       const feed = await NativeAdFeed.create({ feedId: 'snapshot-test', isTesting: true, androidScrollSnapshot: true });
       createdFeeds.push(feed);
@@ -689,17 +691,17 @@ describe('NativeAdFeed', () => {
       return { feed, element };
     };
 
-    it('prepares a hidden image, swaps during scrolling, and restores the native view after settling', async () => {
+    it('keeps a drawn underlay before scrolling and after native restoration', async () => {
       const { element } = await setup();
       const image = element.querySelector('img')!;
       expect(image).not.toBeNull();
-      expect(image.hidden).toBe(true);
+      expect(image.hidden).toBe(false);
       document.dispatchEvent(new Event('scroll'));
       await vi.advanceTimersByTimeAsync(20);
       expect(image.hidden).toBe(false);
       expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([]);
       await settle();
-      expect(image.hidden).toBe(true);
+      expect(image.hidden).toBe(false);
       expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
     });
 
@@ -769,7 +771,7 @@ describe('NativeAdFeed', () => {
       expect(element.querySelector('img')!.hidden).toBe(false);
       expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([]);
       await settle();
-      expect(element.querySelector('img')!.hidden).toBe(true);
+      expect(element.querySelector('img')!.hidden).toBe(false);
     });
 
     it.each([false, true])('keeps fallback placement updates frame-batched (mixed proxies: %s)', async (mixed) => {
@@ -817,10 +819,147 @@ describe('NativeAdFeed', () => {
       const image = element.querySelector('img')!;
       expect(image.style.left).toBe('-4px');
       expect(image.style.top).toBe('-6px');
-      expect(image.style.width).toBe('300px');
-      expect(image.style.height).toBe('320px');
+      expect(image.style.width).toBe('calc(100% + 4px)');
+      expect(image.style.height).toBe('calc(100% + 6px)');
       expect(image.style.maxWidth).toBe('none');
       expect(image.style.boxSizing).toBe('border-box');
+    });
+
+    it('reuses the same image through repeated scrolls and layout invalidation', async () => {
+      const { feed, element } = await setup();
+      const image = element.querySelector('img');
+      const calls = bridge.captureNativeAdSnapshot.mock.calls.length;
+      for (let i = 0; i < 3; i++) {
+        document.dispatchEvent(new Event('scroll'));
+        await vi.advanceTimersByTimeAsync(600);
+        await feed.invalidateLayout();
+        expect(element.querySelector('img')).toBe(image);
+        await vi.advanceTimersByTimeAsync(600);
+      }
+      expect(bridge.captureNativeAdSnapshot).toHaveBeenCalledTimes(calls);
+    });
+
+    it('captures a new image when the ad is reloaded', async () => {
+      const { feed, element } = await setup();
+      const image = element.querySelector('img');
+      bridge.captureNativeAdSnapshot.mockClear();
+      await feed.reload('slot');
+      expect(image?.isConnected).toBe(false);
+      await vi.advanceTimersByTimeAsync(600);
+      expect(bridge.captureNativeAdSnapshot).toHaveBeenCalledTimes(1);
+      expect(element.querySelector('img')).not.toBe(image);
+    });
+
+    it('keeps tracking native while the visual fence is pending and rejects a stale fence', async () => {
+      const { feed, element } = await setup();
+      await feed.pause();
+      let ready!: () => void;
+      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            ready = resolve;
+          }),
+      );
+      feed.resume();
+      await vi.advanceTimersByTimeAsync(600);
+      expect(ready).toBeDefined();
+      document.dispatchEvent(new Event('scroll'));
+      await vi.advanceTimersByTimeAsync(20);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
+      ready();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(element.querySelector('img')).toBeNull();
+    });
+
+    it.each(['pause', 'destroy'] as const)('removes pending images on %s', async (action) => {
+      const { feed, element } = await setup();
+      await feed.pause();
+      let ready!: () => void;
+      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            ready = resolve;
+          }),
+      );
+      feed.resume();
+      await vi.advanceTimersByTimeAsync(600);
+      expect(element.querySelector('img')).not.toBeNull();
+      await feed[action]();
+      ready();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(element.querySelector('img')).toBeNull();
+    });
+
+    it('preserves the old image until a resized replacement passes its fence', async () => {
+      const { feed, element } = await setup();
+      const old = element.querySelector('img');
+      const rect = element.getBoundingClientRect();
+      vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockReturnValue({ ...rect, width: 320, right: 330 });
+      let ready!: () => void;
+      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            ready = resolve;
+          }),
+      );
+      await feed.invalidateLayout();
+      await vi.advanceTimersByTimeAsync(600);
+      expect(old?.isConnected).toBe(true);
+      expect(element.querySelectorAll('img')).toHaveLength(2);
+      ready();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(old?.isConnected).toBe(false);
+      expect(element.querySelectorAll('img')).toHaveLength(1);
+    });
+
+    it('keeps native visible when layout changes before the first fence completes', async () => {
+      const { feed, element } = await setup();
+      await feed.pause();
+      let ready!: () => void;
+      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            ready = resolve;
+          }),
+      );
+      feed.resume();
+      await vi.advanceTimersByTimeAsync(600);
+      await feed.invalidateLayout();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
+      ready();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(element.querySelector('img')).toBeNull();
+    });
+
+    it('still prepares an image after three motion cancellations', async () => {
+      const { feed, element } = await setup();
+      await feed.pause();
+      for (let i = 0; i < 3; i++) {
+        let ready!: () => void;
+        bridge.prepareNativeAdSnapshot.mockImplementationOnce(
+          () =>
+            new Promise<void>((resolve) => {
+              ready = resolve;
+            }),
+        );
+        if (i === 0) feed.resume();
+        await vi.advanceTimersByTimeAsync(1200);
+        expect(ready).toBeDefined();
+        document.dispatchEvent(new Event('scroll'));
+        ready();
+        await vi.advanceTimersByTimeAsync(1);
+      }
+      await vi.advanceTimersByTimeAsync(1500);
+      expect(element.querySelector('img')).not.toBeNull();
+    });
+
+    it('bounds retries for unavailable snapshots', async () => {
+      const { feed } = await setup();
+      await feed.pause();
+      bridge.captureNativeAdSnapshot.mockReset().mockRejectedValue(new Error('video'));
+      feed.resume();
+      await vi.advanceTimersByTimeAsync(10000);
+      expect(bridge.captureNativeAdSnapshot).toHaveBeenCalledTimes(3);
     });
 
     it('rejects production ads for this experiment', async () => {

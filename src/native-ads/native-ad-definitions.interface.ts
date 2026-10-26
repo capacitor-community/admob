@@ -15,6 +15,9 @@ export interface NativeAdDefinitions {
   /** Android-only test-ad snapshot; does not change native visibility. */
   captureNativeAdSnapshot?(options: NativeAdCommandIdentity): Promise<{ dataUrl: string }>;
 
+  /** Android-only: confirm that the appended image is ready for the next WebView draw. */
+  prepareNativeAdSnapshot?(options: NativeAdCommandIdentity): Promise<void>;
+
   addListener(
     eventName: NativeAdPluginEvents,
     listenerFunc: (info: (NativeAdEvent | NativeAdErrorEvent | NativeAdRevenueEvent) & NativeAdFeedSession) => void,

@@ -166,34 +166,76 @@ Set `androidScrollSnapshot: true` together with `isTesting: true` in
 `NativeAdFeed.create()` on Android. The demo enables this option at
 `/native?snapshot`; `/native` retains the normal overlay implementation.
 
-After layout settles, the plugin captures the native view into a PNG and decodes
-it in advance in the HTML slot. On `scroll`, `touchmove`, or `wheel`, the feed shows
-that image and hides the corresponding native overlay through the placement
-channel. The image scrolls and clips with the DOM. After 120 ms without motion,
-the feed restores native placements and hides the image after acknowledgement.
-It refreshes snapshots after another 300 ms at rest. Pause, layout invalidation,
-detach, reload, and destruction discard the images; stale asynchronous results
-cannot reattach them. No clicks or impressions are synthesized for the image.
+After layout settles and the loaded ad has been positioned, capture is scheduled
+with a minimum 50 ms delay. This is an idle scheduling allowance, not a rendering
+deadline. PNG encoding runs off the UI thread. The decoded image is inserted as a
+persistent DOM underlay, and Android's `WebView.postVisualStateCallback` confirms
+that the insertion is ready for the next WebView draw before it becomes eligible
+to replace the native view. The callback is not a display-presentation fence.
+
+On `scroll`, `touchmove`, or `wheel`, an eligible image replaces its native overlay
+through the placement channel and scrolls with the DOM. After 120 ms without
+motion, native placements return over the underlay. The image remains drawn so
+native acknowledgement does not expose an empty slot before native rendering.
+If no prepared image exists, the native view continues tracking.
+
+The same image is reused until the ad is reloaded or its slot size changes.
+Reload discards the old creative and schedules a new capture after load and
+placement complete. Size changes retain the previous underlay until a new image
+passes readiness. Pause, detach, and destruction discard both active and pending
+images; stale asynchronous results cannot reattach them. Each ad/size gets at most
+three failed attempts, spaced at least one second apart. Motion cancellation does
+not consume that retry budget. Native capture permits only one bitmap/encoder at
+a time across feeds, bounded to two million pixels (8 MB of raw RGBA pixels).
+Decoded WebView images, PNG/base64 transfer and temporary replacement buffers add
+memory beyond this bitmap bound. No clicks or impressions are synthesized.
 
 This is a visual experiment, not a production ad rendering mode. Native views
-still handle interactions at rest. The Android bridge rejects snapshot requests
-for production ads and video creatives. Missing, failed, oversized (over two
-million pixels), or not-yet-ready captures retain native tracking. Newly visible
-ads may therefore use the original tracking path until they have settled once.
-The initial hide and final restore still cross the native/Web boundary, so this
-mode does not promise a frame-perfect handoff. A cached image can also precede
-later changes to SDK overlays. Gestures starting on the native ad, video,
-accessibility, physical-device performance, and production-policy suitability
-remain outside the validated scope.
+still handle interactions at rest. Production ads, video creatives and translucent
+backgrounds retain native tracking. Missing, failed, oversized or not-yet-ready
+captures also retain native tracking. A cached image can precede later changes to
+SDK overlays within the same creative; ad reloads explicitly invalidate the cache.
+Corner antialiasing and later SDK drawing can still produce appearance differences.
+Gestures starting on the native ad, accessibility, physical-device performance,
+and production-policy suitability remain outside the validated scope.
 
 Google's native display integration expects registered `NativeAdView` assets and
 SDK-managed clicks: <https://developers.google.com/admob/android/native/advanced>.
 Do not replace that with JavaScript click forwarding.
 
-Local verification on 2026-10-26: Android 16 / API 36 emulator, Medium Google
-static test ads, two slots, upward and downward swipes starting in the page
-margin. All 178 sampled animation frames with the image visible had a 0 CSS px
-vertical difference between the image and its HTML slot; both images were hidden
-again after settling. This measures DOM alignment during the image phase, not
-native handoff latency or dropped frames. Android unit tests (80) and the demo's
-Web tests (45) passed.
+The earlier 178-frame DOM-alignment check measured image/slot alignment only;
+it did not detect native/Web handoff flashes. Subsequent screen recordings on
+Android 16 / API 36 found blank handoff intervals even when image decoding had
+completed before scrolling. See the measurement notes below for the updated
+handoff verification; this experiment does not promise a frame-perfect handoff
+on every device.
+
+Follow-up verification on 2026-10-26, Android 16 / API 36.1 emulator, two Medium
+static test ads:
+
+| Measurement | Earlier handoff | Persistent prepared underlay |
+| --- | --- | --- |
+| Six margin swipes (350/800/1500 ms, both directions) | 5 blank intervals, 51–625 ms | 0 detected in 113 recorded frames |
+| Four handoffs with 450 ms JavaScript blocking | 4 blank intervals, 446–577 ms | 0 detected in 9 recorded frames |
+| Captures during two swipes and subsequent settling | 3 | 0 |
+
+Frame analysis used actual recording timestamps and the first creative's visible
+logo region, excluding the second ad and SDK validator popups. Screenrecord is
+variable-rate; these counts are not display-refresh counts or a guarantee that
+sub-frame flashes cannot occur. Handoff position discontinuities remain a separate
+concern from blank intervals.
+
+Updated capture samples: UI draw CPU 6.3–8.6 ms, PNG/base64 worker CPU 48.4–59.4 ms,
+raw bitmap 3,346,560 bytes, PNG 161–195 KB. Successfully retained images decoded in
+6.8–16.1 ms; native visual readiness acknowledged DOM insertion in 8.2–19.2 ms.
+One reload completed load at 19,770 ms, began capture at 20,177 ms and passed visual
+readiness at 20,389 ms: the 50 ms scheduling minimum does not imply 50 ms end-to-end
+readiness under layout/bridge contention. Reload replaced only the changed slot's
+image; the other slot's cache survived.
+
+App-process PSS snapshots were 186.9 MiB before the updated scroll trial and
+185.2 MiB after reload (baseline 172.3/163.4 MiB). These single-run samples include
+SDK/startup variability and exclude separate WebView renderer memory; they do not
+establish a memory saving or measure peak allocation. Keeping decoded underlays
+trades retained memory for fewer encodes. Android unit tests (80) and Web regression
+tests cover lifecycle cleanup, readiness, reuse, resizing, reload and bounded retry.
