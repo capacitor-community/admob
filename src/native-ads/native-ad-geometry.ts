@@ -1,4 +1,5 @@
 import { getUnprojectedVisibility } from '@rdlabo/capacitor-native-ui-engine';
+
 import type { NativeAdPlacementBatch, NativeAdRect } from './native-ad-placement.interface';
 
 export interface MeasuredNativeAdSlot {

@@ -59,7 +59,9 @@ class NativeAdExecutor(
         var projectionVisible: Boolean = true,
         var deferredPlacement: JSONObject? = null,
 
-    )
+    ) {
+        var placementSequence: Long = -1
+    }
 
     private data class PendingLoad(
         val call: PluginCall,
@@ -172,17 +174,35 @@ class NativeAdExecutor(
         val feedId = batch.optString("feedId")
         val sessionId = batch.optString("sessionId")
         if (!isCurrentSession(feedId, sessionId) || !feedSessions.accepts(feedId, batch.optLong("sequence", -1L))) { complete?.invoke(true); return }
+        val sequence = batch.optLong("sequence", -1L)
+        val eligible = states.filter { it.value.feedId == feedId && it.value.placementSequence < sequence }.keys.toSet()
         val shown = mutableSetOf<String>()
+        val retained = mutableSetOf<String>()
         val placements = batch.optJSONArray("placements") ?: JSArray()
         repeat(placements.length()) { index ->
             try {
-                applyPlacement(feedId, placements.getJSONObject(index))?.let { shown.add(it) }
+                val placement = placements.getJSONObject(index)
+                val key = stateKey(feedId, placement.optString("slotKey"))
+                if (key in eligible) {
+                    if (placement.optBoolean("retain", false)) {
+                        val state = states[key]
+                        if (state != null && placement.optString("feedId") == feedId &&
+                            placement.optInt("generation", -1) == state.generation && placement.optBoolean("visible", false) &&
+                            state.projectionVisible && state.clippingContainer.visibility == View.VISIBLE) {
+                            shown.add(key)
+                            retained.add(key)
+                        }
+                    } else applyPlacement(feedId, placement)?.let { shown.add(it) }
+                }
             } catch (_: JSONException) {
                 // Invalid entries fail closed below.
             }
         }
         val hiding = mutableListOf<NativeUIProjection>()
-        states.filter { it.value.feedId == feedId && it.key !in shown }.values.forEach {
+        // Retain carries no new geometry. A delayed retain must not supersede
+        // the final position arriving independently through the Engine channel.
+        (eligible - retained).forEach { states[it]?.placementSequence = sequence }
+        states.filter { it.key in eligible && it.key !in shown }.values.forEach {
             it.deferredPlacement = null
             it.clippingContainer.visibility = View.GONE
             if (it.projectionVisible || complete != null) it.projection?.let(hiding::add)
@@ -294,6 +314,25 @@ class NativeAdExecutor(
                         ),
                         failedFallback = NativeUIProjection.FailedFallback.NATIVE,
                         captureMode = NativeUIProjection.CaptureMode.VIEW,
+                        updatePlacement = { placement ->
+                            check(states[stateKey] === state && isCurrentSession(feedId, sessionId)) { "Native ad owner changed" }
+                            check(placement.optString("feedId") == feedId && placement.optString("sessionId") == sessionId &&
+                                placement.optString("slotKey") == slotKey) { "Native ad placement identity changed" }
+                            check(placement.optInt("generation", -1) >= state.generation &&
+                                placement.optLong("sequence", -1L) > state.placementSequence && state.projectionVisible) {
+                                "Native ad placement is stale or hidden"
+                            }
+                            if (!placement.optBoolean("visible", false)) {
+                                state.placementSequence = placement.optLong("sequence")
+                                state.deferredPlacement = null
+                                state.clippingContainer.visibility = View.GONE
+                                state.projectionVisible = false
+                                state.projection?.hide()
+                                error("Native ad placement is not visible")
+                            }
+                            check(applyPlacement(feedId, placement, defer = false) == stateKey) { "Native ad placement is invalid" }
+                            state.placementSequence = placement.optLong("sequence")
+                        },
                         beforeNativeReveal = {
                             val placement = state.deferredPlacement
                             state.deferredPlacement = null

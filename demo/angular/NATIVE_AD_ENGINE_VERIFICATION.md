@@ -1,155 +1,178 @@
 # NativeAdFeed Engine migration verification
 
-This migration is **draft / release-gated**. Published Engine 2.0.3 does not contain
-the APIs used here. Before merging, release [Engine PR #333](https://github.com/rdlabo-dev/ionic-theme-ios27/pull/333)
-and update both npm/lockfile and the default Android Maven version to that release.
-Local builds used the linked checkout and Maven artifact `2.0.3-admob.13`; neither
-that artifact nor its local path is a distributable dependency.
+This migration remains **draft / release-gated**. Published Engine 2.0.3 does not
+contain these APIs. Release [Engine #333](https://github.com/rdlabo-dev/ionic-theme-ios27/pull/333),
+then pin the matching npm/lockfile and default Android Maven version and verify a
+clean install without local overrides. Local verification used the npm-linked Engine
+checkout at `0fa8be2` and Maven `2.0.3-admob.17`. No package was published or PR merged.
 
-## Scope and handoff design
+## Implementation and multiple ads
 
 Only Android NativeAdFeed's opt-in `androidScrollSnapshot` path moves to the Engine.
-The ad plugin still owns SDK loading, impression/click handling, placement, and
-capture eligibility (test ads, opaque background, no video, at most 2,000,000 pixels). iOS is not migrated.
-The existing low-level snapshot APIs remain compatible. This uses ordinary Ionic
-scrolling; no virtual scroller was introduced.
+AdMob retains SDK loading, impression/click handling, placement, and test-ad/opaque/
+no-video/2M-pixel capture eligibility. This is ordinary Ionic scrolling, not virtual
+scrolling. AdMob iOS and the low-level snapshot APIs remain compatible.
 
-- A stable per-slot selector survives detach/reattach; replacing an ad closes its old registration.
-- `failedFallback: native` keeps a real ad when a prepared image is unavailable.
-- `CaptureMode.VIEW` captures only the ad, excluding toolbars/adjacent pixels and padding.
-- The Engine prepaints an opaque DOM image below the native ad. It waits for WebView
-  visual readiness and a draw before hiding native. VIEW uses no native entry/return
-  image copies, avoiding their independent positioning during partial scrolling.
-- Content/size changes invalidate preparation; position-only scrolling reuses the PNG
-  and decoded image. Native bitmaps are recycled after encoding. No polling capture timer
-  or fixed 500 ms load delay is needed; eligibility and actual image readiness govern handoff.
-- Late cover callbacks check generation, ownership, visibility and eligibility before hiding.
-- Pause completion waits for both native pixels and the DOM underlay to retire.
-- Placement distinguishes Engine-owned hidden DOM from application `visibility: hidden`,
-  including inherited visibility, and synchronously restores Engine markers before painting.
+- Each ad has its own stable host selector, native registration, image token, content
+  revision, placement binding and sequence. Updating, detaching or failing capture
+  for one ad does not retire another ad's image.
+- `CaptureMode.VIEW` captures only the ad. An opaque image is prepainted below native;
+  WebView visual readiness and a draw fence precede native hiding. Native draw ACK
+  precedes normal image retirement. No independent native entry/return copies are used.
+- AdMob stops measuring a host only after the cover ACK confirms that native is hidden.
+  An unavailable image retains ordinary native tracking (`failedFallback: native`).
+- When another ad still needs updates, the batch keeps the covered slot using a
+  `retain` marker with **no rect or clipRect**. Native does not change that slot's
+  geometry, deferred placement or placement sequence. Omission would hide it, so a
+  covered slot is not simply removed from a full placement batch.
+- Return measures the returning ad once and includes its latest placement in the
+  existing Engine restore request. The native callback validates feed/session/slot,
+  generation, sequence, image token and View identity, then applies placement before
+  reveal. It does not require another bridge round trip. Explicit placement is
+  authoritative: the Engine must not overwrite it using an older image anchor.
+- Full-coordinate deduplication stays separate from retain serialization. Resize,
+  author visibility, pause and explicit invalidation send real new placement/hide
+  data. Per-slot sequencing rejects an older batch without dropping updates to other ads.
+- Session ownership and presentation generations reject old cover/resume ACKs. A new
+  gesture cannot let an earlier resume ACK retire its image. Intermediate `begin()`
+  wakeups cannot send an unnecessary native reveal between two image presentations.
+- A failed handoff clears projection ownership, invalidates optimistic placement
+  caches and schedules normal placement reconciliation. Old sessions cannot clear
+  the new session's binding.
+- Size/content changes and ad replacement recapture; position-only scrolling reuses
+  the PNG and decoded image. Native VIEW Bitmaps are recycled after encoding. No
+  periodic recapture timer or fixed 500 ms load delay is introduced.
+- The window's current touch state survives initial connection/reset, preventing
+  capture while a finger was already down before a new registration connected.
 
-## Reproduction
+## Final visual and lifecycle results
 
-Use an isolated emulator with test ads. Install/link the reviewed Engine checkout into
-the plugin without changing the lockfile, build its runtime, and publish a uniquely
-versioned local Maven verification artifact. The demo keeps minSdk 23.
+Android API 36.1 ARM64, Google test ads, final linked/Maven build:
+
+| Scenario                                                   |    Inspected media samples | Blank candidates |
+| ---------------------------------------------------------- | -------------------------: | ---------------: |
+| Eight ordinary gestures, three speeds and partial clipping | 203 of 209 recorded frames |                0 |
+| JavaScript blocked for 450/900/450/900 ms                  |   22 of 22 recorded frames |                0 |
+| Two ads together, four gestures: first ad                  |        70 ad-frame samples |                0 |
+| Two ads together, four gestures: second ad                 |        68 ad-frame samples |                0 |
+
+Normal-run pause occurred during image display and completed with zero visible image
+proxies. Position-only gestures created zero new PNGs. Reload produced three newly
+decoded resources. Moving-region analysis masks SDK validator popups; contact sheets
+were inspected. These variable-frame-rate recordings are sampled evidence, not a
+proof that every physical frame/device is flash-free. Ad-frame samples from two ads
+are not counted as separate physical display frames.
+
+The multiple-ad run confirmed eight cover/restore cycles (four per ad), with no bridge
+errors. For a controlled mixed case the harness returned capture-unavailable for the
+second ad: the first stayed projected and the second used native tracking. All 22
+mixed batches retained the first ad without geometry. Reloading or detaching the first
+ad left the second projected; pausing the feed cleared both. The harness uses private
+Feed state and explicit capture fault injection only for verification.
+
+The two-ad lifecycle run's process PSS was 184,507 KiB before gestures and 208,111 KiB
+after reload/detach/pause. This includes SDK activity and changing creatives; it is not
+an isolated Engine memory allocation or a leak/no-leak conclusion. The matched static
+creative comparison below is the controlled performance measurement.
+
+Intermediate recordings (`multi-handoff1` and `handoff-final`, earlier local artifacts)
+showed misplaced/duplicated native pixels around return. They are **not** final passing
+evidence. Regression tests reproduced old image-anchor correction overwriting a newer
+placement and an old resume ACK retiring a newer presentation. Both were fixed before
+these final recordings (`retain-final`, `retain-stress-final`, `multi-retain-final`).
+
+## Matched performance comparison
+
+One static Flood-It ad, matching RGBA creative (MAE <0.5/255), identical slot geometry,
+six 800 ms swipes with 700 ms pauses; Wi-Fi disabled after loading; 10 s warmup, idle
+and cooldown windows. The original PR #487 APK (`12e9b393`) and the final migration
+APK were alternated for three accepted runs each. No recording, build or tests ran
+concurrently with timing. Profiling and counters were collected in a separate two-swipe
+window. CPU is host-process time from `/proc`; WebView time is CDP thread TaskDuration.
+
+| Three-run median                 |     PR #487 | Final migration |
+| -------------------------------- | ----------: | --------------: |
+| Motion window                    |    9,477 ms |        9,479 ms |
+| Host process CPU                 |    2,120 ms |        2,370 ms |
+| WebView main-thread TaskDuration |      118 ms |          164 ms |
+| Host PSS after motion            | 183,978 KiB |     181,658 KiB |
+
+Host CPU remains higher in this workload: +250 ms (11.8% of baseline process CPU),
+with ranges 2,030–2,190 ms versus 2,170–2,580 ms. WebView main-thread time is +46 ms
+at the median. PSS ranges overlap: 181,909–186,391 versus 173,758–193,851 KiB. No host
+CPU improvement or memory reduction is claimed. These are comparisons of the tested
+APKs, not attribution of every CPU millisecond to a single function.
+
+Separate two-swipe counters: old PR sent 2 direct placement messages; the final
+migration sent 2–3 direct messages **plus 2 placements piggybacked on restore**.
+The 14 Engine lifecycle messages include those restore requests; they are not another
+14 coordinate payloads. The direct messages can precede the cover ACK while native
+still owns the pixels. During confirmed image ownership, continuous AdMob geometry
+measurement/sending is suppressed. Mixed batches use geometry-free retain markers.
+The previous migration's 58–68 direct messages are historical pre-handoff counts.
+
+The final Engine still performs Web geometry/lifecycle work: 66–76 bounding-rect calls
+and 247–278 computed-style calls versus 42 and 104 in the old PR's separate profiling
+window. Eliminating continuous native placement transport does not eliminate all
+Engine overhead. Accepted creative MAE ranged below 0.359/255 (threshold 0.5/255).
+
+The earlier uncontrolled multi-ad 54% attribution remains withdrawn. Historical
+pre-handoff measurements are retained in `native-ad-engine-benchmark-results.json`;
+they are superseded for the current implementation by the return results linked below.
+This small emulator sample does not establish performance parity or a universal
+physical-device percentage, and process PSS alone does not establish memory improvement.
+
+## Validation and review
+
+- Engine browser suite: 79 passed; build/typecheck/formatting passed.
+- Engine Android: 16 instrumentation tests passed with the API 23-only test skipped
+  on API 36.1; lint passed. The dedicated API 23 fallback test passed separately.
+- AdMob: root/demo/APK builds and ESLint passed; Web suite 47 passed (Feed spec 37);
+  Android unit suite 84 passed.
+- Manager and independent reviewer completed fix/re-review cycles, covering touch
+  reset, mixed ads, per-slot sequencing, visibility/invalidation, failed handoff,
+  old-session ACKs, rapid scroll restart, explicit native placement, and legacy callers.
+- Engine CI on `0fa8be2`: Android integration, Swift, browser, package, lint/format,
+  repository tests and CodeQL all passed. AdMob #488 is stacked
+  on #487 and has no automatic check suite for that base; local results are listed here.
+
+The AdMob demo cannot start on API 23 because Capacitor references
+`android.webkit.ServiceWorkerController` (API 24). The original #487 APK reproduces
+the same crash. Only the Engine's native fallback test is claimed on API 23.
+
+## Reproduction and artifacts
+
+Build/link the Engine checkout, build its injected runtime and publish a uniquely
+versioned local verification Maven artifact. Then build AdMob and its demo:
 
 ```sh
-# In the Engine package
-npm run build
-# Android verification publication is configured in the Engine Android Gradle project.
-
-# In this plugin, after installing dependencies
-npm install --no-save --package-lock=false /path/to/engine/packages/capacitor-native-ui-engine
 npm run build
 cd demo/angular
 npm run build
 npx cap sync android
 cd android
-./gradlew -PnativeUIEngineVersion=2.0.3-admob.13 \
-  -PnativeUIEngineRepository=/path/to/engine/packages/capacitor-native-ui-engine/android/build/maven \
-  assembleDebug
-
-# From demo/angular (Node 22+, adb, ffmpeg/ffprobe and Python 3 required)
-ANDROID_SERIAL=emulator-5580 PROOF_DIR=/tmp/admob-native-proof \
-  node tools/native-ad-engine-proof.cjs trial1 android/app/build/outputs/apk/debug/app-debug.apk
-PROOF_DIR=/tmp/admob-native-proof python3 tools/analyze-native-ad-proof.py trial1
+./gradlew -PnativeUIEngineVersion=2.0.3-admob.17 \
+  -PnativeUIEngineRepository=/path/to/engine/android/build/maven assembleDebug
 ```
 
-The runner records eight gestures across three speeds, including partial viewport
-clipping, then checks pause during image display and ad reload. It fixes the diagnostic
-list height to avoid unrelated text layout changes. A marker follows the ad so analysis
-uses moving geometry; the validator popup is masked. Inspect flagged frames manually.
-Screen recordings have variable frame rate: zero detected blanks is evidence for these
-recorded frames, not proof that every physical display frame is flash-free.
+From `demo/angular`, with Node 22+, adb, ffmpeg/ffprobe and Python 3:
 
-## Final performance comparison
+```sh
+ANDROID_SERIAL=emulator-5580 PROOF_DIR=/tmp/admob-native-proof \
+  node tools/native-ad-engine-proof.cjs normal android/app/build/outputs/apk/debug/app-debug.apk
+PROOF_DIR=/tmp/admob-native-proof python3 tools/analyze-native-ad-proof.py normal
+ANDROID_SERIAL=emulator-5580 PROOF_DIR=/tmp/admob-native-proof \
+  node tools/native-ad-engine-multi-proof.cjs multi android/app/build/outputs/apk/debug/app-debug.apk
+PROOF_DIR=/tmp/admob-native-proof python3 tools/analyze-native-ad-multi-proof.py multi
+```
 
-The earlier multi-ad runs did not hold creatives/SDK activity constant. Their reported
-54% migration-regression attribution was withdrawn; those runs are not the final
-performance comparison.
+Use `tools/native-ad-engine-benchmark.cjs NAME APK` with the same environment variables
+for the matched comparison; its first run saves the creative reference and later runs
+reject mismatching creatives. Multi-ad markers turn gray before deliberate reload/
+detach/pause so those lifecycle gaps are excluded from normal-scroll blank analysis.
 
-The final comparison used API 36.1 ARM64, one static Flood-It test ad, identical slot
-geometry, six 800 ms swipes with 700 ms pauses, and no screen recording during timing.
-Other ad states were removed. The native ad image was compared against the baseline
-RGBA capture (mean absolute channel difference below 0.5/255; actual maximum across
-accepted runs below 0.0873/255). Different creatives were rejected and reloaded. Wi-Fi was
-disabled after loading; each run had a 10 s warmup, a 10 s idle window, the motion window,
-and a 10 s cooldown. Old and final APKs were run alternately, three accepted runs each.
-CPU sampling/profiling and bridge counters ran separately after the timing windows.
-After these measurements, the final eligibility-only fix restored AdMob's old 2M-pixel
-limit (Engine's generic limit is 8M). The benchmark ad was 996 × 840 = 836,640 pixels,
-so it remains eligible; final-build visual/lifecycle smoke verification was repeated.
+- [Current visual/lifecycle summary](tools/native-ad-engine-return-visual-results.json)
+- [Current accepted performance trials](tools/native-ad-engine-return-benchmark-results.json)
+- Raw recordings, captures, CDP traces and profiles: `/private/tmp/admob-final-proof`.
 
-| Metric (three-trial median)      |     PR #487 | Final migration |
-| -------------------------------- | ----------: | --------------: |
-| Motion window                    |    9,546 ms |        9,534 ms |
-| Host process CPU time            |    2,130 ms |        2,350 ms |
-| WebView main-thread TaskDuration |      122 ms |          207 ms |
-| Host PSS after gestures          | 186,811 KiB |     183,747 KiB |
-
-The final implementation still has higher CPU cost in this controlled emulator workload:
-+220 ms host CPU (about 10.3% of baseline CPU time) and +85 ms WebView main-thread time.
-Host CPU ranges were 2,120–2,240 ms versus 2,200–2,380 ms; they overlap. PSS ranges also
-overlap (179,649–199,378 versus 178,592–189,101 KiB), so no memory improvement is claimed.
-These small-sample emulator results do not establish a universal device-wide percentage.
-
-Code inspection and separate two-swipe counter runs identified a concrete migration
-change: the old Feed excluded snapshot-covered ads from native placement batches;
-the migrated Feed continues geometry calculation and sending placements during image
-presentation. Baseline sent 2 direct placement messages; final runs sent 58–68.
-The Engine additionally sent 14 handoff/lifecycle messages per counter run. This
-explains added work, but is not a measured attribution of every CPU millisecond.
-
-The final fix defers same-size native coordinate/clip application while VIEW projection
-owns the image, retaining only the latest validated placement. `beforeNativeReveal`
-applies it before normal return, fallback, reset or active-image release. Hide, resize,
-replacement and generation checks remain immediate. JavaScript calculation/transport
-is still present: eliminating it would require an additional placement synchronization
-contract. No performance-parity claim is made.
-
-To reproduce the matched comparison, run `tools/native-ad-engine-benchmark.cjs NAME APK`
-with `ANDROID_SERIAL` and `PROOF_DIR`. The first run saves `creative-reference.png`;
-subsequent runs reject mismatching creatives before timing. The script uses private Feed
-state only as a test harness to remove other ads; it is not application integration code.
-
-## Final visual and lifecycle verification
-
-Placement-deferral verification (`verified1`–`verified3`): 660 recorded frames / 625 eligible media frames, zero blank candidates. Final APK including the restored 2M-pixel guard (`verified4`): 204 / 204, zero candidates. Final 450/900/450/900 ms JavaScript-blocking recording: 22 / 22, zero candidates. All four normal runs paused during image presentation with zero visible DOM proxies after completion, reloaded to newly decoded image resources, and created no new PNG files during position-only gestures. Moving-region analysis masks the SDK validator popup; contact sheets were inspected. These variable-frame-rate recordings do not prove every physical frame is flash-free.
-
-The earlier final-before-deferral recordings (`release1`–`release3`) contained 648
-frames / 639 eligible media frames with zero blank candidates. These are retained as
-intermediate evidence, not substituted for final APK verification.
-
-Engine browser suite: 64 passed. Final Android native suite passed with the API 23-only
-test skipped on API 36.1; API 23 fallback passed separately. AdMob Web suite: 42 passed,
-final changed Feed spec: 32 passed; Android unit tests: 81 passed (including the pixel-limit boundary test). Builds/typecheck/lint
-passed. Manager and independent reviewer approved the final native deferral change,
-including the active-image release regression test.
-
-Latest-main integration exposed a Swift initializer forwarding error in CI. The fix
-forwards `failedFallback` through the new convenience/internal initializer split;
-the npm-distributed CocoaPods build and all 9 Swift tests passed locally, including
-an explicit `.native` policy regression test. Engine commit `5b127d1` contains this
-integration fix; its Android sources, TypeScript and generated runtime are unchanged
-from measured Engine commit `1523547`.
-
-Raw recordings, CPU profiles, captures and traces are retained locally under
-`/private/tmp/admob-final-proof`. Per-trial final performance data is in
-[the benchmark summary](tools/native-ad-engine-benchmark-results.json).
-
-## API 23
-
-The Engine's unsupported-capture test passes on Android 6.0/API 23 with the native View
-visible. The demo cannot start on that emulator: Capacitor Bridge.loadWebView references
-`android.webkit.ServiceWorkerController` (API 24). Installing the old PR #487 APK reproduces
-the same crash. This is an existing demo/Capacitor limitation, not an Engine migration
-regression; API 23 app runtime support is not claimed.
-
-## Remaining gates
-
-- Publish the Engine fixes and pin the same released npm/Maven version; rerun an ordinary
-  clean dependency install/build with no local overrides.
-- Final CPU overhead is reported above; broader physical-device performance coverage
-  is outside these emulator measurements.
-- No production ads or synthesized ad clicks were used. Neither PR is merged.
+No production ads or synthesized ad clicks were used.

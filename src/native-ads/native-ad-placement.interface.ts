@@ -11,6 +11,8 @@ export interface NativeAdPlacement extends NativeAdIdentity {
   /** Internal binding generation used to reject recycled DOM state. */
   generation: number;
   visible: boolean;
+  /** Internal Android snapshot hint: preserve this slot without resending its geometry. */
+  retain?: boolean;
   rect?: NativeAdRect;
   clipRect?: NativeAdRect;
 }

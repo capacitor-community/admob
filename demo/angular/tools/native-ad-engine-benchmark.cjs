@@ -133,7 +133,7 @@ const adb = (...args) => execFileSync('adb', ['-s', serial, ...args], { encoding
   const afterCool = await sample();
   // Profile separately: instrumentation does not contaminate the timed windows above.
   await ev(
-    `(()=>{window.counts={engine:{},placement:0,rect:0,computedStyle:0};for(const [key,bucket] of [['nativeUIEngine','engine'],['capacitorAdMobPlacements','placement']]){const c=window[key];if(c){const original=c.postMessage.bind(c);c.postMessage=(message)=>{if(bucket==='engine'){const a=JSON.parse(message).request.action;counts.engine[a]=(counts.engine[a]||0)+1}else counts.placement++;return original(message)}}}const rect=Element.prototype.getBoundingClientRect;Element.prototype.getBoundingClientRect=function(){counts.rect++;return rect.call(this)};const style=window.getComputedStyle;window.getComputedStyle=function(...args){counts.computedStyle++;return style.apply(this,args)}})()`,
+    `(()=>{window.counts={engine:{},placement:0,handoffPlacements:0,rect:0,computedStyle:0};for(const [key,bucket] of [['nativeUIEngine','engine'],['capacitorAdMobPlacements','placement']]){const c=window[key];if(c){const original=c.postMessage.bind(c);c.postMessage=(message)=>{if(bucket==='engine'){const req=JSON.parse(message).request;const a=req.action;counts.engine[a]=(counts.engine[a]||0)+1;if(req.placement)counts.handoffPlacements++}else counts.placement++;return original(message)}}}const rect=Element.prototype.getBoundingClientRect;Element.prototype.getBoundingClientRect=function(){counts.rect++;return rect.call(this)};const style=window.getComputedStyle;window.getComputedStyle=function(...args){counts.computedStyle++;return style.apply(this,args)}})()`,
   );
   await call('Profiler.enable');
   await call('Profiler.start');
