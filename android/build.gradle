@@ -53,14 +53,18 @@ android {
 }
 
 repositories {
+    if (project.hasProperty('nativeUIEngineRepository')) {
+        maven { url = uri(project.property('nativeUIEngineRepository')) }
+    }
     google()
-        mavenCentral()
+    mavenCentral()
 
 }
 
 def testRunner = "1.7.0"
 
 dependencies {
+    implementation "io.github.rdlabo:native-ui-engine:${project.findProperty('nativeUIEngineVersion') ?: '2.0.3'}"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
 

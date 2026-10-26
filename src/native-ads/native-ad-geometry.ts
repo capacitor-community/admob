@@ -42,6 +42,29 @@ export function* nativeAdAncestors(element: HTMLElement): Generator<HTMLElement>
   }
 }
 
+// Engine visibility rules hide fallback DOM while its native/image projection is active.
+// Read author visibility without those markers, restoring them synchronously before paint.
+const authorVisibility = (element: HTMLElement): string => {
+  const markers: { node: HTMLElement; name: string; value: string }[] = [];
+  for (const node of [element, ...nativeAdAncestors(element)]) {
+    for (const attribute of Array.from(node.attributes)) {
+      if (
+        attribute.name === 'data-native-ui-snapshot-source' ||
+        attribute.name === 'data-native-ui-snapshot-prepared' ||
+        attribute.name.startsWith('data-native-ui-session-')
+      ) {
+        markers.push({ node, name: attribute.name, value: attribute.value });
+      }
+    }
+  }
+  try {
+    for (const { node, name } of markers) node.removeAttribute(name);
+    return window.getComputedStyle(element).visibility;
+  } finally {
+    for (const { node, name, value } of markers) node.setAttribute(name, value);
+  }
+};
+
 export const measureNativeAdSlot = (
   element: HTMLElement,
   scrollElement?: HTMLElement,
@@ -51,7 +74,7 @@ export const measureNativeAdSlot = (
   if (
     !element.isConnected ||
     style.display === 'none' ||
-    style.visibility === 'hidden' ||
+    (style.visibility === 'hidden' && authorVisibility(element) === 'hidden') ||
     Number.parseFloat(style.opacity || '1') === 0 ||
     domRect.width <= 0 ||
     domRect.height <= 0

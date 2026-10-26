@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-26",
+  "baselineCommit": "12e9b393fd120c6f56766f6a143cadf5f4728718",
+  "engineCommit": "1bcf135",
+  "localMavenVersion": "2.0.3-admob.10",
+  "emulator": "API 36.1 ARM64",
+  "trials": [
+    {
+      "name": "baseline-stable",
+      "hostCpuMs": 1120,
+      "rendererMainTaskMs": 521,
+      "pssAfterKiB": 176228,
+      "windowMs": 25120,
+      "recordedFrames": 193,
+      "eligibleFrames": 193,
+      "blankRuns": [],
+      "newPngFilesDuringScroll": 0,
+      "pauseDuringImage": true,
+      "visibleImagesAfterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      },
+      "reloadDecodeCount": 3
+    },
+    {
+      "name": "baseline-stable2",
+      "hostCpuMs": 1150,
+      "rendererMainTaskMs": 539,
+      "pssAfterKiB": 186931,
+      "windowMs": 25076,
+      "recordedFrames": 193,
+      "eligibleFrames": 184,
+      "blankRuns": [],
+      "newPngFilesDuringScroll": 0,
+      "pauseDuringImage": true,
+      "visibleImagesAfterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      },
+      "reloadDecodeCount": 3
+    },
+    {
+      "name": "baseline-stable3",
+      "hostCpuMs": 1050,
+      "rendererMainTaskMs": 532,
+      "pssAfterKiB": 195948,
+      "windowMs": 24503,
+      "recordedFrames": 202,
+      "eligibleFrames": 202,
+      "blankRuns": [],
+      "newPngFilesDuringScroll": 0,
+      "pauseDuringImage": true,
+      "visibleImagesAfterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      },
+      "reloadDecodeCount": 3
+    },
+    {
+      "name": "release1",
+      "hostCpuMs": 1820,
+      "rendererMainTaskMs": 664,
+      "pssAfterKiB": 190850,
+      "windowMs": 25183,
+      "recordedFrames": 216,
+      "eligibleFrames": 207,
+      "blankRuns": [],
+      "newPngFilesDuringScroll": 0,
+      "pauseDuringImage": true,
+      "visibleImagesAfterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      },
+      "reloadDecodeCount": 3
+    },
+    {
+      "name": "release2",
+      "hostCpuMs": 1720,
+      "rendererMainTaskMs": 672,
+      "pssAfterKiB": 197275,
+      "windowMs": 24663,
+      "recordedFrames": 219,
+      "eligibleFrames": 219,
+      "blankRuns": [],
+      "newPngFilesDuringScroll": 0,
+      "pauseDuringImage": true,
+      "visibleImagesAfterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      },
+      "reloadDecodeCount": 3
+    },
+    {
+      "name": "release3",
+      "hostCpuMs": 1660,
+      "rendererMainTaskMs": 623,
+      "pssAfterKiB": 186186,
+      "windowMs": 24620,
+      "recordedFrames": 213,
+      "eligibleFrames": 213,
+      "blankRuns": [],
+      "newPngFilesDuringScroll": 0,
+      "pauseDuringImage": true,
+      "visibleImagesAfterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      },
+      "reloadDecodeCount": 3
+    }
+  ],
+  "javascriptBlockStress": {
+    "frames": 26,
+    "eligible": 26,
+    "minimumPixels": 2373,
+    "blankRuns": [],
+    "blocksMs": [450, 900, 450, 900]
+  }
+}

@@ -84,6 +84,11 @@ public class AdMob extends Plugin {
     @Override
     public void load() {
         super.load();
+        try {
+            dev.rdlabo.capacitor.nativeuiengine.NativeUIProjection.install(getBridge().getWebView());
+        } catch (Exception error) {
+            android.util.Log.w(getLogTag(), "Native UI channel unavailable; retaining native tracking", error);
+        }
         if (
             androidx.webkit.WebViewFeature.isFeatureSupported(androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER) &&
             !getBridge().getConfig().isUsingLegacyBridge()

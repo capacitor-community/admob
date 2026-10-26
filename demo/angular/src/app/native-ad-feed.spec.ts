@@ -673,16 +673,10 @@ describe('NativeAdFeed', () => {
     const web = new AdMobWeb();
     await expect(web.startNativeAdFeed()).rejects.toThrow('only available on iOS and Android');
   });
-  describe('Android scroll snapshots', () => {
+  describe('Android Engine projection', () => {
     const setup = async () => {
       vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
-      Object.defineProperty(HTMLImageElement.prototype, 'decode', {
-        configurable: true,
-        value: vi.fn().mockResolvedValue(undefined),
-      });
-      bridge.prepareNativeAdSnapshot.mockReset().mockResolvedValue(undefined);
-      bridge.captureNativeAdSnapshot.mockReset().mockResolvedValue({ dataUrl: 'data:image/png;base64,AA==' });
-      const feed = await NativeAdFeed.create({ feedId: 'snapshot-test', isTesting: true, androidScrollSnapshot: true });
+      const feed = await NativeAdFeed.create({ feedId: 'engine-test', isTesting: true, androidScrollSnapshot: true });
       createdFeeds.push(feed);
       const element = document.createElement('div');
       document.body.append(element);
@@ -690,278 +684,64 @@ describe('NativeAdFeed', () => {
       await vi.advanceTimersByTimeAsync(600);
       return { feed, element };
     };
-
-    it('keeps a drawn underlay before scrolling and after native restoration', async () => {
+    it('passes the existing host selector to native instead of using the old capture bridge', async () => {
       const { element } = await setup();
-      const image = element.querySelector('img')!;
-      expect(image).not.toBeNull();
-      expect(image.hidden).toBe(false);
-      document.dispatchEvent(new Event('scroll'));
-      await vi.advanceTimersByTimeAsync(20);
-      expect(image.hidden).toBe(false);
-      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([]);
-      await settle();
-      expect(image.hidden).toBe(false);
-      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
-    });
-
-    it('clears visible proxies on pause, detach and destruction', async () => {
-      const { feed, element } = await setup();
-      document.dispatchEvent(new Event('scroll'));
-      await feed.pause();
+      const selector = bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector;
+      expect(selector).toBeDefined();
+      expect(document.querySelector(selector)).toBe(element);
       expect(element.querySelector('img')).toBeNull();
-      feed.resume();
-      await vi.advanceTimersByTimeAsync(600);
-      expect(element.querySelector('img')).not.toBeNull();
-      feed.detach(element);
-      expect(element.querySelector('img')).toBeNull();
-      feed.attach('slot', element);
-      await vi.advanceTimersByTimeAsync(600);
-      await feed.destroy();
-      expect(element.querySelector('img')).toBeNull();
+      expect(bridge.captureNativeAdSnapshot).not.toHaveBeenCalled();
     });
-
-    it('keeps native tracking when capture fails', async () => {
+    it('keeps placement tracking when the Engine hides fallback DOM', async () => {
       const { feed, element } = await setup();
-      await feed.pause();
-      bridge.captureNativeAdSnapshot.mockRejectedValue(new Error('unavailable'));
-      feed.resume();
-      await vi.advanceTimersByTimeAsync(600);
-      document.dispatchEvent(new Event('scroll'));
-      await vi.advanceTimersByTimeAsync(20);
-      expect(element.querySelector('img')).toBeNull();
-      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
-    });
-
-    it('discards capture results that arrive after destruction', async () => {
-      const { feed, element } = await setup();
-      await feed.pause();
-      let complete!: (result: { dataUrl: string }) => void;
-      bridge.captureNativeAdSnapshot.mockImplementationOnce(
-        () =>
-          new Promise((resolve) => {
-            complete = resolve;
-          }),
-      );
-      feed.resume();
-      await vi.advanceTimersByTimeAsync(600);
-      expect(complete).toBeDefined();
-      await feed.destroy();
-      complete({ dataUrl: 'data:image/png;base64,AA==' });
-      await vi.advanceTimersByTimeAsync(1);
-      expect(element.querySelector('img')).toBeNull();
-    });
-
-    it('does not end a new scroll when an earlier restore acknowledgement arrives', async () => {
-      const { element } = await setup();
-      document.dispatchEvent(new Event('scroll'));
-      await vi.advanceTimersByTimeAsync(20);
-      let acknowledge!: () => void;
-      bridge.updateNativeAdPlacements.mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            acknowledge = resolve;
-          }),
-      );
-      await vi.advanceTimersByTimeAsync(110);
-      expect(acknowledge).toBeDefined();
-      document.dispatchEvent(new Event('scroll'));
-      acknowledge();
-      await vi.advanceTimersByTimeAsync(1);
-      expect(element.querySelector('img')!.hidden).toBe(false);
-      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([]);
-      await settle();
-      expect(element.querySelector('img')!.hidden).toBe(false);
-    });
-
-    it.each([false, true])('keeps fallback placement updates frame-batched (mixed proxies: %s)', async (mixed) => {
-      const { feed, element } = await setup();
-      bridge.captureNativeAdSnapshot.mockRejectedValue(new Error('unavailable'));
-      if (mixed) {
-        const fallback = document.createElement('div');
-        document.body.append(fallback);
-        feed.attach('fallback', fallback);
-      } else {
-        await feed.pause();
-        feed.resume();
-      }
-      await vi.advanceTimersByTimeAsync(600);
-      const frames: FrameRequestCallback[] = [];
-      vi.spyOn(globalThis, 'requestAnimationFrame').mockImplementation((callback) => {
-        frames.push(callback);
-        return 123;
-      });
-      const rect = element.getBoundingClientRect();
-      bridge.updateNativeAdPlacements.mockClear();
-      for (let index = 1; index <= 3; index++) {
-        vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockReturnValue({
-          ...rect,
-          y: rect.y - index,
-          top: rect.top - index,
-          bottom: rect.bottom - index,
-        });
-        document.dispatchEvent(new Event('scroll'));
-        await vi.advanceTimersByTimeAsync(1);
-        expect(bridge.updateNativeAdPlacements).toHaveBeenCalledTimes(mixed ? 1 : 0);
-      }
-      expect(frames).toHaveLength(1);
-      frames[0](performance.now());
-      await vi.advanceTimersByTimeAsync(1);
-      expect(bridge.updateNativeAdPlacements).toHaveBeenCalledTimes(mixed ? 2 : 1);
-    });
-
-    it('positions the proxy over the slot border box', async () => {
-      const { feed, element } = await setup();
-      element.style.borderLeft = '4px solid';
-      element.style.borderTop = '6px solid';
-      await feed.invalidateLayout();
-      await vi.advanceTimersByTimeAsync(600);
-      const image = element.querySelector('img')!;
-      expect(image.style.left).toBe('-4px');
-      expect(image.style.top).toBe('-6px');
-      expect(image.style.width).toBe('calc(100% + 4px)');
-      expect(image.style.height).toBe('calc(100% + 6px)');
-      expect(image.style.maxWidth).toBe('none');
-      expect(image.style.boxSizing).toBe('border-box');
-    });
-
-    it('reuses the same image through repeated scrolls and layout invalidation', async () => {
-      const { feed, element } = await setup();
-      const image = element.querySelector('img');
-      const calls = bridge.captureNativeAdSnapshot.mock.calls.length;
-      for (let i = 0; i < 3; i++) {
-        document.dispatchEvent(new Event('scroll'));
-        await vi.advanceTimersByTimeAsync(600);
+      element.setAttribute('data-native-ui-session-test', 'native');
+      const style = document.createElement('style');
+      style.textContent = '[data-native-ui-session-test="native"] { visibility: hidden !important; }';
+      document.head.append(style);
+      try {
         await feed.invalidateLayout();
-        expect(element.querySelector('img')).toBe(image);
-        await vi.advanceTimersByTimeAsync(600);
+        expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
+        expect(element.getAttribute('data-native-ui-session-test')).toBe('native');
+        element.style.visibility = 'hidden';
+        await feed.invalidateLayout();
+        expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
+        element.style.removeProperty('visibility');
+        const parent = document.createElement('div');
+        parent.style.visibility = 'hidden';
+        document.body.append(parent);
+        parent.append(element);
+        await feed.invalidateLayout();
+        expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
+      } finally {
+        style.remove();
       }
-      expect(bridge.captureNativeAdSnapshot).toHaveBeenCalledTimes(calls);
     });
-
-    it('captures a new image when the ad is reloaded', async () => {
-      const { feed, element } = await setup();
-      const image = element.querySelector('img');
-      bridge.captureNativeAdSnapshot.mockClear();
+    it('reloads the native ad on the same projection host', async () => {
+      const { feed } = await setup();
+      const selector = bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector;
       await feed.reload('slot');
-      expect(image?.isConnected).toBe(false);
-      await vi.advanceTimersByTimeAsync(600);
-      expect(bridge.captureNativeAdSnapshot).toHaveBeenCalledTimes(1);
-      expect(element.querySelector('img')).not.toBe(image);
+      expect(bridge.removeNativeAd).toHaveBeenCalled();
+      expect(bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector).toBe(selector);
+      expect(bridge.loadNativeAd).toHaveBeenCalledTimes(2);
     });
-
-    it('keeps tracking native while the visual fence is pending and rejects a stale fence', async () => {
+    it('rebinds a retained ad to a replacement host with one stable selector', async () => {
       const { feed, element } = await setup();
-      await feed.pause();
-      let ready!: () => void;
-      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            ready = resolve;
-          }),
-      );
-      feed.resume();
+      const selector = bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector;
+      feed.detach(element);
+      const replacement = document.createElement('div');
+      document.body.append(replacement);
+      feed.attach('slot', replacement);
       await vi.advanceTimersByTimeAsync(600);
-      expect(ready).toBeDefined();
-      document.dispatchEvent(new Event('scroll'));
-      await vi.advanceTimersByTimeAsync(20);
-      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
-      ready();
-      await vi.advanceTimersByTimeAsync(1);
-      expect(element.querySelector('img')).toBeNull();
+      expect(document.querySelectorAll(selector)).toHaveLength(1);
+      expect(document.querySelector(selector)).toBe(replacement);
+      expect(bridge.loadNativeAd).toHaveBeenCalledTimes(1);
     });
 
-    it.each(['pause', 'destroy'] as const)('removes pending images on %s', async (action) => {
-      const { feed, element } = await setup();
-      await feed.pause();
-      let ready!: () => void;
-      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            ready = resolve;
-          }),
-      );
-      feed.resume();
-      await vi.advanceTimersByTimeAsync(600);
-      expect(element.querySelector('img')).not.toBeNull();
-      await feed[action]();
-      ready();
-      await vi.advanceTimersByTimeAsync(1);
-      expect(element.querySelector('img')).toBeNull();
-    });
-
-    it('preserves the old image until a resized replacement passes its fence', async () => {
-      const { feed, element } = await setup();
-      const old = element.querySelector('img');
-      const rect = element.getBoundingClientRect();
-      vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockReturnValue({ ...rect, width: 320, right: 330 });
-      let ready!: () => void;
-      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            ready = resolve;
-          }),
-      );
-      await feed.invalidateLayout();
-      await vi.advanceTimersByTimeAsync(600);
-      expect(old?.isConnected).toBe(true);
-      expect(element.querySelectorAll('img')).toHaveLength(2);
-      ready();
-      await vi.advanceTimersByTimeAsync(1);
-      expect(old?.isConnected).toBe(false);
-      expect(element.querySelectorAll('img')).toHaveLength(1);
-    });
-
-    it('keeps native visible when layout changes before the first fence completes', async () => {
-      const { feed, element } = await setup();
-      await feed.pause();
-      let ready!: () => void;
-      bridge.prepareNativeAdSnapshot.mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            ready = resolve;
-          }),
-      );
-      feed.resume();
-      await vi.advanceTimersByTimeAsync(600);
-      await feed.invalidateLayout();
-      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
-      ready();
-      await vi.advanceTimersByTimeAsync(1);
-      expect(element.querySelector('img')).toBeNull();
-    });
-
-    it('still prepares an image after three motion cancellations', async () => {
-      const { feed, element } = await setup();
-      await feed.pause();
-      for (let i = 0; i < 3; i++) {
-        let ready!: () => void;
-        bridge.prepareNativeAdSnapshot.mockImplementationOnce(
-          () =>
-            new Promise<void>((resolve) => {
-              ready = resolve;
-            }),
-        );
-        if (i === 0) feed.resume();
-        await vi.advanceTimersByTimeAsync(1200);
-        expect(ready).toBeDefined();
-        document.dispatchEvent(new Event('scroll'));
-        ready();
-        await vi.advanceTimersByTimeAsync(1);
-      }
-      await vi.advanceTimersByTimeAsync(1500);
-      expect(element.querySelector('img')).not.toBeNull();
-    });
-
-    it('bounds retries for unavailable snapshots', async () => {
+    it('pause hides the native parent', async () => {
       const { feed } = await setup();
       await feed.pause();
-      bridge.captureNativeAdSnapshot.mockReset().mockRejectedValue(new Error('video'));
-      feed.resume();
-      await vi.advanceTimersByTimeAsync(10000);
-      expect(bridge.captureNativeAdSnapshot).toHaveBeenCalledTimes(3);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
     });
-
     it('rejects production ads for this experiment', async () => {
       vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
       await expect(

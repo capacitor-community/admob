@@ -72,7 +72,8 @@
   },
   "dependencies": {
     "@capacitor/core": "^8.0.0",
-    "@rdlabo/capacitor-docgen": "^0.4.1"
+    "@rdlabo/capacitor-docgen": "^0.4.1",
+    "@rdlabo/capacitor-native-ui-engine": "2.0.3"
   },
   "lint-staged": {
     "*.{ts}": [

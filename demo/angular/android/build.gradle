@@ -19,6 +19,9 @@ apply from: "variables.gradle"
 
 allprojects {
     repositories {
+        if (project.hasProperty('nativeUIEngineRepository')) {
+            maven { url = uri(project.property('nativeUIEngineRepository')) }
+        }
         google()
         mavenCentral()
     }

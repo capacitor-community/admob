@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.nativeads
 
 import android.app.Activity
 import android.content.Context
+import dev.rdlabo.capacitor.nativeuiengine.NativeUIProjection
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -53,6 +54,10 @@ class NativeAdExecutor(
         val isTesting: Boolean,
         val opaqueBackground: Boolean,
         var generation: Int = -1,
+        var projection: NativeUIProjection? = null,
+        var projectionIdentity: JSObject? = null,
+        var projectionVisible: Boolean = true,
+
     )
 
     private data class PendingLoad(
@@ -156,15 +161,16 @@ class NativeAdExecutor(
         requiredString(call, "feedId") ?: return
         requiredString(call, "sessionId") ?: return
         activitySupplier.get().runOnUiThread {
-            applyPlacements(call.data)
-            call.resolve()
+            applyPlacements(call.data) { hidden ->
+                if (hidden) call.resolve() else call.reject("Native ad projection did not finish hiding")
+            }
         }
     }
 
-    private fun applyPlacements(batch: JSONObject) {
+    private fun applyPlacements(batch: JSONObject, complete: ((Boolean) -> Unit)? = null) {
         val feedId = batch.optString("feedId")
         val sessionId = batch.optString("sessionId")
-        if (!isCurrentSession(feedId, sessionId) || !feedSessions.accepts(feedId, batch.optLong("sequence", -1L))) return
+        if (!isCurrentSession(feedId, sessionId) || !feedSessions.accepts(feedId, batch.optLong("sequence", -1L))) { complete?.invoke(true); return }
         val shown = mutableSetOf<String>()
         val placements = batch.optJSONArray("placements") ?: JSArray()
         repeat(placements.length()) { index ->
@@ -174,8 +180,23 @@ class NativeAdExecutor(
                 // Invalid entries fail closed below.
             }
         }
+        val hiding = mutableListOf<NativeUIProjection>()
         states.filter { it.value.feedId == feedId && it.key !in shown }.values.forEach {
             it.clippingContainer.visibility = View.GONE
+            if (it.projectionVisible || complete != null) it.projection?.let(hiding::add)
+            if (it.projectionVisible) {
+                it.projectionVisible = false
+                it.projectionIdentity?.let { event -> notifyListeners("nativeAdProjectionHidden", event) }
+            }
+        }
+        if (hiding.isEmpty()) complete?.invoke(true)
+        else {
+            var remaining = hiding.size
+            var succeeded = true
+            hiding.forEach { projection -> projection.hide { result ->
+                succeeded = succeeded && result
+                if (--remaining == 0) complete?.invoke(succeeded)
+            } }
         }
     }
 
@@ -250,6 +271,34 @@ class NativeAdExecutor(
         )
         states[stateKey] = state
         overlayParent.addView(clippingContainer)
+        pendingLoad.call.getString("projectionSelector")?.let { selector ->
+            val event = identity(feedId, sessionId, slotKey).apply { put("loadId", java.util.UUID.randomUUID().toString()) }
+            state.projectionIdentity = event
+            val webView = webViewSupplier.get() as? WebView
+            if (webView != null) webView.post {
+                if (states[stateKey] !== state) return@post
+                state.projection = runCatching {
+                    NativeUIProjection(
+                        window = activitySupplier.get().window,
+                        webView = webView,
+                        plugin = "AdMob",
+                        projectionSelector = selector,
+                        receiveListeners = NativeUIProjection.ReceiveListeners(
+                            update = listOf("nativeAdProjectionUpdated"),
+                            projection = NativeUIProjection.ReceiveListeners.Projection(
+                                native = listOf("nativeAdProjectionShown"), none = listOf("nativeAdProjectionHidden")
+                            ),
+                            match = mapOf("feedId" to feedId, "sessionId" to sessionId, "slotKey" to slotKey, "loadId" to event.optString("loadId"))
+                        ),
+                        failedFallback = NativeUIProjection.FailedFallback.NATIVE,
+                        captureMode = NativeUIProjection.CaptureMode.VIEW,
+                        canCapture = { states[stateKey] === state && state.isTesting && state.opaqueBackground &&
+                            nativeAd.mediaContent?.hasVideoContent() != true },
+                        view = { if (states[stateKey] === state) adView else null }
+                    )
+                }.onFailure { android.util.Log.w("AdMob", "Native ad projection unavailable; retaining native tracking", it) }.getOrNull()
+            }
+        }
         nativeAd.setOnPaidEventListener { adValue ->
             if (states[stateKey] !== state) return@setOnPaidEventListener
             val responseInfo = nativeAd.responseInfo
@@ -330,6 +379,7 @@ class NativeAdExecutor(
 
         val webView = webViewSupplier.get() ?: return null
         val wasVisible = state.clippingContainer.visibility == View.VISIBLE
+        val resized = state.adView.width != value.rectWidth || state.adView.height != value.rectHeight
         val clipParams = state.clippingContainer.layoutParams
         if (clipParams.width != value.clipWidth || clipParams.height != value.clipHeight) {
             state.clippingContainer.layoutParams = clipParams.apply {
@@ -348,6 +398,12 @@ class NativeAdExecutor(
         state.generation = value.generation
         state.clippingContainer.visibility = View.VISIBLE
         if (!wasVisible) state.clippingContainer.bringToFront()
+        if (!state.projectionVisible) {
+            state.projection?.show()
+            state.projectionVisible = true
+            state.projectionIdentity?.let { notifyListeners("nativeAdProjectionShown", it) }
+        }
+        if (resized) state.projectionIdentity?.let { notifyListeners("nativeAdProjectionUpdated", it) }
         return stateKey(value.feedId, value.slotKey)
     }
 
@@ -474,6 +530,7 @@ class NativeAdExecutor(
 
     private fun destroyState(stateKey: String) {
         val state = states.remove(stateKey) ?: return
+        state.projection?.close()
         (state.clippingContainer.parent as? ViewGroup)?.removeView(state.clippingContainer)
         state.adView.destroy()
         state.nativeAd.destroy()
