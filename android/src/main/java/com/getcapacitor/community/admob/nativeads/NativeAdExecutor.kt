@@ -378,6 +378,7 @@ class NativeAdExecutor(
             return stateKey(value.feedId, value.slotKey)
         }
         state.deferredPlacement = null
+        val resized = state.adView.width != value.rectWidth || state.adView.height != value.rectHeight
 
         if (!state.isSmall) {
             val adView = state.adView
@@ -394,7 +395,6 @@ class NativeAdExecutor(
 
         val webView = webViewSupplier.get() ?: return null
         val wasVisible = state.clippingContainer.visibility == View.VISIBLE
-        val resized = state.adView.width != value.rectWidth || state.adView.height != value.rectHeight
         val clipParams = state.clippingContainer.layoutParams
         if (clipParams.width != value.clipWidth || clipParams.height != value.clipHeight) {
             state.clippingContainer.layoutParams = clipParams.apply {
