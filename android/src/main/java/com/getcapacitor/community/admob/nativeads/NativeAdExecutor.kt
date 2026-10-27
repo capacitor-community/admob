@@ -2,7 +2,7 @@ package com.getcapacitor.community.admob.nativeads
 
 import android.app.Activity
 import android.content.Context
-import dev.rdlabo.capacitor.nativeuiengine.NativeUIProjection
+import io.github.webview_native_ui.engine.NativeUIProjection
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color

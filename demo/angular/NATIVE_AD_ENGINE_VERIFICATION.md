@@ -1,10 +1,36 @@
 # NativeAdFeed Engine migration verification
 
-This migration remains **draft / release-gated**. Published Engine 2.0.3 does not
-contain these APIs. Release [Engine #333](https://github.com/rdlabo-dev/ionic-theme-ios27/pull/333),
-then pin the matching npm/lockfile and default Android Maven version and verify a
-clean install without local overrides. Local verification used the npm-linked Engine
-checkout at `0fa8be2` and Maven `2.0.3-admob.17`. No package was published or PR merged.
+The Engine now lives at [webview-native-ui/engine](https://github.com/webview-native-ui/engine).
+AdMob uses the published npm package `@webview-native-ui/engine@0.0.1` and Maven
+artifact `io.github.webview-native-ui:engine:0.0.1`. The Java/Kotlin namespace is
+`io.github.webview_native_ui.engine`. The previous unreleased-package dependency
+gate is resolved; no local npm link or Maven override is needed.
+
+`npm ci --ignore-scripts`, root/demo builds, ESLint, 47 Web tests and 84 Android unit
+tests passed with these published dependencies. Gradle dependency insight resolved
+`io.github.webview-native-ui:engine:0.0.1` using the default configuration.
+
+The detailed performance/visual figures below describe the earlier linked build
+(Engine `0fa8be2`, local Maven `2.0.3-admob.17`) and are retained as historical evidence.
+They are not a new CPU/memory comparison of published 0.0.1. The previous Engine PR
+[#333](https://github.com/rdlabo-dev/ionic-theme-ios27/pull/333) is historical context;
+future Engine work uses the new standalone repository.
+
+## Published 0.0.1 smoke verification
+
+- Normal and partially clipped scrolling: 177/177 eligible recorded frames, zero blank candidates.
+- Two visible ads: 28 and 29 eligible ad-frame samples, zero blank candidates; zero bridge errors.
+- Fault-injected capture unavailability kept one ad native and the other projected.
+  All 22 mixed batches retained the image-owned slot without rect/clipRect.
+- Reload/detach of one ad preserved the other image; feed pause cleared both.
+- Normal-run pause was exercised during image display. Position-only scrolling
+  created no new PNG files; reload decoded fresh image resources.
+- Contact sheet inspection found no return-position duplication. These are sampled
+  emulator checks, not an assertion about every physical display frame.
+
+[Published-release verification summary](tools/native-ad-engine-published-results.json).
+Raw recordings/traces: `/private/tmp/admob-new-engine-proof`. CPU/memory comparisons
+were not repeated for this repository/package relocation.
 
 ## Implementation and multiple ads
 
@@ -45,7 +71,7 @@ scrolling. AdMob iOS and the low-level snapshot APIs remain compatible.
 - The window's current touch state survives initial connection/reset, preventing
   capture while a finger was already down before a new registration connected.
 
-## Final visual and lifecycle results
+## Previous linked-build visual and lifecycle results
 
 Android API 36.1 ARM64, Google test ads, final linked/Maven build:
 
@@ -81,7 +107,7 @@ evidence. Regression tests reproduced old image-anchor correction overwriting a 
 placement and an old resume ACK retiring a newer presentation. Both were fixed before
 these final recordings (`retain-final`, `retain-stress-final`, `multi-retain-final`).
 
-## Matched performance comparison
+## Previous linked-build matched performance comparison
 
 One static Flood-It ad, matching RGBA creative (MAE <0.5/255), identical slot geometry,
 six 800 ms swipes with 700 ms pauses; Wi-Fi disabled after loading; 10 s warmup, idle
@@ -122,7 +148,7 @@ they are superseded for the current implementation by the return results linked 
 This small emulator sample does not establish performance parity or a universal
 physical-device percentage, and process PSS alone does not establish memory improvement.
 
-## Validation and review
+## Previous linked-build validation and review
 
 - Engine browser suite: 79 passed; build/typecheck/formatting passed.
 - Engine Android: 16 instrumentation tests passed with the API 23-only test skipped
@@ -142,17 +168,16 @@ the same crash. Only the Engine's native fallback test is claimed on API 23.
 
 ## Reproduction and artifacts
 
-Build/link the Engine checkout, build its injected runtime and publish a uniquely
-versioned local verification Maven artifact. Then build AdMob and its demo:
+Build against the published npm and Maven packages:
 
 ```sh
+npm ci --ignore-scripts
 npm run build
 cd demo/angular
 npm run build
 npx cap sync android
 cd android
-./gradlew -PnativeUIEngineVersion=2.0.3-admob.17 \
-  -PnativeUIEngineRepository=/path/to/engine/android/build/maven assembleDebug
+./gradlew assembleDebug
 ```
 
 From `demo/angular`, with Node 22+, adb, ffmpeg/ffprobe and Python 3:
@@ -171,8 +196,8 @@ for the matched comparison; its first run saves the creative reference and later
 reject mismatching creatives. Multi-ad markers turn gray before deliberate reload/
 detach/pause so those lifecycle gaps are excluded from normal-scroll blank analysis.
 
-- [Current visual/lifecycle summary](tools/native-ad-engine-return-visual-results.json)
-- [Current accepted performance trials](tools/native-ad-engine-return-benchmark-results.json)
+- [Previous linked-build visual/lifecycle summary](tools/native-ad-engine-return-visual-results.json)
+- [Previous linked-build accepted performance trials](tools/native-ad-engine-return-benchmark-results.json)
 - Raw recordings, captures, CDP traces and profiles: `/private/tmp/admob-final-proof`.
 
 No production ads or synthesized ad clicks were used.

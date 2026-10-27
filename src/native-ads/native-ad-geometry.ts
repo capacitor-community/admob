@@ -1,4 +1,4 @@
-import { getUnprojectedVisibility } from '@rdlabo/capacitor-native-ui-engine';
+import { getUnprojectedVisibility } from '@webview-native-ui/engine';
 
 import type { NativeAdPlacementBatch, NativeAdRect } from './native-ad-placement.interface';
 

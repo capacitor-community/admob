@@ -1,0 +1,156 @@
+{
+  "repository": "https://github.com/webview-native-ui/engine",
+  "npm": "@webview-native-ui/engine@0.0.1",
+  "maven": "io.github.webview-native-ui:engine:0.0.1",
+  "tagCommit": "1156baa5dfc1a0cfa3b992c8e1a73b105de60feb",
+  "localDependencyOverrides": false,
+  "apkSha256": "82bcaf1d89d89ecd051d141f5f0ec0281fe6212906f2479c29e0ef3ea49333c5",
+  "webTests": 47,
+  "androidUnitTests": 84,
+  "normal": {
+    "frames": 177,
+    "eligible": 177,
+    "minimumPixels": 709,
+    "blankRuns": []
+  },
+  "normalLifecycle": {
+    "pauseWasImage": true,
+    "afterPause": {
+      "visible": 0,
+      "oldVisible": 0
+    },
+    "newPngsDuringGestures": 0,
+    "reloadDecodeCount": 3
+  },
+  "multi": {
+    "samples": [
+      {
+        "ad": 0,
+        "eligible": 28,
+        "blankCandidates": []
+      },
+      {
+        "ad": 1,
+        "eligible": 29,
+        "blankCandidates": []
+      }
+    ],
+    "bridgeErrors": [],
+    "blockedCaptures": 2,
+    "mixedBatches": 22,
+    "retainWithGeometry": 0,
+    "mixed": {
+      "time": 35499.09999999404,
+      "bindings": [
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        },
+        {
+          "projected": false,
+          "owner": false,
+          "images": 0
+        }
+      ],
+      "visible": 1
+    },
+    "beforeReload": {
+      "time": 39451.29999999702,
+      "bindings": [
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        },
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        }
+      ],
+      "visible": 2
+    },
+    "afterReload": {
+      "time": 41701.79999999702,
+      "bindings": [
+        {
+          "projected": false,
+          "owner": false,
+          "images": 0
+        },
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        }
+      ],
+      "visible": 1
+    },
+    "beforeDetach": {
+      "time": 43082.79999999702,
+      "bindings": [
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        },
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        }
+      ],
+      "visible": 2
+    },
+    "afterDetach": {
+      "time": 43414.5,
+      "bindings": [
+        {
+          "projected": false,
+          "owner": false,
+          "images": 0
+        },
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        }
+      ],
+      "visible": 1
+    },
+    "beforePause": {
+      "time": 45109.5,
+      "bindings": [
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        },
+        {
+          "projected": true,
+          "owner": true,
+          "images": 0
+        }
+      ],
+      "visible": 2
+    },
+    "afterPause": {
+      "time": 45331.09999999404,
+      "bindings": [
+        {
+          "projected": false,
+          "owner": false,
+          "images": 0
+        },
+        {
+          "projected": false,
+          "owner": false,
+          "images": 0
+        }
+      ],
+      "visible": 0
+    }
+  },
+  "notes": "Smoke verification of published 0.0.1, not a repeated CPU/memory benchmark. Variable-frame-rate samples cannot prove every physical display frame is flash-free. Raw artifacts: /private/tmp/admob-new-engine-proof."
+}

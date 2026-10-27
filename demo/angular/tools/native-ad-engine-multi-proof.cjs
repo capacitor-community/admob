@@ -66,14 +66,14 @@ const adb = (...a) => execFileSync('adb', ['-s', serial, ...a], { encoding: 'utf
  document.querySelector('.feed').style.cssText='padding-top:110px;padding-bottom:600px';sc.scrollTop=0;
  window.slots=[...document.querySelectorAll('capacitor-admob-native')].slice(0,2);
  window.states=slots.map(el=>[...f.slots.values()].find(s=>s.element===el));
- window.binding=el=>el[Symbol.for('capacitor-native-ui-engine.projection-placement')];
+ window.binding=el=>el[Symbol.for('webview-native-ui-engine.projection-placement')];
  window.multi={phases:[],messages:[],measures:[],frames:[],replies:[],batches:[]};
  const postPlacement=capacitorAdMobPlacements.postMessage.bind(capacitorAdMobPlacements);capacitorAdMobPlacements.postMessage=m=>{multi.batches.push({t:performance.now(),batch:JSON.parse(m),projected:states.map(s=>({slotKey:s.slotKey,projected:!!s.placementBinding?.projected}))});return postPlacement(m)};
- const receive=CapacitorNativeUIEngineRuntime.receive;globalThis.CapacitorNativeUIEngineRuntime={...CapacitorNativeUIEngineRuntime,receive:(id,key,value,error)=>{multi.replies.push({t:performance.now(),id,key,value,error});return receive(id,key,value,error)}};
+ const receive=WebViewNativeUIEngineRuntime.receive;globalThis.WebViewNativeUIEngineRuntime={...WebViewNativeUIEngineRuntime,receive:(id,key,value,error)=>{multi.replies.push({t:performance.now(),id,key,value,error});return receive(id,key,value,error)}};
  const measure=f.measurePlacement.bind(f);f.measurePlacement=s=>{multi.measures.push({t:performance.now(),slot:s.slotKey,projected:!!s.placementBinding?.projected});return measure(s)};
  const channel=nativeUIEngine.postMessage.bind(nativeUIEngine);window.blockedID=undefined;
- nativeUIEngine.postMessage=m=>{const msg=JSON.parse(m);multi.messages.push({t:performance.now(),...msg});const id=msg.key.split(':')[0];if(window.blockSecond && slots[1].hasAttribute('data-native-ui-session-'+id.replace(/[^a-zA-Z0-9-]/g,'')) && msg.request.action==='prepare'){multi.blockedCaptures=(multi.blockedCaptures||0)+1;queueMicrotask(()=>CapacitorNativeUIEngineRuntime.receive(id,msg.key,{}));return}return channel(m)};
- const start=CapacitorNativeUIEngineRuntime.start;CapacitorNativeUIEngineRuntime.start=c=>{if(window.blockSecond&&document.querySelector(c.projectionSelector)===slots[1])blockedID=c.id;return start(c)};
+ nativeUIEngine.postMessage=m=>{const msg=JSON.parse(m);multi.messages.push({t:performance.now(),...msg});const id=msg.key.split(':')[0];if(window.blockSecond && slots[1].hasAttribute('data-native-ui-session-'+id.replace(/[^a-zA-Z0-9-]/g,'')) && msg.request.action==='prepare'){multi.blockedCaptures=(multi.blockedCaptures||0)+1;queueMicrotask(()=>WebViewNativeUIEngineRuntime.receive(id,msg.key,{}));return}return channel(m)};
+ const start=WebViewNativeUIEngineRuntime.start;WebViewNativeUIEngineRuntime.start=c=>{if(window.blockSecond&&document.querySelector(c.projectionSelector)===slots[1])blockedID=c.id;return start(c)};
  slots.forEach((el,i)=>{el.parentElement.style.position='relative';const b=document.createElement('div');b.dataset.proofAdMarker=String(i);b.style.cssText='position:absolute;left:0;top:0;width:4px;height:320px;z-index:100;pointer-events:none;background:'+ (i?'cyan':'magenta');el.parentElement.append(b)});
  await f.invalidateLayout();
 })()`);

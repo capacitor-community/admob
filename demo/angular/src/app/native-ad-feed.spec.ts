@@ -687,7 +687,7 @@ describe('NativeAdFeed', () => {
     const bindingOf = (element: HTMLElement) =>
       (
         element as unknown as Record<symbol, { projected: boolean; measure(): Record<string, any>; invalidate(): void }>
-      )[Symbol.for('capacitor-native-ui-engine.projection-placement')];
+      )[Symbol.for('webview-native-ui-engine.projection-placement')];
     it('skips covered-slot measurement and sends the latest placement once on return', async () => {
       const { feed, element } = await setup();
       const binding = bindingOf(element);

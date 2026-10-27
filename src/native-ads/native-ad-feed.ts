@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { bindProjectionPlacement, type ProjectionPlacementBinding } from '@rdlabo/capacitor-native-ui-engine';
+import { bindProjectionPlacement, type ProjectionPlacementBinding } from '@webview-native-ui/engine';
 
 import type { NativeAdDefinitions } from './native-ad-definitions.interface';
 import { connectNativeAdElements, defineNativeAdElement } from './native-ad-element';
