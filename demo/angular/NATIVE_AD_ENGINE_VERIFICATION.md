@@ -1,12 +1,12 @@
 # NativeAdFeed Engine migration verification
 
 The Engine now lives at [webview-native-ui/engine](https://github.com/webview-native-ui/engine).
-AdMob uses the published npm package `@webview-native-ui/engine@0.0.1` and Maven
-artifact `io.github.webview-native-ui:engine:0.0.1`. The Java/Kotlin namespace is
+AdMob uses the published npm package `@webview-native-ui/engine@0.0.3` and Maven
+artifact `io.github.webview-native-ui:engine:0.0.3`. The Java/Kotlin namespace is
 `io.github.webview_native_ui.engine`. The previous unreleased-package dependency
 gate is resolved; no local npm link or Maven override is needed.
 
-At the published-package migration, `npm ci --ignore-scripts`, root/demo builds, ESLint, 47 Web tests and 84 Android unit
+At the initial 0.0.1 published-package migration, `npm ci --ignore-scripts`, root/demo builds, ESLint, 47 Web tests and 84 Android unit
 tests passed with these published dependencies. Gradle dependency insight resolved
 `io.github.webview-native-ui:engine:0.0.1` using the default configuration.
 
@@ -15,6 +15,27 @@ The detailed performance/visual figures below describe the earlier linked build
 They are not a new CPU/memory comparison of published 0.0.1. The previous Engine PR
 [#333](https://github.com/rdlabo-dev/ionic-theme-ios27/pull/333) is historical context;
 future Engine work uses the new standalone repository.
+
+## Published 0.0.3 update
+
+Both npm and Maven are pinned to published 0.0.3 without local links or repository
+or version overrides. Root/demo/APK builds, ESLint (one existing warning), all 46
+Web tests and 84 Android unit tests passed. Gradle dependency insight confirmed
+`io.github.webview-native-ui:engine:0.0.3`. No consumer API changes were necessary;
+the new capture-delay option retains its 50 ms default.
+
+- Android emulator normal scroll: 118/118 eligible recorded frames, zero blank candidates;
+  repeat: 192/198 eligible frames, zero blank candidates.
+- Two-ad run: 62 and 60 eligible ad-frame samples, zero blank candidates and zero
+  bridge errors. All 18 mixed retain batches omitted geometry. Reload/detach kept
+  the other ad projected, and pause cleared both.
+- Position-only scrolling created no PNGs; reload decoded three fresh resources.
+- **Unresolved visual observation:** contact sheets contain intermittent overlapping
+  ad imagery. This is not detected by the blank-frame heuristic. Its cause and
+  whether it is introduced by 0.0.3 are unconfirmed; these results do not establish
+  visual parity or zero flash. No CPU/memory comparison was performed.
+- Evidence: `demo/angular/tools/native-ad-engine-003-results.json`; recordings,
+  traces and contact sheets: `/private/tmp/admob-engine003-proof`.
 
 ## Consumer test responsibility cleanup
 
