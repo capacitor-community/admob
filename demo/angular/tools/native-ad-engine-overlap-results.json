@@ -1,0 +1,233 @@
+{
+  "scope": "Android emulator-5580; same AdMob source and gestures; public npm/Maven 0.0.1 versus 0.0.3; builds finished before both comparison recordings",
+  "runs": {
+    "0.0.1": {
+      "apkSha256": "8462358da3388109a33c487fcf15415bbf523a18a080cef1c2397da11b2a9d69",
+      "blankFrameAnalysis": {
+        "frames": 209,
+        "eligible": 209,
+        "minimumPixels": 461,
+        "blankRuns": []
+      },
+      "coverAcks": [
+        {
+          "sentAtMs": 899.5,
+          "ackLatencyMs": 9.0,
+          "shown": true
+        },
+        {
+          "sentAtMs": 900.1,
+          "ackLatencyMs": 9.7,
+          "shown": true
+        },
+        {
+          "sentAtMs": 1989.2,
+          "ackLatencyMs": 161.8,
+          "shown": true
+        },
+        {
+          "sentAtMs": 1989.4,
+          "ackLatencyMs": 165.4,
+          "shown": true
+        },
+        {
+          "sentAtMs": 2298.9,
+          "ackLatencyMs": 112.7,
+          "shown": true
+        },
+        {
+          "sentAtMs": 2303,
+          "ackLatencyMs": 108.8,
+          "shown": true
+        },
+        {
+          "sentAtMs": 3229.8,
+          "ackLatencyMs": 2.4,
+          "shown": true
+        },
+        {
+          "sentAtMs": 3230,
+          "ackLatencyMs": 2.8,
+          "shown": true
+        },
+        {
+          "sentAtMs": 4812.1,
+          "ackLatencyMs": 2.7,
+          "shown": true
+        },
+        {
+          "sentAtMs": 4813,
+          "ackLatencyMs": 21.8,
+          "shown": true
+        },
+        {
+          "sentAtMs": 6496,
+          "ackLatencyMs": 3.2,
+          "shown": true
+        },
+        {
+          "sentAtMs": 6496.1,
+          "ackLatencyMs": 3.9,
+          "shown": true
+        },
+        {
+          "sentAtMs": 8896.7,
+          "ackLatencyMs": 3.2,
+          "shown": true
+        },
+        {
+          "sentAtMs": 8896.7,
+          "ackLatencyMs": 3.3,
+          "shown": true
+        },
+        {
+          "sentAtMs": 10980.6,
+          "ackLatencyMs": 2.9,
+          "shown": true
+        },
+        {
+          "sentAtMs": 10980.6,
+          "ackLatencyMs": 3.1,
+          "shown": true
+        },
+        {
+          "sentAtMs": 11266.4,
+          "ackLatencyMs": 223.2,
+          "shown": true
+        },
+        {
+          "sentAtMs": 12697.2,
+          "ackLatencyMs": 3.7,
+          "shown": true
+        },
+        {
+          "sentAtMs": 12698.3,
+          "ackLatencyMs": 16.5,
+          "shown": true
+        }
+      ],
+      "bridgeErrorCount": 0,
+      "pauseWasImage": true,
+      "afterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      }
+    },
+    "0.0.3": {
+      "apkSha256": "f623fac933ab5574edb0065f6e23cbb0c84c880090da7f85591b512f5d6d0004",
+      "blankFrameAnalysis": {
+        "frames": 199,
+        "eligible": 194,
+        "minimumPixels": 602,
+        "blankRuns": []
+      },
+      "coverAcks": [
+        {
+          "sentAtMs": 872.8,
+          "ackLatencyMs": 149.2,
+          "shown": true
+        },
+        {
+          "sentAtMs": 878.0,
+          "ackLatencyMs": 148.0,
+          "shown": true
+        },
+        {
+          "sentAtMs": 2002.4,
+          "ackLatencyMs": 2.9,
+          "shown": true
+        },
+        {
+          "sentAtMs": 2003.4,
+          "ackLatencyMs": 13.8,
+          "shown": true
+        },
+        {
+          "sentAtMs": 3200.9,
+          "ackLatencyMs": 2.4,
+          "shown": true
+        },
+        {
+          "sentAtMs": 3201.0,
+          "ackLatencyMs": 18.5,
+          "shown": true
+        },
+        {
+          "sentAtMs": 4813.5,
+          "ackLatencyMs": 283.1,
+          "shown": true
+        },
+        {
+          "sentAtMs": 4815.8,
+          "ackLatencyMs": 294.1,
+          "shown": true
+        },
+        {
+          "sentAtMs": 6499.4,
+          "ackLatencyMs": 2.7,
+          "shown": true
+        },
+        {
+          "sentAtMs": 6499.5,
+          "ackLatencyMs": 4.2,
+          "shown": true
+        },
+        {
+          "sentAtMs": 8833.3,
+          "ackLatencyMs": 3.5,
+          "shown": true
+        },
+        {
+          "sentAtMs": 8834.8,
+          "ackLatencyMs": 14.6,
+          "shown": true
+        },
+        {
+          "sentAtMs": 9780.3,
+          "ackLatencyMs": 173.9,
+          "shown": true
+        },
+        {
+          "sentAtMs": 9830.0,
+          "ackLatencyMs": 125.9,
+          "shown": true
+        },
+        {
+          "sentAtMs": 10983.1,
+          "ackLatencyMs": 5.0,
+          "shown": true
+        },
+        {
+          "sentAtMs": 10985.4,
+          "ackLatencyMs": 15.1,
+          "shown": true
+        },
+        {
+          "sentAtMs": 12699.3,
+          "ackLatencyMs": 2.1,
+          "shown": true
+        },
+        {
+          "sentAtMs": 12699.3,
+          "ackLatencyMs": 6.1,
+          "shown": true
+        }
+      ],
+      "bridgeErrorCount": 0,
+      "pauseWasImage": true,
+      "afterPause": {
+        "visible": 0,
+        "oldVisible": 0
+      }
+    }
+  },
+  "finding": "Offset/overlapping native and Web ad imagery is present in both versions. This observation is not newly introduced by 0.0.3.",
+  "mechanism": "Both versions prepaint the opaque Web image underneath live native content and request cover after scroll starts. Code and traces show a window where the Web image can move before native cover completes. The displayed overlap duration was not measured; cover ACK latency includes bridge and callback scheduling and is not native visibility timing.",
+  "limitations": [
+    "Single sequential run per version with different served test creatives; not a frequency or performance comparison.",
+    "Recorded frames are variable-rate samples, not proof of zero physical-frame flash.",
+    "The earlier trace003 run overlapped build activity and is excluded from this comparison."
+  ],
+  "evidenceRoot": "/private/tmp/admob-overlap-investigation",
+  "workingDependencyRestoredTo": "0.0.3"
+}

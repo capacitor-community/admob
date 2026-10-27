@@ -31,11 +31,52 @@ the new capture-delay option retains its 50 ms default.
   the other ad projected, and pause cleared both.
 - Position-only scrolling created no PNGs; reload decoded three fresh resources.
 - **Unresolved visual observation:** contact sheets contain intermittent overlapping
-  ad imagery. This is not detected by the blank-frame heuristic. Its cause and
-  whether it is introduced by 0.0.3 are unconfirmed; these results do not establish
-  visual parity or zero flash. No CPU/memory comparison was performed.
+  ad imagery. This is not detected by the blank-frame heuristic. The follow-up
+  below reproduces offset/overlap in 0.0.1 as well; this observation is not new to
+  0.0.3. These results do not establish visual parity or zero flash. No CPU/memory
+  comparison was performed.
 - Evidence: `demo/angular/tools/native-ad-engine-003-results.json`; recordings,
   traces and contact sheets: `/private/tmp/admob-engine003-proof`.
+
+## Android overlap follow-up: 0.0.1 versus 0.0.3
+
+The same AdMob source and scroll script were run sequentially on emulator-5580
+with public npm/Maven 0.0.1 and 0.0.3. Both builds finished before recording.
+Offset/overlapping native and Web imagery is visible in both versions, so this
+observation is not newly introduced by the update. The first investigation trace
+(`trace003`) overlapped build activity and is excluded from this comparison.
+
+| Public Engine | Eligible recorded frames | Blank candidates | Bridge errors |
+| ------------- | -----------------------: | ---------------: | ------------: |
+| 0.0.1         |               209 of 209 |                0 |             0 |
+| 0.0.3         |               194 of 199 |                0 |             0 |
+
+The shared handoff mechanism explains a potential overlap window: `captureMode: view`
+uses `opaqueUnderlay`, prepainting the Web image below the native ad even while
+`binding.projected` is false. A scroll event starts the `cover` request; native
+`coverView` hides the ad, and its ACK marks the binding projected. Between initial
+scroll movement and native hide, the underlay can move while the live ad still
+occupies its previous position. Preparation is already complete; changing capture
+debounce does not directly close this handoff window. This behavior is in Engine's
+projection/session implementation, unchanged between these releases apart from the
+configurable capture delay whose default remains 50 ms. No AdMob production code
+was changed in this investigation.
+
+Recorded cover ACK latency ranged up to 223.2 ms in the 0.0.1 run and 294.1 ms in
+0.0.3. These include transport/callback scheduling, **not measured overlap duration**.
+The served creatives differed and there was only one sequential comparison per
+version: neither occurrence frequency nor performance parity is established.
+The exact native draw/hide timestamp was not instrumented. Empty-frame checks do
+not detect overlapping images and cannot prove every display frame is flash-free.
+
+Evidence is summarized in `tools/native-ad-engine-overlap-results.json`. Raw
+`compare001`/`compare003` recordings, bridge traces and contact sheets are in
+`/private/tmp/admob-overlap-investigation`; [0.0.1 frame](tools/evidence/native-ad-overlap-001.png) and
+[0.0.3 frame](tools/evidence/native-ad-overlap-003.png) show examples from the
+comparison baseline and the original 0.0.3 run. The working
+npm dependency, normal Android build and installed emulator app were restored to
+0.0.3. This remains a shared handoff issue to address in Engine, not a reason found
+here to revert the dependency update.
 
 ## Consumer test responsibility cleanup
 
