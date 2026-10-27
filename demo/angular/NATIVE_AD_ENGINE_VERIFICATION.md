@@ -6,7 +6,7 @@ artifact `io.github.webview-native-ui:engine:0.0.1`. The Java/Kotlin namespace i
 `io.github.webview_native_ui.engine`. The previous unreleased-package dependency
 gate is resolved; no local npm link or Maven override is needed.
 
-`npm ci --ignore-scripts`, root/demo builds, ESLint, 47 Web tests and 84 Android unit
+At the published-package migration, `npm ci --ignore-scripts`, root/demo builds, ESLint, 47 Web tests and 84 Android unit
 tests passed with these published dependencies. Gradle dependency insight resolved
 `io.github.webview-native-ui:engine:0.0.1` using the default configuration.
 
@@ -15,6 +15,17 @@ The detailed performance/visual figures below describe the earlier linked build
 They are not a new CPU/memory comparison of published 0.0.1. The previous Engine PR
 [#333](https://github.com/rdlabo-dev/ionic-theme-ios27/pull/333) is historical context;
 future Engine work uses the new standalone repository.
+
+## Consumer test responsibility cleanup
+
+The current Web suite passes 46 tests (36 NativeAdFeed tests). The Engine-owned
+fallback DOM visibility/attribute test was removed. Placement tests now mock the
+public `bindProjectionPlacement` boundary instead of accessing Engine's private
+Symbol storage; detach checks that AdMob calls `dispose`, not how Engine removes
+its storage. AdMob-specific batching, multiple ads, recovery and hide behavior
+remain covered. Engine lifecycle/DOM internals belong in the Engine repository.
+This test-only cleanup did not rerun Android or emulator measurements; the results
+below remain evidence from their original runs.
 
 ## Published 0.0.1 smoke verification
 
