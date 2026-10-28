@@ -74,7 +74,7 @@
   "dependencies": {
     "@capacitor/core": "^8.0.0",
     "@rdlabo/capacitor-docgen": "^0.4.1",
-    "@webview-native-ui/engine": "0.0.3"
+    "@webview-native-ui/engine": "0.0.5"
   },
   "lint-staged": {
     "*.{ts}": [
