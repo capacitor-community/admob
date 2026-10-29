@@ -33,6 +33,10 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: '**/package-lock.json'
+      - name: Ensure SwiftLint is available
+        run: |
+          command -v swiftlint >/dev/null || brew install swiftlint
+          swiftlint version
       - run: npm install
       - run: npm run lint
 

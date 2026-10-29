@@ -1,3 +1,5 @@
+// Preserve existing public Swift API names.
+// swiftlint:disable identifier_name
 public enum RewardAdPluginEvents: String {
     case adClicked = "onRewardedVideoAdClicked"
     case Loaded = "onRewardedVideoAdLoaded"
@@ -8,3 +10,4 @@ public enum RewardAdPluginEvents: String {
     case Rewarded = "onRewardedVideoAdReward"
     case AdImpression = "onRewardedVideoAdImpression"
 }
+// swiftlint:enable identifier_name
