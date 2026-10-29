@@ -32,11 +32,11 @@ class NativeAdExecutorTest {
         val first = mock(FrameLayout::class.java)
         val second = mock(FrameLayout::class.java)
         val stateClass = NativeAdExecutor::class.java.declaredClasses.single { it.simpleName == "NativeAdState" }
-        val constructor = stateClass.declaredConstructors.single { it.parameterCount == 13 }.apply { isAccessible = true }
+        val constructor = stateClass.declaredConstructors.single { it.parameterCount == 12 }.apply { isAccessible = true }
         val sequence = stateClass.getDeclaredField("placementSequence").apply { isAccessible = true }
         fun state(container: FrameLayout, handoffSequence: Long): Any = constructor
             .newInstance("feed", true, Any(), mock(NativeAd::class.java), mock(NativeAdView::class.java), container,
-                true, true, 1, null, null, true, null).also { sequence.setLong(it, handoffSequence) }
+                true, 1, null, null, true, null).also { sequence.setLong(it, handoffSequence) }
         @Suppress("UNCHECKED_CAST")
         val states = NativeAdExecutor::class.java.getDeclaredField("states").apply { isAccessible = true }
             .get(executor) as MutableMap<String, Any>
@@ -81,14 +81,14 @@ class NativeAdExecutorTest {
         `when`(nativeView.width).thenReturn(200)
         `when`(nativeView.height).thenReturn(200)
         val stateClass = NativeAdExecutor::class.java.declaredClasses.single { it.simpleName == "NativeAdState" }
-        val constructor = stateClass.declaredConstructors.single { it.parameterCount == 13 }.apply { isAccessible = true }
+        val constructor = stateClass.declaredConstructors.single { it.parameterCount == 12 }.apply { isAccessible = true }
         val sequence = stateClass.getDeclaredField("placementSequence").apply { isAccessible = true }
         val deferred = stateClass.getDeclaredField("deferredPlacement").apply { isAccessible = true }
         val pending = org.json.JSONObject("""{"prior":"geometry"}""")
         val imageState = constructor.newInstance("feed", true, Any(), mock(NativeAd::class.java), imageView,
-            imageContainer, true, true, 1, null, null, true, pending)
+            imageContainer, true, 1, null, null, true, pending)
         val nativeState = constructor.newInstance("feed", true, Any(), mock(NativeAd::class.java), nativeView,
-            nativeContainer, true, true, 1, null, null, true, null)
+            nativeContainer, true, 1, null, null, true, null)
         sequence.setLong(imageState, 10L)
         @Suppress("UNCHECKED_CAST")
         val states = NativeAdExecutor::class.java.getDeclaredField("states").apply { isAccessible = true }
@@ -161,9 +161,9 @@ class NativeAdExecutorTest {
             JSObject("""{"feedId":"feed","sessionId":"session"}""")))
         // Seed a loaded SDK ad; keep placement, layout and notification handling real.
         val stateClass = NativeAdExecutor::class.java.declaredClasses.single { it.simpleName == "NativeAdState" }
-        val state = stateClass.declaredConstructors.single { it.parameterCount == 13 }.apply { isAccessible = true }
+        val state = stateClass.declaredConstructors.single { it.parameterCount == 12 }.apply { isAccessible = true }
             .newInstance("feed", false, Any(), mock(NativeAd::class.java), adView, container,
-                true, true, -1, null, JSObject().put("slotKey", "slot"), true, null)
+                true, -1, null, JSObject().put("slotKey", "slot"), true, null)
         @Suppress("UNCHECKED_CAST")
         val states = NativeAdExecutor::class.java.getDeclaredField("states").apply { isAccessible = true }
             .get(executor) as MutableMap<String, Any>

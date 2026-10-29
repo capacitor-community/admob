@@ -12,7 +12,7 @@ export interface NativeAdDefinitions {
   loadNativeAd(options: NativeAdLoadOptions): Promise<void>;
   updateNativeAdPlacements(options: NativeAdPlacementBatch): Promise<void>;
   removeNativeAd(options: NativeAdCommandIdentity): Promise<void>;
-  /** Android-only test-ad snapshot; does not change native visibility. */
+  /** Android-only snapshot; does not change native visibility. */
   captureNativeAdSnapshot?(options: NativeAdCommandIdentity): Promise<{ dataUrl: string }>;
 
   /** Android-only: confirm that the appended image is ready for the next WebView draw. */
