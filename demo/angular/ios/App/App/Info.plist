@@ -26,6 +26,9 @@
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>GADIsAdManagerApp</key>
 	<true/>
+	<!-- Hide the validator popup in the showcase. Enable it when validating ad layout changes. -->
+	<key>GADNativeAdValidatorEnabled</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSUserTrackingUsageDescription</key>
