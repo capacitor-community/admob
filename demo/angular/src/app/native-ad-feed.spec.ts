@@ -1,7 +1,26 @@
 import { Capacitor } from '@capacitor/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// Model only the public Engine boundary; Engine owns DOM storage and projection lifecycle tests.
+const { placementBindings } = vi.hoisted(() => ({
+  placementBindings: new WeakMap<
+    HTMLElement,
+    { projected: boolean; measure(): Record<string, unknown>; invalidate(): void; dispose: ReturnType<typeof vi.fn> }
+  >(),
+}));
+
+vi.mock('@webview-native-ui/engine', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@webview-native-ui/engine')>()),
+  bindProjectionPlacement: (element: HTMLElement, measure: () => Record<string, unknown>, invalidate = () => {}) => {
+    const binding = { projected: false, measure, invalidate, dispose: vi.fn() };
+    placementBindings.set(element, binding);
+    return binding;
+  },
+}));
+
 const bridge = {
+  prepareNativeAdSnapshot: vi.fn().mockResolvedValue(undefined),
+  captureNativeAdSnapshot: vi.fn().mockResolvedValue({ dataUrl: 'data:image/png;base64,AA==' }),
   startNativeAdFeed: vi.fn().mockResolvedValue(undefined),
   destroyNativeAdFeed: vi.fn().mockResolvedValue(undefined),
   loadNativeAd: vi.fn().mockResolvedValue(undefined),
@@ -670,5 +689,186 @@ describe('NativeAdFeed', () => {
   it('rejects native feed startup on the web implementation', async () => {
     const web = new AdMobWeb();
     await expect(web.startNativeAdFeed()).rejects.toThrow('only available on iOS and Android');
+  });
+  describe('Android Engine projection', () => {
+    const setup = async () => {
+      vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
+      const feed = await NativeAdFeed.create({ feedId: 'engine-test', isTesting: true, androidScrollSnapshot: true });
+      createdFeeds.push(feed);
+      const element = document.createElement('div');
+      document.body.append(element);
+      feed.attach('slot', element);
+      await vi.advanceTimersByTimeAsync(600);
+      return { feed, element };
+    };
+    const bindingOf = (element: HTMLElement) => placementBindings.get(element)!;
+    it('skips covered-slot measurement and sends the latest placement once on return', async () => {
+      const { feed, element } = await setup();
+      const binding = bindingOf(element);
+      binding.projected = true;
+      const rect = vi.spyOn(element, 'getBoundingClientRect');
+      rect.mockClear();
+      bridge.updateNativeAdPlacements.mockClear();
+      for (let i = 0; i < 8; i++) {
+        document.dispatchEvent(new Event('scroll'));
+        await vi.advanceTimersByTimeAsync(20);
+      }
+      expect(rect).not.toHaveBeenCalled();
+      expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+      rect.mockReturnValue({
+        x: 10,
+        y: 80,
+        left: 10,
+        top: 80,
+        right: 310,
+        bottom: 400,
+        width: 300,
+        height: 320,
+        toJSON: () => ({}),
+      });
+      const placement = binding.measure();
+      expect(placement['rect']).toEqual(expect.objectContaining({ y: 80 }));
+      expect(placement['sessionId']).toBeDefined();
+      expect(placement['sequence']).toBeGreaterThan(0);
+      expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+      binding.projected = false;
+      await vi.advanceTimersByTimeAsync(200);
+      expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+      await feed.pause();
+    });
+    it('isolates covered and live ads and preserves the other ad on out-of-order returns', async () => {
+      const { feed, element } = await setup();
+      const second = document.createElement('div');
+      document.body.append(second);
+      feed.attach('second', second);
+      await vi.advanceTimersByTimeAsync(600);
+      const firstBinding = bindingOf(element);
+      const secondBinding = bindingOf(second);
+      firstBinding.projected = true;
+      const firstRect = vi.fn(element.getBoundingClientRect.bind(element));
+      element.getBoundingClientRect = firstRect;
+      const secondRect = vi.fn().mockReturnValue({
+        x: 10,
+        y: 100,
+        left: 10,
+        top: 100,
+        right: 310,
+        bottom: 420,
+        width: 300,
+        height: 320,
+        toJSON: () => ({}),
+      });
+      second.getBoundingClientRect = secondRect;
+      document.dispatchEvent(new Event('scroll'));
+      await vi.advanceTimersByTimeAsync(20);
+      expect(firstRect).not.toHaveBeenCalled();
+      expect(secondRect).toHaveBeenCalled();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([
+        expect.objectContaining({ slotKey: 'slot', visible: true }),
+        expect.objectContaining({ slotKey: 'second', visible: true, rect: expect.objectContaining({ y: 100 }) }),
+      ]);
+      const retained = bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0];
+      expect(retained.retain).toBe(true);
+      expect(retained.rect).toBeUndefined();
+      expect(retained.clipRect).toBeUndefined();
+      secondBinding.projected = true;
+      firstRect.mockClear();
+      secondRect.mockClear();
+      bridge.updateNativeAdPlacements.mockClear();
+      document.dispatchEvent(new Event('scroll'));
+      await vi.advanceTimersByTimeAsync(20);
+      expect(firstRect).not.toHaveBeenCalled();
+      expect(secondRect).not.toHaveBeenCalled();
+      expect(bridge.updateNativeAdPlacements).not.toHaveBeenCalled();
+      const secondReturn = secondBinding.measure();
+      secondBinding.projected = false;
+      const firstReturn = firstBinding.measure();
+      expect(firstReturn['sequence']).toBeGreaterThan(secondReturn['sequence'] as number);
+      expect(firstReturn['slotKey']).toBe('slot');
+      expect(secondReturn['slotKey']).toBe('second');
+      feed.detach(second);
+      await vi.advanceTimersByTimeAsync(20);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements).toEqual([
+        expect.objectContaining({ slotKey: 'slot', visible: true }),
+        expect.objectContaining({ slotKey: 'second', visible: false }),
+      ]);
+    });
+    it('does not suppress explicit hide or layout invalidation while covered', async () => {
+      const { feed, element } = await setup();
+      bindingOf(element).projected = true;
+      element.style.visibility = 'hidden';
+      await feed.invalidateLayout();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
+      element.style.visibility = '';
+      await feed.invalidateLayout();
+      const resized = bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0];
+      expect(resized.visible).toBe(true);
+      expect(resized.retain).toBeUndefined();
+      expect(resized.rect).toBeDefined();
+      expect(resized.clipRect).toBeDefined();
+      await feed.pause();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
+    });
+    it('resends placement after a failed optimistic handoff even when geometry is unchanged', async () => {
+      const { element } = await setup();
+      const binding = bindingOf(element);
+      binding.projected = true;
+      binding.measure();
+      bridge.updateNativeAdPlacements.mockClear();
+      binding.projected = false;
+      binding.invalidate();
+      await vi.advanceTimersByTimeAsync(20);
+      expect(bridge.updateNativeAdPlacements).toHaveBeenCalledOnce();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
+    });
+    it('disposes the Engine binding and hides the ad on detach', async () => {
+      const { feed, element } = await setup();
+      const binding = bindingOf(element);
+      binding.projected = true;
+      feed.detach(element);
+      expect(binding.dispose).toHaveBeenCalledOnce();
+      await vi.advanceTimersByTimeAsync(200);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
+    });
+    it('passes the existing host selector to native instead of using the old capture bridge', async () => {
+      const { element } = await setup();
+      const selector = bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector;
+      expect(selector).toBeDefined();
+      expect(document.querySelector(selector)).toBe(element);
+      expect(element.querySelector('img')).toBeNull();
+      expect(bridge.captureNativeAdSnapshot).not.toHaveBeenCalled();
+    });
+    it('reloads the native ad on the same projection host', async () => {
+      const { feed } = await setup();
+      const selector = bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector;
+      await feed.reload('slot');
+      expect(bridge.removeNativeAd).toHaveBeenCalled();
+      expect(bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector).toBe(selector);
+      expect(bridge.loadNativeAd).toHaveBeenCalledTimes(2);
+    });
+    it('rebinds a retained ad to a replacement host with one stable selector', async () => {
+      const { feed, element } = await setup();
+      const selector = bridge.loadNativeAd.mock.lastCall?.[0].projectionSelector;
+      feed.detach(element);
+      const replacement = document.createElement('div');
+      document.body.append(replacement);
+      feed.attach('slot', replacement);
+      await vi.advanceTimersByTimeAsync(600);
+      expect(document.querySelectorAll(selector)).toHaveLength(1);
+      expect(document.querySelector(selector)).toBe(replacement);
+      expect(bridge.loadNativeAd).toHaveBeenCalledTimes(1);
+    });
+
+    it('pause hides the native parent', async () => {
+      const { feed } = await setup();
+      await feed.pause();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
+    });
+    it('rejects production ads for this experiment', async () => {
+      vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
+      await expect(
+        NativeAdFeed.create({ feedId: 'production', adId: 'unit', androidScrollSnapshot: true }),
+      ).rejects.toThrow('Android test ads');
+    });
   });
 });

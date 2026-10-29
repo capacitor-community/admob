@@ -1,56 +1,117 @@
-<ion-header [translucent]="true">
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/demo" />
-    </ion-buttons>
-    <ion-title>Native Ads (Preview)</ion-title>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/tabs/demo" [text]="''" /></ion-buttons>
+    <div class="brand" aria-label="Gather">
+      <span class="brand-mark" aria-hidden="true">g.</span>gather<span class="brand-dot">.</span>
+    </div>
+    <span slot="end" class="edition">A little more connected</span>
   </ion-toolbar>
+  <div class="feed-heading">
+    <span class="current-section">For you</span
+    ><span class="community-label"><span></span>Your daily dose of discovery</span>
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Native Ads (Preview)</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-list [inset]="true">
-    <ion-list-header><ion-label>Preview</ion-label></ion-list-header>
-    <ion-item lines="none">
-      <ion-note>
-        Preview feature: its API may change. This sample uses Google test ads in a standard Ionic scroll container.
-        Virtual scrolling is still experimental and is not claimed as supported.
-      </ion-note>
-    </ion-item>
-    @if (vm.lastEvent(); as event) {
-    <ion-item>
-      <ion-label class="ion-text-wrap">Last event: {{ event.name }}<br />{{ event.value | json }}</ion-label>
-    </ion-item>
-    } @if (vm.errorMessage(); as errorMessage) {
-    <ion-item color="danger">
-      <ion-label class="ion-text-wrap">{{ errorMessage }}</ion-label>
-    </ion-item>
-    }
-  </ion-list>
-
-  @if (!vm.isNativePlatform) {
-  <ion-card>
-    <ion-card-header><ion-card-title>Native device required</ion-card-title></ion-card-header>
-    <ion-card-content>Native ads are available only in the iOS and Android demo apps.</ion-card-content>
-  </ion-card>
-  } @else {
-  <section class="feed" aria-label="Native ad example feed">
+<ion-content>
+  <main class="feed" aria-label="Community feed">
     @for (item of vm.feedItems; track item.id) { @if (item.kind === 'article') {
-    <ion-card>
-      <ion-card-header><ion-card-title>{{ item.title }}</ion-card-title></ion-card-header>
-      <ion-card-content>{{ item.summary }}</ion-card-content>
-    </ion-card>
+    <article class="post">
+      <div class="avatar" [class]="'avatar ' + item.tone" aria-hidden="true">{{ item.initials }}</div>
+      <div class="post-body">
+        <header class="post-heading">
+          <strong>{{ item.name }}</strong
+          ><ion-icon name="checkmark-circle" class="verified" aria-label="Verified" /><span class="post-time"
+            >{{ item.time }}</span
+          >
+        </header>
+        <div class="handle">&#64;{{ item.handle }}</div>
+        <p>{{ item.text }}</p>
+        @if (item.image) {
+        <figure><img [src]="item.image" [alt]="item.imageAlt" width="1000" height="600" /></figure>
+        } @if (item.location) {
+        <div class="location"><ion-icon name="leaf-outline" aria-hidden="true" />{{ item.location }}</div>
+        }
+        <!-- These local toggles are synchronous and have no pending operation. -->
+        <!-- eslint-disable @rdlabo/rules/prefer-disable-handler -->
+        <div class="reactions">
+          <span class="reply-count" [attr.aria-label]="item.replies + ' replies'"
+            ><ion-icon name="chatbubble-outline" aria-hidden="true" />{{ item.replies }}</span
+          >
+          <button
+            type="button"
+            (click)="vm.toggleLike(item.id)"
+            [class.selected]="vm.liked().has(item.id)"
+            [attr.aria-pressed]="vm.liked().has(item.id)"
+            [attr.aria-label]="'Like post by ' + item.name"
+          >
+            <ion-icon [name]="vm.liked().has(item.id) ? 'heart' : 'heart-outline'" aria-hidden="true" />{{ item.likes +
+            (vm.liked().has(item.id) ? 1 : 0) }}
+          </button>
+          <button
+            type="button"
+            class="save"
+            (click)="vm.toggleSave(item.id)"
+            [class.selected]="vm.saved().has(item.id)"
+            [attr.aria-pressed]="vm.saved().has(item.id)"
+            [attr.aria-label]="'Save post by ' + item.name"
+          >
+            <ion-icon [name]="vm.saved().has(item.id) ? 'bookmark' : 'bookmark-outline'" aria-hidden="true" />
+          </button>
+        </div>
+        <!-- eslint-enable @rdlabo/rules/prefer-disable-handler -->
+      </div>
+    </article>
     } @else {
     <article class="native-ad-row" aria-label="Sponsored content">
+      <div class="sponsor-heading"><span>Sponsored</span><span class="test-badge">Test ad</span></div>
+      @if (vm.isNativePlatform) {
       <capacitor-admob-native feed-id="native-ad-demo-feed" [attr.slot-key]="item.slotKey"></capacitor-admob-native>
-      <ion-item [button]="true" lines="none" (click)="vm.reload(item.slotKey)">Reload test ad</ion-item>
+      } @else {
+      <div class="native-placeholder">
+        <ion-icon name="leaf-outline" aria-hidden="true" /><strong>A space for something new.</strong
+        ><span>Native ads appear in the iOS and Android apps.</span>
+      </div>
+      }
     </article>
     } }
-  </section>
-  }
+    <footer class="feed-end">
+      <span class="brand-mark" aria-hidden="true">g.</span>
+      <h2>A little inspiration goes a long way.</h2>
+      <p>You’re all caught up. Make something of today.</p>
+      <button type="button" (click)="vm.disableHandler($event, null)">
+        Back to top <ion-icon name="arrow-up-outline" aria-hidden="true" />
+      </button>
+    </footer>
+    <details class="developer-tools">
+      <summary>Demo information &amp; ad diagnostics</summary>
+      <p>
+        A sample community feed with Google test ads. Posts and profiles are fictional. Likes and saves last for this
+        visit.
+      </p>
+      <p>
+        Photo:
+        <a href="https://unsplash.com/photos/TYIzeCiZ_60" target="_blank" rel="noopener noreferrer">Unsplash</a>.
+      </p>
+      <div class="event-log" role="region" aria-label="Ad event log" tabindex="0">
+        @if (vm.lastEvent(); as event) {
+        <pre>
+{{ event.name }}
+{{ event.value | json }}</pre>
+        } @else {
+        <p>Waiting for ad events…</p>
+        } @if (vm.errorMessage(); as errorMessage) {
+        <p class="error">{{ errorMessage }}</p>
+        }
+      </div>
+      @if (vm.isNativePlatform) {
+      <div class="reload-actions">
+        @for (item of vm.feedItems; track item.id) { @if (item.kind === 'native-ad') {
+        <button type="button" (click)="vm.disableHandler($event, item.slotKey)">
+          Reload {{ item.slotKey === 'sponsored-after-capacitor' ? 'first' : 'second' }} test ad
+        </button>
+        } }
+      </div>
+      }
+    </details>
+  </main>
 </ion-content>

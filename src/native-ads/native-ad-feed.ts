@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import type { PluginListenerHandle } from '@capacitor/core';
+import { bindProjectionPlacement, type ProjectionPlacementBinding } from '@webview-native-ui/engine';
 
 import type { NativeAdDefinitions } from './native-ad-definitions.interface';
 import { connectNativeAdElements, defineNativeAdElement } from './native-ad-element';
@@ -48,6 +49,10 @@ interface SlotState {
   status: SlotStatus;
   lastUsed: number;
   loadVersion: number;
+  projectionSelector?: string;
+  projectionOwner?: string;
+  placementBinding?: ProjectionPlacementBinding;
+  lastPlacement?: NativeAdPlacement;
 }
 
 let bridge: NativeAdDefinitions | undefined;
@@ -104,6 +109,9 @@ export class NativeAdFeed {
     }
     if (feeds.size >= MAX_ACTIVE_FEEDS) {
       throw new Error(`At most ${MAX_ACTIVE_FEEDS} native ad feeds can be active`);
+    }
+    if (options.androidScrollSnapshot && (Capacitor.getPlatform() !== 'android' || options.isTesting !== true)) {
+      throw new Error('androidScrollSnapshot requires Android test ads');
     }
     this.options = { ...options, feedId: id };
     this.nativeScrollElement = Capacitor.getPlatform() === 'ios' ? options.scrollElement : undefined;
@@ -242,6 +250,34 @@ export class NativeAdFeed {
     };
     applySlotDefaults(element, this.options.template ?? NativeAdTemplate.Medium);
     state.element = element;
+    if (this.options.androidScrollSnapshot) {
+      const owner = (state.projectionOwner ??= `admob-${crypto.randomUUID()}`);
+      element.dataset['admobProjection'] = owner;
+      state.projectionSelector = `[data-admob-projection="${owner}"]`;
+      state.placementBinding?.dispose();
+      state.placementBinding = bindProjectionPlacement(
+        element,
+        () => {
+          const placement = this.measurePlacement(state);
+          state.lastPlacement = placement;
+          // The reveal request applies this exact placement; keep batch deduplication in sync.
+          if (this.lastPlacements) {
+            const previous = JSON.parse(this.lastPlacements);
+            previous.placements = previous.placements.map((item: NativeAdPlacement) =>
+              item.slotKey === state.slotKey ? placement : item,
+            );
+            this.lastPlacements = JSON.stringify(previous);
+          }
+          return { ...placement, sessionId: this.sessionId, sequence: ++this.placementSequence };
+        },
+        () => {
+          if (state.element !== element || this.destroyed) return;
+          state.lastPlacement = undefined;
+          this.lastPlacements = undefined;
+          this.schedulePlacementUpdate();
+        },
+      );
+    }
     state.generation += 1;
     state.lastUsed = Date.now();
     this.slots.set(normalizedKey, state);
@@ -259,6 +295,10 @@ export class NativeAdFeed {
     }
     const state = this.slots.get(slotKey);
     if (state?.element === element) {
+      state.placementBinding?.dispose();
+      state.placementBinding = undefined;
+      state.lastPlacement = undefined;
+      if (state.projectionOwner) delete element.dataset['admobProjection'];
       state.element = undefined;
       state.intersecting = false;
       state.generation += 1;
@@ -288,6 +328,7 @@ export class NativeAdFeed {
         throw new Error('Native ad capacity is currently in use by visible slots');
       }
       await this.loadState(state);
+      await this.requestPlacementUpdate();
     });
   }
 
@@ -311,6 +352,7 @@ export class NativeAdFeed {
   /** Hides stale overlays and remeasures after an application-driven layout change. */
   async invalidateLayout(): Promise<void> {
     this.assertActive();
+    for (const state of this.slots.values()) state.lastPlacement = undefined;
     this.layoutInvalidated = true;
     this.scheduleEvaluation();
     if (!(await this.requestPlacementUpdate())) {
@@ -357,6 +399,16 @@ export class NativeAdFeed {
   private readonly handleViewportMotion = (event?: Event | ResizeObserverEntry[]): void => {
     if (this.destroyed) {
       return;
+    }
+    if (
+      event instanceof Event &&
+      event.type === 'load' &&
+      event.target instanceof HTMLImageElement &&
+      event.target.dataset['admobSnapshot'] !== undefined
+    )
+      return;
+    if (!(event instanceof Event) || !['scroll', 'touchmove', 'wheel'].includes(event.type)) {
+      for (const state of this.slots.values()) state.lastPlacement = undefined;
     }
     if (!(
       this.nativeScrollElement &&
@@ -422,7 +474,9 @@ export class NativeAdFeed {
     }
     this.settleTimer = setTimeout(() => {
       this.layoutInvalidated = false;
-      void this.runOperation(() => this.evaluate());
+      void this.runOperation(async () => {
+        await this.evaluate();
+      });
     }, SCROLL_SETTLE_MS);
   }
 
@@ -441,7 +495,7 @@ export class NativeAdFeed {
       .filter((state) => state.status === 'idle')
       .slice(0, Math.max(0, MAX_NATIVE_ADS - occupied));
     await Promise.allSettled(loadable.map((state) => this.loadState(state)));
-    void this.requestPlacementUpdate();
+    await this.requestPlacementUpdate();
   }
 
   private async loadState(state: SlotState): Promise<void> {
@@ -460,6 +514,7 @@ export class NativeAdFeed {
         adId: this.options.adId,
         isTesting: this.options.isTesting,
         npa: this.options.npa,
+        ...(state.projectionSelector ? { projectionSelector: state.projectionSelector } : {}),
       });
       if (state.loadVersion === loadVersion) {
         state.status = 'loaded';
@@ -497,6 +552,7 @@ export class NativeAdFeed {
 
   private getVisibleStates(): SlotState[] {
     return [...this.slots.values()].filter((state) => {
+      if (this.reuseProjectedPlacement(state)) return state.intersecting && !!state.lastPlacement?.visible;
       const measured = state.element && state.intersecting ? measureNativeAdSlot(state.element) : undefined;
       return Boolean(measured && this.isSupportedSize(measured));
     });
@@ -557,8 +613,42 @@ export class NativeAdFeed {
     ]);
     this.nativeStarted = false;
     this.listenerHandles.clear();
+    for (const state of this.slots.values()) state.placementBinding?.dispose();
     this.slots.clear();
     this.elementSlots.clear();
+  }
+
+  private reuseProjectedPlacement(state: SlotState): boolean {
+    return Boolean(
+      state.placementBinding?.projected &&
+      state.lastPlacement?.visible &&
+      state.element?.isConnected &&
+      !this.paused &&
+      !this.destroyed &&
+      !document.hidden &&
+      state.status === 'loaded' &&
+      state.lastPlacement.generation === state.generation,
+    );
+  }
+
+  private measurePlacement(state: SlotState): NativeAdPlacement {
+    const measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
+    return {
+      feedId: this.options.feedId,
+      slotKey: state.slotKey,
+      generation: state.generation,
+      visible: Boolean(
+        !this.paused &&
+        !this.destroyed &&
+        state.status === 'loaded' &&
+        (!this.layoutInvalidated || this.options.androidScrollSnapshot) &&
+        measured &&
+        this.isSupportedSize(measured) &&
+        !document.hidden,
+      ),
+      rect: measured?.rect,
+      clipRect: measured?.clipRect,
+    };
   }
 
   private requestPlacementUpdate(allowDirect = false): Promise<boolean> {
@@ -579,21 +669,15 @@ export class NativeAdFeed {
         this.updateDirty = false;
         const allowDirect = !this.placementAcknowledgementRequired;
         this.placementAcknowledgementRequired = false;
+        const retainedSlots = new Set<string>();
         const placements = [...this.slots.values()]
           .filter((state) => state.status === 'loaded')
           .map((state): NativeAdPlacement => {
-            const measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
-            const visible = Boolean(
-              !this.paused && !this.layoutInvalidated && measured && this.isSupportedSize(measured) && !document.hidden,
-            );
-            return {
-              feedId: this.options.feedId,
-              slotKey: state.slotKey,
-              generation: state.generation,
-              visible,
-              rect: measured?.rect,
-              clipRect: measured?.clipRect,
-            };
+            if (this.reuseProjectedPlacement(state)) {
+              retainedSlots.add(state.slotKey);
+              return state.lastPlacement!;
+            }
+            return (state.lastPlacement = this.measurePlacement(state));
           });
         const scrollContainer = this.nativeScrollElement
           ? measureNativeAdScrollContainer(this.nativeScrollElement)
@@ -607,7 +691,17 @@ export class NativeAdFeed {
             feedId: this.options.feedId,
             sessionId: this.sessionId,
             sequence: ++this.placementSequence,
-            placements,
+            placements: placements.map((placement) => {
+              return retainedSlots.has(placement.slotKey)
+                ? {
+                    feedId: placement.feedId,
+                    slotKey: placement.slotKey,
+                    generation: placement.generation,
+                    visible: true,
+                    retain: true,
+                  }
+                : placement;
+            }),
             ...(scrollContainer ? { scrollContainer } : {}),
           };
           const channel =

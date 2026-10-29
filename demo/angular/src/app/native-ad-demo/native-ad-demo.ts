@@ -12,29 +12,40 @@ import { Capacitor } from '@capacitor/core';
 import {
   IonBackButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonContent,
   IonHeader,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonListHeader,
-  IonNote,
-  IonTitle,
+  IonIcon,
   IonToolbar,
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import {
+  arrowUpOutline,
+  bookmark,
+  bookmarkOutline,
+  chatbubbleOutline,
+  checkmarkCircle,
+  heart,
+  heartOutline,
+  leafOutline,
+} from 'ionicons/icons';
 import { ViewModelStore } from '../shared/view-model-store';
 
 interface ArticleItem {
   kind: 'article';
   id: string;
-  title: string;
-  summary: string;
+  name: string;
+  handle: string;
+  initials: string;
+  tone: string;
+  time: string;
+  text: string;
+  likes: number;
+  replies: number;
+  image?: string;
+  imageAlt?: string;
+  location?: string;
 }
 
 interface NativeAdItem {
@@ -54,22 +65,56 @@ const feedItems: FeedItem[] = [
   {
     kind: 'article',
     id: 'article-capacitor',
-    title: 'Build native apps with web technology',
-    summary: 'Capacitor keeps application code portable while exposing native platform capabilities.',
+    name: 'Emma Chen',
+    handle: 'emmachen',
+    initials: 'ec',
+    tone: 'rose',
+    time: '12m',
+    text: 'A slow morning, a good coffee, and nowhere to rush. Found my new favorite corner of the city. ☕',
+    likes: 128,
+    replies: 12,
+    image: 'assets/gather/coffee.jpg',
+    imageAlt: 'Pour-over coffee being brewed by a sunlit café window',
+    location: 'Little moments · Tokyo',
   },
   { kind: 'native-ad', id: 'ad-after-capacitor', slotKey: 'sponsored-after-capacitor' },
   {
     kind: 'article',
     id: 'article-ionic',
-    title: 'Compose a mobile UI with Ionic',
-    summary: 'This page uses an ordinary Ionic scroll container with native ads inserted as feed rows.',
+    name: 'Oliver Park',
+    handle: 'oliverwalks',
+    initials: 'op',
+    tone: 'sage',
+    time: '28m',
+    text: 'Took the long way home. Turns out the best part of the day was the part I hadn’t planned. 🌿',
+    likes: 86,
+    replies: 8,
+    location: 'Everyday discoveries',
+  },
+  {
+    kind: 'article',
+    id: 'article-weekend',
+    name: 'Sofia Rivera',
+    handle: 'sofiamakes',
+    initials: 'sr',
+    tone: 'lavender',
+    time: '42m',
+    text: 'Weekend idea: pick a neighborhood you’ve never visited. No itinerary. Just comfortable shoes and a little curiosity.',
+    likes: 214,
+    replies: 24,
   },
   { kind: 'native-ad', id: 'ad-after-ionic', slotKey: 'sponsored-after-ionic' },
   {
     kind: 'article',
     id: 'article-lifecycle',
-    title: 'Keep feed lifecycle explicit',
-    summary: 'The demo creates one feed on entry and destroys its listeners and native resources on exit.',
+    name: 'Emma Chen',
+    handle: 'emmachen',
+    initials: 'ec',
+    tone: 'rose',
+    time: '1h',
+    text: 'What’s one little place in your city that deserves more love? Collecting recommendations for next weekend. ✨',
+    likes: 53,
+    replies: 19,
   },
 ];
 
@@ -77,24 +122,7 @@ const feedItems: FeedItem[] = [
   selector: 'app-native-ad-demo',
   templateUrl: 'native-ad-demo.html',
   styleUrl: 'native-ad-demo.scss',
-  imports: [
-    JsonPipe,
-    IonBackButton,
-    IonButtons,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonContent,
-    IonHeader,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonListHeader,
-    IonNote,
-    IonTitle,
-    IonToolbar,
-  ],
+  imports: [JsonPipe, IonBackButton, IonButtons, IonContent, IonHeader, IonIcon, IonToolbar],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -103,6 +131,16 @@ export class NativeAdDemo implements ViewWillEnter, ViewWillLeave {
   readonly vm = new ViewModel(this);
 
   constructor() {
+    addIcons({
+      arrowUpOutline,
+      bookmark,
+      bookmarkOutline,
+      chatbubbleOutline,
+      checkmarkCircle,
+      heart,
+      heartOutline,
+      leafOutline,
+    });
     afterRenderEffect(() => {
       this.vm.lastEvent();
       this.vm.errorMessage();
@@ -121,6 +159,32 @@ export class NativeAdDemo implements ViewWillEnter, ViewWillLeave {
 
 class ViewModel extends ViewModelStore<NativeAdDemo> {
   readonly feedItems = feedItems;
+  readonly liked = signal<ReadonlySet<string>>(new Set());
+  readonly saved = signal<ReadonlySet<string>>(new Set());
+
+  toggleLike(id: string): void {
+    this.liked.update((previous) => this.#toggle(previous, id));
+  }
+
+  toggleSave(id: string): void {
+    this.saved.update((previous) => this.#toggle(previous, id));
+  }
+
+  async disableHandler(event: Event, slotKey: string | null): Promise<void> {
+    const button = event.currentTarget as HTMLButtonElement;
+    button.disabled = true;
+    const work = slotKey ? this.reload(slotKey) : this.host.content().scrollToTop(300);
+    await work.finally(() => {
+      button.disabled = false;
+    });
+  }
+
+  #toggle(previous: ReadonlySet<string>, id: string): ReadonlySet<string> {
+    const next = new Set(previous);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    return next;
+  }
   readonly isNativePlatform = Capacitor.isNativePlatform();
   readonly lastEvent = signal<AdEvent | undefined>(undefined);
   readonly errorMessage = signal<string | undefined>(undefined);
@@ -163,15 +227,18 @@ class ViewModel extends ViewModelStore<NativeAdDemo> {
     const feed = await NativeAdFeed.create({
       scrollElement,
       feedId: 'native-ad-demo-feed',
+      androidScrollSnapshot: Capacitor.getPlatform() === 'android',
       template: NativeAdTemplate.Medium,
       isTesting: true,
       style: {
         backgroundColor: '#ffffff',
-        borderColor: '#d7d8da',
-        borderWidth: 1,
-        cornerRadius: 12,
-        headlineColor: '#1f2937',
-        callToActionBackgroundColor: '#3880ff',
+        borderColor: '#ffffff',
+        borderWidth: 0,
+        cornerRadius: 0,
+        headlineColor: '#24232b',
+        bodyColor: '#72717c',
+        callToActionTextColor: '#ffffff',
+        callToActionBackgroundColor: '#cf3867',
       },
     });
     if (generation !== this.#generation) {

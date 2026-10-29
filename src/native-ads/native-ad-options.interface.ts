@@ -15,6 +15,9 @@ export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa' | 'isTesting'
    */
   scrollElement?: HTMLElement;
 
+  /** Android test-ad experiment: use a cached DOM image while scrolling. */
+  androidScrollSnapshot?: boolean;
+
   /** Plugin-owned layout used for every native ad in this feed. */
   template?: NativeAdTemplate;
 
@@ -32,6 +35,8 @@ export interface NativeAdFeedSession {
 
 export interface NativeAdLoadOptions extends Pick<AdOptions, 'npa' | 'isTesting'>, NativeAdFeedSession {
   slotKey: string;
+  /** Internal Feed projection destination; applications use attach(). */
+  projectionSelector?: string;
   template: NativeAdTemplate;
   style?: NativeAdStyle;
   adId?: string;
