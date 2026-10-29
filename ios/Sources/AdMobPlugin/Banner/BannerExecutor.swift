@@ -6,7 +6,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     weak var plugin: AdMobPlugin?
     var bannerView: BannerView!
     var adPosition: String = ""
-    var Margin: Int = 0
+    var margin: Int = 0
 
     func showBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
         if let rootViewController = plugin?.getRootVC() {
@@ -112,11 +112,11 @@ class BannerExecutor: NSObject, BannerViewDelegate {
         call.resolve([:])
     }
 
-    private func addBannerViewToView(_ bannerView: BannerView, _ adPosition: String, _ Margin: Int) {
+    private func addBannerViewToView(_ bannerView: BannerView, _ adPosition: String, _ margin: Int) {
         removeBannerViewToView()
         bannerView.translatesAutoresizingMaskIntoConstraints = false
         bannerView.tag = 2743243288699 // rand
-        self.Margin = Margin
+        self.margin = margin
         self.adPosition = adPosition
     }
 
@@ -142,7 +142,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                                     toItem: rootViewController.view.safeAreaLayoutGuide,
                                     attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
                                     multiplier: 1,
-                                    constant: CGFloat(Int(self.Margin) * -1)),
+                                    constant: CGFloat(Int(self.margin) * -1)),
                  NSLayoutConstraint(item: bannerView,
                                     attribute: .centerX,
                                     relatedBy: .equal,
