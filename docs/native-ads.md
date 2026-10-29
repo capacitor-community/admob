@@ -1,6 +1,4 @@
-# Native Ads (Preview)
-
-**Native Ads is a Preview feature.** You can use it for testing and in production. Its API may change in a minor release while in Preview.
+# Native Ads
 
 Native ads are rendered with Google Mobile Ads SDK views owned by this plugin. Your app reserves an HTML slot and supplies a stable key; it does not implement a `NativeAdView` in Kotlin or Swift and does not render ad assets in JavaScript.
 
@@ -32,7 +30,7 @@ const paidHandle = await nativeAds.addListener(NativeAdPluginEvents.AdPaid, (eve
 });
 ```
 
-Use the framework-independent element in ordinary or virtualized markup. `slot-key` must identify the logical ad item, not its array index and not the recycled DOM node.
+Use the framework-independent element in your feed markup. `slot-key` must identify the logical ad item, not its array index and not the recycled DOM node.
 
 ```html
 <capacitor-admob-native feed-id="home-feed" slot-key="sponsored-after-article-42"></capacitor-admob-native>
@@ -134,7 +132,7 @@ Call `destroy()` when leaving a screen. Await `pause()` before presenting an ove
 | `invalidateLayout(): Promise<void>`            | Hides and remeasures after an application-driven reflow.       |
 | `destroy()`                                    | Removes listeners and all native resources for the session.    |
 
-`NativeAdFeedOptions` contains `feedId`, `adId`, `template`, `style`, `isTesting`, `npa`, and the optional iOS `scrollElement`. Set `isTesting: true` to use Google's platform test ad unit. For production ads, set your platform-specific native ad unit ID in `adId` and omit `isTesting` or set it to `false`. `adId` is required unless `isTesting` is `true`. `feedId` and every `slotKey` must be non-empty and stable; reuse the same feed IDs across WebView reloads so stale native sessions can be replaced safely.
+`NativeAdFeedOptions` contains `feedId`, `adId`, `template`, `style`, `isTesting`, `npa`, the optional iOS `scrollElement`, and Android `androidScrollSnapshot`. Set `isTesting: true` to use Google's platform test ad unit. For production ads, set your platform-specific native ad unit ID in `adId` and omit `isTesting` or set it to `false`. `adId` is required unless `isTesting` is `true`. `feedId` and every `slotKey` must be non-empty and stable; reuse the same feed IDs across WebView reloads so stale native sessions can be replaced safely.
 
 ## Rendering and policy boundary
 
@@ -156,86 +154,34 @@ const feed = await NativeAdFeed.create({
 });
 ```
 
-On iOS, specifying `scrollElement` enables experimental native scroll tracking for that container. Layout changes still require remeasurement; call `invalidateLayout()` after application-driven changes. Clipping inside the scroll container and at its visible bounds is retained. `pause()` and `destroy()` stop tracking. Other platforms ignore this option and retain JavaScript coordinate updates.
+On iOS, specifying `scrollElement` enables native scroll tracking for that container. Layout changes still require remeasurement; call `invalidateLayout()` after application-driven changes. Clipping inside the scroll container and at its visible bounds is retained. `pause()` and `destroy()` stop tracking. Other platforms ignore this option and retain JavaScript coordinate updates.
 
 If the specified container cannot be identified unambiguously, the update fails and its ads stay hidden. Use one untransformed, unzoomed overflow scroll container; nested scrolling, document scrolling through this option, and virtual-scroll integrations are not supported. This does not change gesture routing for swipes that begin on an ad.
 
-### Android scroll snapshot experiment (test ads only)
+## Android scroll snapshots
 
-Set `androidScrollSnapshot: true` together with `isTesting: true` in
-`NativeAdFeed.create()` on Android. The demo enables this option at
-`/native?snapshot`; `/native` retains the normal overlay implementation.
+Set `androidScrollSnapshot: true` to display a cached image in the web feed while
+scrolling and restore the native ad when scrolling stops. The demo enables this
+option by default on Android.
 
-After layout settles and the loaded ad has been positioned, capture is scheduled
-with a minimum 50 ms delay. This is an idle scheduling allowance, not a rendering
-deadline. PNG encoding runs off the UI thread. The decoded image is inserted as a
-persistent DOM underlay, and Android's `WebView.postVisualStateCallback` confirms
-that the insertion is ready for the next WebView draw before it becomes eligible
-to replace the native view. The callback is not a display-presentation fence.
+```ts
+const feed = await NativeAdFeed.create({
+  feedId: 'articles',
+  adId: 'YOUR_ANDROID_NATIVE_AD_UNIT_ID',
+  androidScrollSnapshot: true,
+});
+```
 
-On `scroll`, `touchmove`, or `wheel`, an eligible image replaces its native overlay
-through the placement channel and scrolls with the DOM. After 120 ms without
-motion, native placements return over the underlay. The image remains drawn so
-native acknowledgement does not expose an empty slot before native rendering.
-If no prepared image exists, the native view continues tracking.
+Use `isTesting: true` during development to request Google's test ads. For production,
+provide your native ad unit ID in `adId` and omit `isTesting` or set it to `false`.
+Snapshots are available in either mode. The option is supported only on Android.
 
-The same image is reused until the ad is reloaded or its slot size changes.
-Reload discards the old creative and schedules a new capture after load and
-placement complete. Size changes retain the previous underlay until a new image
-passes readiness. Pause, detach, and destruction discard both active and pending
-images; stale asynchronous results cannot reattach them. Each ad/size gets at most
-three failed attempts, spaced at least one second apart. Motion cancellation does
-not consume that retry budget. Native capture permits only one bitmap/encoder at
-a time across feeds, bounded to two million pixels (8 MB of raw RGBA pixels).
-Decoded WebView images, PNG/base64 transfer and temporary replacement buffers add
-memory beyond this bitmap bound. No clicks or impressions are synthesized.
+WebView Native UI Engine manages snapshot capture and switching between the image
+and native view. Each ad slot has its own projection. Images are refreshed when the
+ad is reloaded or its layout changes; pausing, detaching, or destroying the feed
+hides or removes the corresponding projections.
 
-This is a visual experiment, not a production ad rendering mode. Native views
-still handle interactions at rest. Production ads, video creatives and translucent
-backgrounds retain native tracking. Missing, failed, oversized or not-yet-ready
-captures also retain native tracking. A cached image can precede later changes to
-SDK overlays within the same creative; ad reloads explicitly invalidate the cache.
-Corner antialiasing and later SDK drawing can still produce appearance differences.
-Gestures starting on the native ad, accessibility, physical-device performance,
-and production-policy suitability remain outside the validated scope.
-
-Google's native display integration expects registered `NativeAdView` assets and
-SDK-managed clicks: <https://developers.google.com/admob/android/native/advanced>.
-Do not replace that with JavaScript click forwarding.
-
-The earlier 178-frame DOM-alignment check measured image/slot alignment only;
-it did not detect native/Web handoff flashes. Subsequent screen recordings on
-Android 16 / API 36 found blank handoff intervals even when image decoding had
-completed before scrolling. See the measurement notes below for the updated
-handoff verification; this experiment does not promise a frame-perfect handoff
-on every device.
-
-Follow-up verification on 2026-10-26, Android 16 / API 36.1 emulator, two Medium
-static test ads:
-
-| Measurement | Earlier handoff | Persistent prepared underlay |
-| --- | --- | --- |
-| Six margin swipes (350/800/1500 ms, both directions) | 5 blank intervals, 51–625 ms | 0 detected in 113 recorded frames |
-| Four handoffs with 450 ms JavaScript blocking | 4 blank intervals, 446–577 ms | 0 detected in 9 recorded frames |
-| Captures during two swipes and subsequent settling | 3 | 0 |
-
-Frame analysis used actual recording timestamps and the first creative's visible
-logo region, excluding the second ad and SDK validator popups. Screenrecord is
-variable-rate; these counts are not display-refresh counts or a guarantee that
-sub-frame flashes cannot occur. Handoff position discontinuities remain a separate
-concern from blank intervals.
-
-Updated capture samples: UI draw CPU 6.3–8.6 ms, PNG/base64 worker CPU 48.4–59.4 ms,
-raw bitmap 3,346,560 bytes, PNG 161–195 KB. Successfully retained images decoded in
-6.8–16.1 ms; native visual readiness acknowledged DOM insertion in 8.2–19.2 ms.
-One reload completed load at 19,770 ms, began capture at 20,177 ms and passed visual
-readiness at 20,389 ms: the 50 ms scheduling minimum does not imply 50 ms end-to-end
-readiness under layout/bridge contention. Reload replaced only the changed slot's
-image; the other slot's cache survived.
-
-App-process PSS snapshots were 186.9 MiB before the updated scroll trial and
-185.2 MiB after reload (baseline 172.3/163.4 MiB). These single-run samples include
-SDK/startup variability and exclude separate WebView renderer memory; they do not
-establish a memory saving or measure peak allocation. Keeping decoded underlays
-trades retained memory for fewer encodes. Android unit tests (80) and Web regression
-tests cover lifecycle cleanup, readiness, reuse, resizing, reload and bounded retry.
+Video creatives and translucent backgrounds retain native tracking. If a snapshot
+is unavailable, not ready, or exceeds the supported dimensions, the native view
+continues tracking. Native SDK views handle ad interactions; snapshots do not
+forward clicks or synthesize impressions.

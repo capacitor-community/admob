@@ -51,7 +51,6 @@ class NativeAdExecutor(
         val nativeAd: NativeAd,
         val adView: NativeAdView,
         val clippingContainer: FrameLayout,
-        val isTesting: Boolean,
         val opaqueBackground: Boolean,
         var generation: Int = -1,
         var projection: NativeUIProjection? = null,
@@ -288,7 +287,6 @@ class NativeAdExecutor(
         val backgroundColor = (adView.background as? GradientDrawable)?.color?.defaultColor
         val state = NativeAdState(
             feedId, template == "small", pendingLoad.token, nativeAd, adView, clippingContainer,
-            pendingLoad.call.getBoolean("isTesting", false) == true,
             backgroundColor != null && Color.alpha(backgroundColor) == 255,
         )
         states[stateKey] = state
@@ -338,7 +336,7 @@ class NativeAdExecutor(
                             state.deferredPlacement = null
                             if (states[stateKey] === state && placement != null) applyPlacement(feedId, placement, defer = false)
                         },
-                        canCapture = { states[stateKey] === state && state.isTesting && state.opaqueBackground &&
+                        canCapture = { states[stateKey] === state && state.opaqueBackground &&
                             nativeAd.mediaContent?.hasVideoContent() != true && isSnapshotSizeSupported(adView.width, adView.height) },
                         view = { if (states[stateKey] === state) adView else null }
                     )
@@ -463,15 +461,15 @@ class NativeAdExecutor(
 
     private fun overlayParent(): ViewGroup? = webViewSupplier.get()?.parent as? ViewGroup
 
-    // Experimental visual proxy only. SDK views remain responsible for all ad interactions.
+    // Scroll snapshot proxy. SDK views remain responsible for all ad interactions.
     fun captureSnapshot(call: PluginCall) {
         val feedId = requiredString(call, "feedId") ?: return
         val sessionId = requiredString(call, "sessionId") ?: return
         val slotKey = requiredString(call, "slotKey") ?: return
         activitySupplier.get().runOnUiThread {
             val state = states[stateKey(feedId, slotKey)]
-            if (!isCurrentSession(feedId, sessionId) || state == null || !state.isTesting) {
-                call.reject("Snapshots require an active test ad")
+            if (!isCurrentSession(feedId, sessionId) || state == null) {
+                call.reject("Snapshots require an active ad")
                 return@runOnUiThread
             }
             if (!state.opaqueBackground) {
@@ -479,7 +477,7 @@ class NativeAdExecutor(
                 return@runOnUiThread
             }
             if (state.nativeAd.mediaContent?.hasVideoContent() == true) {
-                call.reject("Video ads retain native tracking in the snapshot experiment")
+                call.reject("Video ads retain native tracking while scrolling")
                 return@runOnUiThread
             }
             val view = state.adView
@@ -546,7 +544,7 @@ class NativeAdExecutor(
             val key = stateKey(feedId, slotKey)
             val state = states[key]
             val webView = webViewSupplier.get() as? WebView
-            if (!isCurrentSession(feedId, sessionId) || state == null || !state.isTesting ||
+            if (!isCurrentSession(feedId, sessionId) || state == null ||
                 webView == null || !webView.isAttachedToWindow || !webView.isShown) {
                 call.reject("Native ad snapshot WebView is no longer visible")
                 return@runOnUiThread

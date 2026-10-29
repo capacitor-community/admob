@@ -864,11 +864,34 @@ describe('NativeAdFeed', () => {
       await feed.pause();
       expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
     });
-    it('rejects production ads for this experiment', async () => {
+    it.each([false, undefined])('loads production ads with snapshots when isTesting is %s', async (isTesting) => {
       vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
-      await expect(
-        NativeAdFeed.create({ feedId: 'production', adId: 'unit', androidScrollSnapshot: true }),
-      ).rejects.toThrow('Android test ads');
+      const feed = await NativeAdFeed.create({
+        feedId: 'production',
+        adId: 'unit',
+        isTesting,
+        androidScrollSnapshot: true,
+      });
+      createdFeeds.push(feed);
+      const element = document.createElement('div');
+      document.body.append(element);
+      feed.attach('slot', element);
+      await vi.advanceTimersByTimeAsync(600);
+      expect(bridge.loadNativeAd).toHaveBeenCalledWith(
+        expect.objectContaining({
+          adId: 'unit',
+          isTesting,
+          projectionSelector: expect.any(String),
+        }),
+      );
+      expect(placementBindings.has(element)).toBe(true);
+    });
+
+    it('still rejects snapshots on iOS', async () => {
+      vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('ios');
+      await expect(NativeAdFeed.create({ feedId: 'ios', adId: 'unit', androidScrollSnapshot: true })).rejects.toThrow(
+        'androidScrollSnapshot requires Android',
+      );
     });
   });
 });

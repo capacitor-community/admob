@@ -67,12 +67,10 @@ type NativeAdListener =
   ((event: NativeAdEvent) => void) | ((event: NativeAdErrorEvent) => void) | ((event: NativeAdRevenueEvent) => void);
 
 /**
- * Experimental manager for native-ad integration research.
+ * Manages native ad placement and lifecycle in a scrolling feed.
  *
  * A stable `slotKey`, rather than the element or array index, owns the native
  * ad lifecycle. Virtual-scroller compatibility has not yet been validated.
- *
- * @experimental Native overlay gesture routing is still being validated on devices.
  */
 export class NativeAdFeed {
   private readonly options: NativeAdFeedOptions;
@@ -110,8 +108,8 @@ export class NativeAdFeed {
     if (feeds.size >= MAX_ACTIVE_FEEDS) {
       throw new Error(`At most ${MAX_ACTIVE_FEEDS} native ad feeds can be active`);
     }
-    if (options.androidScrollSnapshot && (Capacitor.getPlatform() !== 'android' || options.isTesting !== true)) {
-      throw new Error('androidScrollSnapshot requires Android test ads');
+    if (options.androidScrollSnapshot && Capacitor.getPlatform() !== 'android') {
+      throw new Error('androidScrollSnapshot requires Android');
     }
     this.options = { ...options, feedId: id };
     this.nativeScrollElement = Capacitor.getPlatform() === 'ios' ? options.scrollElement : undefined;

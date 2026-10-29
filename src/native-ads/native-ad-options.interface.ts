@@ -3,19 +3,19 @@ import type { AdOptions } from '../shared';
 import type { NativeAdStyle } from './native-ad-style.interface';
 import type { NativeAdTemplate } from './native-ad-template.enum';
 
-/** @experimental Native feed ads are not yet covered by the stable API contract. */
+/** Options for a native ad feed. */
 export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa' | 'isTesting'> {
   /** Unique ID for this feed manager. */
   feedId: string;
 
   /**
-   * Experimental iOS native tracking for a single scroll container.
+   * iOS native tracking for a single scroll container.
    * For Ionic, pass the result of ion-content.getScrollElement().
    * Other platforms retain JavaScript placement updates.
    */
   scrollElement?: HTMLElement;
 
-  /** Android test-ad experiment: use a cached DOM image while scrolling. */
+  /** Android: use a cached DOM image while scrolling. */
   androidScrollSnapshot?: boolean;
 
   /** Plugin-owned layout used for every native ad in this feed. */
