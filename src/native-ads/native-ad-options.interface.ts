@@ -35,6 +35,8 @@ export interface NativeAdFeedSession {
 
 export interface NativeAdLoadOptions extends Pick<AdOptions, 'npa' | 'isTesting'>, NativeAdFeedSession {
   slotKey: string;
+  /** Internal Feed projection destination; applications use attach(). */
+  projectionSelector?: string;
   template: NativeAdTemplate;
   style?: NativeAdStyle;
   adId?: string;

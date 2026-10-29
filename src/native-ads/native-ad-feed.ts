@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import type { PluginListenerHandle } from '@capacitor/core';
+import { bindProjectionPlacement, type ProjectionPlacementBinding } from '@webview-native-ui/engine';
 
 import type { NativeAdDefinitions } from './native-ad-definitions.interface';
 import { connectNativeAdElements, defineNativeAdElement } from './native-ad-element';
@@ -12,8 +13,6 @@ import type { NativeAdPluginEvents } from './native-ad-plugin-events.enum';
 import { NativeAdTemplate } from './native-ad-template.enum';
 
 const SCROLL_SETTLE_MS = 120;
-const SNAPSHOT_IDLE_MS = 50;
-const MAX_SNAPSHOT_ATTEMPTS = 3;
 const MAX_NATIVE_ADS = 3;
 const MAX_ACTIVE_FEEDS = 2;
 const MIN_SMALL_SLOT_WIDTH = 120;
@@ -42,14 +41,6 @@ const applySlotDefaults = (element: HTMLElement, template: NativeAdTemplate): vo
 
 type SlotStatus = 'idle' | 'loading' | 'loaded' | 'failed' | 'removing' | 'removeFailed';
 
-interface SlotSnapshot {
-  image: HTMLImageElement;
-  width: number;
-  height: number;
-  loadVersion: number;
-  position: string;
-}
-
 interface SlotState {
   slotKey: string;
   element?: HTMLElement;
@@ -58,12 +49,10 @@ interface SlotState {
   status: SlotStatus;
   lastUsed: number;
   loadVersion: number;
-  snapshot?: SlotSnapshot;
-  pendingSnapshot?: SlotSnapshot;
-  usingSnapshot?: boolean;
-  snapshotDueAt?: number;
-  snapshotAttemptKey?: string;
-  snapshotAttempts?: number;
+  projectionSelector?: string;
+  projectionOwner?: string;
+  placementBinding?: ProjectionPlacementBinding;
+  lastPlacement?: NativeAdPlacement;
 }
 
 let bridge: NativeAdDefinitions | undefined;
@@ -94,10 +83,6 @@ export class NativeAdFeed {
   private readonly scrollRoots = new Set<ShadowRoot>();
   private readonly intersectionObserver?: IntersectionObserver;
   private readonly resizeObserver?: ResizeObserver;
-  private snapshotScrolling = false;
-  private snapshotEpoch = 0;
-  private snapshotTimer?: ReturnType<typeof setTimeout>;
-  private snapshotCapturePending = false;
   private destroyed = false;
   private nativeStarted = false;
   private paused = false;
@@ -265,6 +250,34 @@ export class NativeAdFeed {
     };
     applySlotDefaults(element, this.options.template ?? NativeAdTemplate.Medium);
     state.element = element;
+    if (this.options.androidScrollSnapshot) {
+      const owner = (state.projectionOwner ??= `admob-${crypto.randomUUID()}`);
+      element.dataset['admobProjection'] = owner;
+      state.projectionSelector = `[data-admob-projection="${owner}"]`;
+      state.placementBinding?.dispose();
+      state.placementBinding = bindProjectionPlacement(
+        element,
+        () => {
+          const placement = this.measurePlacement(state);
+          state.lastPlacement = placement;
+          // The reveal request applies this exact placement; keep batch deduplication in sync.
+          if (this.lastPlacements) {
+            const previous = JSON.parse(this.lastPlacements);
+            previous.placements = previous.placements.map((item: NativeAdPlacement) =>
+              item.slotKey === state.slotKey ? placement : item,
+            );
+            this.lastPlacements = JSON.stringify(previous);
+          }
+          return { ...placement, sessionId: this.sessionId, sequence: ++this.placementSequence };
+        },
+        () => {
+          if (state.element !== element || this.destroyed) return;
+          state.lastPlacement = undefined;
+          this.lastPlacements = undefined;
+          this.schedulePlacementUpdate();
+        },
+      );
+    }
     state.generation += 1;
     state.lastUsed = Date.now();
     this.slots.set(normalizedKey, state);
@@ -282,7 +295,10 @@ export class NativeAdFeed {
     }
     const state = this.slots.get(slotKey);
     if (state?.element === element) {
-      this.clearSnapshot(state);
+      state.placementBinding?.dispose();
+      state.placementBinding = undefined;
+      state.lastPlacement = undefined;
+      if (state.projectionOwner) delete element.dataset['admobProjection'];
       state.element = undefined;
       state.intersecting = false;
       state.generation += 1;
@@ -313,7 +329,6 @@ export class NativeAdFeed {
       }
       await this.loadState(state);
       await this.requestPlacementUpdate();
-      this.scheduleSnapshots();
     });
   }
 
@@ -321,7 +336,6 @@ export class NativeAdFeed {
   async pause(): Promise<void> {
     this.assertActive();
     this.paused = true;
-    this.resetSnapshots();
     this.layoutInvalidated = true;
     if (!(await this.requestPlacementUpdate())) {
       throw new Error('Failed to hide native ad placements');
@@ -338,7 +352,7 @@ export class NativeAdFeed {
   /** Hides stale overlays and remeasures after an application-driven layout change. */
   async invalidateLayout(): Promise<void> {
     this.assertActive();
-    this.invalidateSnapshots();
+    for (const state of this.slots.values()) state.lastPlacement = undefined;
     this.layoutInvalidated = true;
     this.scheduleEvaluation();
     if (!(await this.requestPlacementUpdate())) {
@@ -349,7 +363,6 @@ export class NativeAdFeed {
   async destroy(): Promise<void> {
     if (!this.destroyed) {
       this.destroyed = true;
-      this.resetSnapshots();
       feeds.delete(this.options.feedId);
       document.removeEventListener('scroll', this.handleViewportMotion, true);
       for (const root of this.scrollRoots) {
@@ -394,12 +407,8 @@ export class NativeAdFeed {
       event.target.dataset['admobSnapshot'] !== undefined
     )
       return;
-    if (this.options.androidScrollSnapshot) {
-      if (event instanceof Event && ['scroll', 'touchmove', 'wheel'].includes(event.type)) {
-        this.beginSnapshotScroll();
-      } else {
-        this.invalidateSnapshots();
-      }
+    if (!(event instanceof Event) || !['scroll', 'touchmove', 'wheel'].includes(event.type)) {
+      for (const state of this.slots.values()) state.lastPlacement = undefined;
     }
     if (!(
       this.nativeScrollElement &&
@@ -449,7 +458,6 @@ export class NativeAdFeed {
       return;
     }
     if (document.hidden) {
-      this.resetSnapshots();
       this.layoutInvalidated = true;
       void this.requestPlacementUpdate();
       return;
@@ -464,11 +472,9 @@ export class NativeAdFeed {
     if (this.settleTimer) {
       clearTimeout(this.settleTimer);
     }
-    const epoch = this.snapshotEpoch;
     this.settleTimer = setTimeout(() => {
       this.layoutInvalidated = false;
       void this.runOperation(async () => {
-        if (this.options.androidScrollSnapshot && epoch !== this.snapshotEpoch) return;
         await this.evaluate();
       });
     }, SCROLL_SETTLE_MS);
@@ -479,12 +485,6 @@ export class NativeAdFeed {
       return;
     }
 
-    if (this.options.androidScrollSnapshot) {
-      this.snapshotScrolling = false;
-      for (const state of this.slots.values()) state.usingSnapshot = false;
-      // A native acknowledgement is not a draw fence. Keep the underlay during and after restoration.
-      await this.requestPlacementUpdate();
-    }
     const visibleStates = this.getVisibleStates();
     for (const state of visibleStates) {
       state.lastUsed = Date.now();
@@ -496,182 +496,6 @@ export class NativeAdFeed {
       .slice(0, Math.max(0, MAX_NATIVE_ADS - occupied));
     await Promise.allSettled(loadable.map((state) => this.loadState(state)));
     await this.requestPlacementUpdate();
-    this.scheduleSnapshots();
-  }
-
-  private beginSnapshotScroll(): void {
-    ++this.snapshotEpoch;
-    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
-    if (this.paused || document.hidden || this.snapshotScrolling) return;
-    this.snapshotScrolling = true;
-    let hasSnapshot = false;
-    for (const state of this.slots.values()) {
-      // Only images whose DOM insertion passed the native visual fence can hide a native view.
-      state.usingSnapshot = Boolean(state.element && state.snapshot?.loadVersion === state.loadVersion);
-      hasSnapshot ||= state.usingSnapshot;
-    }
-    if (hasSnapshot) void this.requestPlacementUpdate(true);
-  }
-
-  private needsSnapshot(state: SlotState): boolean {
-    if (!state.element || state.status !== 'loaded') return false;
-    const rect = state.element.getBoundingClientRect();
-    const key = `${state.loadVersion}:${rect.width}:${rect.height}`;
-    if (state.snapshotAttemptKey !== key) {
-      state.snapshotAttemptKey = key;
-      state.snapshotAttempts = 0;
-    }
-    return (
-      (state.snapshotAttempts ?? 0) < MAX_SNAPSHOT_ATTEMPTS &&
-      (!state.snapshot ||
-        state.snapshot.loadVersion !== state.loadVersion ||
-        Math.abs(state.snapshot.width - rect.width) > 1 ||
-        Math.abs(state.snapshot.height - rect.height) > 1)
-    );
-  }
-
-  private scheduleSnapshots(): void {
-    if (
-      !this.options.androidScrollSnapshot ||
-      this.destroyed ||
-      this.paused ||
-      this.snapshotScrolling ||
-      document.hidden ||
-      this.snapshotCapturePending ||
-      !bridge?.captureNativeAdSnapshot ||
-      !bridge.prepareNativeAdSnapshot
-    )
-      return;
-    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
-    const states = this.getVisibleStates().filter((state) => this.needsSnapshot(state));
-    if (!states.length) return;
-    for (const state of states) state.snapshotDueAt ??= Date.now() + SNAPSHOT_IDLE_MS;
-    const delay = Math.max(SNAPSHOT_IDLE_MS, Math.min(...states.map((state) => state.snapshotDueAt!)) - Date.now());
-    this.snapshotTimer = setTimeout(() => void this.captureSnapshots(), delay);
-  }
-
-  private async captureSnapshots(): Promise<void> {
-    if (this.snapshotCapturePending || this.snapshotScrolling || this.destroyed || this.paused || document.hidden)
-      return;
-    this.snapshotCapturePending = true;
-    const epoch = this.snapshotEpoch;
-    try {
-      for (const state of this.getVisibleStates()) {
-        if (epoch !== this.snapshotEpoch) break;
-        const element = state.element;
-        if (
-          !element ||
-          !this.needsSnapshot(state) ||
-          (state.snapshotDueAt ?? 0) > Date.now() ||
-          !bridge?.captureNativeAdSnapshot ||
-          !bridge.prepareNativeAdSnapshot
-        )
-          continue;
-        const version = state.loadVersion;
-        const generation = state.generation;
-        const rect = element.getBoundingClientRect();
-        const current = () =>
-          epoch === this.snapshotEpoch &&
-          !this.destroyed &&
-          !this.paused &&
-          !document.hidden &&
-          state.element === element &&
-          state.loadVersion === version &&
-          state.generation === generation &&
-          state.status === 'loaded';
-        let candidate: SlotSnapshot | undefined;
-        state.snapshotDueAt = Date.now() + 1000;
-        try {
-          const { dataUrl } = await bridge.captureNativeAdSnapshot({
-            feedId: this.feedId,
-            sessionId: this.sessionId,
-            slotKey: state.slotKey,
-          });
-          if (!current()) continue;
-          const image = new Image();
-          image.dataset['admobSnapshot'] = '';
-          image.src = dataUrl;
-          await image.decode();
-          if (!current()) continue;
-          const position = state.snapshot?.position ?? element.style.position;
-          if (getComputedStyle(element).position === 'static') element.style.position = 'relative';
-          image.alt = '';
-          image.setAttribute('aria-hidden', 'true');
-          image.draggable = false;
-          candidate = { image, position, width: rect.width, height: rect.height, loadVersion: version };
-          state.pendingSnapshot = candidate;
-          this.updateSnapshotGeometry(state, candidate);
-          // Both buffers remain drawn until the new image is ready for the next WebView draw.
-          element.append(image);
-          await bridge.prepareNativeAdSnapshot({
-            feedId: this.feedId,
-            sessionId: this.sessionId,
-            slotKey: state.slotKey,
-          });
-          if (!current() || state.pendingSnapshot !== candidate) continue;
-          state.snapshot?.image.remove();
-          state.snapshot = candidate;
-          state.pendingSnapshot = undefined;
-          state.snapshotDueAt = undefined;
-        } catch {
-          if (current()) state.snapshotAttempts = (state.snapshotAttempts ?? 0) + 1;
-          // Keep the old image on failure; bounded retries avoid continuous CPU/memory churn.
-        } finally {
-          if (candidate && state.snapshot !== candidate) {
-            candidate.image.remove();
-            if (state.pendingSnapshot === candidate) {
-              state.pendingSnapshot = undefined;
-              if (!state.snapshot && state.element === element) element.style.position = candidate.position;
-            }
-          }
-        }
-        if (epoch !== this.snapshotEpoch) break;
-      }
-    } finally {
-      this.snapshotCapturePending = false;
-      this.scheduleSnapshots();
-    }
-  }
-
-  private updateSnapshotGeometry(state: SlotState, snapshot: SlotSnapshot): void {
-    if (!state.element) return;
-    const style = getComputedStyle(state.element);
-    const left = Number.parseFloat(style.borderLeftWidth) || 0;
-    const top = Number.parseFloat(style.borderTopWidth) || 0;
-    const right = Number.parseFloat(style.borderRightWidth) || 0;
-    const bottom = Number.parseFloat(style.borderBottomWidth) || 0;
-    snapshot.image.style.cssText = `position:absolute;left:${-left}px;top:${-top}px;
-      width:calc(100% + ${left + right}px);height:calc(100% + ${top + bottom}px);box-sizing:border-box;
-      border:0;padding:0;margin:0;min-width:0;min-height:0;max-width:none;max-height:none;pointer-events:none;display:block;`;
-  }
-
-  private clearSnapshot(state: SlotState): void {
-    const snapshot = state.snapshot ?? state.pendingSnapshot;
-    state.snapshot?.image.remove();
-    state.pendingSnapshot?.image.remove();
-    if (snapshot && state.element) state.element.style.position = snapshot.position;
-    state.snapshot = undefined;
-    state.pendingSnapshot = undefined;
-    state.usingSnapshot = false;
-    state.snapshotAttempts = 0;
-    state.snapshotDueAt = undefined;
-  }
-
-  private invalidateSnapshots(): void {
-    // Keep the last drawn image through layout invalidation instead of creating an empty slot.
-    ++this.snapshotEpoch;
-    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
-    for (const state of this.slots.values()) {
-      if (state.snapshot) this.updateSnapshotGeometry(state, state.snapshot);
-      if (state.pendingSnapshot) this.updateSnapshotGeometry(state, state.pendingSnapshot);
-    }
-  }
-
-  private resetSnapshots(): void {
-    ++this.snapshotEpoch;
-    this.snapshotScrolling = false;
-    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
-    for (const state of this.slots.values()) this.clearSnapshot(state);
   }
 
   private async loadState(state: SlotState): Promise<void> {
@@ -690,11 +514,11 @@ export class NativeAdFeed {
         adId: this.options.adId,
         isTesting: this.options.isTesting,
         npa: this.options.npa,
+        ...(state.projectionSelector ? { projectionSelector: state.projectionSelector } : {}),
       });
       if (state.loadVersion === loadVersion) {
         state.status = 'loaded';
         state.lastUsed = Date.now();
-        state.snapshotDueAt = Date.now() + SNAPSHOT_IDLE_MS;
       }
     } catch (error) {
       if (state.loadVersion === loadVersion) {
@@ -728,6 +552,7 @@ export class NativeAdFeed {
 
   private getVisibleStates(): SlotState[] {
     return [...this.slots.values()].filter((state) => {
+      if (this.reuseProjectedPlacement(state)) return state.intersecting && !!state.lastPlacement?.visible;
       const measured = state.element && state.intersecting ? measureNativeAdSlot(state.element) : undefined;
       return Boolean(measured && this.isSupportedSize(measured));
     });
@@ -753,7 +578,6 @@ export class NativeAdFeed {
       state.status = 'idle';
       return;
     }
-    this.clearSnapshot(state);
     state.status = 'removing';
     const removeVersion = ++state.loadVersion;
     await this.requestPlacementUpdate();
@@ -789,8 +613,42 @@ export class NativeAdFeed {
     ]);
     this.nativeStarted = false;
     this.listenerHandles.clear();
+    for (const state of this.slots.values()) state.placementBinding?.dispose();
     this.slots.clear();
     this.elementSlots.clear();
+  }
+
+  private reuseProjectedPlacement(state: SlotState): boolean {
+    return Boolean(
+      state.placementBinding?.projected &&
+      state.lastPlacement?.visible &&
+      state.element?.isConnected &&
+      !this.paused &&
+      !this.destroyed &&
+      !document.hidden &&
+      state.status === 'loaded' &&
+      state.lastPlacement.generation === state.generation,
+    );
+  }
+
+  private measurePlacement(state: SlotState): NativeAdPlacement {
+    const measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
+    return {
+      feedId: this.options.feedId,
+      slotKey: state.slotKey,
+      generation: state.generation,
+      visible: Boolean(
+        !this.paused &&
+        !this.destroyed &&
+        state.status === 'loaded' &&
+        (!this.layoutInvalidated || this.options.androidScrollSnapshot) &&
+        measured &&
+        this.isSupportedSize(measured) &&
+        !document.hidden,
+      ),
+      rect: measured?.rect,
+      clipRect: measured?.clipRect,
+    };
   }
 
   private requestPlacementUpdate(allowDirect = false): Promise<boolean> {
@@ -811,25 +669,15 @@ export class NativeAdFeed {
         this.updateDirty = false;
         const allowDirect = !this.placementAcknowledgementRequired;
         this.placementAcknowledgementRequired = false;
+        const retainedSlots = new Set<string>();
         const placements = [...this.slots.values()]
-          .filter((state) => state.status === 'loaded' && !state.usingSnapshot)
+          .filter((state) => state.status === 'loaded')
           .map((state): NativeAdPlacement => {
-            const measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
-            const visible = Boolean(
-              !this.paused &&
-              (!this.layoutInvalidated || (this.options.androidScrollSnapshot && !state.snapshot)) &&
-              measured &&
-              this.isSupportedSize(measured) &&
-              !document.hidden,
-            );
-            return {
-              feedId: this.options.feedId,
-              slotKey: state.slotKey,
-              generation: state.generation,
-              visible,
-              rect: measured?.rect,
-              clipRect: measured?.clipRect,
-            };
+            if (this.reuseProjectedPlacement(state)) {
+              retainedSlots.add(state.slotKey);
+              return state.lastPlacement!;
+            }
+            return (state.lastPlacement = this.measurePlacement(state));
           });
         const scrollContainer = this.nativeScrollElement
           ? measureNativeAdScrollContainer(this.nativeScrollElement)
@@ -843,7 +691,17 @@ export class NativeAdFeed {
             feedId: this.options.feedId,
             sessionId: this.sessionId,
             sequence: ++this.placementSequence,
-            placements,
+            placements: placements.map((placement) => {
+              return retainedSlots.has(placement.slotKey)
+                ? {
+                    feedId: placement.feedId,
+                    slotKey: placement.slotKey,
+                    generation: placement.generation,
+                    visible: true,
+                    retain: true,
+                  }
+                : placement;
+            }),
             ...(scrollContainer ? { scrollContainer } : {}),
           };
           const channel =

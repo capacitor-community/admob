@@ -1,3 +1,5 @@
+import { getUnprojectedVisibility } from '@webview-native-ui/engine';
+
 import type { NativeAdPlacementBatch, NativeAdRect } from './native-ad-placement.interface';
 
 export interface MeasuredNativeAdSlot {
@@ -51,7 +53,7 @@ export const measureNativeAdSlot = (
   if (
     !element.isConnected ||
     style.display === 'none' ||
-    style.visibility === 'hidden' ||
+    (style.visibility === 'hidden' && getUnprojectedVisibility(element) === 'hidden') ||
     Number.parseFloat(style.opacity || '1') === 0 ||
     domRect.width <= 0 ||
     domRect.height <= 0
