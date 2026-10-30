@@ -64,7 +64,7 @@ repositories {
 def testRunner = "1.7.0"
 
 dependencies {
-    implementation "io.github.webview-native-ui:engine:${project.findProperty('nativeUIEngineVersion') ?: '1.0.0'}"
+    implementation "io.github.webview-native-ui:engine:${project.findProperty('nativeUIEngineVersion') ?: '[1.0.0,2.0.0)'}"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
 
