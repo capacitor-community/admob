@@ -415,7 +415,7 @@ jobs:
               return;
             }
 
-            if (isComment && Date.parse(runs.get('Package Candidate').created_at) > requestedAt) {
+            if (isComment && Date.parse(runs.get('Package Candidate').created_at) >= requestedAt) {
               throw new Error('The candidate was built after the /beta request; post a fresh comment.');
             }
 
