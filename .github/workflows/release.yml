@@ -138,7 +138,7 @@ jobs:
       github.event.comment.body == '/beta' &&
       github.run_attempt == '1') ||
       (github.event_name == 'workflow_dispatch' &&
-      github.ref_name == github.event.repository.default_branch &&
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
       github.actor == 'github-actions[bot]') ||
       (github.event_name == 'workflow_run' &&
       github.event.action == 'completed')
@@ -229,6 +229,7 @@ jobs:
             let event;
             let sourceKind;
             let requestedAt;
+            let lastForcePush;
 
             if (isComment) {
               let comment = context.payload.comment;
@@ -273,6 +274,29 @@ jobs:
                 core.notice('The PR must be open and ready for review.');
                 core.setOutput('allowed', 'false');
                 return;
+              }
+              if (!isDispatch && Date.parse(pullRequest.updated_at) > requestedAt) {
+                throw new Error('The PR was updated after /beta; post a fresh comment after CI passes.');
+              }
+              if (!isDispatch) {
+                const { repository } = await github.graphql(`
+                  query($owner: String!, $repo: String!, $number: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $number) {
+                        headRefOid
+                        timelineItems(last: 1, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) {
+                          nodes { ... on HeadRefForcePushedEvent { createdAt afterCommit { oid } } }
+                        }
+                      }
+                    }
+                  }
+                `, { owner, repo, number: Number(prNumber) });
+                const current = repository?.pullRequest;
+                if (current?.headRefOid !== pullRequest.head.sha ||
+                    current.timelineItems.nodes.some(node => Date.parse(node.createdAt) >= requestedAt)) {
+                  throw new Error('The PR head changed at or after /beta; post a fresh comment.');
+                }
+                [lastForcePush] = current.timelineItems.nodes;
               }
               if (!pullRequest.head.repo) {
                 core.setFailed('The pull request head repository is no longer available.');
@@ -396,6 +420,10 @@ jobs:
             }
 
             const candidateRun = runs.get('Package Candidate');
+            if (lastForcePush && lastForcePush.afterCommit?.oid !== headSha &&
+                Date.parse(candidateRun.created_at) <= Date.parse(lastForcePush.createdAt)) {
+              throw new Error('The candidate predates the last head rewind; post /beta after fresh CI.');
+            }
             const artifactName = `npm-candidate-${headSha}`;
             const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
               owner,
@@ -607,27 +635,29 @@ jobs:
             exit 1
           fi
           PACKAGE_ARCHIVE="${PACKAGES[0]}"
-          ACTUAL_NAME=$(tar -xOf "$PACKAGE_ARCHIVE" package/package.json | node -e "let input=''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => process.stdout.write(JSON.parse(input).name));")
-          ACTUAL_VERSION=$(tar -xOf "$PACKAGE_ARCHIVE" package/package.json | node -e "let input=''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => process.stdout.write(JSON.parse(input).version));")
-          ACTUAL_REGISTRY=$(tar -xOf "$PACKAGE_ARCHIVE" package/package.json | node -e "let input=''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => process.stdout.write(JSON.parse(input).publishConfig?.registry || ''));")
-          if [ "$ACTUAL_NAME" != "$EXPECTED_NAME" ] || [ "$ACTUAL_VERSION" != "$EXPECTED_VERSION" ]; then
-            echo "::error::Artifact identity mismatch: ${ACTUAL_NAME}@${ACTUAL_VERSION}"
-            exit 1
-          fi
-          if [ -n "$ACTUAL_REGISTRY" ] && [ "$ACTUAL_REGISTRY" != "https://registry.npmjs.org" ] && [ "$ACTUAL_REGISTRY" != "https://registry.npmjs.org/" ]; then
-            echo "::error::Refusing package with an unexpected publish registry: $ACTUAL_REGISTRY"
-            exit 1
-          fi
-          if [ "$DIST_TAG" != "beta" ]; then
-            echo "::error::Refusing unsupported dist-tag: $DIST_TAG"
-            exit 1
-          fi
           PACKAGE_ARCHIVE="$PACKAGE_ARCHIVE" node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
           import { readFileSync } from 'node:fs';
           import { createHash } from 'node:crypto';
-          import { spawnSync } from 'node:child_process';
+          import { execFileSync, spawnSync } from 'node:child_process';
           const { EXPECTED_NAME, EXPECTED_VERSION, DIST_TAG, PACKAGE_ARCHIVE } = process.env;
+          import { createRequire } from 'node:module';
+          const require = createRequire(import.meta.url);
+          const npmRoot = execFileSync('npm', ['root', '-g'], { encoding: 'utf8' }).trim();
+          const pacote = require(`${npmRoot}/npm/node_modules/pacote`);
+          const readManifest = archive => pacote.manifest(archive, {
+            cache: `${process.env.RUNNER_TEMP}/npm-manifest-cache`, ignoreScripts: true, offline: true,
+          });
+          const pkg = await readManifest(PACKAGE_ARCHIVE);
+          assert.equal(pkg.name, EXPECTED_NAME, 'Unexpected package identity');
+          assert.equal(pkg.version, EXPECTED_VERSION, 'Artifact version mismatch');
+          assert.equal(DIST_TAG, 'beta', 'Unexpected dist-tag');
+          assert([undefined, 'https://registry.npmjs.org', 'https://registry.npmjs.org/'].includes(pkg.publishConfig?.registry),
+            'Unexpected publish registry');
+          const config = pkg.publishConfig ?? {};
+          assert.equal(typeof config, 'object', 'Invalid publishConfig');
+          assert(!Array.isArray(config) && Object.keys(config).every(key => ['access', 'registry', 'tag'].includes(key)),
+            'Unexpected publishConfig key');
           const archives = new Map([[EXPECTED_NAME, PACKAGE_ARCHIVE]]);
           const isPublished = (spec, archive) => {
             const existing = spawnSync('npm', ['view', spec, 'dist.integrity', '--json', '--prefer-online',
@@ -652,16 +682,16 @@ jobs:
               if (result.status === 0) continue;
               let code;
               try { code = JSON.parse(result.stdout).error?.code; } catch {}
-              assert.equal(code, 'E409', `Publish failed for ${spec}`);
-              // Another release run can finish before the version is visible to npm view.
-              for (const delay of [0, 2000, 4000, 8000, 16000]) {
+              // A concurrent publish may fail in npm's version check or during the PUT.
+              let matched = false;
+              for (const delay of code === 'E409' ? [0, 2000, 4000, 8000, 16000] : [0]) {
                 if (delay) await new Promise(resolve => setTimeout(resolve, delay));
                 if (isPublished(spec, archive)) {
-                  code = undefined;
+                  matched = true;
                   break;
                 }
               }
-              assert.equal(code, undefined, `Publish conflict for ${spec}: no matching public version became visible`);
+              assert(matched, `Publish failed for ${spec}: no matching public version became visible`);
             }
             console.log(`${spec} already published with matching contents; skipping.`);
           }
