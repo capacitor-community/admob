@@ -109,6 +109,11 @@ class BannerExecutor: NSObject, BannerViewDelegate {
 
     func removeBanner(_ call: CAPPluginCall) {
         self.removeBannerViewToView()
+        // A banner still loading, or one a failed refresh took off the
+        // screen, has no tagged view to be found: without its delegate it
+        // is never put up again.
+        self.bannerView?.delegate = nil
+        self.bannerView?.removeFromSuperview()
         call.resolve([:])
     }
 
