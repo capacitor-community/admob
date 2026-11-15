@@ -102,7 +102,7 @@ final class PluginNativeAdView: NativeAdView {
         bodyLabel.textColor = color(style["bodyColor"] as? String) ?? .darkGray
         bodyLabel.isHidden = isSmall || nativeAd.body == nil
         addSubview(bodyLabel)
-        bodyView = bodyLabel
+        bodyView = bodyLabel.isHidden ? nil : bodyLabel
 
         advertiserLabel.text = nativeAd.advertiser
         advertiserLabel.font = .systemFont(ofSize: 11)

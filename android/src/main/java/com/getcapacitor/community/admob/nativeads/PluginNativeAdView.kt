@@ -106,7 +106,7 @@ internal class PluginNativeAdView private constructor(
             visibility = if (isSmall || nativeAd.body == null) View.GONE else View.VISIBLE
         }
         parent.addView(body)
-        view.bodyView = body
+        if (body.visibility == View.VISIBLE) view.bodyView = body
     }
 
     private fun bindFooter(parent: LinearLayout, nativeAd: NativeAd, isSmall: Boolean) {
