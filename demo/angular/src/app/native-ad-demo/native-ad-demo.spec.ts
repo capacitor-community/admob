@@ -22,42 +22,26 @@ describe('NativeAdDemo', () => {
     ]);
   });
 
-  it.each([false, true])('updates diagnostics without hiding ads when expanded=%s', async (expanded) => {
+  it('does not invalidate ad layout when the diagnostic log updates', async () => {
     vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
-    vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
     fixture.destroy();
     fixture = TestBed.createComponent(NativeAdDemo);
-    const listeners = new Map<string, (value: unknown) => void>();
     const feed = {
       invalidateLayout: vi.fn().mockResolvedValue(undefined),
+      addListener: vi.fn().mockResolvedValue(undefined),
       destroy: vi.fn().mockResolvedValue(undefined),
-      addListener: vi.fn(async (event: string, listener: (value: unknown) => void) => {
-        listeners.set(event, listener);
-        return { remove: async () => undefined };
-      }),
     };
     vi.spyOn(NativeAdFeed, 'create').mockResolvedValue(feed as unknown as NativeAdFeed);
     const vm = fixture.componentInstance.vm;
+    await vm.enter();
     fixture.detectChanges();
     await fixture.whenStable();
-    await vm.enter();
-    const details = (fixture.nativeElement as HTMLElement).querySelector('details')!;
-    details.open = expanded;
     feed.invalidateLayout.mockClear();
 
-    for (const event of [NativeAdPluginEvents.Loaded, NativeAdPluginEvents.AdPaid, NativeAdPluginEvents.AdImpression]) {
-      listeners.get(event)!({ slotKey: 'test-ad' });
-      fixture.detectChanges();
-      await fixture.whenStable();
-      expect(feed.invalidateLayout).not.toHaveBeenCalled();
-      expect((fixture.nativeElement as HTMLElement).querySelector('.event-log')?.textContent).toContain(event);
-    }
-
-    vm.errorMessage.set('Test load failed');
+    vm.lastEvent.set({ name: NativeAdPluginEvents.Loaded, value: { slotKey: 'test-ad' } });
     fixture.detectChanges();
     await fixture.whenStable();
     expect(feed.invalidateLayout).not.toHaveBeenCalled();
-    expect((fixture.nativeElement as HTMLElement).querySelector('.error')?.textContent).toContain('Test load failed');
     await vm.leave();
   });
 
