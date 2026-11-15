@@ -22,26 +22,43 @@ describe('NativeAdDemo', () => {
     ]);
   });
 
-  it('remeasures after event or error text renders without repeating on unrelated renders', async () => {
+  it.each([false, true])('updates diagnostics without hiding ads when expanded=%s', async (expanded) => {
+    vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
+    fixture.destroy();
+    fixture = TestBed.createComponent(NativeAdDemo);
+    const listeners = new Map<string, (value: unknown) => void>();
+    const feed = {
+      invalidateLayout: vi.fn().mockResolvedValue(undefined),
+      destroy: vi.fn().mockResolvedValue(undefined),
+      addListener: vi.fn(async (event: string, listener: (value: unknown) => void) => {
+        listeners.set(event, listener);
+        return { remove: async () => undefined };
+      }),
+    };
+    vi.spyOn(NativeAdFeed, 'create').mockResolvedValue(feed as unknown as NativeAdFeed);
     const vm = fixture.componentInstance.vm;
-    const invalidate = vi.spyOn(vm, 'invalidateLayout').mockResolvedValue();
     fixture.detectChanges();
     await fixture.whenStable();
-    invalidate.mockClear();
+    await vm.enter();
+    const details = (fixture.nativeElement as HTMLElement).querySelector('details')!;
+    details.open = expanded;
+    feed.invalidateLayout.mockClear();
 
-    vm.lastEvent.set({ name: NativeAdPluginEvents.Loaded, value: { slotKey: 'test-ad' } });
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(invalidate).toHaveBeenCalledTimes(1);
+    for (const event of [NativeAdPluginEvents.Loaded, NativeAdPluginEvents.AdPaid, NativeAdPluginEvents.AdImpression]) {
+      listeners.get(event)!({ slotKey: 'test-ad' });
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(feed.invalidateLayout).not.toHaveBeenCalled();
+      expect((fixture.nativeElement as HTMLElement).querySelector('.event-log')?.textContent).toContain(event);
+    }
 
     vm.errorMessage.set('Test load failed');
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(invalidate).toHaveBeenCalledTimes(2);
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(invalidate).toHaveBeenCalledTimes(2);
+    expect(feed.invalidateLayout).not.toHaveBeenCalled();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.error')?.textContent).toContain('Test load failed');
+    await vm.leave();
   });
 
   it('discards a late feed after leaving and destroys the next feed without waiting for listener setup', async () => {
