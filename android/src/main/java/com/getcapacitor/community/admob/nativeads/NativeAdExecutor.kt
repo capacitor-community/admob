@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob.nativeads
 import android.app.Activity
 import android.content.Context
 import io.github.webview_native_ui.engine.NativeUIProjection
+import io.github.webview_native_ui.engine.NativeUIScrollHosting
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -269,19 +270,18 @@ class NativeAdExecutor(
             pendingLoad.call.reject(message, "-1", event)
             return
         }
-        val adView = PluginNativeAdView.create(contextSupplier.get(), nativeAd, template, style)
-        val clippingContainer = FrameLayout(contextSupplier.get()).apply {
-            clipChildren = true
-            clipToPadding = true
-            visibility = View.GONE
-            addView(adView)
-        }
+        val webView = webViewSupplier.get() as? WebView
         val overlayParent = overlayParent()
-        if (overlayParent == null) {
-            adView.destroy()
+        if (webView == null || overlayParent == null) {
             nativeAd.destroy()
             pendingLoad.call.reject("AdMob WebView parent is unavailable")
             return
+        }
+        val adView = PluginNativeAdView.create(contextSupplier.get(), nativeAd, template, style)
+        val clippingContainer = NativeUIScrollHosting(webView, adView).apply {
+            clipChildren = true
+            clipToPadding = true
+            visibility = View.GONE
         }
 
         val backgroundColor = (adView.background as? GradientDrawable)?.color?.defaultColor
@@ -294,8 +294,7 @@ class NativeAdExecutor(
         pendingLoad.call.getString("projectionSelector")?.let { selector ->
             val event = identity(feedId, sessionId, slotKey).apply { put("loadId", java.util.UUID.randomUUID().toString()) }
             state.projectionIdentity = event
-            val webView = webViewSupplier.get() as? WebView
-            if (webView != null) webView.post {
+            webView.post {
                 if (states[stateKey] !== state) return@post
                 state.projection = runCatching {
                     NativeUIProjection(
