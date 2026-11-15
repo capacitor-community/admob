@@ -160,6 +160,8 @@ If the specified container cannot be identified unambiguously, the update fails 
 
 ## Android scroll snapshots
 
+Drags that begin on a native ad are handed to the WebView through Engine's scroll host. Taps remain handled by the Google SDK.
+
 Set `androidScrollSnapshot: true` to display a cached image in the web feed while
 scrolling and restore the native ad when scrolling stops. The demo enables this
 option by default on Android.
