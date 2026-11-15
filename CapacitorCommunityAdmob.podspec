@@ -15,6 +15,7 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
   s.static_framework = true
   s.dependency 'Capacitor'
+  s.dependency 'WebViewNativeUIEngine', '>= 1.0.8', '< 2.0'
   s.dependency 'Google-Mobile-Ads-SDK', '13.11.0'
   s.dependency 'GoogleUserMessagingPlatform', '~> 3.1'
 end
