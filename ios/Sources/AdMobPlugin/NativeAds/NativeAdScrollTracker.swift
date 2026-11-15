@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import WebViewNativeUIEngine
 
 /// Research-preview binding to a single HTML overflow scroll container.
 final class NativeAdScrollTracker {
@@ -9,11 +10,13 @@ final class NativeAdScrollTracker {
     private let clip: CGRect
     private let render: ([NativeAdPlacementValue]) -> Void
     private var observation: NSKeyValueObservation?
+    let hosting: NativeUIScrollHosting
 
     init?(
         container: [String: Any],
         webView: WKWebView,
         placements: [NativeAdPlacementValue],
+        previousHosting: NativeUIScrollHosting? = nil,
         render: @escaping ([NativeAdPlacementValue]) -> Void
     ) {
         guard
@@ -37,6 +40,9 @@ final class NativeAdScrollTracker {
                 abs(scroll.contentSize.width - width) < 3 && abs(scroll.contentSize.height - height) < 3
         }
         guard candidates.count == 1, let scroll = candidates.first else { return nil }
+        guard let hosting = previousHosting.flatMap({ $0.matches(scroll, in: webView) ? $0 : nil }) ??
+            NativeUIScrollHosting(webView: webView, scrollView: scroll) else { return nil }
+        self.hosting = hosting
         self.webView = webView
         self.scrollView = scroll
         self.placements = placements
@@ -45,6 +51,10 @@ final class NativeAdScrollTracker {
         observation = scroll.observe(\.contentOffset, options: [.new]) { [weak self] _, _ in
             self?.update()
         }
+    }
+
+    func host(_ view: UIView, frame: CGRect) -> Bool {
+        hosting.place(view, frame: frame)
     }
 
     func update() {
