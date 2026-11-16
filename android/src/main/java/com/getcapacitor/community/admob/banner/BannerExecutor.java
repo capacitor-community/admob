@@ -221,7 +221,11 @@ public class BannerExecutor extends Executor {
             mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
 
             int densityMargin = (int) (adOptions.margin * density);
-            int[] margins = new int[] { 0, densityMargin, 0, densityMargin };
+            // Apply the requested offset only at the anchored edge. Applying it to
+            // both edges reduces the available height twice and clips large offsets.
+            int topMargin = "TOP_CENTER".equals(adOptions.position) ? densityMargin : 0;
+            int bottomMargin = "BOTTOM_CENTER".equals(adOptions.position) ? densityMargin : 0;
+            int[] margins = new int[] { 0, topMargin, 0, bottomMargin };
 
             // Center Banner Ads
             int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
@@ -233,7 +237,7 @@ public class BannerExecutor extends Executor {
                 }
                 margins[0] = margin;
                 margins[2] = margin;
-                mAdViewLayoutParams.setMargins(margin, densityMargin, margin, densityMargin);
+                mAdViewLayoutParams.setMargins(margin, topMargin, margin, bottomMargin);
             } else {
                 int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
                 if (fullscreen) {
@@ -241,7 +245,7 @@ public class BannerExecutor extends Executor {
                 }
                 margins[0] = sideMargin;
                 margins[2] = sideMargin;
-                mAdViewLayoutParams.setMargins(sideMargin, densityMargin, sideMargin, densityMargin);
+                mAdViewLayoutParams.setMargins(sideMargin, topMargin, sideMargin, bottomMargin);
             }
 
             // Use the insets remaining after Capacitor's parent layout has handled them.
