@@ -45,3 +45,5 @@ await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
 See [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for `isTesting`.
 
 Load, show, dismissal, and failure events are listed on [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).
+
+Prepared interstitial ads expire after one hour. An expired `showInterstitial()` call rejects with `AD_EXPIRED`; prepare a new ad before trying again.

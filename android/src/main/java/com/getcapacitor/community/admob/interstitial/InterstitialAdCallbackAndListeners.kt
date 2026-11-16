@@ -3,6 +3,7 @@ package com.getcapacitor.community.admob.interstitial
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
+import com.getcapacitor.community.admob.helpers.AdExpiration
 import com.getcapacitor.community.admob.models.AdMobPluginError
 import com.getcapacitor.community.admob.models.AdMobRevenueData
 import com.google.android.gms.ads.LoadAdError
@@ -30,6 +31,7 @@ object InterstitialAdCallbackAndListeners {
                 }
 
                 AdInterstitialExecutor.preparedAds[ad.adUnitId] = ad
+                AdInterstitialExecutor.preparedAdExpirations[ad.adUnitId] = AdExpiration(3600)
                 AdInterstitialExecutor.lastPreparedAdId = ad.adUnitId
 
                 val adInfo = JSObject()
