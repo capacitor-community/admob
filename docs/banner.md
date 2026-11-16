@@ -133,8 +133,8 @@ await AdMob.prepareBanner(options);
 await AdMob.showBanner(options);
 ```
 
-`prepareBanner()` loads one unattached banner and resolves on SDK load. It emits `Loaded`, but never changes the displayed size or emits `SizeChanged` on success, failure, or cancellation. Remove the current banner before preparing another.
+`prepareBanner()` loads one unattached banner and resolves on SDK load. It emits `Loaded`, but never changes the displayed size or emits `SizeChanged` on success, failure, or cancellation. The current banner stays displayed while the next one loads. Preparing again replaces only the previous preparation (rejecting it if still pending).
 
-`showBanner()` reuses a ready banner only when the ad unit, request options, format, and current SDK dimensions match. Position and margin come from the show call. It emits the displayed size after attachment, without another request or duplicate `Loaded`. Pending or mismatched preparation is discarded and the usual show operation proceeds.
+`showBanner()` reuses a ready banner only when the ad unit, request options, format, and current SDK dimensions match. The current banner is replaced only by this show call. Position and margin come from the show call. It emits `SizeChanged` after attachment only if the displayed dimensions change, without another request or duplicate `Loaded`. Pending or mismatched preparation is discarded and the usual show operation proceeds.
 
 `hideBanner()` and `resumeBanner()` continue to control only the displayed banner. `removeBanner()` also cancels preparation; canceling an unattached banner does not emit a size change. Existing API-only workflows retain their behavior.

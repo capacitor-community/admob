@@ -243,13 +243,12 @@ public class BannerExecutor extends Executor {
             call.reject(ex.getLocalizedMessage(), ex);
             return;
         }
+        final PreparedBanner previous;
         synchronized (this) {
-            if (mAdView != null || preparedBanner != null) {
-                call.reject("Remove the current or prepared banner before preparing another");
-                return;
-            }
+            previous = preparedBanner;
             preparedBanner = prepared;
         }
+        discardPreparedBanner(previous, "Banner preparation was superseded by prepareBanner()", null);
         activity.runOnUiThread(() -> {
             synchronized (BannerExecutor.this) {
                 if (preparedBanner != prepared) return;
@@ -357,36 +356,31 @@ public class BannerExecutor extends Executor {
             fullscreen = true;
         }
 
-        if (mAdView != null) {
+        PreparedBanner prepared = takePreparedBanner();
+        boolean usePrepared = false;
+        if (prepared != null) {
+            try {
+                usePrepared = canUsePreparedBanner(prepared, adOptions, requestedBannerSize(adOptions));
+            } catch (Exception ex) {
+                discardPreparedBanner(prepared, ex.getLocalizedMessage(), null);
+                call.reject(ex.getLocalizedMessage(), ex);
+                return;
+            }
+            if (!usePrepared) discardPreparedBanner(prepared, "Banner preparation was superseded by showBanner()", null);
+        }
+        if (mAdView != null && !usePrepared) {
             updateExistingAdView(call, adOptions);
             return;
         }
 
+        final AdView previousAdView = mAdView;
+        final RelativeLayout previousLayout = mAdViewLayout;
+        final boolean previousLoaded = bannerLoaded;
         // Why a try catch block?
         try {
             bannerLoaded = false;
-            PreparedBanner prepared = takePreparedBanner();
-            boolean usePrepared = false;
-            if (prepared == null) {
-                mAdView = new AdView(contextSupplier.get());
-                mAdView.setAdSize(requestedBannerSize(adOptions));
-            } else {
-                AdSize size;
-                try {
-                    size = requestedBannerSize(adOptions);
-                    usePrepared = canUsePreparedBanner(prepared, adOptions, size);
-                } catch (Exception ex) {
-                    discardPreparedBanner(prepared, ex.getLocalizedMessage(), null);
-                    throw ex;
-                }
-                if (usePrepared) {
-                    mAdView = prepared.view;
-                } else {
-                    discardPreparedBanner(prepared, "Banner preparation was superseded by showBanner()", null);
-                    mAdView = new AdView(contextSupplier.get());
-                    mAdView.setAdSize(size);
-                }
-            }
+            mAdView = usePrepared ? prepared.view : new AdView(contextSupplier.get());
+            if (!usePrepared) mAdView.setAdSize(requestedBannerSize(adOptions));
 
             // Setup AdView Layout
             mAdViewLayout = new RelativeLayout(contextSupplier.get());
@@ -465,7 +459,7 @@ public class BannerExecutor extends Executor {
             });
 
             mAdOptions = adOptions;
-            createNewAdView(adOptions, usePrepared);
+            createNewAdView(adOptions, usePrepared, previousAdView, previousLayout, previousLoaded);
 
             call.resolve();
         } catch (Exception ex) {
@@ -594,7 +588,13 @@ public class BannerExecutor extends Executor {
      * Follow iOS method Name:
      * https://developers.google.com/admob/ios/banner?hl=ja
      */
-    private void createNewAdView(AdOptions adOptions, boolean usePrepared) {
+    private void createNewAdView(
+        AdOptions adOptions,
+        boolean usePrepared,
+        AdView previousAdView,
+        RelativeLayout previousLayout,
+        boolean previousLoaded
+    ) {
         // Bind to the AdView instance created for this call. `mAdView` is a
         // shared field that removeBanner/hideBanner or a stale ad-listener
         // callback can null from the UI thread before this posted task runs;
@@ -604,6 +604,19 @@ public class BannerExecutor extends Executor {
 
         // Run AdMob In Main UI Thread
         activitySupplier.get().runOnUiThread(() -> {
+            BannerAdSizeInfo previousSize =
+                previousLoaded && previousLayout.getVisibility() == View.VISIBLE && previousLayout.getParent() != null
+                    ? new BannerAdSizeInfo(previousAdView)
+                    : null;
+            // A ready preparation replaces the displayed banner only when show is called.
+            if (previousAdView != null) {
+                ViewGroup parent = (ViewGroup) previousLayout.getParent();
+                if (parent != null) parent.removeView(previousLayout);
+                previousLayout.removeView(previousAdView);
+                previousAdView.setAdListener(null);
+                previousAdView.setOnPaidEventListener(null);
+                previousAdView.destroy();
+            }
             if (adView != mAdView) {
                 // Banner was removed or replaced before this task ran.
                 return;
@@ -702,7 +715,8 @@ public class BannerExecutor extends Executor {
                 mAdViewLayout.requestApplyInsets();
                 if (usePrepared) {
                     bannerLoaded = true;
-                    notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), new BannerAdSizeInfo(adView));
+                    BannerAdSizeInfo size = new BannerAdSizeInfo(adView);
+                    if (!size.equals(previousSize)) notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), size);
                 }
             } else {
                 Log.w(logTag, "Banner not attached: parent unavailable");

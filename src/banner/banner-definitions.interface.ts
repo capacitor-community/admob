@@ -51,7 +51,8 @@ export interface BannerDefinitions {
    * Loads one banner offscreen. Resolves on load and does not change the display
    * or emit SizeChanged. Call showBanner() with matching request options to
    * display it without reloading. A pending or mismatched preparation is
-   * discarded when showBanner() is called. Remove any existing banner first.
+   * discarded when showBanner() is called. Leaves the current banner unchanged.
+   * Preparing again replaces only the previous preparation.
    *
    * @group Banner
    */

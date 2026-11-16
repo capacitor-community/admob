@@ -46,14 +46,11 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     }
 
     func prepareBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
-        guard preparedBanner == nil, bannerView?.delegate == nil else {
-            call.reject("Remove the current or prepared banner before preparing another")
-            return
-        }
         guard let root = plugin?.getRootVC(), let size = requestedBannerSize(call) else {
             call.reject("Banner view unavailable")
             return
         }
+        discardPreparedBanner("Banner preparation was superseded by prepareBanner()")
         let view = BannerView(adSize: size)
         view.adUnitID = adUnitID
         view.rootViewController = root
@@ -127,6 +124,15 @@ class BannerExecutor: NSObject, BannerViewDelegate {
             }
             let prepared = takePreparedBanner(call, adUnitID: adUnitID, size: bannerSize)
 
+            var previousSize = CGSize.zero
+            if prepared != nil {
+                if let banner = self.bannerView, banner.superview != nil, !banner.isHidden {
+                    previousSize = banner.bounds.size
+                }
+                self.bannerView?.delegate = nil
+                self.bannerView?.paidEventHandler = nil
+                self.bannerView?.removeFromSuperview()
+            }
             self.bannerView = prepared ?? BannerView(adSize: bannerSize)
             self.addBannerViewToView(self.bannerView, adPosition, adMargin)
             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
@@ -150,7 +156,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                 ])
             }
 
-            if prepared != nil { _ = displayBannerView(self.bannerView) }
+            if prepared != nil { _ = displayBannerView(self.bannerView, previousSize: previousSize) }
             call.resolve([:])
         }
     }
@@ -252,7 +258,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
         }
     }
 
-    private func displayBannerView(_ bannerView: BannerView) -> Bool {
+    private func displayBannerView(_ bannerView: BannerView, previousSize: CGSize? = nil) -> Bool {
         if let rootViewController = plugin?.getRootVC() {
             rootViewController.view.addSubview(bannerView)
             rootViewController.view.addConstraints(
@@ -271,10 +277,12 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                                     multiplier: 1,
                                     constant: 0)
                 ])
-            self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
-                "width": bannerView.frame.width,
-                "height": bannerView.frame.height
-            ])
+            if previousSize != bannerView.frame.size {
+                self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
+                    "width": bannerView.frame.width,
+                    "height": bannerView.frame.height
+                ])
+            }
             return true
 
         }
