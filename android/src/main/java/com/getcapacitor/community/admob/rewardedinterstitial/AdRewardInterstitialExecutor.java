@@ -7,8 +7,8 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
-import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
+import com.getcapacitor.community.admob.helpers.RewardedAdShowCallback;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.AdOptions;
 import com.getcapacitor.community.admob.models.Executor;
@@ -22,6 +22,7 @@ public class AdRewardInterstitialExecutor extends Executor {
 
     public static final Map<String, RewardedInterstitialAd> preparedAds = new LinkedHashMap<>();
     public static String lastPreparedAdId;
+    private boolean showing;
 
     public AdRewardInterstitialExecutor(
         Supplier<Context> contextSupplier,
@@ -68,19 +69,35 @@ public class AdRewardInterstitialExecutor extends Executor {
 
         try {
             activitySupplier.get().runOnUiThread(() -> {
-                ad.setFullScreenContentCallback(
-                    new FullscreenPluginCallback(RewardInterstitialAdPluginEvents.INSTANCE, notifyListenersFunction, () -> {
-                        preparedAds.remove(adId);
-                        if (adId != null && adId.equals(lastPreparedAdId)) {
+                if (showing) {
+                    call.reject("An ad is already showing", "REWARDED_AD_ALREADY_SHOWING");
+                    return;
+                }
+                if (preparedAds.get(adId) != ad) {
+                    call.reject("Rewarded ad is no longer ready");
+                    return;
+                }
+                showing = true;
+                RewardedAdShowCallback callback = new RewardedAdShowCallback(
+                    call,
+                    RewardInterstitialAdPluginEvents.INSTANCE,
+                    RewardInterstitialAdPluginEvents.Rewarded,
+                    notifyListenersFunction,
+                    () -> {
+                        showing = false;
+                        preparedAds.remove(adId, ad);
+                        if (!preparedAds.containsKey(lastPreparedAdId)) {
                             lastPreparedAdId = null;
                             for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
                         }
-                    })
+                    }
                 );
-                ad.show(
-                    activitySupplier.get(),
-                    RewardedInterstitialAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
-                );
+                try {
+                    ad.setFullScreenContentCallback(callback);
+                    ad.show(activitySupplier.get(), callback);
+                } catch (Exception ex) {
+                    callback.fail(ex);
+                }
             });
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
