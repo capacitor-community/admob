@@ -9,7 +9,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     var margin: Int = 0
 
     func getAdaptiveBannerSize(_ call: CAPPluginCall) {
-        let width = call.getDouble("width")
+        let width = call.getDouble("width") ?? call.getInt("width").map(Double.init)
         if call.options["width"] != nil {
             guard let width = width, width.isFinite, width >= 1, width <= Double(Int32.max) else {
                 call.reject("width must be a finite positive number of logical pixels")

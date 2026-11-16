@@ -74,6 +74,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
 
     public override func load() {
         self.consentExecutor.plugin = self
+        self.bannerExecutor.plugin = self
     }
 
     /// Full-screen ads that currently have web media suspended.
@@ -353,7 +354,6 @@ extension AdMobPlugin {
     // MARK: SDK initialization
 
     @objc func initialize(_ call: CAPPluginCall) {
-        bannerExecutor.plugin = self
         adInterstitialExecutor.plugin = self
         adRewardExecutor.plugin = self
         adRewardInterstitialExecutor.plugin = self
