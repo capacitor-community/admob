@@ -127,6 +127,9 @@ class BannerExecutorTest {
     class ShowBanner {
 
         @Mock
+        MockedStatic<android.util.Log> logMock;
+
+        @Mock
         MockedConstruction<RelativeLayout> relativeLayoutMockedConstruction;
 
         @Mock
@@ -219,6 +222,45 @@ class BannerExecutorTest {
             assertEquals(0, adViewMockedConstruction.constructed().size());
             verify(notifierMock, never()).accept(any(), any());
             requestHelperMockedStatic.verifyNoInteractions();
+        }
+
+        private void assertBannerSize(int width, int height) {
+            clearInvocations(activityMock);
+            PluginCall query = mock(PluginCall.class);
+            sut.getBannerSize(query);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            verify(query).resolve(new BannerAdSizeInfo(width, height));
+        }
+
+        @Test
+        void returnsOnlyTheCurrentlyDisplayedSize() {
+            assertBannerSize(0, 0);
+            sut.showBanner(mock(PluginCall.class), true);
+            verify(activityMock, atLeast(1)).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            AdView ad = adViewMockedConstruction.constructed().get(0);
+            AdSize size = mock(AdSize.class);
+            when(size.getWidth()).thenReturn(320);
+            when(size.getHeight()).thenReturn(50);
+            when(ad.getAdSize()).thenReturn(size);
+            assertBannerSize(0, 0);
+            ArgumentCaptor<com.google.android.gms.ads.AdListener> listener = ArgumentCaptor.forClass(
+                com.google.android.gms.ads.AdListener.class
+            );
+            verify(ad).setAdListener(listener.capture());
+            listener.getValue().onAdLoaded();
+            assertBannerSize(320, 50);
+            RelativeLayout layout = relativeLayoutMockedConstruction.constructed().get(0);
+            when(layout.getVisibility()).thenReturn(View.GONE);
+            assertBannerSize(0, 0);
+            when(layout.getVisibility()).thenReturn(View.VISIBLE);
+            assertBannerSize(320, 50);
+            sut.removeBanner(mock(PluginCall.class));
+            verify(activityMock, atLeast(1)).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            assertBannerSize(0, 0);
+            verify(ad).loadAd(any());
         }
 
         @Test

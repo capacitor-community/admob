@@ -32,6 +32,14 @@ class BannerExecutor: NSObject, BannerViewDelegate {
         return currentOrientationAnchoredAdaptiveBanner(width: availableWidth)
     }
 
+    func getBannerSize(_ call: CAPPluginCall) {
+        guard let banner = bannerView, banner.superview != nil, !banner.isHidden else {
+            call.resolve(["width": 0, "height": 0])
+            return
+        }
+        call.resolve(["width": banner.bounds.width, "height": banner.bounds.height])
+    }
+
     func showBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
         if let rootViewController = plugin?.getRootVC() {
 

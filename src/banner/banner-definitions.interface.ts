@@ -58,6 +58,15 @@ export interface BannerDefinitions {
   getAdaptiveBannerSize(options?: { width?: number }): Promise<AdMobBannerSize>;
 
   /**
+   * Returns the currently displayed banner size in dp (Android) or points (iOS).
+   * Returns zero dimensions before loading or while hidden, removed, or failed.
+   * Does not create, load, or show an ad.
+   *
+   * @group Banner
+   */
+  getBannerSize(): Promise<AdMobBannerSize>;
+
+  /**
    * Listens for changes to the displayed banner dimensions.
    *
    * @group Banner

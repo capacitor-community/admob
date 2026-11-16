@@ -20,6 +20,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "setApplicationMuted", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setApplicationVolume", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getAdaptiveBannerSize", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getBannerSize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resumeBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hideBanner", returnType: CAPPluginReturnPromise),
@@ -369,6 +370,10 @@ extension AdMobPlugin {
 
     @objc func getAdaptiveBannerSize(_ call: CAPPluginCall) {
         DispatchQueue.main.async { self.bannerExecutor.getAdaptiveBannerSize(call) }
+    }
+
+    @objc func getBannerSize(_ call: CAPPluginCall) {
+        DispatchQueue.main.async { self.bannerExecutor.getBannerSize(call) }
     }
 
     @objc func showBanner(_ call: CAPPluginCall) {

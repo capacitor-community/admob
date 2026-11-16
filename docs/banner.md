@@ -114,3 +114,13 @@ await AdMob.showBanner(options);
 The default width is the current available width with safe areas taken into account, using the same SDK calculation as `showBanner()` for adaptive banners. Dimensions are logical pixels (dp on Android, points on iOS). Recalculate after rotation or a change in available width, and continue using `SizeChanged` for the displayed size.
 
 An optional `{ width: 300 }` calculates for a specific width in logical pixels; it does not change the width used by `showBanner()`. Invalid widths reject. This calculation is available on Android and iOS; the web implementation rejects as unavailable.
+
+## Read the current banner size
+
+`getBannerSize()` returns the displayed width and height in logical pixels, including when the initial size event was missed. It does not request or display an ad. Before loading, or while the banner is hidden, removed, or failed, both dimensions are zero.
+
+```ts
+const { width, height } = await AdMob.getBannerSize();
+```
+
+Keep listening to `BannerAdPluginEvents.SizeChanged` for subsequent changes.

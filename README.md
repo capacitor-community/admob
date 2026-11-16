@@ -222,6 +222,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 * [`resumeBanner()`](#resumebanner)
 * [`removeBanner()`](#removebanner)
 * [`getAdaptiveBannerSize(...)`](#getadaptivebannersize)
+* [`getBannerSize()`](#getbannersize)
 * [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
 * [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
 * [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
@@ -579,6 +580,21 @@ or available-width changes. An explicit width does not resize showBanner().
 | Param         | Type                             |
 | ------------- | -------------------------------- |
 | **`options`** | <code>{ width?: number; }</code> |
+
+**Returns:** <code>Promise&lt;<a href="#admobbannersize">AdMobBannerSize</a>&gt;</code>
+
+--------------------
+
+
+### getBannerSize()
+
+```typescript
+getBannerSize() => Promise<AdMobBannerSize>
+```
+
+Returns the currently displayed banner size in dp (Android) or points (iOS).
+Returns zero dimensions before loading or while hidden, removed, or failed.
+Does not create, load, or show an ad.
 
 **Returns:** <code>Promise&lt;<a href="#admobbannersize">AdMobBannerSize</a>&gt;</code>
 
