@@ -48,6 +48,15 @@ export interface BannerDefinitions {
   removeBanner(): Promise<void>;
 
   /**
+   * Preloads the next banner without changing the current display.
+   * Resolves when loaded. Call showBanner() with matching options to display it.
+   * Preparing again replaces the previous preparation; removeBanner() cancels it.
+   *
+   * @group Banner
+   */
+  prepareBanner(options: BannerAdOptions): Promise<void>;
+
+  /**
    * Calculates the anchored adaptive banner size without creating or loading an ad.
    * Uses the current safe-area-aware available width unless a width is provided.
    * Dimensions are dp on Android and points on iOS. Recalculate after rotation

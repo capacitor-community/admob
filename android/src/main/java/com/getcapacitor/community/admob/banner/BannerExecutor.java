@@ -44,6 +44,21 @@ public class BannerExecutor extends Executor {
     private AdOptions mAdOptions;
     private int[] mBannerMargins;
     private ViewGroup mViewGroup;
+    private PreparedBanner preparedBanner;
+
+    private static final class PreparedBanner {
+
+        final AdOptions options;
+        PluginCall pending;
+        AdView view;
+        AdSize size;
+        String adUnitID;
+
+        PreparedBanner(AdOptions options, PluginCall pending) {
+            this.options = options;
+            this.pending = pending;
+        }
+    }
 
     public BannerExecutor(
         Supplier<Context> contextSupplier,
@@ -215,6 +230,110 @@ public class BannerExecutor extends Executor {
         return (int) (width / metrics.density);
     }
 
+    public void prepareBanner(final PluginCall call) {
+        Activity activity = liveActivity();
+        if (activity == null) {
+            call.reject("Activity unavailable");
+            return;
+        }
+        final PreparedBanner prepared;
+        try {
+            prepared = new PreparedBanner(AdOptions.getFactory().createBannerOptions(call), call);
+        } catch (Exception ex) {
+            call.reject(ex.getLocalizedMessage(), ex);
+            return;
+        }
+        final PreparedBanner previous;
+        synchronized (this) {
+            previous = preparedBanner;
+            preparedBanner = prepared;
+        }
+        discardPreparedBanner(previous, "Banner preparation was superseded by prepareBanner()", null);
+        activity.runOnUiThread(() -> {
+            synchronized (BannerExecutor.this) {
+                if (preparedBanner != prepared) return;
+            }
+            try {
+                AdSize size = requestedBannerSize(prepared.options);
+                if (size == null || size.equals(AdSize.INVALID)) throw new IllegalArgumentException("Invalid banner size");
+                prepared.view = new AdView(contextSupplier.get());
+                prepared.view.setAdSize(size);
+                prepared.size = size;
+                AdRequest request = RequestHelper.createRequest(prepared.options);
+                AdViewIdHelper.assignIdToAdView(prepared.view, prepared.options, request, logTag, contextSupplier.get());
+                prepared.adUnitID = prepared.view.getAdUnitId();
+                prepared.view.setAdListener(
+                    new AdListener() {
+                        @Override
+                        public void onAdLoaded() {
+                            PluginCall pending;
+                            synchronized (BannerExecutor.this) {
+                                if (preparedBanner != prepared || prepared.pending == null) return;
+                                pending = prepared.pending;
+                                prepared.pending = null;
+                            }
+                            notifyListeners(BannerAdPluginEvents.Loaded.getWebEventName(), emptyObject);
+                            pending.resolve();
+                        }
+
+                        @Override
+                        public void onAdFailedToLoad(@NonNull LoadAdError error) {
+                            if (!detachPreparedBanner(prepared)) return;
+                            discardPreparedBanner(prepared, error.getMessage(), String.valueOf(error.getCode()));
+                            notifyListeners(BannerAdPluginEvents.FailedToLoad.getWebEventName(), new AdMobPluginError(error));
+                        }
+                    }
+                );
+                prepared.view.loadAd(request);
+            } catch (Exception ex) {
+                if (detachPreparedBanner(prepared)) discardPreparedBanner(prepared, ex.getLocalizedMessage(), null);
+            }
+        });
+    }
+
+    private synchronized PreparedBanner takePreparedBanner() {
+        PreparedBanner prepared = preparedBanner;
+        preparedBanner = null;
+        return prepared;
+    }
+
+    private synchronized boolean detachPreparedBanner(PreparedBanner prepared) {
+        if (preparedBanner != prepared) return false;
+        preparedBanner = null;
+        return true;
+    }
+
+    private void discardPreparedBanner(PreparedBanner prepared, String reason, String code) {
+        if (prepared == null) return;
+        PluginCall pending = prepared.pending;
+        prepared.pending = null;
+        if (pending != null) pending.reject(reason, code);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (prepared.view != null) prepared.view.destroy();
+        });
+    }
+
+    private AdSize requestedBannerSize(AdOptions options) {
+        return options.adSize.toString().equals("ADAPTIVE_BANNER")
+            ? AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), adaptiveBannerWidth())
+            : options.adSize.getSize();
+    }
+
+    private boolean canUsePreparedBanner(PreparedBanner prepared, AdOptions options, AdSize size) {
+        return (
+            prepared.pending == null &&
+            prepared.view != null &&
+            prepared.options.adSize == options.adSize &&
+            prepared.options.npa == options.npa &&
+            prepared.options.isTesting == options.isTesting &&
+            Objects.equals(prepared.size, size) &&
+            Objects.equals(
+                prepared.adUnitID,
+                AdViewIdHelper.getFinalAdId(options, RequestHelper.createRequest(options), logTag, contextSupplier.get())
+            )
+        );
+    }
+
     public void getBannerSize(final PluginCall call) {
         activitySupplier.get().runOnUiThread(() -> {
             boolean visible = bannerLoaded && mAdView != null && mAdViewLayout.getVisibility() == View.VISIBLE;
@@ -237,22 +356,31 @@ public class BannerExecutor extends Executor {
             fullscreen = true;
         }
 
-        if (mAdView != null) {
+        PreparedBanner prepared = takePreparedBanner();
+        boolean usePrepared = false;
+        if (prepared != null) {
+            try {
+                usePrepared = canUsePreparedBanner(prepared, adOptions, requestedBannerSize(adOptions));
+            } catch (Exception ex) {
+                discardPreparedBanner(prepared, ex.getLocalizedMessage(), null);
+                call.reject(ex.getLocalizedMessage(), ex);
+                return;
+            }
+            if (!usePrepared) discardPreparedBanner(prepared, "Banner preparation was superseded by showBanner()", null);
+        }
+        if (mAdView != null && !usePrepared) {
             updateExistingAdView(call, adOptions);
             return;
         }
 
+        final AdView previousAdView = mAdView;
+        final RelativeLayout previousLayout = mAdViewLayout;
+        final boolean previousLoaded = bannerLoaded;
         // Why a try catch block?
         try {
             bannerLoaded = false;
-            mAdView = new AdView(contextSupplier.get());
-
-            if (!adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
-                mAdView.setAdSize(adOptions.adSize.getSize());
-            } else {
-                // ADAPTIVE BANNER
-                mAdView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), adaptiveBannerWidth()));
-            }
+            mAdView = usePrepared ? prepared.view : new AdView(contextSupplier.get());
+            if (!usePrepared) mAdView.setAdSize(requestedBannerSize(adOptions));
 
             // Setup AdView Layout
             mAdViewLayout = new RelativeLayout(contextSupplier.get());
@@ -331,7 +459,7 @@ public class BannerExecutor extends Executor {
             });
 
             mAdOptions = adOptions;
-            createNewAdView(adOptions);
+            createNewAdView(adOptions, usePrepared, previousAdView, previousLayout, previousLoaded);
 
             call.resolve();
         } catch (Exception ex) {
@@ -384,6 +512,7 @@ public class BannerExecutor extends Executor {
     }
 
     public void removeBanner(final PluginCall call) {
+        discardPreparedBanner(takePreparedBanner(), "Banner preparation was cancelled by removeBanner()", null);
         try {
             if (mAdView != null) {
                 activitySupplier.get().runOnUiThread(() -> {
@@ -459,7 +588,13 @@ public class BannerExecutor extends Executor {
      * Follow iOS method Name:
      * https://developers.google.com/admob/ios/banner?hl=ja
      */
-    private void createNewAdView(AdOptions adOptions) {
+    private void createNewAdView(
+        AdOptions adOptions,
+        boolean usePrepared,
+        AdView previousAdView,
+        RelativeLayout previousLayout,
+        boolean previousLoaded
+    ) {
         // Bind to the AdView instance created for this call. `mAdView` is a
         // shared field that removeBanner/hideBanner or a stale ad-listener
         // callback can null from the UI thread before this posted task runs;
@@ -469,17 +604,30 @@ public class BannerExecutor extends Executor {
 
         // Run AdMob In Main UI Thread
         activitySupplier.get().runOnUiThread(() -> {
+            BannerAdSizeInfo previousSize =
+                previousLoaded && previousLayout.getVisibility() == View.VISIBLE && previousLayout.getParent() != null
+                    ? new BannerAdSizeInfo(previousAdView)
+                    : null;
+            // A ready preparation replaces the displayed banner only when show is called.
+            if (previousAdView != null) {
+                ViewGroup parent = (ViewGroup) previousLayout.getParent();
+                if (parent != null) parent.removeView(previousLayout);
+                previousLayout.removeView(previousAdView);
+                previousAdView.setAdListener(null);
+                previousAdView.setOnPaidEventListener(null);
+                previousAdView.destroy();
+            }
             if (adView != mAdView) {
                 // Banner was removed or replaced before this task ran.
                 return;
             }
-            final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-            // Assign the correct id needed
-            AdViewIdHelper.assignIdToAdView(adView, adOptions, adRequest, logTag, contextSupplier.get());
+            final AdRequest adRequest = usePrepared ? null : RequestHelper.createRequest(adOptions);
+            // A prepared view already has its size, unit ID, and loaded request.
+            if (!usePrepared) AdViewIdHelper.assignIdToAdView(adView, adOptions, adRequest, logTag, contextSupplier.get());
             // Add the AdView to the view hierarchy.
             mAdViewLayout.addView(adView);
             // Start loading the ad.
-            adView.loadAd(adRequest);
+            if (!usePrepared) adView.loadAd(adRequest);
             adView.setAdListener(
                 new AdListener() {
                     @Override
@@ -565,6 +713,11 @@ public class BannerExecutor extends Executor {
             if (bannerParent != null) {
                 bannerParent.addView(mAdViewLayout);
                 mAdViewLayout.requestApplyInsets();
+                if (usePrepared) {
+                    bannerLoaded = true;
+                    BannerAdSizeInfo size = new BannerAdSizeInfo(adView);
+                    if (!size.equals(previousSize)) notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), size);
+                }
             } else {
                 Log.w(logTag, "Banner not attached: parent unavailable");
             }

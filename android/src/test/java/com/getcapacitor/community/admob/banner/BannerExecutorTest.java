@@ -263,6 +263,205 @@ class BannerExecutorTest {
             verify(ad).loadAd(any());
         }
 
+        private com.google.android.gms.ads.AdListener prepare(PluginCall call) {
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(
+                new AdOptions.TesterAdOptionsBuilder().setAdSize(BannerAdSizeEnum.BANNER).build()
+            );
+            sut.prepareBanner(call);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            clearInvocations(activityMock);
+            AdView ad = adViewMockedConstruction.constructed().get(adViewMockedConstruction.constructed().size() - 1);
+            Mockito.lenient().when(ad.getAdSize()).thenReturn(AdSize.BANNER);
+            ArgumentCaptor<com.google.android.gms.ads.AdListener> listener = ArgumentCaptor.forClass(
+                com.google.android.gms.ads.AdListener.class
+            );
+            verify(ad).setAdListener(listener.capture());
+            return listener.getValue();
+        }
+
+        @Test
+        void preparationDoesNotDisplayOrNotifySizeAndShowReusesLoadedView() {
+            PluginCall call = mock(PluginCall.class);
+            var listener = prepare(call);
+            AdView ad = adViewMockedConstruction.constructed().get(0);
+            verify(call, never()).resolve();
+            listener.onAdLoaded();
+            verify(call).resolve();
+            verify(notifierMock).accept(Mockito.eq(BannerAdPluginEvents.Loaded.getWebEventName()), any());
+            verify(notifierMock, never()).accept(Mockito.eq(BannerAdPluginEvents.SizeChanged.getWebEventName()), any());
+            verify(viewGroupMock, never()).addView(any());
+            assertEquals(0, relativeLayoutMockedConstruction.constructed().size());
+            sut.showBanner(mock(PluginCall.class), true);
+            // SDK view getters require the UI thread; matching uses the prepared metadata.
+            verify(ad, never()).getAdSize();
+            verify(ad).getAdUnitId();
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            assertEquals(1, adViewMockedConstruction.constructed().size());
+            verify(ad).loadAd(any());
+            verify(viewGroupMock).addView(relativeLayoutMockedConstruction.constructed().get(0));
+            verify(notifierMock).accept(BannerAdPluginEvents.SizeChanged.getWebEventName(), new BannerAdSizeInfo(320, 50));
+            verify(notifierMock).accept(Mockito.eq(BannerAdPluginEvents.Loaded.getWebEventName()), any());
+        }
+
+        private AdView displayCurrentBanner() {
+            sut.showBanner(mock(PluginCall.class), true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            AdView ad = adViewMockedConstruction.constructed().get(0);
+            when(ad.getAdSize()).thenReturn(AdSize.BANNER);
+            ArgumentCaptor<com.google.android.gms.ads.AdListener> listener = ArgumentCaptor.forClass(
+                com.google.android.gms.ads.AdListener.class
+            );
+            verify(ad).setAdListener(listener.capture());
+            listener.getValue().onAdLoaded();
+            clearInvocations(activityMock, notifierMock);
+            return ad;
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true, 50, false", "false, 50, true", "true, 100, true" })
+        void preparationKeepsCurrentBannerUntilShowReplacesIt(boolean visible, int height, boolean sizeChanged) {
+            AdView current = displayCurrentBanner();
+            RelativeLayout currentLayout = relativeLayoutMockedConstruction.constructed().get(0);
+            when(currentLayout.getParent()).thenReturn(viewGroupMock);
+            when(currentLayout.getVisibility()).thenReturn(visible ? View.VISIBLE : View.GONE);
+            when(current.getAdSize()).thenReturn(height == 100 ? AdSize.LARGE_BANNER : AdSize.BANNER);
+            PluginCall call = mock(PluginCall.class);
+            prepare(call).onAdLoaded();
+            verify(call).resolve();
+            verify(current, never()).destroy();
+            verify(currentLayout, never()).removeView(any());
+            verify(notifierMock, never()).accept(Mockito.eq(BannerAdPluginEvents.SizeChanged.getWebEventName()), any());
+            assertBannerSize(visible ? 320 : 0, visible ? height : 0);
+            clearInvocations(activityMock);
+
+            sut.showBanner(mock(PluginCall.class), true);
+            verify(current, never()).destroy();
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            AdView prepared = adViewMockedConstruction.constructed().get(1);
+            verify(current).destroy();
+            verify(currentLayout).removeView(current);
+            verify(viewGroupMock).removeView(currentLayout);
+            verify(prepared).loadAd(any());
+            assertEquals(2, adViewMockedConstruction.constructed().size());
+            verify(notifierMock).accept(Mockito.eq(BannerAdPluginEvents.Loaded.getWebEventName()), any());
+            if (sizeChanged) {
+                verify(notifierMock).accept(BannerAdPluginEvents.SizeChanged.getWebEventName(), new BannerAdSizeInfo(320, 50));
+            } else {
+                verify(notifierMock, never()).accept(Mockito.eq(BannerAdPluginEvents.SizeChanged.getWebEventName()), any());
+            }
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true", "false" })
+        void preparationReplacementOrFailureLeavesCurrentBannerUnchanged(boolean replace) {
+            AdView current = displayCurrentBanner();
+            PluginCall first = mock(PluginCall.class);
+            var oldListener = prepare(first);
+            try (
+                MockedStatic<android.os.Looper> looper = Mockito.mockStatic(android.os.Looper.class);
+                MockedConstruction<android.os.Handler> handlers = Mockito.mockConstruction(android.os.Handler.class, (handler, context) ->
+                    when(handler.post(any())).thenAnswer((invocation) -> {
+                        invocation.<Runnable>getArgument(0).run();
+                        return true;
+                    })
+                )
+            ) {
+                if (replace) {
+                    PluginCall next = mock(PluginCall.class);
+                    prepare(next).onAdLoaded();
+                    verify(next).resolve();
+                } else {
+                    com.google.android.gms.ads.LoadAdError error = mock(com.google.android.gms.ads.LoadAdError.class);
+                    when(error.getMessage()).thenReturn("No fill");
+                    oldListener.onAdFailedToLoad(error);
+                }
+                oldListener.onAdLoaded();
+                verify(first).reject(any(), Mockito.nullable(String.class));
+                verify(first, never()).resolve();
+                verify(adViewMockedConstruction.constructed().get(1)).destroy();
+                verify(current, never()).destroy();
+                verify(relativeLayoutMockedConstruction.constructed().get(0), never()).removeView(any());
+                verify(notifierMock, never()).accept(Mockito.eq(BannerAdPluginEvents.SizeChanged.getWebEventName()), any());
+                assertBannerSize(320, 50);
+            }
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true", "false" })
+        void cancellationAndFailureDoNotChangeSizeOrAcceptLateCallbacks(boolean cancel) {
+            PluginCall call = mock(PluginCall.class);
+            var listener = prepare(call);
+            try (
+                MockedStatic<android.os.Looper> looper = Mockito.mockStatic(android.os.Looper.class);
+                MockedConstruction<android.os.Handler> handlers = Mockito.mockConstruction(android.os.Handler.class)
+            ) {
+                if (cancel) {
+                    sut.removeBanner(mock(PluginCall.class));
+                } else {
+                    com.google.android.gms.ads.LoadAdError error = mock(com.google.android.gms.ads.LoadAdError.class);
+                    when(error.getMessage()).thenReturn("No fill");
+                    when(error.getCode()).thenReturn(3);
+                    listener.onAdFailedToLoad(error);
+                }
+                listener.onAdLoaded();
+                verify(call).reject(any(), Mockito.nullable(String.class));
+                verify(call, never()).resolve();
+                verify(notifierMock, never()).accept(Mockito.eq(BannerAdPluginEvents.SizeChanged.getWebEventName()), any());
+                verify(notifierMock, never()).accept(Mockito.eq(BannerAdPluginEvents.Loaded.getWebEventName()), any());
+            }
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true, false", "false, false", "true, true", "false, true" })
+        void showFallsBackToNormalLoadingForPendingOrMismatchedPreparation(boolean pending, boolean active) {
+            if (active) {
+                displayCurrentBanner();
+                useExistingLayoutParams();
+            }
+            PluginCall prepared = mock(PluginCall.class);
+            var listener = prepare(prepared);
+            if (!pending) {
+                listener.onAdLoaded();
+                when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(
+                    new AdOptions.TesterAdOptionsBuilder().setAdSize(BannerAdSizeEnum.BANNER).setNpa(true).build()
+                );
+            }
+            try (
+                MockedStatic<android.os.Looper> looper = Mockito.mockStatic(android.os.Looper.class);
+                MockedConstruction<android.os.Handler> handlers = Mockito.mockConstruction(android.os.Handler.class)
+            ) {
+                PluginCall show = mock(PluginCall.class);
+                sut.showBanner(show, true);
+                verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+                runnableArgumentCaptor.getValue().run();
+                verify(show).resolve();
+                assertEquals(2, adViewMockedConstruction.constructed().size());
+                verify(adViewMockedConstruction.constructed().get(active ? 0 : 1), times(active ? 2 : 1)).loadAd(any());
+                if (pending) verify(prepared).reject(any(), Mockito.<String>isNull());
+            }
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true", "false" })
+        void legacyShowFollowedImmediatelyByHideOrRemoveStillWorks(boolean hide) {
+            PluginCall show = mock(PluginCall.class);
+            PluginCall action = mock(PluginCall.class);
+            sut.showBanner(show, true);
+            if (hide) sut.hideBanner(action);
+            else sut.removeBanner(action);
+            verify(activityMock, times(2)).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getAllValues().forEach(Runnable::run);
+            verify(show).resolve();
+            verify(action).resolve();
+            AdView ad = adViewMockedConstruction.constructed().get(0);
+            if (hide) verify(ad).pause();
+            else verify(ad).destroy();
+        }
+
         @Test
         @DisplayName("Banner constructs the request using the RequestHelper")
         void showBannerUsesRequestHelper() {

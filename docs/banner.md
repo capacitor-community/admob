@@ -99,7 +99,7 @@ await AdMob.removeBanner();
 
 Banner impression-level revenue is emitted on `BannerAdPluginEvents.AdPaid`. Full-screen formats emit the same `AdMobRevenueData` through their `AdImpression` event. See [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).
 
-To move the existing Android banner, call `showBanner()` again with the same ad unit and request options and the new `position` or `margin`. The existing ad size is retained even if `adSize` is omitted. A layout-only change keeps the displayed ad and resolves without requesting another ad. Keep the same request options (such as `npa`) when moving it. Calling `showBanner()` with unchanged layout, or changing request options, retains the existing reload behavior. This does not create a second banner. Use `removeBanner()` before switching to a different ad size or ad unit.
+To move the existing Android banner, call `showBanner()` again with the same ad unit and request options and the new `position` or `margin`. The existing ad size is retained even if `adSize` is omitted. A layout-only change keeps the displayed ad and resolves without requesting another ad. Keep the same request options (such as `npa`) when moving it. Calling `showBanner()` with unchanged layout, or changing request options, retains the existing reload behavior. This does not create a second banner. Without a matching banner preloaded by `prepareBanner()`, use `removeBanner()` before switching to a different ad size or ad unit.
 
 ## Reserve space before loading an adaptive banner
 
@@ -124,3 +124,17 @@ const { width, height } = await AdMob.getBannerSize();
 ```
 
 Keep listening to `BannerAdPluginEvents.SizeChanged` for subsequent changes.
+
+## Preload without displaying
+
+```ts
+await AdMob.prepareBanner(options);
+// Later, when the screen is ready:
+await AdMob.showBanner(options);
+```
+
+`prepareBanner()` resolves when the next banner has loaded, leaving the current banner displayed. Use the same ad unit, size, and request options in `showBanner()` to display it without loading again; position and margin may differ. Without a reusable prepared banner, `showBanner()` works as usual.
+
+Preparing again replaces the previous preparation. `removeBanner()` clears both the displayed and prepared banners. Pending preparation rejects when replaced or removed.
+
+Preparation emits `Loaded` without `SizeChanged`. Showing a prepared banner emits `SizeChanged` only when the displayed dimensions change, without repeating `Loaded`.

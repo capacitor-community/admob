@@ -221,6 +221,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
 * [`removeBanner()`](#removebanner)
+* [`prepareBanner(...)`](#preparebanner)
 * [`getAdaptiveBannerSize(...)`](#getadaptivebannersize)
 * [`getBannerSize()`](#getbannersize)
 * [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
@@ -562,6 +563,23 @@ removeBanner() => Promise<void>
 Destroys the current banner and removes it from the screen.
 
 **Since:** 1.1.2
+
+--------------------
+
+
+### prepareBanner(...)
+
+```typescript
+prepareBanner(options: BannerAdOptions) => Promise<void>
+```
+
+Preloads the next banner without changing the current display.
+Resolves when loaded. Call showBanner() with matching options to display it.
+Preparing again replaces the previous preparation; removeBanner() cancels it.
+
+| Param         | Type                                                        |
+| ------------- | ----------------------------------------------------------- |
+| **`options`** | <code><a href="#banneradoptions">BannerAdOptions</a></code> |
 
 --------------------
 
