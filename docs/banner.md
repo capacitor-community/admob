@@ -100,3 +100,15 @@ await AdMob.removeBanner();
 Banner impression-level revenue is emitted on `BannerAdPluginEvents.AdPaid`. Full-screen formats emit the same `AdMobRevenueData` through their `AdImpression` event. See [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).
 
 To move the existing Android banner, call `showBanner()` again with the same ad unit and request options and the new `position` or `margin`. The existing ad size is retained even if `adSize` is omitted. A layout-only change keeps the displayed ad and resolves without requesting another ad. Keep the same request options (such as `npa`) when moving it. Calling `showBanner()` with unchanged layout, or changing request options, retains the existing reload behavior. This does not create a second banner. Use `removeBanner()` before switching to a different ad size or ad unit.
+
+## Preload without displaying
+
+`prepareBanner()` loads the single banner without making it visible. Its promise resolves after the SDK reports a successful load and rejects on load failure or cancellation by `removeBanner()`.
+
+```ts
+await AdMob.prepareBanner(options);
+// Later, when the screen is ready:
+await AdMob.resumeBanner();
+```
+
+Preparation emits `Loaded` but no nonzero `SizeChanged` event. `resumeBanner()` displays the loaded banner and emits its size without requesting another ad. Wait for preparation to finish before resuming. Call `removeBanner()` before preparing another banner. No banner IDs or additional simultaneous banners are introduced. The existing `showBanner(options)` behavior is unchanged.

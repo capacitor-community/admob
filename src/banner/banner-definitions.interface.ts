@@ -48,6 +48,15 @@ export interface BannerDefinitions {
   removeBanner(): Promise<void>;
 
   /**
+   * Loads a banner without displaying it. Resolves when loaded, rejects on failure
+   * or removal. Call resumeBanner() to display it without another ad request.
+   * Remove the current banner before preparing another. Only one banner is held.
+   *
+   * @group Banner
+   */
+  prepareBanner(options: BannerAdOptions): Promise<void>;
+
+  /**
    * Listens for changes to the displayed banner dimensions.
    *
    * @group Banner

@@ -230,6 +230,14 @@ public class AdMob extends Plugin {
     // ---------------------------------------------------------
 
     @PluginMethod
+    public void prepareBanner(final PluginCall call) {
+        boolean systemBarsHandlesInsets = !"disable".equals(
+            getBridge().getConfig().getPluginConfiguration("SystemBars").getString("insetsHandling", "css")
+        );
+        bannerExecutor.prepareBanner(call, systemBarsHandlesInsets);
+    }
+
+    @PluginMethod
     public void showBanner(final PluginCall call) {
         boolean systemBarsHandlesInsets = !"disable".equals(
             getBridge().getConfig().getPluginConfiguration("SystemBars").getString("insetsHandling", "css")

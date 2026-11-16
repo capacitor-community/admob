@@ -7,8 +7,27 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     var bannerView: BannerView!
     var adPosition: String = ""
     var margin: Int = 0
+    private var pendingPrepare: CAPPluginCall?
+
+    func prepareBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
+        guard bannerView == nil, pendingPrepare == nil else {
+            call.reject("Remove the current banner before preparing another")
+            return
+        }
+        guard plugin?.getRootVC() != nil else {
+            call.reject("Banner view unavailable")
+            return
+        }
+        pendingPrepare = call
+        showBanner(call, request, adUnitID)
+    }
 
     func showBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
+        if let pendingPrepare = pendingPrepare, pendingPrepare !== call {
+            call.reject("A banner is still being prepared")
+            return
+        }
+        let preparing = pendingPrepare === call
         if let rootViewController = plugin?.getRootVC() {
 
             let adSize = call.getString("adSize") ?? "ADAPTIVE_BANNER"
@@ -46,8 +65,9 @@ class BannerExecutor: NSObject, BannerViewDelegate {
             self.bannerView.adUnitID = adUnitID
             self.bannerView.rootViewController = plugin?.getRootVC()
 
-            self.bannerView.load(request)
+            self.bannerView.isHidden = preparing
             self.bannerView.delegate = self
+            self.bannerView.load(request)
 
             self.bannerView.paidEventHandler = { [weak self] adValue in
                 guard let self = self else { return }
@@ -63,12 +83,13 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                 ])
             }
 
-            call.resolve([:])
+            if !preparing { call.resolve([:]) }
         }
     }
 
     func hideBanner(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
+            self.bannerView?.isHidden = true
             if let rootViewController = self.plugin?.getRootVC() {
                 if let subView = rootViewController.view.viewWithTag(2743243288699) {
                     NSLog("AdMob: find subView for hideBanner")
@@ -88,6 +109,10 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     }
 
     func resumeBanner(_ call: CAPPluginCall) {
+        guard pendingPrepare == nil else {
+            call.reject("Wait for prepareBanner() to finish before resuming the banner")
+            return
+        }
         if let rootViewController = plugin?.getRootVC() {
             if let subView = rootViewController.view.viewWithTag(2743243288699) {
                 NSLog("AdMob: find subView for resumeBanner")
@@ -114,6 +139,9 @@ class BannerExecutor: NSObject, BannerViewDelegate {
         // is never put up again.
         self.bannerView?.delegate = nil
         self.bannerView?.removeFromSuperview()
+        self.bannerView = nil
+        pendingPrepare?.reject("Banner preparation was cancelled by removeBanner()")
+        pendingPrepare = nil
         call.resolve([:])
     }
 
@@ -137,6 +165,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
 
     /// Tells the delegate an ad request loaded an ad.
     func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        guard bannerView === self.bannerView else { return }
         NSLog("bannerViewDidReceiveAd")
         if let rootViewController = plugin?.getRootVC() {
             rootViewController.view.addSubview(bannerView)
@@ -156,10 +185,15 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                                     multiplier: 1,
                                     constant: 0)
                 ])
-            self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
-                "width": bannerView.frame.width,
-                "height": bannerView.frame.height
-            ])
+            if !bannerView.isHidden {
+                self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
+                    "width": bannerView.frame.width,
+                    "height": bannerView.frame.height
+                ])
+            }
+            let prepared = pendingPrepare
+            pendingPrepare = nil
+            prepared?.resolve()
             self.plugin?.notifyListeners(BannerAdPluginEvents.Loaded.rawValue, data: [:])
 
         }
@@ -168,8 +202,14 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     /// Tells the delegate an ad request failed.
     func bannerView(_ bannerView: BannerView,
                     didFailToReceiveAdWithError error: Error) {
+        guard bannerView === self.bannerView else { return }
+        let prepared = pendingPrepare
+        pendingPrepare = nil
+        prepared?.reject(error.localizedDescription, String((error as NSError).code), error)
         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
         self.removeBannerViewToView()
+        bannerView.delegate = nil
+        self.bannerView = nil
         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
             "width": 0,
             "height": 0

@@ -67,6 +67,10 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin, NativeAdDefiniti
     console.log('setApplicationVolume', options);
   }
 
+  async prepareBanner(options: AdOptions): Promise<void> {
+    console.log('prepareBanner', options);
+  }
+
   async showBanner(options: AdOptions): Promise<void> {
     console.log('showBanner', options);
   }

@@ -39,6 +39,7 @@ public class BannerExecutor extends Executor {
     private final JSObject emptyObject = new JSObject();
     private RelativeLayout mAdViewLayout;
     private AdView mAdView;
+    private PluginCall pendingPrepare;
     private AdOptions mAdOptions;
     private int[] mBannerMargins;
     private ViewGroup mViewGroup;
@@ -165,7 +166,33 @@ public class BannerExecutor extends Executor {
         }
     }
 
+    public void prepareBanner(final PluginCall call, boolean systemBarsHandlesInsets) {
+        Activity activity = liveActivity();
+        if (activity == null) {
+            call.reject("Activity unavailable");
+            return;
+        }
+        activity.runOnUiThread(() -> {
+            if (mAdView != null || pendingPrepare != null) {
+                call.reject("Remove the current banner before preparing another");
+                return;
+            }
+            pendingPrepare = call;
+            try {
+                showBanner(call, systemBarsHandlesInsets);
+            } catch (Exception ex) {
+                pendingPrepare = null;
+                call.reject(ex.getLocalizedMessage(), ex);
+            }
+        });
+    }
+
     public void showBanner(final PluginCall call, boolean systemBarsHandlesInsets) {
+        if (pendingPrepare != null && pendingPrepare != call) {
+            call.reject("A banner is still being prepared");
+            return;
+        }
+        final boolean preparing = pendingPrepare == call;
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
         float density = contextSupplier.get().getResources().getDisplayMetrics().density;
 
@@ -202,6 +229,7 @@ public class BannerExecutor extends Executor {
             mAdViewLayout = new RelativeLayout(contextSupplier.get());
             mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
             mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
+            if (preparing) mAdViewLayout.setVisibility(View.GONE);
 
             final CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
                 CoordinatorLayout.LayoutParams.WRAP_CONTENT,
@@ -277,8 +305,9 @@ public class BannerExecutor extends Executor {
             mAdOptions = adOptions;
             createNewAdView(adOptions);
 
-            call.resolve();
+            if (!preparing) call.resolve();
         } catch (Exception ex) {
+            if (pendingPrepare == call) pendingPrepare = null;
             call.reject(ex.getLocalizedMessage(), ex);
         }
     }
@@ -308,6 +337,10 @@ public class BannerExecutor extends Executor {
     }
 
     public void resumeBanner(final PluginCall call) {
+        if (pendingPrepare != null) {
+            call.reject("Wait for prepareBanner() to finish before resuming the banner");
+            return;
+        }
         try {
             activitySupplier.get().runOnUiThread(() -> {
                 if (mAdViewLayout != null && mAdView != null) {
@@ -332,6 +365,10 @@ public class BannerExecutor extends Executor {
             if (mAdView != null) {
                 activitySupplier.get().runOnUiThread(() -> {
                     if (mAdView != null) {
+                        if (pendingPrepare != null) {
+                            pendingPrepare.reject("Banner preparation was cancelled by removeBanner()");
+                            pendingPrepare = null;
+                        }
                         final ViewGroup bannerParent = resolveViewGroup();
                         if (bannerParent != null) {
                             bannerParent.removeView(mAdViewLayout);
@@ -421,8 +458,6 @@ public class BannerExecutor extends Executor {
             AdViewIdHelper.assignIdToAdView(adView, adOptions, adRequest, logTag, contextSupplier.get());
             // Add the AdView to the view hierarchy.
             mAdViewLayout.addView(adView);
-            // Start loading the ad.
-            adView.loadAd(adRequest);
             adView.setAdListener(
                 new AdListener() {
                     @Override
@@ -432,7 +467,14 @@ public class BannerExecutor extends Executor {
                         }
                         final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(adView);
 
-                        notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
+                        if (mAdViewLayout.getVisibility() == View.VISIBLE) {
+                            notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
+                        }
+                        if (pendingPrepare != null) {
+                            PluginCall prepared = pendingPrepare;
+                            pendingPrepare = null;
+                            prepared.resolve();
+                        }
                         notifyListeners(BannerAdPluginEvents.Loaded.getWebEventName(), emptyObject);
                         super.onAdLoaded();
                     }
@@ -447,6 +489,10 @@ public class BannerExecutor extends Executor {
                             return;
                         }
 
+                        if (pendingPrepare != null) {
+                            pendingPrepare.reject(adError.getMessage(), String.valueOf(adError.getCode()));
+                            pendingPrepare = null;
+                        }
                         final ViewGroup bannerParent = resolveViewGroup();
                         if (bannerParent != null) {
                             bannerParent.removeView(mAdViewLayout);
@@ -500,6 +546,8 @@ public class BannerExecutor extends Executor {
                 AdMobRevenueData revenueData = new AdMobRevenueData(adValue, adView.getAdUnitId(), networkName, impressionId);
                 notifyListeners(BannerAdPluginEvents.AdPaid.getWebEventName(), revenueData);
             });
+
+            adView.loadAd(adRequest);
 
             // Add AdViewLayout top of the WebView
             final ViewGroup bannerParent = resolveViewGroup();

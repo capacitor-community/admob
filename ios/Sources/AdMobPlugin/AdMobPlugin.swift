@@ -19,6 +19,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "resetConsentInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setApplicationMuted", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setApplicationVolume", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resumeBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hideBanner", returnType: CAPPluginReturnPromise),
@@ -365,6 +366,14 @@ extension AdMobPlugin {
     }
 
     // MARK: Banner ads
+
+    @objc func prepareBanner(_ call: CAPPluginCall) {
+        let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/6300978111")
+        let request = GADRequestWithOption(call.getBool("npa") ?? false)
+        DispatchQueue.main.async {
+            self.bannerExecutor.prepareBanner(call, request, adUnitID)
+        }
+    }
 
     @objc func showBanner(_ call: CAPPluginCall) {
         let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/6300978111")
