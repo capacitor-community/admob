@@ -85,7 +85,14 @@ public class AdMob extends Plugin {
     public void load() {
         super.load();
         try {
-            io.github.webview_native_ui.engine.NativeUIProjection.install(getBridge().getWebView());
+            // Use the running bridge configuration, including programmatic server settings.
+            String appUrl = getBridge().getServerUrl();
+            if (appUrl == null) appUrl = getBridge().getLocalUrl();
+            String origin = android.net.Uri.parse(appUrl).buildUpon().path(null).fragment(null).clearQuery().build().toString();
+            io.github.webview_native_ui.engine.NativeUIProjection.install(
+                getBridge().getWebView(),
+                java.util.Collections.singleton(origin)
+            );
         } catch (Exception error) {
             android.util.Log.w(getLogTag(), "Native UI channel unavailable; retaining native tracking", error);
         }

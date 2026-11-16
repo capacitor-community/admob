@@ -22,26 +22,27 @@ describe('NativeAdDemo', () => {
     ]);
   });
 
-  it('remeasures after event or error text renders without repeating on unrelated renders', async () => {
+  it('does not invalidate ad layout when the diagnostic log updates', async () => {
+    vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
+    fixture.destroy();
+    fixture = TestBed.createComponent(NativeAdDemo);
+    const feed = {
+      invalidateLayout: vi.fn().mockResolvedValue(undefined),
+      addListener: vi.fn().mockResolvedValue(undefined),
+      destroy: vi.fn().mockResolvedValue(undefined),
+    };
+    vi.spyOn(NativeAdFeed, 'create').mockResolvedValue(feed as unknown as NativeAdFeed);
     const vm = fixture.componentInstance.vm;
-    const invalidate = vi.spyOn(vm, 'invalidateLayout').mockResolvedValue();
+    await vm.enter();
     fixture.detectChanges();
     await fixture.whenStable();
-    invalidate.mockClear();
+    feed.invalidateLayout.mockClear();
 
     vm.lastEvent.set({ name: NativeAdPluginEvents.Loaded, value: { slotKey: 'test-ad' } });
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(invalidate).toHaveBeenCalledTimes(1);
-
-    vm.errorMessage.set('Test load failed');
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(invalidate).toHaveBeenCalledTimes(2);
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(invalidate).toHaveBeenCalledTimes(2);
+    expect(feed.invalidateLayout).not.toHaveBeenCalled();
+    await vm.leave();
   });
 
   it('discards a late feed after leaving and destroys the next feed without waiting for listener setup', async () => {

@@ -1,12 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import {
-  afterRenderEffect,
-  ChangeDetectionStrategy,
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, signal, viewChild } from '@angular/core';
 import { NativeAdFeed, NativeAdPluginEvents, NativeAdTemplate } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 import {
@@ -141,11 +134,6 @@ export class NativeAdDemo implements ViewWillEnter, ViewWillLeave {
       heartOutline,
       leafOutline,
     });
-    afterRenderEffect(() => {
-      this.vm.lastEvent();
-      this.vm.errorMessage();
-      void this.vm.invalidateLayout();
-    });
   }
 
   ionViewWillEnter(): void {
@@ -192,10 +180,6 @@ class ViewModel extends ViewModelStore<NativeAdDemo> {
   #feed?: NativeAdFeed;
   #generation = 0;
   #setup?: Promise<void>;
-
-  async invalidateLayout(): Promise<void> {
-    await this.#feed?.invalidateLayout().catch((error: unknown) => console.error(error));
-  }
 
   async enter(): Promise<void> {
     if (!this.isNativePlatform) return;
