@@ -237,7 +237,56 @@ class BannerExecutorTest {
                 params.gravity
             );
             verify(relativeLayoutMockedConstruction.constructed().get(0), times(2)).requestApplyInsets();
+            verify(adViewMockedConstruction.constructed().get(0)).loadAd(any());
             verify(update).resolve();
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "ADAPTIVE_BANNER", "BANNER" })
+        void centersUsingTheDisplayedSizeWhenUpdateSizeIsOmittedOrDifferent(BannerAdSizeEnum updateSize) {
+            displayMetricsMock.widthPixels = 360;
+            AdOptions initial = new AdOptions.TesterAdOptionsBuilder()
+                .setAdSize(BannerAdSizeEnum.MEDIUM_RECTANGLE)
+                .setPosition("BOTTOM_CENTER")
+                .setMargin(0)
+                .build();
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(initial);
+            sut.showBanner(mock(PluginCall.class), true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            clearInvocations(activityMock);
+            AdView ad = adViewMockedConstruction.constructed().get(0);
+            when(ad.getAdSize()).thenReturn(AdSize.MEDIUM_RECTANGLE);
+            AdOptions update = new AdOptions.TesterAdOptionsBuilder()
+                .setAdSize(updateSize)
+                .setPosition("BOTTOM_CENTER")
+                .setMargin(75)
+                .build();
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(update);
+            PluginCall call = mock(PluginCall.class);
+            sut.showBanner(call, true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            verify(layoutParamsMockedConstruction.constructed().get(1)).setMargins(30, 0, 30, 75);
+            verify(ad).loadAd(any());
+            verify(call).resolve();
+        }
+
+        @Test
+        void reloadsWhenRequestOptionsChangeEvenAlongsideLayout() {
+            sut.showBanner(mock(PluginCall.class), true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            clearInvocations(activityMock);
+            AdOptions update = new AdOptions.TesterAdOptionsBuilder().setNpa(true).setMargin(75).build();
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(update);
+            PluginCall call = mock(PluginCall.class);
+            sut.showBanner(call, true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            requestHelperMockedStatic.verify(() -> RequestHelper.createRequest(update));
+            verify(adViewMockedConstruction.constructed().get(0), times(2)).loadAd(any());
+            verify(call).resolve();
         }
 
         @ParameterizedTest

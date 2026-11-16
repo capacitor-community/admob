@@ -32,12 +32,14 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.common.util.BiConsumer;
+import java.util.Objects;
 
 public class BannerExecutor extends Executor {
 
     private final JSObject emptyObject = new JSObject();
     private RelativeLayout mAdViewLayout;
     private AdView mAdView;
+    private AdOptions mAdOptions;
     private ViewGroup mViewGroup;
 
     public BannerExecutor(
@@ -189,6 +191,7 @@ public class BannerExecutor extends Executor {
             // Setup AdView Layout
             mAdViewLayout = new RelativeLayout(contextSupplier.get());
             configureBannerLayout(adOptions, systemBarsHandlesInsets);
+            mAdOptions = adOptions;
 
             createNewAdView(adOptions);
 
@@ -254,6 +257,7 @@ public class BannerExecutor extends Executor {
                         mAdViewLayout.removeView(mAdView);
                         mAdView.destroy();
                         mAdView = null;
+                        mAdOptions = null;
                         Log.d(logTag, "Banner AD Removed");
                         final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
                         notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
@@ -276,9 +280,16 @@ public class BannerExecutor extends Executor {
                     return;
                 }
                 try {
+                    boolean layoutOnly =
+                        mAdOptions != null &&
+                        (mAdOptions.margin != adOptions.margin || !Objects.equals(mAdOptions.position, adOptions.position)) &&
+                        Objects.equals(mAdOptions.adId, adOptions.adId) &&
+                        mAdOptions.isTesting == adOptions.isTesting &&
+                        mAdOptions.npa == adOptions.npa;
                     configureBannerLayout(adOptions, systemBarsHandlesInsets);
                     mAdViewLayout.requestApplyInsets();
-                    adView.loadAd(RequestHelper.createRequest(adOptions));
+                    if (!layoutOnly) adView.loadAd(RequestHelper.createRequest(adOptions));
+                    if (adView == mAdView) mAdOptions = adOptions;
                     call.resolve();
                 } catch (Exception ex) {
                     call.reject(ex.getLocalizedMessage(), ex);
@@ -332,9 +343,10 @@ public class BannerExecutor extends Executor {
         int[] margins = new int[] { 0, topMargin, 0, bottomMargin };
 
         // Center Banner Ads
-        int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
+        AdSize displayedSize = mAdView.getAdSize();
+        int adWidth = (int) ((displayedSize != null ? displayedSize : adOptions.adSize.getSize()).getWidth() * density);
 
-        if (adWidth <= 0 || adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
+        if (adWidth <= 0) {
             int margin = 0;
             if (fullscreen) {
                 margin = (realWidthPixels - defaultWidthPixels) / 2;
@@ -431,6 +443,7 @@ public class BannerExecutor extends Executor {
                         mAdViewLayout.removeView(adView);
                         adView.destroy();
                         mAdView = null;
+                        mAdOptions = null;
 
                         final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
                         notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
