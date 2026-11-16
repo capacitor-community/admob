@@ -2,12 +2,26 @@ package com.getcapacitor.community.admob.helpers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import android.os.SystemClock;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 class AdExpirationTest {
+
+    @ParameterizedTest
+    @ValueSource(longs = { 3600, 14400 })
+    void defaultClockCountsElapsedTimeDuringDeviceSleep(long seconds) {
+        try (MockedStatic<SystemClock> clock = Mockito.mockStatic(SystemClock.class)) {
+            clock.when(SystemClock::elapsedRealtimeNanos).thenReturn(100L);
+            AdExpiration expiration = new AdExpiration(seconds);
+            clock.when(SystemClock::elapsedRealtimeNanos).thenReturn(100L + TimeUnit.SECONDS.toNanos(seconds));
+            assertTrue(expiration.isExpired());
+        }
+    }
 
     @ParameterizedTest
     @ValueSource(longs = { 3600, 14400 })

@@ -1,9 +1,10 @@
 package com.getcapacitor.community.admob.helpers;
 
+import android.os.SystemClock;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongSupplier;
 
-/** Tracks an ad's lifetime using a monotonic clock. */
+/** Tracks an ad's lifetime using a monotonic clock that includes device sleep. */
 public final class AdExpiration {
 
     private final LongSupplier clock;
@@ -11,7 +12,7 @@ public final class AdExpiration {
     private final long maxAge;
 
     public AdExpiration(long maxAgeSeconds) {
-        this(maxAgeSeconds, System::nanoTime);
+        this(maxAgeSeconds, SystemClock::elapsedRealtimeNanos);
     }
 
     public AdExpiration(long maxAgeSeconds, LongSupplier clock) {
