@@ -4,6 +4,7 @@ import GoogleMobileAds
 
 class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
+    private var webViewLayout: FullScreenAdWebViewLayout?
     private var preparedAds: [String: RewardedAd] = [:]
     private var lastPreparedAdId: String?
     private var currentlyShowingAdId: String?
@@ -83,6 +84,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
         if let rootViewController = plugin?.getRootVC() {
             if let ad = preparedAds[adId] {
                 currentlyShowingAdId = adId
+                webViewLayout = FullScreenAdWebViewLayout(webView: plugin?.bridge?.webView)
                 ad.present(from: rootViewController,
                            userDidEarnRewardHandler: {
                             let reward = ad.adReward
@@ -125,6 +127,9 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
 
     private func removeCurrentlyShowingAd() {
         guard let adId = currentlyShowingAdId else { return }
+        let layout = webViewLayout
+        webViewLayout = nil
+        DispatchQueue.main.async { layout?.restore() }
         preparedAds.removeValue(forKey: adId)
         if lastPreparedAdId == adId { lastPreparedAdId = Array(preparedAds.keys).last }
         currentlyShowingAdId = nil
