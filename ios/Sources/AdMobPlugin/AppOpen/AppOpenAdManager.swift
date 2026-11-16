@@ -1,9 +1,11 @@
 import Foundation
+import Capacitor
 import GoogleMobileAds
 import UIKit
 
 @objc public class AppOpenAdManager: NSObject {
     private var appOpenAd: AppOpenAd?
+    private var webViewLayout: FullScreenAdWebViewLayout?
     private var isLoadingAd = false
     private var isShowingAd = false
     private var adUnitId: String
@@ -72,6 +74,7 @@ import UIKit
         self.onFailedToShow = onFailedToShow
         isShowingAd = true
         ad.fullScreenContentDelegate = self
+        webViewLayout = FullScreenAdWebViewLayout(webView: (rootViewController as? CAPBridgeViewController)?.webView)
         ad.present(from: rootViewController)
     }
 
@@ -93,6 +96,9 @@ extension AppOpenAdManager: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         appOpenAd = nil
         isShowingAd = false
+        let layout = webViewLayout
+        webViewLayout = nil
+        DispatchQueue.main.async { layout?.restore() }
         let onClosed = self.onClosed
         self.onOpened = nil
         self.onClosed = nil
@@ -103,6 +109,9 @@ extension AppOpenAdManager: FullScreenContentDelegate {
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         appOpenAd = nil
         isShowingAd = false
+        let layout = webViewLayout
+        webViewLayout = nil
+        DispatchQueue.main.async { layout?.restore() }
         let onFailedToShow = self.onFailedToShow
         self.onOpened = nil
         self.onClosed = nil
