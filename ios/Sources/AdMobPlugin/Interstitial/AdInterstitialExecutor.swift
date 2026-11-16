@@ -4,6 +4,7 @@ import GoogleMobileAds
 
 class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
+    private var webViewLayout: FullScreenAdWebViewLayout?
     private var preparedAds: [String: InterstitialAd] = [:]
     private var lastPreparedAdId: String?
     private var currentlyShowingAdId: String?
@@ -63,6 +64,7 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
         if let rootViewController = plugin?.getRootVC() {
             if let ad = preparedAds[adId] {
                 currentlyShowingAdId = adId
+                webViewLayout = FullScreenAdWebViewLayout(webView: plugin?.bridge?.webView)
                 ad.present(from: rootViewController)
                 call.resolve([:])
             } else {
@@ -97,6 +99,9 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
 
     private func removeCurrentlyShowingAd() {
         guard let adId = currentlyShowingAdId else { return }
+        let layout = webViewLayout
+        webViewLayout = nil
+        DispatchQueue.main.async { layout?.restore() }
         preparedAds.removeValue(forKey: adId)
         if lastPreparedAdId == adId { lastPreparedAdId = Array(preparedAds.keys).last }
         currentlyShowingAdId = nil
