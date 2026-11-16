@@ -221,6 +221,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
 * [`removeBanner()`](#removebanner)
+* [`getBannerSize()`](#getbannersize)
 * [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
 * [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
 * [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
@@ -560,6 +561,21 @@ removeBanner() => Promise<void>
 Destroys the current banner and removes it from the screen.
 
 **Since:** 1.1.2
+
+--------------------
+
+
+### getBannerSize()
+
+```typescript
+getBannerSize() => Promise<AdMobBannerSize>
+```
+
+Returns the currently displayed banner size in dp (Android) or points (iOS).
+Returns zero dimensions before loading or while hidden, removed, or failed.
+Does not create, load, or show an ad.
+
+**Returns:** <code>Promise&lt;<a href="#admobbannersize">AdMobBannerSize</a>&gt;</code>
 
 --------------------
 

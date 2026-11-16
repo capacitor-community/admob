@@ -39,6 +39,7 @@ public class BannerExecutor extends Executor {
     private final JSObject emptyObject = new JSObject();
     private RelativeLayout mAdViewLayout;
     private AdView mAdView;
+    private boolean bannerLoaded;
     private AdOptions mAdOptions;
     private int[] mBannerMargins;
     private ViewGroup mViewGroup;
@@ -165,6 +166,13 @@ public class BannerExecutor extends Executor {
         }
     }
 
+    public void getBannerSize(final PluginCall call) {
+        activitySupplier.get().runOnUiThread(() -> {
+            boolean visible = bannerLoaded && mAdView != null && mAdViewLayout.getVisibility() == View.VISIBLE;
+            call.resolve(visible ? new BannerAdSizeInfo(mAdView) : new BannerAdSizeInfo(0, 0));
+        });
+    }
+
     public void showBanner(final PluginCall call, boolean systemBarsHandlesInsets) {
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
         float density = contextSupplier.get().getResources().getDisplayMetrics().density;
@@ -187,6 +195,7 @@ public class BannerExecutor extends Executor {
 
         // Why a try catch block?
         try {
+            bannerLoaded = false;
             mAdView = new AdView(contextSupplier.get());
 
             if (!adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
@@ -339,6 +348,7 @@ public class BannerExecutor extends Executor {
                         mAdViewLayout.removeView(mAdView);
                         mAdView.destroy();
                         mAdView = null;
+                        bannerLoaded = false;
                         mAdOptions = null;
                         Log.d(logTag, "Banner AD Removed");
                         final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
@@ -430,6 +440,7 @@ public class BannerExecutor extends Executor {
                         if (adView != mAdView) {
                             return;
                         }
+                        bannerLoaded = true;
                         final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(adView);
 
                         notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
@@ -454,6 +465,7 @@ public class BannerExecutor extends Executor {
                         mAdViewLayout.removeView(adView);
                         adView.destroy();
                         mAdView = null;
+                        bannerLoaded = false;
                         mAdOptions = null;
 
                         final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
