@@ -210,15 +210,15 @@ class BannerExecutorTest {
 
         @ParameterizedTest
         @CsvSource({
-            "BOTTOM_CENTER, false, true,  24,   0, 7, 31",
-            "BOTTOM_CENTER, true,  true,  24, 300, 7, 7",
-            "BOTTOM_CENTER, true,  true,  24,   0, 7, 31",
-            "BOTTOM_CENTER, false, true,   0,   0, 7, 7",
-            "BOTTOM_CENTER, true,  true,   0, 300, 7, 7",
-            "BOTTOM_CENTER, false, false, 24,   0, 7, 31",
-            "BOTTOM_CENTER, true,  false, 24, 300, 7, 31",
-            "TOP_CENTER,    false, true,  24,   0, 39, 7",
-            "TOP_CENTER,    true,  true,  24, 300, 39, 7"
+            "BOTTOM_CENTER, false, true,  24,   0, 0, 31",
+            "BOTTOM_CENTER, true,  true,  24, 300, 0, 7",
+            "BOTTOM_CENTER, true,  true,  24,   0, 0, 31",
+            "BOTTOM_CENTER, false, true,   0,   0, 0, 7",
+            "BOTTOM_CENTER, true,  true,   0, 300, 0, 7",
+            "BOTTOM_CENTER, false, false, 24,   0, 0, 31",
+            "BOTTOM_CENTER, true,  false, 24, 300, 0, 31",
+            "TOP_CENTER,    false, true,  24,   0, 39, 0",
+            "TOP_CENTER,    true,  true,  24, 300, 39, 0"
         })
         void appliesOnlyRemainingSafeAreaInsets(
             String position,
@@ -255,6 +255,16 @@ class BannerExecutorTest {
             }
         }
 
+        @ParameterizedTest
+        @CsvSource({ "TOP_CENTER, 300, 0", "BOTTOM_CENTER, 0, 300", "CENTER, 0, 0" })
+        void largeOffsetOnlyConsumesSpaceAtTheAnchoredEdge(String position, int top, int bottom) {
+            adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().setPosition(position).setMargin(300).build();
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
+            sut.showBanner(mock(PluginCall.class), true);
+            CoordinatorLayout.LayoutParams params = layoutParamsMockedConstruction.constructed().get(0);
+            verify(params).setMargins(0, top, 0, bottom);
+        }
+
         @Test
         void restoresMarginsAfterKeyboardClosesWithoutAccumulatingInsets() {
             adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().setPosition("BOTTOM_CENTER").setMargin(7).build();
@@ -278,9 +288,9 @@ class BannerExecutorTest {
                     listener.getValue().onApplyWindowInsets(banner, platformInsets);
                 }
                 var order = inOrder(params);
-                order.verify(params).setMargins(0, 7, 0, 31);
-                order.verify(params).setMargins(0, 7, 0, 7);
-                order.verify(params, times(2)).setMargins(0, 7, 0, 31);
+                order.verify(params).setMargins(0, 0, 0, 31);
+                order.verify(params).setMargins(0, 0, 0, 7);
+                order.verify(params, times(2)).setMargins(0, 0, 0, 31);
             }
         }
 
