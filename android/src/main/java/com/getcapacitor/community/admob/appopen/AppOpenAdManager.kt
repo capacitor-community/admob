@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.appopen
 
 import android.app.Activity
 import android.content.Context
+import com.getcapacitor.community.admob.helpers.AdExpiration
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -12,15 +13,21 @@ import com.google.android.gms.ads.appopen.AppOpenAd
 class AppOpenAdManager(val adUnitId: String) {
 
     private var appOpenAd: AppOpenAd? = null
+    private var expiration: AdExpiration? = null
     private var isLoadingAd = false
     private var isShowingAd = false
 
     val isAdLoaded: Boolean
-        get() = appOpenAd != null
+        get() = appOpenAd != null && expiration?.isExpired() == false
 
     fun loadAd(context: Context, onLoaded: () -> Unit, onFailed: (LoadAdError?) -> Unit, onPaidEvent: (AdValue, String, String) -> Unit) {
-        if (appOpenAd != null) {
+        if (isAdLoaded) {
             onLoaded()
+            return
+        }
+
+        if (isShowingAd) {
+            onFailed(null)
             return
         }
 
@@ -29,6 +36,8 @@ class AppOpenAdManager(val adUnitId: String) {
             return
         }
 
+        appOpenAd = null
+        expiration = null
         isLoadingAd = true
         val request = AdRequest.Builder().build()
 
@@ -40,6 +49,7 @@ class AppOpenAdManager(val adUnitId: String) {
             object : AppOpenAd.AppOpenAdLoadCallback() {
                 override fun onAdLoaded(ad: AppOpenAd) {
                     appOpenAd = ad
+                    expiration = AdExpiration(4 * 3600)
                     isLoadingAd = false
                     ad.setOnPaidEventListener { adValue ->
                         val networkName = ad.responseInfo?.mediationAdapterClassName ?: ""
@@ -63,7 +73,7 @@ class AppOpenAdManager(val adUnitId: String) {
         onClosed: () -> Unit,
         onFailedToShow: (AdError?) -> Unit
     ) {
-        if (appOpenAd == null || isShowingAd) {
+        if (!isAdLoaded || isShowingAd) {
             onFailedToShow(null)
             return
         }
@@ -76,12 +86,14 @@ class AppOpenAdManager(val adUnitId: String) {
 
             override fun onAdDismissedFullScreenContent() {
                 appOpenAd = null
+                expiration = null
                 isShowingAd = false
                 onClosed()
             }
 
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                 appOpenAd = null
+                expiration = null
                 isShowingAd = false
                 onFailedToShow(adError)
             }

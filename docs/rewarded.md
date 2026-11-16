@@ -4,6 +4,8 @@ Rewarded ads let you give in-app items for interacting with video ads, playable 
 
 Treat rewarded ads as a reward flow, not as another non-rewarded interstitial. Call this after [initialize](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Grant the reward only from the returned result or the `Rewarded` event, not from `Dismissed`.
 
+Both `showRewardVideoAd()` and `showRewardInterstitialAd()` resolve with the reward when it is earned. If the ad is dismissed before a reward is earned, the promise rejects with code `REWARDED_AD_CANCELLED`. Presentation failures also reject; native SDK error codes remain platform-specific. Handle rejection so cancellation can restore your app's buttons and loading state. The existing `Rewarded`, `Dismissed`, and `FailedToShow` events continue to fire. Prepare another ad after dismissal or failure before showing again.
+
 ## Rewarded video
 
 Use a rewarded ad for a dedicated reward flow.
@@ -146,3 +148,5 @@ await AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
   }
 });
 ```
+
+On Android, pass `immersiveMode: true` to `prepareRewardVideoAd()` to hide system bars during the ad. The option belongs to the prepare call, not the show call; hiding bars on the host app alone does not configure the SDK's ad activity.

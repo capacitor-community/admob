@@ -19,6 +19,9 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "resetConsentInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setApplicationMuted", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setApplicationVolume", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getAdaptiveBannerSize", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getBannerSize", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "prepareBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resumeBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hideBanner", returnType: CAPPluginReturnPromise),
@@ -73,6 +76,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
 
     public override func load() {
         self.consentExecutor.plugin = self
+        self.bannerExecutor.plugin = self
     }
 
     /// Full-screen ads that currently have web media suspended.
@@ -352,7 +356,6 @@ extension AdMobPlugin {
     // MARK: SDK initialization
 
     @objc func initialize(_ call: CAPPluginCall) {
-        bannerExecutor.plugin = self
         adInterstitialExecutor.plugin = self
         adRewardExecutor.plugin = self
         adRewardInterstitialExecutor.plugin = self
@@ -365,6 +368,20 @@ extension AdMobPlugin {
     }
 
     // MARK: Banner ads
+
+    @objc func getAdaptiveBannerSize(_ call: CAPPluginCall) {
+        DispatchQueue.main.async { self.bannerExecutor.getAdaptiveBannerSize(call) }
+    }
+
+    @objc func getBannerSize(_ call: CAPPluginCall) {
+        DispatchQueue.main.async { self.bannerExecutor.getBannerSize(call) }
+    }
+
+    @objc func prepareBanner(_ call: CAPPluginCall) {
+        let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/6300978111")
+        let request = GADRequestWithOption(call.getBool("npa") ?? false)
+        DispatchQueue.main.async { self.bannerExecutor.prepareBanner(call, request, adUnitID) }
+    }
 
     @objc func showBanner(_ call: CAPPluginCall) {
         let adUnitID = getAdId(call, "ca-app-pub-3940256099942544/6300978111")

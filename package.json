@@ -1,7 +1,7 @@
 {
   "name": "@capacitor-community/admob",
   "private": false,
-  "version": "8.3.0",
+  "version": "8.4.0",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -74,7 +74,7 @@
   "dependencies": {
     "@capacitor/core": "^8.0.0",
     "@rdlabo/capacitor-docgen": "^0.4.1",
-    "@webview-native-ui/engine": "1.0.10"
+    "@webview-native-ui/engine": "^1.0.10"
   },
   "lint-staged": {
     "*.{ts}": [

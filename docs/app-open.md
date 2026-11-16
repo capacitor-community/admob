@@ -51,3 +51,5 @@ There is no `isTesting` flag; during development set `adId` to Google's [App Ope
 Use the `Closed` event to resume your app flow and begin loading the next ad.
 
 When no `adId` is passed to `showAppOpen()` or `isAppOpenLoaded()`, the most recently loaded ad is targeted. See [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events) for the event list.
+
+App-open ads expire four hours after loading. `isAppOpenLoaded()` returns `{ value: false }` for an expired ad. Call `loadAppOpen()` again to replace it with a fresh ad before showing it.

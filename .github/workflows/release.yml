@@ -6,6 +6,20 @@ on:
       - 'v*'
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      comment-id:
+        description: ID of the authorized /beta comment
+        required: true
+        type: string
+      head-sha:
+        description: PR head authorized by the comment workflow
+        required: true
+        type: string
+      target-branch:
+        description: PR base authorized by the comment workflow
+        required: true
+        type: string
   workflow_run:
     workflows:
       - Validation
@@ -37,7 +51,7 @@ jobs:
                 repo: context.repo.repo,
                 username: context.payload.comment.user.login,
               });
-              return { authorized: ['admin', 'maintain'].includes(data.permission) };
+              return { authorized: [data.permission, data.role_name].some((role) => ['admin', 'maintain'].includes(role)) };
             } catch (error) {
               core.warning(`Could not verify beta comment permission: ${error.message}`);
               return { authorized: false };
@@ -121,7 +135,11 @@ jobs:
       (github.event_name == 'issue_comment' &&
       github.event.action == 'created' &&
       github.event.issue.pull_request &&
-      github.event.comment.body == '/beta') ||
+      github.event.comment.body == '/beta' &&
+      github.run_attempt == '1') ||
+      (github.event_name == 'workflow_dispatch' &&
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+      github.actor == 'github-actions[bot]') ||
       (github.event_name == 'workflow_run' &&
       github.event.action == 'completed')
     runs-on: ubuntu-latest
@@ -149,7 +167,8 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const defaultBranch = context.payload.repository.default_branch;
-            const isComment = context.eventName === 'issue_comment';
+            const isDispatch = context.eventName === 'workflow_dispatch';
+            const isComment = context.eventName === 'issue_comment' || isDispatch;
             const protectedWorkflows = [
               '.github/workflows/package-candidate.yml',
               '.github/workflows/release.yml',
@@ -209,21 +228,43 @@ jobs:
             let required;
             let event;
             let sourceKind;
+            let requestedAt;
+            let lastForcePush;
 
             if (isComment) {
-              const requester = context.payload.comment.user.login;
+              let comment = context.payload.comment;
+              if (isDispatch) {
+                const inputs = context.payload.inputs;
+                if (!/^[1-9]\d*$/.test(inputs['comment-id']) ||
+                    !/^[a-f0-9]{40}$/.test(inputs['head-sha']) ||
+                    inputs['target-branch'] !== defaultBranch) {
+                  throw new Error('Invalid beta dispatch inputs.');
+                }
+                ({ data: comment } = await github.rest.issues.getComment({
+                  owner, repo, comment_id: Number(inputs['comment-id']),
+                }));
+              }
+              if (comment.body !== '/beta' || comment.created_at !== comment.updated_at) {
+                throw new Error('The original /beta comment is no longer valid.');
+              }
+              requestedAt = Date.parse(comment.created_at);
+              if (!Number.isFinite(requestedAt)) throw new Error('Invalid /beta comment timestamp.');
+              const requester = comment.user.login;
               const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
                 owner,
                 repo,
                 username: requester,
               });
-              if (!['admin', 'maintain'].includes(permission.permission)) {
+              if (![permission.permission, permission.role_name].some((role) => ['admin', 'maintain'].includes(role))) {
                 core.notice(`@${requester} is not a repository owner or maintainer; /beta was ignored.`);
                 core.setOutput('allowed', 'false');
                 return;
               }
 
-              prNumber = String(context.payload.issue.number);
+              prNumber = isDispatch
+                ? comment.issue_url.match(/\/issues\/([1-9]\d*)$/)?.[1]
+                : String(context.payload.issue.number);
+              if (!prNumber) throw new Error('The beta comment has no associated pull request.');
               const { data: pullRequest } = await github.rest.pulls.get({
                 owner,
                 repo,
@@ -234,9 +275,41 @@ jobs:
                 core.setOutput('allowed', 'false');
                 return;
               }
+              if (!isDispatch && Date.parse(pullRequest.updated_at) > requestedAt) {
+                throw new Error('The PR was updated after /beta; post a fresh comment after CI passes.');
+              }
+              if (!isDispatch) {
+                const { repository } = await github.graphql(`
+                  query($owner: String!, $repo: String!, $number: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $number) {
+                        headRefOid
+                        timelineItems(last: 1, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) {
+                          nodes { ... on HeadRefForcePushedEvent { createdAt afterCommit { oid } } }
+                        }
+                      }
+                    }
+                  }
+                `, { owner, repo, number: Number(prNumber) });
+                const current = repository?.pullRequest;
+                if (current?.headRefOid !== pullRequest.head.sha ||
+                    current.timelineItems.nodes.some(node => Date.parse(node.createdAt) >= requestedAt)) {
+                  throw new Error('The PR head changed at or after /beta; post a fresh comment.');
+                }
+                [lastForcePush] = current.timelineItems.nodes;
+              }
               if (!pullRequest.head.repo) {
                 core.setFailed('The pull request head repository is no longer available.');
                 return;
+              }
+              if (pullRequest.base.ref !== defaultBranch) {
+                core.notice('Beta publishing requires a PR targeting the default branch.');
+                core.setOutput('allowed', 'false');
+                return;
+              }
+              if (isDispatch && (pullRequest.head.sha !== context.payload.inputs['head-sha'] ||
+                  pullRequest.base.ref !== context.payload.inputs['target-branch'])) {
+                throw new Error('The PR head or base changed after /beta; a fresh /beta is required.');
               }
               const changedWorkflows = [];
               for (const path of protectedWorkflows) {
@@ -255,7 +328,7 @@ jobs:
               }
               if (changedWorkflows.length > 0) {
                 const body = `🚫 \`/beta\` cannot publish a pull request that changes a release-gating workflow: ${changedWorkflows.join(', ')}.`;
-                await tryCreateComment(body);
+                if (!isDispatch) await tryCreateComment(body);
                 core.setOutput('allowed', 'false');
                 return;
               }
@@ -333,7 +406,7 @@ jobs:
               return !run || run.status !== 'completed' || run.conclusion !== 'success';
             });
             if (incomplete.length > 0) {
-              if (isComment) {
+              if (context.eventName === 'issue_comment') {
                 const body = `🚫 \`/beta\` did not publish commit \`${headSha.slice(0, 12)}\`. Required CI has not passed: ${incomplete.join(', ')}. Run \`/beta\` again after CI succeeds.`;
                 await tryCreateComment(body);
               }
@@ -342,7 +415,15 @@ jobs:
               return;
             }
 
+            if (isComment && Date.parse(runs.get('Package Candidate').created_at) >= requestedAt) {
+              throw new Error('The candidate was built after the /beta request; post a fresh comment.');
+            }
+
             const candidateRun = runs.get('Package Candidate');
+            if (lastForcePush && lastForcePush.afterCommit?.oid !== headSha &&
+                Date.parse(candidateRun.created_at) <= Date.parse(lastForcePush.createdAt)) {
+              throw new Error('The candidate predates the last head rewind; post /beta after fresh CI.');
+            }
             const artifactName = `npm-candidate-${headSha}`;
             const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
               owner,
@@ -371,9 +452,36 @@ jobs:
             core.setOutput('version', version);
             core.setOutput('source-kind', sourceKind);
 
+  dispatch-comment-beta:
+    needs: authorize-candidate
+    if: github.event_name == 'issue_comment' && needs.authorize-candidate.outputs.allowed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch the authorized beta
+        uses: actions/github-script@v8
+        env:
+          HEAD_SHA: ${{ needs.authorize-candidate.outputs.head-sha }}
+          TARGET_BRANCH: ${{ github.event.repository.default_branch }}
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo,
+              workflow_id: 'release.yml',
+              ref: context.payload.repository.default_branch,
+              inputs: {
+                'comment-id': String(context.payload.comment.id),
+                'head-sha': process.env.HEAD_SHA,
+                'target-branch': process.env.TARGET_BRANCH,
+              },
+            });
+
   publish-candidate:
     needs: authorize-candidate
-    if: needs.authorize-candidate.outputs.allowed == 'true'
+    if: >-
+      (github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_run') &&
+      needs.authorize-candidate.outputs.allowed == 'true'
     runs-on: ubuntu-latest
     concurrency:
       group: npm-${{ needs.authorize-candidate.outputs.dist-tag }}-${{ needs.authorize-candidate.outputs.head-sha }}
@@ -385,6 +493,7 @@ jobs:
       actions: read
       contents: read
       id-token: write
+      issues: read
       pull-requests: read
 
     steps:
@@ -423,17 +532,25 @@ jobs:
             if (process.env.SOURCE_KIND === 'comment') {
               const pull_number = Number(process.env.PR_NUMBER);
               const { data: pullRequest } = await github.rest.pulls.get({ owner, repo, pull_number });
-              if (pullRequest.state !== 'open' || pullRequest.head.sha !== process.env.HEAD_SHA) {
+              if (pullRequest.state !== 'open' || pullRequest.draft ||
+                  pullRequest.head.sha !== process.env.HEAD_SHA || pullRequest.base.ref !== defaultBranch) {
                 core.setFailed('The PR head changed after /beta; a fresh owner or maintainer /beta is required.');
                 return;
               }
-              const requester = context.payload.comment.user.login;
+              const { data: comment } = await github.rest.issues.getComment({
+                owner, repo, comment_id: Number(context.payload.inputs['comment-id']),
+              });
+              if (comment.body !== '/beta' || comment.created_at !== comment.updated_at ||
+                  comment.issue_url !== pullRequest.issue_url) {
+                throw new Error('The original /beta comment is no longer valid.');
+              }
+              const requester = comment.user.login;
               const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
                 owner,
                 repo,
                 username: requester,
               });
-              if (!['admin', 'maintain'].includes(permission.permission)) {
+              if (![permission.permission, permission.role_name].some((role) => ['admin', 'maintain'].includes(role))) {
                 core.setFailed(`@${requester} is no longer a repository owner or maintainer.`);
                 return;
               }
@@ -518,26 +635,67 @@ jobs:
             exit 1
           fi
           PACKAGE_ARCHIVE="${PACKAGES[0]}"
-          ACTUAL_NAME=$(tar -xOf "$PACKAGE_ARCHIVE" package/package.json | node -e "let input=''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => process.stdout.write(JSON.parse(input).name));")
-          ACTUAL_VERSION=$(tar -xOf "$PACKAGE_ARCHIVE" package/package.json | node -e "let input=''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => process.stdout.write(JSON.parse(input).version));")
-          ACTUAL_REGISTRY=$(tar -xOf "$PACKAGE_ARCHIVE" package/package.json | node -e "let input=''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => process.stdout.write(JSON.parse(input).publishConfig?.registry || ''));")
-          if [ "$ACTUAL_NAME" != "$EXPECTED_NAME" ] || [ "$ACTUAL_VERSION" != "$EXPECTED_VERSION" ]; then
-            echo "::error::Artifact identity mismatch: ${ACTUAL_NAME}@${ACTUAL_VERSION}"
-            exit 1
-          fi
-          if [ -n "$ACTUAL_REGISTRY" ] && [ "$ACTUAL_REGISTRY" != "https://registry.npmjs.org" ] && [ "$ACTUAL_REGISTRY" != "https://registry.npmjs.org/" ]; then
-            echo "::error::Refusing package with an unexpected publish registry: $ACTUAL_REGISTRY"
-            exit 1
-          fi
-          if [ "$DIST_TAG" != "beta" ]; then
-            echo "::error::Refusing unsupported dist-tag: $DIST_TAG"
-            exit 1
-          fi
-          if npm view "${EXPECTED_NAME}@${EXPECTED_VERSION}" version --registry "$NPM_CONFIG_REGISTRY" >/dev/null 2>&1; then
-            echo "${EXPECTED_NAME}@${EXPECTED_VERSION} already exists; skipping publish."
-          else
-            npm publish "$PACKAGE_ARCHIVE" --ignore-scripts --provenance --access public --registry "$NPM_CONFIG_REGISTRY" --tag "$DIST_TAG"
-          fi
+          PACKAGE_ARCHIVE="$PACKAGE_ARCHIVE" node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          import { execFileSync, spawnSync } from 'node:child_process';
+          const { EXPECTED_NAME, EXPECTED_VERSION, DIST_TAG, PACKAGE_ARCHIVE } = process.env;
+          import { createRequire } from 'node:module';
+          const require = createRequire(import.meta.url);
+          const npmRoot = execFileSync('npm', ['root', '-g'], { encoding: 'utf8' }).trim();
+          const pacote = require(`${npmRoot}/npm/node_modules/pacote`);
+          const readManifest = archive => pacote.manifest(archive, {
+            cache: `${process.env.RUNNER_TEMP}/npm-manifest-cache`, ignoreScripts: true, offline: true,
+          });
+          const pkg = await readManifest(PACKAGE_ARCHIVE);
+          assert.equal(pkg.name, EXPECTED_NAME, 'Unexpected package identity');
+          assert.equal(pkg.version, EXPECTED_VERSION, 'Artifact version mismatch');
+          assert.equal(DIST_TAG, 'beta', 'Unexpected dist-tag');
+          assert([undefined, 'https://registry.npmjs.org', 'https://registry.npmjs.org/'].includes(pkg.publishConfig?.registry),
+            'Unexpected publish registry');
+          const config = pkg.publishConfig ?? {};
+          assert.equal(typeof config, 'object', 'Invalid publishConfig');
+          assert(!Array.isArray(config) && Object.keys(config).every(key => ['access', 'registry', 'tag'].includes(key)),
+            'Unexpected publishConfig key');
+          const archives = new Map([[EXPECTED_NAME, PACKAGE_ARCHIVE]]);
+          const isPublished = (spec, archive) => {
+            const existing = spawnSync('npm', ['view', spec, 'dist.integrity', '--json', '--prefer-online',
+              '--registry=https://registry.npmjs.org'], { encoding: 'utf8' });
+            if (existing.status === 0) {
+              const integrity = 'sha512-' + createHash('sha512').update(readFileSync(archive)).digest('base64');
+              assert.equal(JSON.parse(existing.stdout), integrity, `${spec} already exists with different contents`);
+              return true;
+            }
+            let error;
+            try { error = JSON.parse(existing.stdout).error; } catch {}
+            assert.equal(error?.code, 'E404', `Cannot check ${spec}: ${existing.stderr}`);
+            return false;
+          };
+          for (const [name, archive] of archives) {
+            const spec = `${name}@${EXPECTED_VERSION}`;
+            if (!isPublished(spec, archive)) {
+              const result = spawnSync('npm', ['publish', archive, '--ignore-scripts', '--provenance', '--access', 'public',
+                '--json', '--registry=https://registry.npmjs.org', '--tag', DIST_TAG], { encoding: 'utf8' });
+              process.stdout.write(result.stdout ?? '');
+              process.stderr.write(result.stderr ?? '');
+              if (result.status === 0) continue;
+              let code;
+              try { code = JSON.parse(result.stdout).error?.code; } catch {}
+              // A concurrent publish may fail in npm's version check or during the PUT.
+              let matched = false;
+              for (const delay of code === 'E409' ? [0, 2000, 4000, 8000, 16000] : [0]) {
+                if (delay) await new Promise(resolve => setTimeout(resolve, delay));
+                if (isPublished(spec, archive)) {
+                  matched = true;
+                  break;
+                }
+              }
+              assert(matched, `Publish failed for ${spec}: no matching public version became visible`);
+            }
+            console.log(`${spec} already published with matching contents; skipping.`);
+          }
+          JS
 
   comment-candidate:
     needs: [authorize-candidate, publish-candidate]

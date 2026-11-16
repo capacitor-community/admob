@@ -98,3 +98,43 @@ await AdMob.removeBanner();
 ```
 
 Banner impression-level revenue is emitted on `BannerAdPluginEvents.AdPaid`. Full-screen formats emit the same `AdMobRevenueData` through their `AdImpression` event. See [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).
+
+To move the existing Android banner, call `showBanner()` again with the same ad unit and request options and the new `position` or `margin`. The existing ad size is retained even if `adSize` is omitted. A layout-only change keeps the displayed ad and resolves without requesting another ad. Keep the same request options (such as `npa`) when moving it. Calling `showBanner()` with unchanged layout, or changing request options, retains the existing reload behavior. This does not create a second banner. Without a matching banner preloaded by `prepareBanner()`, use `removeBanner()` before switching to a different ad size or ad unit.
+
+## Reserve space before loading an adaptive banner
+
+Calculate the expected size without creating a banner or making an ad request:
+
+```ts
+const { height } = await AdMob.getAdaptiveBannerSize();
+content.style.paddingBottom = `${height}px`;
+await AdMob.showBanner(options);
+```
+
+The default width is the current available width with safe areas taken into account, using the same SDK calculation as `showBanner()` for adaptive banners. Dimensions are logical pixels (dp on Android, points on iOS). Recalculate after rotation or a change in available width, and continue using `SizeChanged` for the displayed size.
+
+An optional `{ width: 300 }` calculates for a specific width in logical pixels; it does not change the width used by `showBanner()`. Invalid widths reject. This calculation is available on Android and iOS; the web implementation rejects as unavailable.
+
+## Read the current banner size
+
+`getBannerSize()` returns the displayed width and height in logical pixels, including when the initial size event was missed. It does not request or display an ad. Before loading, or while the banner is hidden, removed, or failed, both dimensions are zero.
+
+```ts
+const { width, height } = await AdMob.getBannerSize();
+```
+
+Keep listening to `BannerAdPluginEvents.SizeChanged` for subsequent changes.
+
+## Preload without displaying
+
+```ts
+await AdMob.prepareBanner(options);
+// Later, when the screen is ready:
+await AdMob.showBanner(options);
+```
+
+`prepareBanner()` resolves when the next banner has loaded, leaving the current banner displayed. Use the same ad unit, size, and request options in `showBanner()` to display it without loading again; position and margin may differ. Without a reusable prepared banner, `showBanner()` works as usual.
+
+Preparing again replaces the previous preparation. `removeBanner()` clears both the displayed and prepared banners. Pending preparation rejects when replaced or removed.
+
+Preparation emits `Loaded` without `SizeChanged`. Showing a prepared banner emits `SizeChanged` only when the displayed dimensions change, without repeating `Loaded`.

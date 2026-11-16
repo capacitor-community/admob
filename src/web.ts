@@ -8,6 +8,7 @@ import type {
   AdmobConsentRequestOptions,
 } from '.';
 import type { AppOpenAdOptions } from './app-open/app-open-ad-options.interface';
+import type { AdMobBannerSize } from './banner';
 import { AdmobConsentStatus } from './consent/consent-status.enum';
 import { PrivacyOptionsRequirementStatus } from './consent/privacy-options-requirement-status.enum';
 import type { NativeAdDefinitions } from './native-ads/native-ad-definitions.interface';
@@ -65,6 +66,18 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin, NativeAdDefiniti
 
   async setApplicationVolume(options: ApplicationVolumeOptions): Promise<void> {
     console.log('setApplicationVolume', options);
+  }
+
+  async getAdaptiveBannerSize(): Promise<AdMobBannerSize> {
+    throw this.unavailable('Adaptive banner sizes are only available on iOS and Android');
+  }
+
+  async getBannerSize(): Promise<AdMobBannerSize> {
+    return { width: 0, height: 0 };
+  }
+
+  async prepareBanner(options: AdOptions): Promise<void> {
+    console.log('prepareBanner', options);
   }
 
   async showBanner(options: AdOptions): Promise<void> {

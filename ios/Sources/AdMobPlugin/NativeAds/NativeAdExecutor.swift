@@ -133,10 +133,10 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
             call.resolve()
             return
         }
-        scrollTrackers.removeValue(forKey: feedId)
         states.values.filter { $0.feedId == feedId }.forEach { $0.clippingView.isHidden = true }
 
         if updateTrackedPlacements(call, feedId: feedId) { return }
+        scrollTrackers.removeValue(forKey: feedId)
 
         for case let placement as [String: Any] in call.getArray("placements") ?? [] {
             applyPlacement(placement, expectedFeedId: feedId)
@@ -245,8 +245,11 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
             let webView = plugin?.bridge?.webView
         else { return }
 
-        let webOrigin = webView.frame.origin
-        state.clippingView.frame = placement.clip.offsetBy(dx: webOrigin.x, dy: webOrigin.y)
+        if scrollTrackers[placement.feedId]?.host(state.clippingView, frame: placement.clip) != true {
+            guard let parent = webView.superview else { return }
+            if state.clippingView.superview !== parent { parent.addSubview(state.clippingView) }
+            state.clippingView.frame = parent.convert(placement.clip, from: webView)
+        }
         state.adView.frame = CGRect(
             x: placement.rect.minX - placement.clip.minX,
             y: placement.rect.minY - placement.clip.minY,
@@ -305,11 +308,13 @@ extension NativeAdExecutor {
             return NativeAdPlacementValue(value, expectedFeedId: feedId)
         }
         if placements.isEmpty {
+            scrollTrackers.removeValue(forKey: feedId)
             call.resolve()
             return true
         }
         guard let webView = plugin?.bridge?.webView,
-              let tracker = NativeAdScrollTracker(container: container, webView: webView, placements: placements, render: { [weak self] values in
+              let tracker = NativeAdScrollTracker(container: container, webView: webView, placements: placements,
+                                                previousHosting: scrollTrackers[feedId]?.hosting, render: { [weak self] values in
                   guard let self else { return }
                   self.states.values.filter { $0.feedId == feedId }.forEach { $0.clippingView.isHidden = true }
                   values.forEach { self.applyPlacement($0) }

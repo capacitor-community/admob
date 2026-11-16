@@ -22,7 +22,7 @@ jobs:
     if: "${{ (needs.ci-reuse.result != 'success' && !cancelled()) || ((success()) && needs.ci-reuse.outputs.reuse != 'true') }}"
     needs:
       - ci-reuse
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Fail if tree verification failed
         if: needs.ci-reuse.result != 'success'
