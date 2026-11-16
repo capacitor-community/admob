@@ -573,11 +573,9 @@ Destroys the current banner and removes it from the screen.
 prepareBanner(options: BannerAdOptions) => Promise<void>
 ```
 
-Loads one banner offscreen. Resolves on load and does not change the display
-or emit SizeChanged. Call showBanner() with matching request options to
-display it without reloading. A pending or mismatched preparation is
-discarded when showBanner() is called. Leaves the current banner unchanged.
-Preparing again replaces only the previous preparation.
+Preloads the next banner without changing the current display.
+Resolves when loaded. Call showBanner() with matching options to display it.
+Preparing again replaces the previous preparation; removeBanner() cancels it.
 
 | Param         | Type                                                        |
 | ------------- | ----------------------------------------------------------- |
