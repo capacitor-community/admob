@@ -125,6 +125,7 @@ class BannerExecutorTest {
     @Nested
     @DisplayName("Show Banner")
     class ShowBanner {
+
         @Mock
         MockedStatic<android.util.Log> logMock;
 
@@ -205,6 +206,20 @@ class BannerExecutorTest {
             );
             verify(ad).setAdListener(listener.capture());
             return listener.getValue();
+        }
+
+        @Test
+        void queuedRemovalCancelsPreparationBeforeItsViewExists() {
+            PluginCall prepare = mock(PluginCall.class);
+            PluginCall remove = mock(PluginCall.class);
+            sut.prepareBanner(prepare, true);
+            sut.removeBanner(remove);
+            verify(activityMock, times(2)).runOnUiThread(runnableArgumentCaptor.capture());
+            List<Runnable> tasks = runnableArgumentCaptor.getAllValues();
+            tasks.forEach(Runnable::run);
+            verify(prepare).reject("Banner preparation was cancelled by removeBanner()");
+            verify(remove).resolve();
+            verify(prepare, never()).resolve();
         }
 
         @Test

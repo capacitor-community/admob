@@ -362,29 +362,26 @@ public class BannerExecutor extends Executor {
 
     public void removeBanner(final PluginCall call) {
         try {
-            if (mAdView != null) {
-                activitySupplier.get().runOnUiThread(() -> {
-                    if (mAdView != null) {
-                        if (pendingPrepare != null) {
-                            pendingPrepare.reject("Banner preparation was cancelled by removeBanner()");
-                            pendingPrepare = null;
-                        }
-                        final ViewGroup bannerParent = resolveViewGroup();
-                        if (bannerParent != null) {
-                            bannerParent.removeView(mAdViewLayout);
-                        }
-                        mAdViewLayout.removeView(mAdView);
-                        mAdView.destroy();
-                        mAdView = null;
-                        mAdOptions = null;
-                        Log.d(logTag, "Banner AD Removed");
-                        final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
-                        notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
+            activitySupplier.get().runOnUiThread(() -> {
+                if (pendingPrepare != null) {
+                    pendingPrepare.reject("Banner preparation was cancelled by removeBanner()");
+                    pendingPrepare = null;
+                }
+                if (mAdView != null) {
+                    final ViewGroup bannerParent = resolveViewGroup();
+                    if (bannerParent != null) {
+                        bannerParent.removeView(mAdViewLayout);
                     }
-                });
-            }
-
-            call.resolve();
+                    mAdViewLayout.removeView(mAdView);
+                    mAdView.destroy();
+                    mAdView = null;
+                    mAdOptions = null;
+                    Log.d(logTag, "Banner AD Removed");
+                    final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(0, 0);
+                    notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
+                }
+                call.resolve();
+            });
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
