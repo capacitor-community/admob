@@ -178,42 +178,45 @@ public class BannerExecutor extends Executor {
                 return;
             }
             pendingPrepare = call;
-            try {
-                showBanner(call, systemBarsHandlesInsets);
-            } catch (Exception ex) {
-                pendingPrepare = null;
-                call.reject(ex.getLocalizedMessage(), ex);
-            }
+            showBannerOnUiThread(call, systemBarsHandlesInsets);
         });
     }
 
     public void showBanner(final PluginCall call, boolean systemBarsHandlesInsets) {
-        if (pendingPrepare != null && pendingPrepare != call) {
-            call.reject("A banner is still being prepared");
+        Activity activity = liveActivity();
+        if (activity == null) {
+            call.reject("Activity unavailable");
             return;
         }
-        final boolean preparing = pendingPrepare == call;
-        final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
-        float density = contextSupplier.get().getResources().getDisplayMetrics().density;
+        activity.runOnUiThread(() -> showBannerOnUiThread(call, systemBarsHandlesInsets));
+    }
 
-        int defaultWidthPixels = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        activitySupplier.get().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-        int realWidthPixels = metrics.widthPixels;
-
-        boolean fullscreen = false;
-        if ((activitySupplier.get().getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
-            fullscreen = true;
-        }
-
-        if (mAdView != null) {
-            updateExistingAdView(call, adOptions);
-            return;
-        }
-
-        // Why a try catch block?
+    private void showBannerOnUiThread(final PluginCall call, boolean systemBarsHandlesInsets) {
         try {
+            if (pendingPrepare != null && pendingPrepare != call) {
+                call.reject("A banner is still being prepared");
+                return;
+            }
+            final boolean preparing = pendingPrepare == call;
+            final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
+            float density = contextSupplier.get().getResources().getDisplayMetrics().density;
+
+            int defaultWidthPixels = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
+
+            DisplayMetrics metrics = new DisplayMetrics();
+            activitySupplier.get().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+            int realWidthPixels = metrics.widthPixels;
+
+            boolean fullscreen = false;
+            if ((activitySupplier.get().getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
+                fullscreen = true;
+            }
+
+            if (mAdView != null) {
+                updateExistingAdView(call, adOptions);
+                return;
+            }
+
             mAdView = new AdView(contextSupplier.get());
 
             if (!adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
@@ -337,12 +340,12 @@ public class BannerExecutor extends Executor {
     }
 
     public void resumeBanner(final PluginCall call) {
-        if (pendingPrepare != null) {
-            call.reject("Wait for prepareBanner() to finish before resuming the banner");
-            return;
-        }
         try {
             activitySupplier.get().runOnUiThread(() -> {
+                if (pendingPrepare != null) {
+                    call.reject("Wait for prepareBanner() to finish before resuming the banner");
+                    return;
+                }
                 if (mAdViewLayout != null && mAdView != null) {
                     mAdViewLayout.setVisibility(View.VISIBLE);
                     mAdView.resume();
@@ -352,9 +355,8 @@ public class BannerExecutor extends Executor {
 
                     Log.d(logTag, "Banner AD Resumed");
                 }
+                call.resolve();
             });
-
-            call.resolve();
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }

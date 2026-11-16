@@ -67,23 +67,26 @@ class BannerExecutor: NSObject, BannerViewDelegate {
 
             self.bannerView.isHidden = preparing
             self.bannerView.delegate = self
+            setPaidEventHandler(self.bannerView)
             self.bannerView.load(request)
 
-            self.bannerView.paidEventHandler = { [weak self] adValue in
-                guard let self = self else { return }
-                let networkName = self.bannerView.responseInfo?.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
-                let impressionId = self.bannerView.responseInfo?.responseIdentifier ?? ""
-                self.plugin?.notifyListeners(BannerAdPluginEvents.AdPaid.rawValue, data: [
-                    "adUnitId": self.bannerView.adUnitID ?? "",
-                    "valueMicros": adValue.value.multiplying(byPowerOf10: 6).int64Value,
-                    "currencyCode": adValue.currencyCode,
-                    "precision": adValue.precision.rawValue,
-                    "networkName": networkName,
-                    "impressionId": impressionId
-                ])
-            }
-
             if !preparing { call.resolve([:]) }
+        }
+    }
+
+    func setPaidEventHandler(_ banner: BannerView) {
+        banner.paidEventHandler = { [weak self, weak banner] adValue in
+            guard let self = self, let banner = banner, banner === self.bannerView else { return }
+            let networkName = banner.responseInfo?.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
+            let impressionId = banner.responseInfo?.responseIdentifier ?? ""
+            self.plugin?.notifyListeners(BannerAdPluginEvents.AdPaid.rawValue, data: [
+                "adUnitId": banner.adUnitID ?? "",
+                "valueMicros": adValue.value.multiplying(byPowerOf10: 6).int64Value,
+                "currencyCode": adValue.currencyCode,
+                "precision": adValue.precision.rawValue,
+                "networkName": networkName,
+                "impressionId": impressionId
+            ])
         }
     }
 
