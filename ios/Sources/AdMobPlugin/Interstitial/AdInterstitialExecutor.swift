@@ -6,6 +6,7 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
     private var webViewLayout: FullScreenAdWebViewLayout?
     private var preparedAds: [String: InterstitialAd] = [:]
+    private var preparedAdExpirations: [String: AdExpiration] = [:]
     private var lastPreparedAdId: String?
     private var currentlyShowingAdId: String?
 
@@ -39,6 +40,7 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
                         ])
                     }
                     self.preparedAds[adUnitID] = ad
+                    self.preparedAdExpirations[adUnitID] = AdExpiration(maxAge: 3600)
                     self.lastPreparedAdId = adUnitID
                 }
                 self.plugin?.notifyListeners(InterstitialAdPluginEvents.Loaded.rawValue, data: [
@@ -58,6 +60,17 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
         }
         guard currentlyShowingAdId == nil else {
             call.reject("An ad is already showing")
+            return
+        }
+
+        if preparedAdExpirations[adId]?.isExpired == true {
+            preparedAds.removeValue(forKey: adId)
+            preparedAdExpirations.removeValue(forKey: adId)
+            if lastPreparedAdId == adId { lastPreparedAdId = Array(preparedAds.keys).last }
+            let message = "Interstitial ad expired. Prepare a new ad before showing it."
+            call.reject(message, "AD_EXPIRED")
+            plugin?.notifyListeners(InterstitialAdPluginEvents.FailedToShow.rawValue,
+                                    data: ["code": -1, "message": message])
             return
         }
 
@@ -103,6 +116,7 @@ class AdInterstitialExecutor: NSObject, FullScreenContentDelegate {
         webViewLayout = nil
         DispatchQueue.main.async { layout?.restore() }
         preparedAds.removeValue(forKey: adId)
+        preparedAdExpirations.removeValue(forKey: adId)
         if lastPreparedAdId == adId { lastPreparedAdId = Array(preparedAds.keys).last }
         currentlyShowingAdId = nil
     }
