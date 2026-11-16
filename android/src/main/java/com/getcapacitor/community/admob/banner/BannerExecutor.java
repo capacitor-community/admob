@@ -51,6 +51,8 @@ public class BannerExecutor extends Executor {
         final AdOptions options;
         PluginCall pending;
         AdView view;
+        AdSize size;
+        String adUnitID;
 
         PreparedBanner(AdOptions options, PluginCall pending) {
             this.options = options;
@@ -257,8 +259,10 @@ public class BannerExecutor extends Executor {
                 if (size == null || size.equals(AdSize.INVALID)) throw new IllegalArgumentException("Invalid banner size");
                 prepared.view = new AdView(contextSupplier.get());
                 prepared.view.setAdSize(size);
+                prepared.size = size;
                 AdRequest request = RequestHelper.createRequest(prepared.options);
                 AdViewIdHelper.assignIdToAdView(prepared.view, prepared.options, request, logTag, contextSupplier.get());
+                prepared.adUnitID = prepared.view.getAdUnitId();
                 prepared.view.setAdListener(
                     new AdListener() {
                         @Override
@@ -323,9 +327,9 @@ public class BannerExecutor extends Executor {
             prepared.options.adSize == options.adSize &&
             prepared.options.npa == options.npa &&
             prepared.options.isTesting == options.isTesting &&
-            Objects.equals(prepared.view.getAdSize(), size) &&
+            Objects.equals(prepared.size, size) &&
             Objects.equals(
-                prepared.view.getAdUnitId(),
+                prepared.adUnitID,
                 AdViewIdHelper.getFinalAdId(options, RequestHelper.createRequest(options), logTag, contextSupplier.get())
             )
         );

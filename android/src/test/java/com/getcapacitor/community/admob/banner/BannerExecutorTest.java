@@ -293,6 +293,9 @@ class BannerExecutorTest {
             verify(viewGroupMock, never()).addView(any());
             assertEquals(0, relativeLayoutMockedConstruction.constructed().size());
             sut.showBanner(mock(PluginCall.class), true);
+            // SDK view getters require the UI thread; matching uses the prepared metadata.
+            verify(ad, never()).getAdSize();
+            verify(ad).getAdUnitId();
             verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
             runnableArgumentCaptor.getValue().run();
             assertEquals(1, adViewMockedConstruction.constructed().size());
