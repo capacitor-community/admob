@@ -209,6 +209,38 @@ class BannerExecutorTest {
         }
 
         @ParameterizedTest
+        @CsvSource({ "BOTTOM_CENTER, 75, 0, 75", "TOP_CENTER, 120, 120, 0", "CENTER, 200, 0, 0" })
+        void updatesExistingBannerLayoutAndSettlesCall(String position, int margin, int top, int bottom) {
+            PluginCall initial = mock(PluginCall.class);
+            PluginCall update = mock(PluginCall.class);
+            sut.showBanner(initial, true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            clearInvocations(activityMock);
+
+            AdOptions options = new AdOptions.TesterAdOptionsBuilder().setPosition(position).setMargin(margin).build();
+            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(options);
+            sut.showBanner(update, true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            assertEquals(1, adViewMockedConstruction.constructed().size());
+            assertEquals(1, relativeLayoutMockedConstruction.constructed().size());
+            CoordinatorLayout.LayoutParams params = layoutParamsMockedConstruction.constructed().get(1);
+            verify(params).setMargins(0, top, 0, bottom);
+            assertEquals(
+                "TOP_CENTER".equals(position)
+                    ? android.view.Gravity.TOP
+                    : "CENTER".equals(position)
+                      ? android.view.Gravity.CENTER
+                      : android.view.Gravity.BOTTOM,
+                params.gravity
+            );
+            verify(relativeLayoutMockedConstruction.constructed().get(0), times(2)).requestApplyInsets();
+            verify(update).resolve();
+        }
+
+        @ParameterizedTest
         @CsvSource({
             "BOTTOM_CENTER, false, true,  24,   0, 0, 31",
             "BOTTOM_CENTER, true,  true,  24, 300, 0, 7",

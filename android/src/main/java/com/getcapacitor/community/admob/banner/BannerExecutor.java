@@ -168,17 +168,8 @@ public class BannerExecutor extends Executor {
 
         int defaultWidthPixels = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        activitySupplier.get().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-        int realWidthPixels = metrics.widthPixels;
-
-        boolean fullscreen = false;
-        if ((activitySupplier.get().getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
-            fullscreen = true;
-        }
-
         if (mAdView != null) {
-            updateExistingAdView(adOptions);
+            updateExistingAdView(call, adOptions, systemBarsHandlesInsets);
             return;
         }
 
@@ -197,78 +188,7 @@ public class BannerExecutor extends Executor {
 
             // Setup AdView Layout
             mAdViewLayout = new RelativeLayout(contextSupplier.get());
-            mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
-            mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
-
-            final CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
-                CoordinatorLayout.LayoutParams.WRAP_CONTENT,
-                CoordinatorLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            // TODO: Make an enum like the AdSizeEnum?
-            switch (adOptions.position) {
-                case "TOP_CENTER":
-                    mAdViewLayoutParams.gravity = Gravity.TOP;
-                    break;
-                case "CENTER":
-                    mAdViewLayoutParams.gravity = Gravity.CENTER;
-                    break;
-                default:
-                    mAdViewLayoutParams.gravity = Gravity.BOTTOM;
-                    break;
-            }
-
-            mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-
-            int densityMargin = (int) (adOptions.margin * density);
-            // Apply the requested offset only at the anchored edge. Applying it to
-            // both edges reduces the available height twice and clips large offsets.
-            int topMargin = "TOP_CENTER".equals(adOptions.position) ? densityMargin : 0;
-            int bottomMargin = "BOTTOM_CENTER".equals(adOptions.position) ? densityMargin : 0;
-            int[] margins = new int[] { 0, topMargin, 0, bottomMargin };
-
-            // Center Banner Ads
-            int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
-
-            if (adWidth <= 0 || adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
-                int margin = 0;
-                if (fullscreen) {
-                    margin = (realWidthPixels - defaultWidthPixels) / 2;
-                }
-                margins[0] = margin;
-                margins[2] = margin;
-                mAdViewLayoutParams.setMargins(margin, topMargin, margin, bottomMargin);
-            } else {
-                int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
-                if (fullscreen) {
-                    sideMargin = (realWidthPixels - adWidth) / 2;
-                }
-                margins[0] = sideMargin;
-                margins[2] = sideMargin;
-                mAdViewLayoutParams.setMargins(sideMargin, topMargin, sideMargin, bottomMargin);
-            }
-
-            // Use the insets remaining after Capacitor's parent layout has handled them.
-            // Replacing the decor-view listener would override SystemBars' safe-area handling.
-            mAdViewLayout.setOnApplyWindowInsetsListener((v, insets) -> {
-                WindowInsetsCompat compat = WindowInsetsCompat.toWindowInsetsCompat(insets, v);
-                Insets safeArea = compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-                boolean keyboardVisible =
-                    compat.isVisible(WindowInsetsCompat.Type.ime()) && compat.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0;
-                // SystemBars already pads the parent for the keyboard. Neither the IME
-                // height nor the navigation bar belongs in the banner's margin then.
-                // With insetsHandling=disable, the host app owns keyboard avoidance.
-                int bottomInset = keyboardVisible && systemBarsHandlesInsets ? 0 : safeArea.bottom;
-
-                if ("TOP_CENTER".equals(adOptions.position)) {
-                    mAdViewLayoutParams.setMargins(margins[0], margins[1] + safeArea.top, margins[2], margins[3]);
-                } else {
-                    mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
-                }
-
-                v.setLayoutParams(mAdViewLayoutParams);
-                return insets;
-            });
+            configureBannerLayout(adOptions, systemBarsHandlesInsets);
 
             createNewAdView(adOptions);
 
@@ -347,18 +267,111 @@ public class BannerExecutor extends Executor {
         }
     }
 
-    private void updateExistingAdView(AdOptions adOptions) {
-        // Bind to the AdView present when this call was made. `mAdView` is a
-        // shared field that another UI-thread task can null before this one
-        // runs; using the captured reference avoids a NullPointerException.
+    private void updateExistingAdView(PluginCall call, AdOptions adOptions, boolean systemBarsHandlesInsets) {
         final AdView adView = mAdView;
-        activitySupplier.get().runOnUiThread(() -> {
-            if (adView != mAdView) {
-                // Banner was removed or replaced before this task ran.
-                return;
+        try {
+            activitySupplier.get().runOnUiThread(() -> {
+                if (adView != mAdView) {
+                    call.reject("Banner was removed or replaced before the update");
+                    return;
+                }
+                try {
+                    configureBannerLayout(adOptions, systemBarsHandlesInsets);
+                    mAdViewLayout.requestApplyInsets();
+                    adView.loadAd(RequestHelper.createRequest(adOptions));
+                    call.resolve();
+                } catch (Exception ex) {
+                    call.reject(ex.getLocalizedMessage(), ex);
+                }
+            });
+        } catch (Exception ex) {
+            call.reject(ex.getLocalizedMessage(), ex);
+        }
+    }
+
+    private void configureBannerLayout(AdOptions adOptions, boolean systemBarsHandlesInsets) {
+        float density = contextSupplier.get().getResources().getDisplayMetrics().density;
+        int defaultWidthPixels = contextSupplier.get().getResources().getDisplayMetrics().widthPixels;
+        DisplayMetrics metrics = new DisplayMetrics();
+        activitySupplier.get().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        int realWidthPixels = metrics.widthPixels;
+
+        boolean fullscreen = false;
+        if ((activitySupplier.get().getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) {
+            fullscreen = true;
+        }
+
+        mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+        mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
+
+        final CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
+            CoordinatorLayout.LayoutParams.WRAP_CONTENT,
+            CoordinatorLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        // TODO: Make an enum like the AdSizeEnum?
+        switch (adOptions.position) {
+            case "TOP_CENTER":
+                mAdViewLayoutParams.gravity = Gravity.TOP;
+                break;
+            case "CENTER":
+                mAdViewLayoutParams.gravity = Gravity.CENTER;
+                break;
+            default:
+                mAdViewLayoutParams.gravity = Gravity.BOTTOM;
+                break;
+        }
+
+        mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
+
+        int densityMargin = (int) (adOptions.margin * density);
+        // Apply the requested offset only at the anchored edge. Applying it to
+        // both edges reduces the available height twice and clips large offsets.
+        int topMargin = "TOP_CENTER".equals(adOptions.position) ? densityMargin : 0;
+        int bottomMargin = "BOTTOM_CENTER".equals(adOptions.position) ? densityMargin : 0;
+        int[] margins = new int[] { 0, topMargin, 0, bottomMargin };
+
+        // Center Banner Ads
+        int adWidth = (int) (adOptions.adSize.getSize().getWidth() * density);
+
+        if (adWidth <= 0 || adOptions.adSize.toString().equals("ADAPTIVE_BANNER")) {
+            int margin = 0;
+            if (fullscreen) {
+                margin = (realWidthPixels - defaultWidthPixels) / 2;
             }
-            final AdRequest adRequest = RequestHelper.createRequest(adOptions);
-            adView.loadAd(adRequest);
+            margins[0] = margin;
+            margins[2] = margin;
+            mAdViewLayoutParams.setMargins(margin, topMargin, margin, bottomMargin);
+        } else {
+            int sideMargin = ((int) defaultWidthPixels - adWidth) / 2;
+            if (fullscreen) {
+                sideMargin = (realWidthPixels - adWidth) / 2;
+            }
+            margins[0] = sideMargin;
+            margins[2] = sideMargin;
+            mAdViewLayoutParams.setMargins(sideMargin, topMargin, sideMargin, bottomMargin);
+        }
+
+        // Use the insets remaining after Capacitor's parent layout has handled them.
+        // Replacing the decor-view listener would override SystemBars' safe-area handling.
+        mAdViewLayout.setOnApplyWindowInsetsListener((v, insets) -> {
+            WindowInsetsCompat compat = WindowInsetsCompat.toWindowInsetsCompat(insets, v);
+            Insets safeArea = compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            boolean keyboardVisible =
+                compat.isVisible(WindowInsetsCompat.Type.ime()) && compat.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0;
+            // SystemBars already pads the parent for the keyboard. Neither the IME
+            // height nor the navigation bar belongs in the banner's margin then.
+            // With insetsHandling=disable, the host app owns keyboard avoidance.
+            int bottomInset = keyboardVisible && systemBarsHandlesInsets ? 0 : safeArea.bottom;
+
+            if ("TOP_CENTER".equals(adOptions.position)) {
+                mAdViewLayoutParams.setMargins(margins[0], margins[1] + safeArea.top, margins[2], margins[3]);
+            } else {
+                mAdViewLayoutParams.setMargins(margins[0], margins[1], margins[2], margins[3] + bottomInset);
+            }
+
+            v.setLayoutParams(mAdViewLayoutParams);
+            return insets;
         });
     }
 

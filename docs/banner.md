@@ -98,3 +98,5 @@ await AdMob.removeBanner();
 ```
 
 Banner impression-level revenue is emitted on `BannerAdPluginEvents.AdPaid`. Full-screen formats emit the same `AdMobRevenueData` through their `AdImpression` event. See [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).
+
+To move the existing Android banner, call `showBanner()` again with the same ad unit and size and the new `position` or `margin`. The call updates the existing banner's layout and resolves; it does not create a second banner. Use `removeBanner()` before switching to a different ad size or ad unit.
