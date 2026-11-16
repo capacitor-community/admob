@@ -47,3 +47,14 @@ See [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for
 Load, show, dismissal, and failure events are listed on [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).
 
 Prepared interstitial ads expire after one hour. An expired `showInterstitial()` call rejects with `AD_EXPIRED`; prepare a new ad before trying again.
+
+## Android immersive mode
+
+Set `immersiveMode: true` on `prepareInterstitial()` to hide the Android system bars while the ad is displayed. Hiding bars on the application's activity alone does not configure the Google Mobile Ads SDK's separate ad activity.
+
+```ts
+await AdMob.prepareInterstitial({ adId: 'YOUR_AD_UNIT_ID', immersiveMode: true });
+await AdMob.showInterstitial();
+```
+
+This also applies to `prepareRewardVideoAd()`. Immersive mode controls system bars; the SDK and creative determine the ad's aspect ratio and any letterboxing. Users can still reveal transient system bars with a swipe.

@@ -148,3 +148,5 @@ await AdMob.addListener(RewardAdPluginEvents.Rewarded, async () => {
   }
 });
 ```
+
+On Android, pass `immersiveMode: true` to `prepareRewardVideoAd()` to hide system bars during the ad. The option belongs to the prepare call, not the show call; hiding bars on the host app alone does not configure the SDK's ad activity.
