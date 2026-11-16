@@ -48,13 +48,33 @@ export interface BannerDefinitions {
   removeBanner(): Promise<void>;
 
   /**
-   * Loads a banner without displaying it. Resolves when loaded, rejects on failure
-   * or removal. Call resumeBanner() to display it without another ad request.
-   * Remove the current banner before preparing another. Only one banner is held.
+   * Loads one banner offscreen. Resolves on load and does not change the display
+   * or emit SizeChanged. Call showBanner() with matching request options to
+   * display it without reloading. A pending or mismatched preparation is
+   * discarded when showBanner() is called. Remove any existing banner first.
    *
    * @group Banner
    */
   prepareBanner(options: BannerAdOptions): Promise<void>;
+
+  /**
+   * Calculates the anchored adaptive banner size without creating or loading an ad.
+   * Uses the current safe-area-aware available width unless a width is provided.
+   * Dimensions are dp on Android and points on iOS. Recalculate after rotation
+   * or available-width changes. An explicit width does not resize showBanner().
+   *
+   * @group Banner
+   */
+  getAdaptiveBannerSize(options?: { width?: number }): Promise<AdMobBannerSize>;
+
+  /**
+   * Returns the currently displayed banner size in dp (Android) or points (iOS).
+   * Returns zero dimensions before loading or while hidden, removed, or failed.
+   * Does not create, load, or show an ad.
+   *
+   * @group Banner
+   */
+  getBannerSize(): Promise<AdMobBannerSize>;
 
   /**
    * Listens for changes to the displayed banner dimensions.

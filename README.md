@@ -222,6 +222,8 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 * [`resumeBanner()`](#resumebanner)
 * [`removeBanner()`](#removebanner)
 * [`prepareBanner(...)`](#preparebanner)
+* [`getAdaptiveBannerSize(...)`](#getadaptivebannersize)
+* [`getBannerSize()`](#getbannersize)
 * [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
 * [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
 * [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
@@ -571,13 +573,49 @@ Destroys the current banner and removes it from the screen.
 prepareBanner(options: BannerAdOptions) => Promise<void>
 ```
 
-Loads a banner without displaying it. Resolves when loaded, rejects on failure
-or removal. Call resumeBanner() to display it without another ad request.
-Remove the current banner before preparing another. Only one banner is held.
+Loads one banner offscreen. Resolves on load and does not change the display
+or emit SizeChanged. Call showBanner() with matching request options to
+display it without reloading. A pending or mismatched preparation is
+discarded when showBanner() is called. Remove any existing banner first.
 
 | Param         | Type                                                        |
 | ------------- | ----------------------------------------------------------- |
 | **`options`** | <code><a href="#banneradoptions">BannerAdOptions</a></code> |
+
+--------------------
+
+
+### getAdaptiveBannerSize(...)
+
+```typescript
+getAdaptiveBannerSize(options?: { width?: number | undefined; } | undefined) => Promise<AdMobBannerSize>
+```
+
+Calculates the anchored adaptive banner size without creating or loading an ad.
+Uses the current safe-area-aware available width unless a width is provided.
+Dimensions are dp on Android and points on iOS. Recalculate after rotation
+or available-width changes. An explicit width does not resize showBanner().
+
+| Param         | Type                             |
+| ------------- | -------------------------------- |
+| **`options`** | <code>{ width?: number; }</code> |
+
+**Returns:** <code>Promise&lt;<a href="#admobbannersize">AdMobBannerSize</a>&gt;</code>
+
+--------------------
+
+
+### getBannerSize()
+
+```typescript
+getBannerSize() => Promise<AdMobBannerSize>
+```
+
+Returns the currently displayed banner size in dp (Android) or points (iOS).
+Returns zero dimensions before loading or while hidden, removed, or failed.
+Does not create, load, or show an ad.
+
+**Returns:** <code>Promise&lt;<a href="#admobbannersize">AdMobBannerSize</a>&gt;</code>
 
 --------------------
 
