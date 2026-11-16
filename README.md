@@ -221,6 +221,7 @@ Start with [Installation](#installation) above, then [Configuration](https://doc
 * [`hideBanner()`](#hidebanner)
 * [`resumeBanner()`](#resumebanner)
 * [`removeBanner()`](#removebanner)
+* [`getAdaptiveBannerSize(...)`](#getadaptivebannersize)
 * [`addListener(BannerAdPluginEvents.SizeChanged, ...)`](#addlistenerbanneradplugineventssizechanged-)
 * [`addListener(BannerAdPluginEvents.Loaded, ...)`](#addlistenerbanneradplugineventsloaded-)
 * [`addListener(BannerAdPluginEvents.FailedToLoad, ...)`](#addlistenerbanneradplugineventsfailedtoload-)
@@ -560,6 +561,26 @@ removeBanner() => Promise<void>
 Destroys the current banner and removes it from the screen.
 
 **Since:** 1.1.2
+
+--------------------
+
+
+### getAdaptiveBannerSize(...)
+
+```typescript
+getAdaptiveBannerSize(options?: { width?: number | undefined; } | undefined) => Promise<AdMobBannerSize>
+```
+
+Calculates the anchored adaptive banner size without creating or loading an ad.
+Uses the current safe-area-aware available width unless a width is provided.
+Dimensions are dp on Android and points on iOS. Recalculate after rotation
+or available-width changes. An explicit width does not resize showBanner().
+
+| Param         | Type                             |
+| ------------- | -------------------------------- |
+| **`options`** | <code>{ width?: number; }</code> |
+
+**Returns:** <code>Promise&lt;<a href="#admobbannersize">AdMobBannerSize</a>&gt;</code>
 
 --------------------
 
