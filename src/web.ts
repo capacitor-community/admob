@@ -68,6 +68,10 @@ export class AdMobWeb extends WebPlugin implements AdMobPlugin, NativeAdDefiniti
     console.log('setApplicationVolume', options);
   }
 
+  async getAdaptiveBannerSize(): Promise<AdMobBannerSize> {
+    throw this.unavailable('Adaptive banner sizes are only available on iOS and Android');
+  }
+
   async getBannerSize(): Promise<AdMobBannerSize> {
     return { width: 0, height: 0 };
   }

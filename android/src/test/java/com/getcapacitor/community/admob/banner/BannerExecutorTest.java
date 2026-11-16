@@ -165,10 +165,10 @@ class BannerExecutorTest {
             adOptionsMockForTesting = new AdOptions.TesterAdOptionsBuilder().build();
 
             adOptionsMockedStatic.when(AdOptions::getFactory).thenReturn(adOptionsFactoryMock);
-            when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
+            Mockito.lenient().when(adOptionsFactoryMock.createBannerOptions(any())).thenReturn(adOptionsMockForTesting);
 
             when(contextMock.getResources()).thenReturn(resourcesMock);
-            when(resourcesMock.getDisplayMetrics()).thenReturn(displayMetricsMock);
+            Mockito.lenient().when(resourcesMock.getDisplayMetrics()).thenReturn(displayMetricsMock);
 
             sut.awaitViewGroup((found) -> {});
         }
@@ -186,6 +186,42 @@ class BannerExecutorTest {
             CoordinatorLayout.LayoutParams params = layoutParamsMockedConstruction.constructed().get(0);
             when(relativeLayoutMockedConstruction.constructed().get(0).getLayoutParams()).thenReturn(params);
             clearInvocations(params);
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "0", "-1", "NaN", "Infinity", "2147483648" })
+        void rejectsInvalidAdaptiveWidths(double width) {
+            PluginCall call = mock(PluginCall.class);
+            when(call.getDouble("width")).thenReturn(width);
+            when(call.getData()).thenReturn(new JSObject().put("width", 1));
+            sut.getAdaptiveBannerSize(call);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+            verify(call).reject("width must be a finite positive number of logical pixels");
+            assertEquals(0, adViewMockedConstruction.constructed().size());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "true, 300", "false, 400" })
+        void calculatesAdaptiveSizeWithoutLoadingAnAd(boolean explicit, int width) {
+            PluginCall call = mock(PluginCall.class);
+            when(call.getData()).thenReturn(explicit ? new JSObject().put("width", width) : new JSObject());
+            when(call.getDouble("width")).thenReturn(explicit ? (double) width : null);
+            displayMetricsMock.density = 2;
+            if (!explicit) when(viewGroupMock.getWidth()).thenReturn(800);
+            AdSize size = mock(AdSize.class);
+            when(size.getWidth()).thenReturn(width);
+            when(size.getHeight()).thenReturn(50);
+            AdSizeStaticMock.when(() -> AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextMock, width)).thenReturn(size);
+            sut.getAdaptiveBannerSize(call);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            try (MockedConstruction<android.graphics.Rect> rects = Mockito.mockConstruction(android.graphics.Rect.class)) {
+                runnableArgumentCaptor.getValue().run();
+            }
+            verify(call).resolve(new BannerAdSizeInfo(width, 50));
+            assertEquals(0, adViewMockedConstruction.constructed().size());
+            verify(notifierMock, never()).accept(any(), any());
+            requestHelperMockedStatic.verifyNoInteractions();
         }
 
         private void assertBannerSize(int width, int height) {

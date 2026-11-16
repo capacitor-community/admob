@@ -48,6 +48,16 @@ export interface BannerDefinitions {
   removeBanner(): Promise<void>;
 
   /**
+   * Calculates the anchored adaptive banner size without creating or loading an ad.
+   * Uses the current safe-area-aware available width unless a width is provided.
+   * Dimensions are dp on Android and points on iOS. Recalculate after rotation
+   * or available-width changes. An explicit width does not resize showBanner().
+   *
+   * @group Banner
+   */
+  getAdaptiveBannerSize(options?: { width?: number }): Promise<AdMobBannerSize>;
+
+  /**
    * Returns the currently displayed banner size in dp (Android) or points (iOS).
    * Returns zero dimensions before loading or while hidden, removed, or failed.
    * Does not create, load, or show an ad.

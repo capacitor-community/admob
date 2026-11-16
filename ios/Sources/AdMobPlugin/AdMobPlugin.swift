@@ -19,6 +19,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "resetConsentInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setApplicationMuted", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setApplicationVolume", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getAdaptiveBannerSize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getBannerSize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "showBanner", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resumeBanner", returnType: CAPPluginReturnPromise),
@@ -74,6 +75,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
 
     public override func load() {
         self.consentExecutor.plugin = self
+        self.bannerExecutor.plugin = self
     }
 
     /// Full-screen ads that currently have web media suspended.
@@ -353,7 +355,6 @@ extension AdMobPlugin {
     // MARK: SDK initialization
 
     @objc func initialize(_ call: CAPPluginCall) {
-        bannerExecutor.plugin = self
         adInterstitialExecutor.plugin = self
         adRewardExecutor.plugin = self
         adRewardInterstitialExecutor.plugin = self
@@ -366,6 +367,10 @@ extension AdMobPlugin {
     }
 
     // MARK: Banner ads
+
+    @objc func getAdaptiveBannerSize(_ call: CAPPluginCall) {
+        DispatchQueue.main.async { self.bannerExecutor.getAdaptiveBannerSize(call) }
+    }
 
     @objc func getBannerSize(_ call: CAPPluginCall) {
         DispatchQueue.main.async { self.bannerExecutor.getBannerSize(call) }

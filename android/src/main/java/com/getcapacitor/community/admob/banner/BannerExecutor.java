@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.banner;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
@@ -166,6 +167,54 @@ public class BannerExecutor extends Executor {
         }
     }
 
+    public void getAdaptiveBannerSize(final PluginCall call) {
+        Activity activity = liveActivity();
+        if (activity == null) {
+            call.reject("Activity unavailable");
+            return;
+        }
+        activity.runOnUiThread(() -> {
+            try {
+                Double width = call.getDouble("width");
+                if (call.getData().has("width") && (width == null || !Double.isFinite(width) || width < 1 || width > Integer.MAX_VALUE)) {
+                    call.reject("width must be a finite positive number of logical pixels");
+                    return;
+                }
+                AdSize size = AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+                    contextSupplier.get(),
+                    width == null ? adaptiveBannerWidth() : width.intValue()
+                );
+                if (size.getWidth() <= 0 || size.getHeight() <= 0) {
+                    call.reject("Unable to calculate an adaptive banner size for this width");
+                    return;
+                }
+                call.resolve(new BannerAdSizeInfo(size.getWidth(), size.getHeight()));
+            } catch (Exception ex) {
+                call.reject(ex.getLocalizedMessage(), ex);
+            }
+        });
+    }
+
+    private int adaptiveBannerWidth() {
+        DisplayMetrics metrics = contextSupplier.get().getResources().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        ViewGroup parent = resolveViewGroup();
+        if (parent != null && parent.getWidth() > 0) {
+            int[] location = new int[2];
+            parent.getLocationOnScreen(location);
+            int left = location[0] + parent.getPaddingLeft();
+            int right = location[0] + parent.getWidth() - parent.getPaddingRight();
+            Rect visible = new Rect();
+            parent.getWindowVisibleDisplayFrame(visible);
+            if (visible.width() > 0) {
+                left = Math.max(left, visible.left);
+                right = Math.min(right, visible.right);
+            }
+            width = right - left;
+        }
+        return (int) (width / metrics.density);
+    }
+
     public void getBannerSize(final PluginCall call) {
         activitySupplier.get().runOnUiThread(() -> {
             boolean visible = bannerLoaded && mAdView != null && mAdViewLayout.getVisibility() == View.VISIBLE;
@@ -202,9 +251,7 @@ public class BannerExecutor extends Executor {
                 mAdView.setAdSize(adOptions.adSize.getSize());
             } else {
                 // ADAPTIVE BANNER
-                mAdView.setAdSize(
-                    AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), (int) (defaultWidthPixels / density))
-                );
+                mAdView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(contextSupplier.get(), adaptiveBannerWidth()));
             }
 
             // Setup AdView Layout

@@ -230,6 +230,11 @@ public class AdMob extends Plugin {
     // ---------------------------------------------------------
 
     @PluginMethod
+    public void getAdaptiveBannerSize(final PluginCall call) {
+        bannerExecutor.getAdaptiveBannerSize(call);
+    }
+
+    @PluginMethod
     public void getBannerSize(final PluginCall call) {
         bannerExecutor.getBannerSize(call);
     }
