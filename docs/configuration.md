@@ -6,10 +6,10 @@ Native application IDs belong in AndroidManifest / Info.plist; see [Installation
 
 ## CocoaPods
 
-Swift Package Manager resolves WebView Native UI Engine automatically. CocoaPods applications must register its local pod from npm. Install Engine 1.0.8 or a compatible later 1.x release as a direct dependency:
+Swift Package Manager resolves WebView Native UI Engine automatically. CocoaPods applications must register its local pod from npm. Install Engine 1.0.10 or a compatible later 1.x release as a direct dependency:
 
 ```sh
-npm install '@webview-native-ui/engine@^1.0.8'
+npm install '@webview-native-ui/engine@^1.0.10'
 ```
 
 Add the following inside the application's target in `ios/App/Podfile`, outside the generated `def capacitor_pods` block:
