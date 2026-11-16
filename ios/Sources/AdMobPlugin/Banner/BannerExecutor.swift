@@ -8,6 +8,30 @@ class BannerExecutor: NSObject, BannerViewDelegate {
     var adPosition: String = ""
     var margin: Int = 0
 
+    func getAdaptiveBannerSize(_ call: CAPPluginCall) {
+        let width = call.getDouble("width")
+        if call.options["width"] != nil {
+            guard let width = width, width.isFinite, width >= 1, width <= Double(Int32.max) else {
+                call.reject("width must be a finite positive number of logical pixels")
+                return
+            }
+        }
+        guard let size = adaptiveBannerSize(width.map { CGFloat($0.rounded(.down)) }),
+              size.size.width > 0, size.size.height > 0 else {
+            call.reject("Unable to calculate an adaptive banner size for this width")
+            return
+        }
+        call.resolve(["width": size.size.width, "height": size.size.height])
+    }
+
+    private func adaptiveBannerSize(_ width: CGFloat? = nil) -> AdSize? {
+        if let width = width { return currentOrientationAnchoredAdaptiveBanner(width: width) }
+        guard let view = plugin?.getRootVC()?.view else { return nil }
+        view.layoutIfNeeded()
+        let availableWidth = view.bounds.inset(by: view.safeAreaInsets).width
+        return currentOrientationAnchoredAdaptiveBanner(width: availableWidth)
+    }
+
     func showBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
         if let rootViewController = plugin?.getRootVC() {
 
@@ -31,20 +55,18 @@ class BannerExecutor: NSObject, BannerViewDelegate {
             case "SMART_BANNER":
                 bannerSize = kGADAdSizeSmartBannerPortrait
             default: // ADAPTIVE_BANNER
-                let frame = { () -> CGRect in
-                    // Here safe area is taken into account, hence the view frame is used
-                    // after the view has been laid out.
-                    return rootViewController.view.frame.inset(by: rootViewController.view.safeAreaInsets)
-                }()
-                let viewWidth = frame.size.width
-                bannerSize = currentOrientationAnchoredAdaptiveBanner(width: viewWidth)
+                guard let adaptiveSize = adaptiveBannerSize() else {
+                    call.reject("Banner view unavailable")
+                    return
+                }
+                bannerSize = adaptiveSize
             }
 
             self.bannerView = BannerView(adSize: bannerSize)
             self.addBannerViewToView(self.bannerView, adPosition, adMargin)
             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
             self.bannerView.adUnitID = adUnitID
-            self.bannerView.rootViewController = plugin?.getRootVC()
+            self.bannerView.rootViewController = rootViewController
 
             self.bannerView.load(request)
             self.bannerView.delegate = self
