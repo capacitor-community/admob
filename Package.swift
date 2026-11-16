@@ -25,7 +25,8 @@ let package = Package(
                 .product(name: "GoogleMobileAds", package: "swift-package-manager-google-mobile-ads"),
                 .product(name: "GoogleUserMessagingPlatform", package: "swift-package-manager-google-user-messaging-platform")
             ],
-            path: "ios/Sources/AdMobPlugin"),
+            path: "ios/Sources/AdMobPlugin",
+            resources: [.copy("PrivacyInfo.xcprivacy")]),
         .testTarget(
             name: "AdMobPluginTests",
             dependencies: ["AdMobPlugin"],
