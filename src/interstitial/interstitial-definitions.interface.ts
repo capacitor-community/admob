@@ -15,6 +15,9 @@ export interface InterstitialDefinitions {
   /**
    * Loads an interstitial ad and returns the loaded ad unit ID.
    *
+   * SDK load failures reject with the native error message and a string `code`.
+   * Codes are platform-specific; FailedToLoad events expose the same code as a number.
+   *
    * @group Interstitial
    * @param options AdOptions
    * @since 1.1.2

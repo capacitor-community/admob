@@ -79,6 +79,30 @@ class AdInterstitialExecutorTest {
         reset(context, mockedActivity, notifierMock);
     }
 
+    @Test
+    void rejectsAnAdThatExpiresWhileWaitingForTheUiThread() {
+        String id = "expiry-test";
+        PluginCall call = mock(PluginCall.class);
+        InterstitialAd ad = mock(InterstitialAd.class);
+        java.util.concurrent.atomic.AtomicLong clock = new java.util.concurrent.atomic.AtomicLong();
+        AdInterstitialExecutor.preparedAds.put(id, ad);
+        AdInterstitialExecutor.preparedAdExpirations.put(id, new com.getcapacitor.community.admob.helpers.AdExpiration(3600, clock::get));
+        when(call.getString("adId")).thenReturn(id);
+        try {
+            sut.showInterstitial(call, notifierMock);
+            verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
+            clock.set(java.util.concurrent.TimeUnit.HOURS.toNanos(1));
+            runnableArgumentCaptor.getValue().run();
+            verify(call).reject(any(), org.mockito.ArgumentMatchers.eq("AD_EXPIRED"));
+            verify(ad, org.mockito.Mockito.never()).show(any());
+            assertTrue(!AdInterstitialExecutor.preparedAds.containsKey(id));
+            assertTrue(!AdInterstitialExecutor.preparedAdExpirations.containsKey(id));
+        } finally {
+            AdInterstitialExecutor.preparedAds.remove(id);
+            AdInterstitialExecutor.preparedAdExpirations.remove(id);
+        }
+    }
+
     @Nested
     class PrepareInterstitial {
 
@@ -106,7 +130,7 @@ class AdInterstitialExecutorTest {
         @Mock
         AdOptions adOptionsMock;
 
-        AdRequest adRequestFromHelper = (new AdRequest.Builder("test-ad-unit")).build();
+        AdRequest adRequestFromHelper = new AdRequest.Builder("test-ad-unit").build();
 
         final String idFromViewHelper = "The Id From The View Helper";
 

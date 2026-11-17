@@ -6,15 +6,14 @@ This plugin exposes UMP and iOS App Tracking Transparency through one API. Befor
 
 ## Recommended order
 
-1. Call `AdMob.initialize()`. See [Configuration](./configuration.md).
-2. Call `AdMob.requestConsentInfo()`.
-3. If required, call `AdMob.showConsentForm()`.
-4. Load ads only when `consentInfo.canRequestAds` is `true`.
+1. Call `AdMob.requestConsentInfo()` at each app launch.
+2. If required, call `AdMob.showConsentForm()`.
+3. When `consentInfo.canRequestAds` is `true`, call `AdMob.initialize()` once, then load ads. See [Configuration](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration).
+
+Since 8.2.0, iOS consent forms can be presented before SDK initialization, matching Android.
 
 ```ts
 import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
-
-await AdMob.initialize();
 
 let consentInfo = await AdMob.requestConsentInfo();
 if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
@@ -22,6 +21,7 @@ if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentSta
 }
 
 if (consentInfo.canRequestAds) {
+  await AdMob.initialize();
   // Ads may now be requested.
 }
 ```
@@ -77,4 +77,4 @@ await AdMob.showPrivacyOptionsForm();
 
 <!-- !::resetConsentInfo:: -->
 
-For debug geography and test device IDs, see [Testing](./testing.md).
+For debug geography and test device IDs, see [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing).

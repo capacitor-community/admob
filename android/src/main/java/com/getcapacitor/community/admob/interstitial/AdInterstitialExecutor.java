@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.core.util.Supplier;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.helpers.AdExpiration;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
@@ -20,6 +21,7 @@ public class AdInterstitialExecutor extends Executor {
 
     public static final Map<String, InterstitialAd> preparedAds = new LinkedHashMap<>();
     public static String lastPreparedAdId;
+    public static final Map<String, AdExpiration> preparedAdExpirations = new LinkedHashMap<>();
 
     InterstitialAdCallbackAndListeners adCallbackAndListeners;
 
@@ -39,13 +41,11 @@ public class AdInterstitialExecutor extends Executor {
         final AdOptions adOptions = factory.createInterstitialOptions(call);
 
         try {
-            activitySupplier
-                .get()
-                .runOnUiThread(() -> {
-                    final String id = AdViewIdHelper.getFinalAdId(adOptions, logTag, contextSupplier.get());
-                    final AdRequest adRequest = RequestHelper.createRequest(adOptions, id);
-                    InterstitialAd.load(adRequest, adCallbackAndListeners.getInterstitialAdLoadCallback(call, notifyListenersFunction, id));
-                });
+            activitySupplier.get().runOnUiThread(() -> {
+                final String id = AdViewIdHelper.getFinalAdId(adOptions, logTag, contextSupplier.get());
+                final AdRequest adRequest = RequestHelper.createRequest(adOptions, id);
+                InterstitialAd.load(adRequest, adCallbackAndListeners.getInterstitialAdLoadCallback(call, notifyListenersFunction, id));
+            });
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
         }
@@ -56,6 +56,7 @@ public class AdInterstitialExecutor extends Executor {
         String adId = requestedAdId != null ? requestedAdId : lastPreparedAdId;
         InterstitialAd ad = adId != null ? preparedAds.get(adId) : null;
 
+        AdExpiration expiration = preparedAdExpirations.get(adId);
         if (ad == null) {
             String errorMessage = "No Interstitial can be shown. It was not prepared or maybe it failed to be prepared.";
             call.reject(errorMessage);
@@ -65,24 +66,41 @@ public class AdInterstitialExecutor extends Executor {
         }
 
         final InterstitialAd adToShow = ad;
-        activitySupplier
-            .get()
-            .runOnUiThread(() -> {
-                try {
-                    adToShow.setAdEventCallback(
-                        adCallbackAndListeners.getInterstitialAdEventCallback(notifyListenersFunction, () -> {
-                            preparedAds.remove(adId);
-                            if (adId != null && adId.equals(lastPreparedAdId)) {
-                                lastPreparedAdId = null;
-                                for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
-                            }
-                        })
+        activitySupplier.get().runOnUiThread(() -> {
+            try {
+                if (expiration != null && expiration.isExpired()) {
+                    removePreparedAd(adId, adToShow);
+                    String message = "Interstitial ad expired. Prepare a new ad before showing it.";
+                    call.reject(message, "AD_EXPIRED");
+                    notifyListenersFunction.accept(
+                        InterstitialAdPluginPluginEvent.INSTANCE.getFailedToShow(),
+                        new AdMobPluginError(-1, message)
                     );
-                    adToShow.show(activitySupplier.get());
-                    call.resolve();
-                } catch (Exception ex) {
-                    call.reject(ex.getLocalizedMessage(), ex);
+                    return;
                 }
-            });
+                adToShow.setAdEventCallback(
+                    adCallbackAndListeners.getInterstitialAdEventCallback(
+                        notifyListenersFunction,
+                        () -> {
+                            removePreparedAd(adId, adToShow);
+                        },
+                        adToShow.getAdEventCallback()
+                    )
+                );
+                adToShow.show(activitySupplier.get());
+                call.resolve();
+            } catch (Exception ex) {
+                call.reject(ex.getLocalizedMessage(), ex);
+            }
+        });
+    }
+
+    private static void removePreparedAd(String adId, InterstitialAd ad) {
+        if (!preparedAds.remove(adId, ad)) return;
+        preparedAdExpirations.remove(adId);
+        if (adId.equals(lastPreparedAdId)) {
+            lastPreparedAdId = null;
+            for (String remainingAdId : preparedAds.keySet()) lastPreparedAdId = remainingAdId;
+        }
     }
 }

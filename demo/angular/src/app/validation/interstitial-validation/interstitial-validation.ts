@@ -6,6 +6,7 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -14,7 +15,7 @@ import {
   ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, notificationsCircleOutline, playOutline } from 'ionicons/icons';
 import { interstitialOptions } from '../../shared/ad.options';
@@ -36,7 +37,18 @@ const testItems: ValidationTestItem[] = [
   selector: 'app-interstitial-validation',
   templateUrl: 'interstitial-validation.html',
   styleUrl: 'interstitial-validation.scss',
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonLabel, IonItem, IonIcon],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonListHeader,
+    IonLabel,
+    IonItem,
+    IonItemGroup,
+    IonIcon,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InterstitialValidation implements ViewDidEnter, ViewWillEnter, ViewWillLeave {

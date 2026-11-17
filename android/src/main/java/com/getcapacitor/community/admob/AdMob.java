@@ -21,6 +21,7 @@ import com.getcapacitor.community.admob.consent.AdConsentExecutor;
 import com.getcapacitor.community.admob.helpers.AuthorizationStatusEnum;
 import com.getcapacitor.community.admob.interstitial.AdInterstitialExecutor;
 import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndListeners;
+import com.getcapacitor.community.admob.nativeads.NativeAdExecutor;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.getcapacitor.community.admob.rewardedinterstitial.AdRewardInterstitialExecutor;
 import com.google.android.libraries.ads.mobile.sdk.MobileAds;
@@ -73,6 +74,51 @@ public class AdMob extends Plugin {
 
     private final AppOpenAdPlugin appOpenAdPlugin = new AppOpenAdPlugin();
 
+    private final NativeAdExecutor nativeAdExecutor = new NativeAdExecutor(
+        this::getContext,
+        this::getActivity,
+        () -> getBridge().getWebView(),
+        this::notifyListeners,
+        getLogTag()
+    );
+
+    private boolean nativeAdPlacementChannelRegistered;
+
+    @Override
+    public void load() {
+        super.load();
+        try {
+            // Use the running bridge configuration, including programmatic server settings.
+            String appUrl = getBridge().getServerUrl();
+            if (appUrl == null) appUrl = getBridge().getLocalUrl();
+            String origin = android.net.Uri.parse(appUrl).buildUpon().path(null).fragment(null).clearQuery().build().toString();
+            io.github.webview_native_ui.engine.NativeUIProjection.install(
+                getBridge().getWebView(),
+                java.util.Collections.singleton(origin)
+            );
+        } catch (Exception error) {
+            android.util.Log.w(getLogTag(), "Native UI channel unavailable; retaining native tracking", error);
+        }
+        if (
+            androidx.webkit.WebViewFeature.isFeatureSupported(androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER) &&
+            !getBridge().getConfig().isUsingLegacyBridge()
+        ) {
+            try {
+                androidx.webkit.WebViewCompat.addWebMessageListener(
+                    getBridge().getWebView(),
+                    "capacitorAdMobPlacements",
+                    getBridge().getAllowedOriginRules(),
+                    (view, message, origin, mainFrame, reply) -> {
+                        if (mainFrame) nativeAdExecutor.updateDirectPlacements(message.getData());
+                    }
+                );
+                nativeAdPlacementChannelRegistered = true;
+            } catch (RuntimeException ignored) {
+                // Placement updates retain the regular Capacitor bridge as a fallback.
+            }
+        }
+    }
+
     @PluginMethod
     public void loadAppOpen(final PluginCall call) {
         appOpenAdPlugin.loadAppOpen(getContext(), getActivity(), call, this::notifyListeners);
@@ -112,18 +158,21 @@ public class AdMob extends Plugin {
                     new InitializationConfig.Builder(appId).setRequestConfiguration(requestConfiguration).build(),
                     (initializationStatus) -> {}
                 );
-                Activity activity = getActivity();
-                if (activity != null) {
-                    activity.runOnUiThread(bannerExecutor::initialize);
-                } else {
-                    new Handler(Looper.getMainLooper()).post(bannerExecutor::initialize);
-                }
-                call.resolve();
+                // Resolve only once the banner parent actually exists, so a resolved
+                // initialize() means what callers already read it as. See #451.
+                new Handler(Looper.getMainLooper()).post(() ->
+                    bannerExecutor.awaitViewGroup((found) -> {
+                        if (found) {
+                            call.resolve();
+                        } else {
+                            call.reject("AdMob initialized, but the banner parent view never appeared");
+                        }
+                    })
+                );
             } catch (Exception ex) {
                 call.reject(ex.getLocalizedMessage(), ex);
             }
-        })
-            .start();
+        }).start();
     }
 
     @PluginMethod
@@ -193,8 +242,26 @@ public class AdMob extends Plugin {
     // ---------------------------------------------------------
 
     @PluginMethod
+    public void getAdaptiveBannerSize(final PluginCall call) {
+        bannerExecutor.getAdaptiveBannerSize(call);
+    }
+
+    @PluginMethod
+    public void getBannerSize(final PluginCall call) {
+        bannerExecutor.getBannerSize(call);
+    }
+
+    @PluginMethod
+    public void prepareBanner(final PluginCall call) {
+        bannerExecutor.prepareBanner(call);
+    }
+
+    @PluginMethod
     public void showBanner(final PluginCall call) {
-        bannerExecutor.showBanner(call);
+        boolean systemBarsHandlesInsets = !"disable".equals(
+            getBridge().getConfig().getPluginConfiguration("SystemBars").getString("insetsHandling", "css")
+        );
+        bannerExecutor.showBanner(call, systemBarsHandlesInsets);
     }
 
     @PluginMethod
@@ -210,6 +277,45 @@ public class AdMob extends Plugin {
     @PluginMethod
     public void removeBanner(final PluginCall call) {
         bannerExecutor.removeBanner(call);
+    }
+
+    // ---------------------------------------------------------
+    // NATIVE ADS
+    // ---------------------------------------------------------
+
+    @PluginMethod
+    public void startNativeAdFeed(final PluginCall call) {
+        nativeAdExecutor.startFeed(call);
+    }
+
+    @PluginMethod
+    public void destroyNativeAdFeed(final PluginCall call) {
+        nativeAdExecutor.destroyFeed(call);
+    }
+
+    @PluginMethod
+    public void loadNativeAd(final PluginCall call) {
+        nativeAdExecutor.load(call);
+    }
+
+    @PluginMethod
+    public void updateNativeAdPlacements(final PluginCall call) {
+        nativeAdExecutor.updatePlacements(call);
+    }
+
+    @PluginMethod
+    public void removeNativeAd(final PluginCall call) {
+        nativeAdExecutor.remove(call);
+    }
+
+    @PluginMethod
+    public void captureNativeAdSnapshot(final PluginCall call) {
+        nativeAdExecutor.captureSnapshot(call);
+    }
+
+    @PluginMethod
+    public void prepareNativeAdSnapshot(final PluginCall call) {
+        nativeAdExecutor.prepareSnapshot(call);
     }
 
     // ---------------------------------------------------------
@@ -345,5 +451,15 @@ public class AdMob extends Plugin {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    protected void handleOnDestroy() {
+        if (nativeAdPlacementChannelRegistered) {
+            androidx.webkit.WebViewCompat.removeWebMessageListener(getBridge().getWebView(), "capacitorAdMobPlacements");
+            nativeAdPlacementChannelRegistered = false;
+        }
+        nativeAdExecutor.destroyAll();
+        super.handleOnDestroy();
     }
 }

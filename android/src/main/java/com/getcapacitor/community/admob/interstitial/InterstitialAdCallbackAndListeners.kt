@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.interstitial
 
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
+import com.getcapacitor.community.admob.helpers.AdExpiration
 import com.getcapacitor.community.admob.models.AdMobPluginError
 import com.getcapacitor.community.admob.models.AdMobRevenueData
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
@@ -24,13 +25,14 @@ object InterstitialAdCallbackAndListeners {
                 ad.adEventCallback =
                     object : InterstitialAdEventCallback {
                         override fun onAdPaid(value: com.google.android.libraries.ads.mobile.sdk.common.AdValue) {
-                            val revenueData = AdMobRevenueData(value, adUnitId, "", "")
+                            val revenueData = AdMobRevenueData(value, adUnitId, ad.getResponseInfo()?.adapterClassName ?: "", ad.getResponseInfo()?.responseId ?: "")
                             notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.AdImpression, revenueData)
                         }
                     }
 
                 AdInterstitialExecutor.preparedAds[adUnitId] = ad
                 AdInterstitialExecutor.lastPreparedAdId = adUnitId
+                AdInterstitialExecutor.preparedAdExpirations[adUnitId] = AdExpiration(3600)
 
                 val adInfo = JSObject()
                 adInfo.put("adUnitId", adUnitId)
@@ -43,16 +45,19 @@ object InterstitialAdCallbackAndListeners {
                 val adMobError = AdMobPluginError(adError)
 
                 notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.FailedToLoad, adMobError)
-                call.reject(adError.message)
+                call.reject(adError.message, adError.code.value.toString())
             }
         }
     }
 
+    @JvmOverloads
     fun getInterstitialAdEventCallback(
         notifyListenersFunction: BiConsumer<String, JSObject>,
         onCompleted: Runnable? = null,
+        paidCallback: InterstitialAdEventCallback? = null,
     ): InterstitialAdEventCallback {
         return object : InterstitialAdEventCallback {
+            override fun onAdPaid(value: com.google.android.libraries.ads.mobile.sdk.common.AdValue) { paidCallback?.onAdPaid(value) }
             override fun onAdShowedFullScreenContent() {
                 notifyListenersFunction.accept(InterstitialAdPluginPluginEvent.Showed, JSObject())
             }

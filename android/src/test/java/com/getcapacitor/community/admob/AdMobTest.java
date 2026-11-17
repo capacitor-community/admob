@@ -14,6 +14,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Consumer;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
@@ -162,6 +163,14 @@ public class AdMobTest {
             })
                 .when(mockedActivity)
                 .runOnUiThread(any(Runnable.class));
+
+            BannerExecutor bannerExecutor = bannerExecutorMockedConstruction.constructed().get(0);
+            doAnswer((invocation) -> {
+                ((Consumer<Boolean>) invocation.getArgument(0)).accept(true);
+                return null;
+            })
+                .when(bannerExecutor)
+                .awaitViewGroup(any());
 
             sut.initialize(pluginCallMock);
             assertEquals("test.package", mockedContext.getPackageName());

@@ -1,3 +1,5 @@
+// Preserve existing public Swift API names.
+// swiftlint:disable identifier_name
 public enum BannerAdSizeEnum: String {
     case BANNER = "BANNER"
     case FULL_BANNER = "FULL_BANNER"
@@ -8,3 +10,4 @@ public enum BannerAdSizeEnum: String {
     case ADAPTIVE_BANNER = "ADAPTIVE_BANNER"
     //    case FLUID = "FLUID"
 }
+// swiftlint:enable identifier_name

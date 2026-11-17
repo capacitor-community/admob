@@ -2,6 +2,8 @@ package com.getcapacitor.community.admob.appopen
 
 import android.app.Activity
 import android.content.Context
+import com.google.android.libraries.ads.mobile.sdk.common.AdValue
+import com.getcapacitor.community.admob.helpers.AdExpiration
 import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAd
 import com.google.android.libraries.ads.mobile.sdk.appopen.AppOpenAdEventCallback
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
@@ -12,15 +14,22 @@ import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 class AppOpenAdManager(val adUnitId: String) {
 
     private var appOpenAd: AppOpenAd? = null
+    private var expiration: AdExpiration? = null
     private var isLoadingAd = false
     private var isShowingAd = false
+    private var onPaidEvent: ((AdValue, String, String) -> Unit)? = null
 
     val isAdLoaded: Boolean
-        get() = appOpenAd != null
+        get() = appOpenAd != null && expiration?.isExpired() == false
 
-    fun loadAd(context: Context, onLoaded: () -> Unit, onFailed: (LoadAdError?) -> Unit) {
-        if (appOpenAd != null) {
+    fun loadAd(context: Context, onLoaded: () -> Unit, onFailed: (LoadAdError?) -> Unit, onPaidEvent: (AdValue, String, String) -> Unit) {
+        if (isAdLoaded) {
             onLoaded()
+            return
+        }
+
+        if (isShowingAd) {
+            onFailed(null)
             return
         }
 
@@ -29,6 +38,9 @@ class AppOpenAdManager(val adUnitId: String) {
             return
         }
 
+        appOpenAd = null
+        expiration = null
+        this.onPaidEvent = onPaidEvent
         isLoadingAd = true
         val request = AdRequest.Builder(adUnitId).build()
 
@@ -37,6 +49,7 @@ class AppOpenAdManager(val adUnitId: String) {
             object : AdLoadCallback<AppOpenAd> {
                 override fun onAdLoaded(ad: AppOpenAd) {
                     appOpenAd = ad
+                    expiration = AdExpiration(4 * 3600)
                     isLoadingAd = false
                     onLoaded()
                 }
@@ -55,25 +68,31 @@ class AppOpenAdManager(val adUnitId: String) {
         onClosed: () -> Unit,
         onFailedToShow: (FullScreenContentError?) -> Unit
     ) {
-        if (appOpenAd == null || isShowingAd) {
+        if (!isAdLoaded || isShowingAd) {
             onFailedToShow(null)
             return
         }
 
         isShowingAd = true
         appOpenAd?.adEventCallback = object : AppOpenAdEventCallback {
+            override fun onAdPaid(value: AdValue) {
+                val info = appOpenAd?.getResponseInfo()
+                onPaidEvent?.invoke(value, info?.adapterClassName ?: "", info?.responseId ?: "")
+            }
             override fun onAdShowedFullScreenContent() {
                 onOpened()
             }
 
             override fun onAdDismissedFullScreenContent() {
                 appOpenAd = null
+                expiration = null
                 isShowingAd = false
                 onClosed()
             }
 
             override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                 appOpenAd = null
+                expiration = null
                 isShowingAd = false
                 onFailedToShow(fullScreenContentError)
             }

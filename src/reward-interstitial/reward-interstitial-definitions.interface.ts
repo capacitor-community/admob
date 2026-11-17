@@ -17,6 +17,9 @@ export interface RewardInterstitialDefinitions {
   /**
    * Loads a rewarded interstitial ad and returns the loaded ad unit ID.
    *
+   * SDK load failures reject with the native error message and a string `code`.
+   * Codes are platform-specific; FailedToLoad events expose the same code as a number.
+   *
    * @group RewardInterstitial
    * @param options RewardInterstitialAdOptions
    * @since 1.1.2

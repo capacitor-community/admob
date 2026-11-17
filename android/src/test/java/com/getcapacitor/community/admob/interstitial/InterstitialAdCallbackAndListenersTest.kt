@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.interstitial
 
 import android.app.Activity
 import android.content.Context
+import android.os.SystemClock
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
@@ -18,6 +19,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
+import org.mockito.MockedStatic
 import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.spy
@@ -89,7 +91,7 @@ internal class InterstitialAdCallbackAndListenersTest {
                 // ACt
                 listener.onAdFailedToLoad(loadAdErrorMock)
 
-                Mockito.verify(pluginCall).reject(argumentCaptor.capture())
+                Mockito.verify(pluginCall).reject(argumentCaptor.capture(), ArgumentMatchers.eq(wantedErrorCode.toString()))
                 val resolvedError = argumentCaptor.value
                 assertEquals(wantedMessage, resolvedError)
             }
@@ -98,6 +100,9 @@ internal class InterstitialAdCallbackAndListenersTest {
 
         @Nested
         inner class AdLoaded {
+            @Mock
+            lateinit var systemClock: org.mockito.MockedStatic<android.os.SystemClock>
+
             @Mock
             lateinit var interstitialAdMock: InterstitialAd
 

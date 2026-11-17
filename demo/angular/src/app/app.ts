@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AdMob } from '@capacitor-community/admob';
-import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular';
 import { ViewModelStore } from './shared/view-model-store';
 
 @Component({

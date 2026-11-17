@@ -51,7 +51,7 @@ object RewardedAdCallbackAndListeners {
                 ad.adEventCallback =
                     object : RewardedAdEventCallback {
                         override fun onAdPaid(value: AdValue) {
-                            val revenueData = AdMobRevenueData(value, adUnitId, "", "")
+                            val revenueData = AdMobRevenueData(value, adUnitId, ad.getResponseInfo()?.adapterClassName ?: "", ad.getResponseInfo()?.responseId ?: "")
                             notifyListenersFunction.accept(RewardAdPluginEvents.AdImpression, revenueData)
                         }
                     }
@@ -70,7 +70,7 @@ object RewardedAdCallbackAndListeners {
                 val adMobError = AdMobPluginError(adError)
 
                 notifyListenersFunction.accept(RewardAdPluginEvents.FailedToLoad, adMobError)
-                call.reject(adError.message)
+                call.reject(adError.message, adError.code.value.toString())
             }
         }
     }

@@ -11,5 +11,5 @@ data class BannerAdSizeInfo(val width: Int, val height: Int) : JSObject() {
         super.put("width", width)
         super.put("height", height)
     }
-    constructor(mAdView: AdView): this(mAdView.width, mAdView.height)
+    constructor(mAdView: AdView): this(mAdView.getBannerAd()?.getAdSize()?.width ?: 0, mAdView.getBannerAd()?.getAdSize()?.height ?: 0)
 }

@@ -1,3 +1,5 @@
+// Preserve existing public Swift API names.
+// swiftlint:disable identifier_name
 public enum AppOpenAdPluginEvents: String {
     case Loaded = "appOpenAdLoaded"
     case FailedToLoad = "appOpenAdFailedToLoad"
@@ -6,3 +8,4 @@ public enum AppOpenAdPluginEvents: String {
     case FailedToShow = "appOpenAdFailedToShow"
     case AdImpression = "appOpenAdImpression"
 }
+// swiftlint:enable identifier_name

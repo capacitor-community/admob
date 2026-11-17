@@ -38,7 +38,7 @@ object RewardedInterstitialAdCallbackAndListeners {
                 ad.adEventCallback =
                     object : RewardedInterstitialAdEventCallback {
                         override fun onAdPaid(value: AdValue) {
-                            val revenueData = AdMobRevenueData(value, adUnitId, "", "")
+                            val revenueData = AdMobRevenueData(value, adUnitId, ad.getResponseInfo()?.adapterClassName ?: "", ad.getResponseInfo()?.responseId ?: "")
                             notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.AdImpression, revenueData)
                         }
                     }
@@ -57,7 +57,7 @@ object RewardedInterstitialAdCallbackAndListeners {
                 val adMobError = AdMobPluginError(adError)
 
                 notifyListenersFunction.accept(RewardInterstitialAdPluginEvents.FailedToLoad, adMobError)
-                call.reject(adError.message)
+                call.reject(adError.message, adError.code.value.toString())
             }
         }
     }

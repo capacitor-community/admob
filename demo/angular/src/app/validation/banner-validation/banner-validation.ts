@@ -6,6 +6,7 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -14,7 +15,7 @@ import {
   ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, notificationsCircleOutline, playOutline } from 'ionicons/icons';
 import { bannerBottomOptions } from '../../shared/ad.options';
@@ -45,7 +46,18 @@ const testItems: ValidationTestItem[] = [
   selector: 'app-banner-validation',
   templateUrl: 'banner-validation.html',
   styleUrl: 'banner-validation.scss',
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonLabel, IonItem, IonIcon],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonListHeader,
+    IonLabel,
+    IonItem,
+    IonItemGroup,
+    IonIcon,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BannerValidation implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
@@ -106,19 +118,20 @@ class ViewModel extends ViewModelStore<BannerValidation> {
     await this.#record('hideBanner', AdMob.hideBanner());
     await this.#record('resumeBanner', AdMob.resumeBanner());
     await this.#record('removeBanner', AdMob.removeBanner());
-    await this.#record('showBannerFailed', AdMob.showBanner({ adId: 'showBannerFailed' }), true);
+    // Loading failures arrive through FailedToLoad; showBanner resolves when the request starts.
+    await this.#record('showBannerFailed', AdMob.showBanner({ adId: 'showBannerFailed' }));
   }
 
   async leave(): Promise<void> {
     await Promise.all(this.#listenerHandlers.splice(0).map((handler) => handler.remove()));
   }
 
-  async #record(name: string, operation: Promise<unknown>, expectFailure = false): Promise<void> {
+  async #record(name: string, operation: Promise<unknown>): Promise<void> {
     const succeeded = await operation.then(
       () => true,
       () => false,
     );
-    await this.#resultService.update(this.eventItems, name, expectFailure ? !succeeded : succeeded);
+    await this.#resultService.update(this.eventItems, name, succeeded);
   }
 
   #recordEvent(name: BannerAdPluginEvents, value?: unknown): void {

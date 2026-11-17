@@ -2,7 +2,7 @@
 
 Interstitial ads are full-screen ads that cover the host app. Show them at a natural transition, such as between activities or game levels. The user can tap through or close the ad and return to the app. Google's interstitial guides for [Android](https://developers.google.com/admob/android/interstitial) and [iOS](https://developers.google.com/admob/ios/interstitial) explain the format.
 
-Use an interstitial when the user should not receive an in-app reward. Call this after [initialize](./configuration.md) and [consent](./consent.md). Prepare the ad ahead of time, register listeners first, and show it only when it is ready.
+Use an interstitial when the user should not receive an in-app reward. Call this after [initialize](https://docs.rdlabo.dev/projects/capacitor-admob/docs/configuration) and [consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent). Prepare the ad ahead of time, register listeners first, and show it only when it is ready.
 
 ```ts
 import { AdLoadInfo, AdMob, AdMobRevenueData, AdOptions, InterstitialAdPluginEvents } from '@capacitor-community/admob';
@@ -42,6 +42,19 @@ await AdMob.prepareInterstitial({ adId: 'ca-app-pub-xxx/interstitial-2' });
 await AdMob.showInterstitial({ adId: 'ca-app-pub-xxx/interstitial-1' });
 ```
 
-See [Testing](./testing.md) for `isTesting`.
+See [Testing](https://docs.rdlabo.dev/projects/capacitor-admob/docs/testing) for `isTesting`.
 
-Load, show, dismissal, and failure events are listed on [Ad Events](./events.md).
+Load, show, dismissal, and failure events are listed on [Ad Events](https://docs.rdlabo.dev/projects/capacitor-admob/docs/events).
+
+Prepared interstitial ads expire after one hour. An expired `showInterstitial()` call rejects with `AD_EXPIRED`; prepare a new ad before trying again.
+
+## Android immersive mode
+
+Set `immersiveMode: true` on `prepareInterstitial()` to hide the Android system bars while the ad is displayed. Hiding bars on the application's activity alone does not configure the Google Mobile Ads SDK's separate ad activity.
+
+```ts
+await AdMob.prepareInterstitial({ adId: 'YOUR_AD_UNIT_ID', immersiveMode: true });
+await AdMob.showInterstitial();
+```
+
+This also applies to `prepareRewardVideoAd()`. Immersive mode controls system bars; the SDK and creative determine the ad's aspect ratio and any letterboxing. Users can still reveal transient system bars with a swipe.

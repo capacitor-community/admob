@@ -1,9 +1,12 @@
 import Foundation
+import Capacitor
 import GoogleMobileAds
 import UIKit
 
 @objc public class AppOpenAdManager: NSObject {
     private var appOpenAd: AppOpenAd?
+    private var webViewLayout: FullScreenAdWebViewLayout?
+    private var expiration: AdExpiration?
     private var isLoadingAd = false
     private var isShowingAd = false
     private var adUnitId: String
@@ -14,8 +17,13 @@ import UIKit
     }
 
     public func loadAd(onLoaded: @escaping () -> Void, onFailed: @escaping (Error?) -> Void, onPaidEvent: @escaping (_ valueMicros: Int64, _ currencyCode: String, _ precision: Int, _ networkName: String, _ impressionId: String) -> Void) {
-        if appOpenAd != nil {
+        if isAdLoaded() {
             onLoaded()
+            return
+        }
+
+        if isShowingAd {
+            onFailed(nil)
             return
         }
 
@@ -24,6 +32,8 @@ import UIKit
             return
         }
 
+        appOpenAd = nil
+        expiration = nil
         isLoadingAd = true
         Task { [weak self] in
             guard let self = self else {
@@ -34,11 +44,12 @@ import UIKit
                 await MainActor.run {
                     self.isLoadingAd = false
                     self.appOpenAd = ad
+                    self.expiration = AdExpiration(maxAge: 4 * 3600)
                     ad.paidEventHandler = { adValue in
                         let networkName = ad.responseInfo.loadedAdNetworkResponseInfo?.adNetworkClassName ?? ""
                         let impressionId = ad.responseInfo.responseIdentifier ?? ""
                         onPaidEvent(
-                            adValue.value.int64Value,
+                            adValue.value.multiplying(byPowerOf10: 6).int64Value,
                             adValue.currencyCode,
                             adValue.precision.rawValue,
                             networkName,
@@ -62,7 +73,7 @@ import UIKit
         onClosed: @escaping () -> Void,
         onFailedToShow: @escaping (Error?) -> Void
     ) {
-        guard let ad = appOpenAd, !isShowingAd else {
+        guard let ad = appOpenAd, isAdLoaded(), !isShowingAd else {
             onFailedToShow(nil)
             return
         }
@@ -72,11 +83,12 @@ import UIKit
         self.onFailedToShow = onFailedToShow
         isShowingAd = true
         ad.fullScreenContentDelegate = self
+        webViewLayout = FullScreenAdWebViewLayout(webView: (rootViewController as? CAPBridgeViewController)?.webView)
         ad.present(from: rootViewController)
     }
 
     public func isAdLoaded() -> Bool {
-        return appOpenAd != nil
+        return appOpenAd != nil && expiration?.isExpired == false
     }
 
     private var onClosed: (() -> Void)?
@@ -92,7 +104,11 @@ extension AppOpenAdManager: FullScreenContentDelegate {
 
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         appOpenAd = nil
+        expiration = nil
         isShowingAd = false
+        let layout = webViewLayout
+        webViewLayout = nil
+        DispatchQueue.main.async { layout?.restore() }
         let onClosed = self.onClosed
         self.onOpened = nil
         self.onClosed = nil
@@ -102,7 +118,11 @@ extension AppOpenAdManager: FullScreenContentDelegate {
 
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         appOpenAd = nil
+        expiration = nil
         isShowingAd = false
+        let layout = webViewLayout
+        webViewLayout = nil
+        DispatchQueue.main.async { layout?.restore() }
         let onFailedToShow = self.onFailedToShow
         self.onOpened = nil
         self.onClosed = nil

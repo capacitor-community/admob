@@ -1,7 +1,7 @@
 {
   "name": "@capacitor-community/admob",
   "private": false,
-  "version": "8.1.0",
+  "version": "8.4.1",
   "description": "A native plugin for AdMob",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -33,6 +33,7 @@
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
     "verify:ios": "xcodebuild -scheme CapacitorCommunityAdmob -destination generic/platform=iOS",
+    "test:ios": "xcodebuild test -scheme CapacitorCommunityAdmob",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "npm run build",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
@@ -67,11 +68,13 @@
     "rimraf": "^6.1.0",
     "rollup": "^4.53.2",
     "swiftlint": "^2.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@rollup/plugin-node-resolve": "^16.0.3"
   },
   "dependencies": {
     "@capacitor/core": "^8.0.0",
-    "@rdlabo/capacitor-docgen": "^0.4.1"
+    "@rdlabo/capacitor-docgen": "^0.4.1",
+    "@webview-native-ui/engine": "^1.0.10"
   },
   "lint-staged": {
     "*.{ts}": [
@@ -84,7 +87,6 @@
     ]
   },
   "prettier": "@ionic/prettier-config",
-  "swiftlint": "@ionic/swiftlint-config",
   "eslintConfig": {
     "extends": "@ionic/eslint-config/recommended"
   },

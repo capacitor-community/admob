@@ -94,7 +94,9 @@ public class AdOptionsTest {
             final String wantedProperty = "npa";
             final boolean expected = true;
             final boolean defaultValue = false;
-            lenient().when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean())).thenReturn(expected);
+            lenient()
+                .when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean()))
+                .thenReturn(expected);
 
             final AdOptions adOptions = AdOptions.getFactory().createGenericOptions(pluginCallMock, "");
 
@@ -110,7 +112,9 @@ public class AdOptionsTest {
             final JSObject expected = new JSObject();
             expected.put(customData, customData);
             expected.put(userId, userId);
-            lenient().when(pluginCallMock.getObject(eq(wantedProperty))).thenReturn(expected);
+            lenient()
+                .when(pluginCallMock.getObject(eq(wantedProperty)))
+                .thenReturn(expected);
 
             final AdOptions adOptions = AdOptions.getFactory().createGenericOptions(pluginCallMock, "");
 
@@ -173,7 +177,9 @@ public class AdOptionsTest {
             final String wantedProperty = "npa";
             final boolean expected = true;
             final boolean defaultValue = false;
-            lenient().when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean())).thenReturn(expected);
+            lenient()
+                .when(pluginCallMock.getBoolean(eq(wantedProperty), anyBoolean()))
+                .thenReturn(expected);
 
             final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
 
@@ -189,7 +195,9 @@ public class AdOptionsTest {
             final JSObject expected = new JSObject();
             expected.put(customData, customData);
             expected.put(userId, userId);
-            lenient().when(pluginCallMock.getObject(eq(wantedProperty))).thenReturn(expected);
+            lenient()
+                .when(pluginCallMock.getObject(eq(wantedProperty)))
+                .thenReturn(expected);
 
             final AdOptions adOptions = AdOptions.getFactory().createAppOpenOptions(pluginCallMock);
 

@@ -6,9 +6,16 @@ This plugin can request those demo units or register a device through `initializ
 
 ## Demo ad units
 
-Google provides [demo ad units](https://developers.google.com/admob/android/test-ads#demo_ad_units) that always return test ads. Prefer these during development.
+Google provides [demo ad units](https://developers.google.com/admob/android/test-ads#demo_ad_units) that always return test ads. Prefer these during development. This plugin supports native iOS and Android only—use the matching platform ID.
 
-You can also set `isTesting: true` on banner, interstitial, rewarded, and rewarded interstitial requests. App Open ads have no `isTesting` option; pass a demo ad unit as `adId`.
+Banner demo units used by this plugin and its demo:
+
+| Platform | Banner `adId` |
+| --- | --- |
+| Android | `ca-app-pub-3940256099942544/6300978111` |
+| iOS | `ca-app-pub-3940256099942544/2934735716` |
+
+Other format demo IDs are listed in Google's test-ads guides linked above. You can also set `isTesting: true` on banner, interstitial, rewarded, and rewarded interstitial requests. App Open ads have no `isTesting` option; pass a demo ad unit as `adId`.
 
 ## Test devices
 
@@ -53,8 +60,8 @@ const consentInfo = await AdMob.requestConsentInfo({
 
 If you decline consent in the test form (Manage → Confirm Choices), ads may not load. That is expected in a test environment and does not predict production behavior after a user consents.
 
-`resetConsentInfo()` is for tests only. See [Consent](./consent.md).
+`resetConsentInfo()` is for tests only. See [Consent](https://docs.rdlabo.dev/projects/capacitor-admob/docs/consent).
 
 ## Server-side verification
 
-Server-side verification (SSV) callbacks fire only for production ads. Test ads will not hit your SSV endpoint. For a mock request example, see [Rewarded Ads](./rewarded.md).
+Server-side verification (SSV) callbacks fire only for production ads. Test ads will not hit your SSV endpoint. For a mock request example, see [Rewarded Ads](https://docs.rdlabo.dev/projects/capacitor-admob/docs/rewarded).

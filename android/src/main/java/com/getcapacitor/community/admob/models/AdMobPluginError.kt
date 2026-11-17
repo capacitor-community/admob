@@ -13,19 +13,11 @@ data class AdMobPluginError(val code: Int, val message: String) : JSObject() {
         super.put("message", this.message)
     }
 
-    constructor(adError: LoadAdError) : this(codeToInt(adError.code), adError.message)
+    constructor(adError: LoadAdError) : this(adError.code.value, adError.message)
 
     constructor(fullScreenContentError: FullScreenContentError) : this(
-        codeToInt(fullScreenContentError.code),
+        fullScreenContentError.code.value,
         fullScreenContentError.message
     )
 
-    companion object {
-        private fun codeToInt(code: Any?): Int =
-            when (code) {
-                is Number -> code.toInt()
-                is Enum<*> -> code.ordinal
-                else -> -1
-            }
-    }
 }

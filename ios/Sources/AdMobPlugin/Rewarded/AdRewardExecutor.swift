@@ -4,9 +4,10 @@ import GoogleMobileAds
 
 class AdRewardExecutor: NSObject, FullScreenContentDelegate {
     weak var plugin: AdMobPlugin?
+    private var webViewLayout: FullScreenAdWebViewLayout?
     private var preparedAds: [String: RewardedAd] = [:]
     private var lastPreparedAdId: String?
-    private var currentlyShowingAdId: String?
+    private var currentShow: RewardedAdShowCall?
 
     func prepareRewardVideoAd(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
         RewardedAd.load(
@@ -16,10 +17,10 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                 if let error = error {
                     NSLog("Rewarded ad failed to load with error: \(error.localizedDescription)")
                     self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToLoad.rawValue, data: [
-                        "code": 0,
+                        "code": (error as NSError).code,
                         "message": error.localizedDescription
                     ])
-                    call.reject("Loading failed")
+                    call.reject(error.localizedDescription, String((error as NSError).code), error)
                     return
                 }
 
@@ -50,7 +51,7 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
                     let impressionId = ad.responseInfo.responseIdentifier ?? ""
                     self.plugin?.notifyListeners(RewardAdPluginEvents.AdImpression.rawValue, data: [
                         "adUnitId": adUnitID,
-                        "valueMicros": adValue.value.int64Value,
+                        "valueMicros": adValue.value.multiplying(byPowerOf10: 6).int64Value,
                         "currencyCode": adValue.currencyCode,
                         "precision": adValue.precision.rawValue,
                         "networkName": networkName,
@@ -75,51 +76,69 @@ class AdRewardExecutor: NSObject, FullScreenContentDelegate {
             call.reject("No ad prepared")
             return
         }
-        guard currentlyShowingAdId == nil else {
-            call.reject("An ad is already showing")
+        guard currentShow == nil else {
+            call.reject("An ad is already showing", "REWARDED_AD_ALREADY_SHOWING")
             return
         }
 
-        if let rootViewController = plugin?.getRootVC() {
-            if let ad = preparedAds[adId] {
-                currentlyShowingAdId = adId
-                ad.present(from: rootViewController,
-                           userDidEarnRewardHandler: {
-                            let reward = ad.adReward
-                            self.plugin?.notifyListeners(RewardAdPluginEvents.Rewarded.rawValue, data: ["type": reward.type, "amount": reward.amount])
-                            call.resolve(["type": reward.type, "amount": reward.amount])
-                           }
-                )
-            } else {
-                call.reject("Reward Video is Not Ready Yet")
-            }
+        guard let rootViewController = plugin?.getRootVC() else {
+            call.reject("No root view controller available", "REWARDED_AD_SHOW_FAILED")
+            return
         }
+        guard let ad = preparedAds[adId] else {
+            call.reject("Reward Video is Not Ready Yet")
+            return
+        }
+        let show = RewardedAdShowCall(ad: ad, adId: adId, call: call)
+        currentShow = show
+        webViewLayout = FullScreenAdWebViewLayout(webView: plugin?.bridge?.webView)
+        ad.present(from: rootViewController, userDidEarnRewardHandler: { [weak self, weak ad, weak show] in
+            guard let ad = ad, let show = show else { return }
+            let reward = ad.adReward
+            let item: [String: Any] = ["type": reward.type, "amount": reward.amount]
+            if show.reward(item) {
+                self?.plugin?.notifyListeners(RewardAdPluginEvents.Rewarded.rawValue, data: item)
+            }
+        })
     }
 
     func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        removeCurrentlyShowingAd()
+        self.plugin?.resumeWebMedia(for: ad)
+        guard finishShow(ad, error: error as NSError) else { return }
         NSLog("RewardFullScreenDelegate Ad failed to present full screen content with error \(error.localizedDescription).")
         self.plugin?.notifyListeners(RewardAdPluginEvents.FailedToShow.rawValue, data: [
-            "code": 0,
+            "code": (error as NSError).code,
             "message": error.localizedDescription
         ])
     }
 
     func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
+        self.plugin?.suspendWebMedia(for: ad)
         NSLog("RewardFullScreenDelegate Ad did present full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Showed.rawValue, data: [:])
     }
 
+    func adDidRecordClick(_ advertisement: FullScreenPresentingAd) {
+        self.plugin?.notifyListeners(RewardAdPluginEvents.adClicked.rawValue, data: [:])
+    }
+
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        removeCurrentlyShowingAd()
+        self.plugin?.resumeWebMedia(for: ad)
+        guard finishShow(ad) else { return }
         NSLog("RewardFullScreenDelegate Ad did dismiss full screen content.")
         self.plugin?.notifyListeners(RewardAdPluginEvents.Dismissed.rawValue, data: [:])
     }
 
-    private func removeCurrentlyShowingAd() {
-        guard let adId = currentlyShowingAdId else { return }
-        preparedAds.removeValue(forKey: adId)
-        if lastPreparedAdId == adId { lastPreparedAdId = Array(preparedAds.keys).last }
-        currentlyShowingAdId = nil
+    private func finishShow(_ ad: FullScreenPresentingAd, error: NSError? = nil) -> Bool {
+        guard let show = currentShow, show.ad === (ad as AnyObject) else { return false }
+        let layout = webViewLayout
+        webViewLayout = nil
+        DispatchQueue.main.async { layout?.restore() }
+        if preparedAds[show.adId] === show.ad {
+            preparedAds.removeValue(forKey: show.adId)
+        }
+        if lastPreparedAdId == show.adId { lastPreparedAdId = Array(preparedAds.keys).last }
+        currentShow = nil
+        return show.finish(error: error)
     }
 }
