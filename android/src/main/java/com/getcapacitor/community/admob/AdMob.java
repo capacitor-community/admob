@@ -140,33 +140,38 @@ public class AdMob extends Plugin {
         this.setRequestConfiguration(call);
 
         // Same as banner/interstitial: bridge thread is not the UI thread — MobileAds + view setup must run on main.
-        Runnable initOnMain = () -> {
+        runOnMainThread(() -> {
             try {
                 MobileAds.initialize(
                     getContext(),
                     new OnInitializationCompleteListener() {
                         @Override
-                        public void onInitializationComplete(InitializationStatus initializationStatus) {}
+                        public void onInitializationComplete(InitializationStatus initializationStatus) {
+                            // SDK initialization and the banner parent must both be ready. See #39 and #451.
+                            runOnMainThread(() -> {
+                                bannerExecutor.awaitViewGroup((found) -> {
+                                    if (found) {
+                                        call.resolve();
+                                    } else {
+                                        call.reject("AdMob initialized, but the banner parent view never appeared");
+                                    }
+                                });
+                            });
+                        }
                     }
                 );
-                // Resolve only once the banner parent actually exists, so a resolved
-                // initialize() means what callers already read it as. See #451.
-                bannerExecutor.awaitViewGroup((found) -> {
-                    if (found) {
-                        call.resolve();
-                    } else {
-                        call.reject("AdMob initialized, but the banner parent view never appeared");
-                    }
-                });
             } catch (Exception ex) {
                 call.reject(ex.getLocalizedMessage(), ex);
             }
-        };
+        });
+    }
+
+    private void runOnMainThread(Runnable action) {
         Activity activity = getActivity();
         if (activity != null) {
-            activity.runOnUiThread(initOnMain);
+            activity.runOnUiThread(action);
         } else {
-            new Handler(Looper.getMainLooper()).post(initOnMain);
+            new Handler(Looper.getMainLooper()).post(action);
         }
     }
 

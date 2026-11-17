@@ -2,7 +2,9 @@ package com.getcapacitor.community.admob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +18,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,7 +130,7 @@ public class AdMobTest {
         }
 
         @Test
-        @DisplayName("Awaits the banner parent view group")
+        @DisplayName("Awaits SDK initialization and the banner parent view group")
         public void bannerExecutorAwaitViewGroup() {
             when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(false);
             doAnswer((invocation) -> {
@@ -147,7 +150,14 @@ public class AdMobTest {
 
             sut.initialize(pluginCallMock);
 
+            verify(pluginCallMock, never()).resolve();
+            ArgumentCaptor<OnInitializationCompleteListener> listener = ArgumentCaptor.forClass(OnInitializationCompleteListener.class);
+            mobileAdsMockedStatic.verify(() -> MobileAds.initialize(eq(mockedContext), listener.capture()));
+            listener.getValue().onInitializationComplete(null);
+
+            verify(mockedActivity, times(2)).runOnUiThread(any(Runnable.class));
             verify(bannerExecutor).awaitViewGroup(any());
+            verify(pluginCallMock).resolve();
         }
     }
 }
