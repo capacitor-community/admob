@@ -155,6 +155,7 @@ public class AdMobTest {
             mobileAdsMockedStatic.verify(() -> MobileAds.initialize(eq(mockedContext), listener.capture()));
             listener.getValue().onInitializationComplete(null);
 
+            verify(mockedActivity, times(2)).runOnUiThread(any(Runnable.class));
             verify(bannerExecutor).awaitViewGroup(any());
             verify(pluginCallMock).resolve();
         }
