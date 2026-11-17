@@ -309,12 +309,12 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
             MobileAds.shared.requestConfiguration.testDeviceIdentifiers = call.getArray("testingDevices", String.self) ?? []
         }
 
-        if call.getBool("tagForChildDirectedTreatment") == true {
-            MobileAds.shared.requestConfiguration.tagForChildDirectedTreatment = true
+        if let value = call.getBool("tagForChildDirectedTreatment") {
+            MobileAds.shared.requestConfiguration.tagForChildDirectedTreatment = NSNumber(value: value)
         }
 
-        if call.getBool("tagForUnderAgeOfConsent") == true {
-            MobileAds.shared.requestConfiguration.tagForUnderAgeOfConsent = true
+        if let value = call.getBool("tagForUnderAgeOfConsent") {
+            MobileAds.shared.requestConfiguration.tagForUnderAgeOfConsent = NSNumber(value: value)
         }
 
         if call.getString("maxAdContentRating") != nil {
@@ -363,8 +363,9 @@ extension AdMobPlugin {
         nativeAdExecutor.plugin = self
         setRequestConfiguration(call)
 
-        MobileAds.shared.start(completionHandler: nil)
-        call.resolve([:])
+        MobileAds.shared.start { _ in
+            call.resolve([:])
+        }
     }
 
     // MARK: Banner ads
