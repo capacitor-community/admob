@@ -41,10 +41,21 @@ Made with [contributors-img](https://contrib.rocks).
 
 ### Screenshots
 
-|             | Banner | Interstitial | Reward | App Open | Native Ads |
-| :---------- | :----: | :----------: | :----: | :------: | :--------: |
-| **iOS**     | ![](demo/screenshots/ios_banner.png) | ![](demo/screenshots/ios_interstitial.png) | ![](demo/screenshots/ios_reward.png) | ![](demo/screenshots/ios_open.png) | <img src="demo/screenshots/ios_native.png" alt="iOS Native Ads displayed in the demo feed" width="200" /> |
-| **Android** | ![](demo/screenshots/md_banner.png) | ![](demo/screenshots/md_interstitial.png) | ![](demo/screenshots/md_reward.png) | ![](demo/screenshots/md_open.png) | <img src="demo/screenshots/md_native.png" alt="Android Native Ads displayed in the demo feed" width="200" /> |
+#### iOS
+
+| Banner | Interstitial | Reward |
+| :----: | :----------: | :----: |
+| <img src="demo/screenshots/ios_banner.webp" alt="iOS Banner test ad" width="240" /> | <img src="demo/screenshots/ios_interstitial.webp" alt="iOS Interstitial test ad" width="240" /> | <img src="demo/screenshots/ios_reward.webp" alt="iOS Reward test ad" width="240" /> |
+| **App Open** | **Native Ads** | |
+| <img src="demo/screenshots/ios_open.webp" alt="iOS App Open test ad" width="240" /> | <img src="demo/screenshots/ios_native.webp" alt="iOS Native test ad displayed in the demo feed" width="240" /> | |
+
+#### Android
+
+| Banner | Interstitial | Reward |
+| :----: | :----------: | :----: |
+| <img src="demo/screenshots/md_banner.webp" alt="Android Banner test ad" width="240" /> | <img src="demo/screenshots/md_interstitial.webp" alt="Android Interstitial test ad" width="240" /> | <img src="demo/screenshots/md_reward.webp" alt="Android Reward test ad" width="240" /> |
+| **App Open** | **Native Ads** | |
+| <img src="demo/screenshots/md_open.webp" alt="Android App Open test ad" width="240" /> | <img src="demo/screenshots/md_native.webp" alt="Android Native test ad displayed in the demo feed" width="240" /> | |
 
 <!-- /rdlabo-docs-omit -->
 
