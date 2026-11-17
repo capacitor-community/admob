@@ -2,7 +2,9 @@ package com.getcapacitor.community.admob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,6 +18,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +26,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -126,9 +131,10 @@ public class AdMobTest {
             }
         }
 
-        @Test
-        @DisplayName("Awaits the banner parent view group")
-        public void bannerExecutorAwaitViewGroup() {
+        @ParameterizedTest
+        @ValueSource(booleans = { true, false })
+        @DisplayName("Awaits SDK initialization and then the banner parent view group")
+        public void awaitsSdkAndBannerParent(boolean found) {
             when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(false);
             doAnswer((invocation) -> {
                 ((Runnable) invocation.getArgument(0)).run();
@@ -138,16 +144,25 @@ public class AdMobTest {
                 .runOnUiThread(any(Runnable.class));
 
             BannerExecutor bannerExecutor = bannerExecutorMockedConstruction.constructed().get(0);
-            doAnswer((invocation) -> {
-                ((Consumer<Boolean>) invocation.getArgument(0)).accept(true);
-                return null;
-            })
-                .when(bannerExecutor)
-                .awaitViewGroup(any());
-
             sut.initialize(pluginCallMock);
 
-            verify(bannerExecutor).awaitViewGroup(any());
+            verify(pluginCallMock, never()).resolve();
+            verify(bannerExecutor, never()).awaitViewGroup(any());
+            ArgumentCaptor<OnInitializationCompleteListener> listener = ArgumentCaptor.forClass(OnInitializationCompleteListener.class);
+            mobileAdsMockedStatic.verify(() -> MobileAds.initialize(eq(mockedContext), listener.capture()));
+            listener.getValue().onInitializationComplete(null);
+
+            ArgumentCaptor<Consumer<Boolean>> parentResult = ArgumentCaptor.forClass(Consumer.class);
+            verify(bannerExecutor).awaitViewGroup(parentResult.capture());
+            verify(pluginCallMock, never()).resolve();
+            parentResult.getValue().accept(found);
+
+            if (found) {
+                verify(pluginCallMock).resolve();
+            } else {
+                verify(pluginCallMock).reject("AdMob initialized, but the banner parent view never appeared");
+                verify(pluginCallMock, never()).resolve();
+            }
         }
     }
 }

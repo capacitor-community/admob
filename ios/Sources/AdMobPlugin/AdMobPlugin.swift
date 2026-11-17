@@ -363,8 +363,9 @@ extension AdMobPlugin {
         nativeAdExecutor.plugin = self
         setRequestConfiguration(call)
 
-        MobileAds.shared.start(completionHandler: nil)
-        call.resolve([:])
+        MobileAds.shared.start { _ in
+            call.resolve([:])
+        }
     }
 
     // MARK: Banner ads
