@@ -6,9 +6,9 @@ import android.content.res.Resources
 import android.util.DisplayMetrics
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import com.google.android.gms.ads.nativead.MediaView
-import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdView
+import com.google.android.libraries.ads.mobile.sdk.nativead.MediaView
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView
 import android.view.View
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject

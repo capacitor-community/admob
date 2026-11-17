@@ -12,10 +12,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.getcapacitor.JSObject
-import com.google.android.gms.ads.nativead.AdChoicesView
-import com.google.android.gms.ads.nativead.MediaView
-import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdView
+import com.google.android.libraries.ads.mobile.sdk.common.AdChoicesView
+import com.google.android.libraries.ads.mobile.sdk.nativead.MediaView
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -29,6 +29,7 @@ internal class PluginNativeAdView private constructor(
 ) {
     private val density = context.resources.displayMetrics.density
     private val view = NativeAdView(context)
+    private var mediaView: MediaView? = null
 
     init {
         view.layoutParams = FrameLayout.LayoutParams(
@@ -37,7 +38,7 @@ internal class PluginNativeAdView private constructor(
         )
         applyBackground()
         bindAssets(nativeAd, template == "small")
-        view.setNativeAd(nativeAd)
+        view.registerNativeAd(nativeAd, mediaView)
     }
 
     private fun bindAssets(nativeAd: NativeAd, isSmall: Boolean) {
@@ -53,7 +54,7 @@ internal class PluginNativeAdView private constructor(
         if (!isSmall) {
             val media = MediaView(context).apply { minimumHeight = pixels(120) }
             content.addView(media, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
-            view.mediaView = media
+            mediaView = media
         }
 
         val details = LinearLayout(context).apply {

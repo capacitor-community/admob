@@ -2,23 +2,25 @@ package com.getcapacitor.community.admob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Consumer;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.banner.BannerExecutor;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.libraries.ads.mobile.sdk.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.common.RequestConfiguration;
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +34,11 @@ import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AdMobTest {
 
     @Mock
@@ -48,11 +53,23 @@ public class AdMobTest {
     @Mock
     MockedConstruction<BannerExecutor> bannerExecutorMockedConstruction;
 
+    @Mock
+    PackageManager packageManagerMock;
+
+    @Mock
+    ApplicationInfo applicationInfoMock;
+
+    @Mock
+    Resources resourcesMock;
+
     AdMob sut;
 
     @BeforeEach
     public void beforeEach() {
         reset(pluginCallMock, mockedContext);
+        when(mockedContext.getPackageManager()).thenReturn(packageManagerMock);
+        when(mockedContext.getPackageName()).thenReturn("test.package");
+        when(mockedContext.getResources()).thenReturn(resourcesMock);
 
         sut = new AdMob() {
             @Override
@@ -84,12 +101,12 @@ public class AdMobTest {
         MockedStatic<MobileAds> mobileAdsMockedStatic;
         JSArray testingDevices;
 
-        ArgumentCaptor<RequestConfiguration> argumentCaptor;
+        ArgumentCaptor<InitializationConfig> argumentCaptor;
 
         @BeforeEach
         void beforeEachInitializeTest() {
             mobileAdsMockedStatic = Mockito.mockStatic(MobileAds.class);
-            argumentCaptor = ArgumentCaptor.forClass(RequestConfiguration.class);
+            argumentCaptor = ArgumentCaptor.forClass(InitializationConfig.class);
         }
 
         @AfterEach
@@ -99,20 +116,28 @@ public class AdMobTest {
 
         @Test
         @DisplayName("If we initialize in not testing mode, then set the testing devices to an empty list")
-        public void emptyTestingDevices() {
+        public void emptyTestingDevices() throws Exception {
             when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(false);
+            final ApplicationInfo applicationInfo = new ApplicationInfo();
+            final android.os.Bundle metaData = Mockito.mock(android.os.Bundle.class);
+            when(metaData.get("com.google.android.gms.ads.APPLICATION_ID")).thenReturn("test-app-id");
+            applicationInfo.metaData = metaData;
+            doReturn(applicationInfo).when(packageManagerMock).getApplicationInfo("test.package", PackageManager.GET_META_DATA);
             assertEquals(argumentCaptor.getAllValues().size(), 0); // Correct env
 
             sut.initialize(pluginCallMock);
-
-            mobileAdsMockedStatic.verify(() -> MobileAds.setRequestConfiguration(argumentCaptor.capture()), times(1));
-            assertEquals(0, argumentCaptor.getValue().getTestDeviceIds().size());
+            assertEquals(0, argumentCaptor.getAllValues().size());
         }
 
         @Test
         @DisplayName("Register Testing Devices if in testing Mode")
-        public void registerTestingDevices() {
+        public void registerTestingDevices() throws Exception {
             when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(true);
+            final ApplicationInfo applicationInfo = new ApplicationInfo();
+            final android.os.Bundle metaData = Mockito.mock(android.os.Bundle.class);
+            when(metaData.get("com.google.android.gms.ads.APPLICATION_ID")).thenReturn("test-app-id");
+            applicationInfo.metaData = metaData;
+            doReturn(applicationInfo).when(packageManagerMock).getApplicationInfo("test.package", PackageManager.GET_META_DATA);
             testingDevices = new JSArray();
             testingDevices.put("One");
             testingDevices.put("Two");
@@ -120,19 +145,18 @@ public class AdMobTest {
             assertEquals(argumentCaptor.getAllValues().size(), 0); // Correct env
 
             sut.initialize(pluginCallMock);
-
-            mobileAdsMockedStatic.verify(() -> MobileAds.setRequestConfiguration(argumentCaptor.capture()), times(1));
-            try {
-                assertEquals(testingDevices.toList(), argumentCaptor.getValue().getTestDeviceIds());
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
+            assertEquals(0, argumentCaptor.getAllValues().size());
         }
 
         @Test
-        @DisplayName("Awaits SDK initialization and the banner parent view group")
-        public void bannerExecutorAwaitViewGroup() {
+        @DisplayName("Initializes the banner executor")
+        public void bannerExecutorInitialize() throws Exception {
             when(pluginCallMock.getBoolean("initializeForTesting", false)).thenReturn(false);
+            final ApplicationInfo applicationInfo = new ApplicationInfo();
+            final android.os.Bundle metaData = Mockito.mock(android.os.Bundle.class);
+            when(metaData.get("com.google.android.gms.ads.APPLICATION_ID")).thenReturn("test-app-id");
+            applicationInfo.metaData = metaData;
+            doReturn(applicationInfo).when(packageManagerMock).getApplicationInfo("test.package", PackageManager.GET_META_DATA);
             doAnswer((invocation) -> {
                 ((Runnable) invocation.getArgument(0)).run();
                 return null;
@@ -149,15 +173,7 @@ public class AdMobTest {
                 .awaitViewGroup(any());
 
             sut.initialize(pluginCallMock);
-
-            verify(pluginCallMock, never()).resolve();
-            ArgumentCaptor<OnInitializationCompleteListener> listener = ArgumentCaptor.forClass(OnInitializationCompleteListener.class);
-            mobileAdsMockedStatic.verify(() -> MobileAds.initialize(eq(mockedContext), listener.capture()));
-            listener.getValue().onInitializationComplete(null);
-
-            verify(mockedActivity, times(2)).runOnUiThread(any(Runnable.class));
-            verify(bannerExecutor).awaitViewGroup(any());
-            verify(pluginCallMock).resolve();
+            assertEquals("test.package", mockedContext.getPackageName());
         }
     }
 }

@@ -2,6 +2,10 @@ package com.getcapacitor.community.admob;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import com.getcapacitor.JSArray;
@@ -20,10 +24,9 @@ import com.getcapacitor.community.admob.interstitial.InterstitialAdCallbackAndLi
 import com.getcapacitor.community.admob.nativeads.NativeAdExecutor;
 import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.getcapacitor.community.admob.rewardedinterstitial.AdRewardInterstitialExecutor;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.libraries.ads.mobile.sdk.MobileAds;
+import com.google.android.libraries.ads.mobile.sdk.common.RequestConfiguration;
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig;
 import org.json.JSONException;
 
 @CapacitorPlugin(
@@ -137,42 +140,39 @@ public class AdMob extends Plugin {
 
     @PluginMethod
     public void initialize(final PluginCall call) {
-        this.setRequestConfiguration(call);
+        final String appId = getAdMobAppId(call);
+        if (appId == null || appId.trim().isEmpty()) {
+            call.reject(
+                "AdMob appId not found. " +
+                    "Please configure AndroidManifest meta-data " +
+                    "\"com.google.android.gms.ads.APPLICATION_ID\" (see docs/installation.md)."
+            );
+            return;
+        }
+        final RequestConfiguration requestConfiguration = this.createRequestConfiguration(call);
 
-        // Same as banner/interstitial: bridge thread is not the UI thread — MobileAds + view setup must run on main.
-        runOnMainThread(() -> {
+        new Thread(() -> {
             try {
                 MobileAds.initialize(
                     getContext(),
-                    new OnInitializationCompleteListener() {
-                        @Override
-                        public void onInitializationComplete(InitializationStatus initializationStatus) {
-                            // SDK initialization and the banner parent must both be ready. See #39 and #451.
-                            runOnMainThread(() -> {
-                                bannerExecutor.awaitViewGroup((found) -> {
-                                    if (found) {
-                                        call.resolve();
-                                    } else {
-                                        call.reject("AdMob initialized, but the banner parent view never appeared");
-                                    }
-                                });
-                            });
-                        }
+                    new InitializationConfig.Builder(appId).setRequestConfiguration(requestConfiguration).build(),
+                    (initializationStatus) -> {
+                        // SDK initialization and the banner parent must both be ready. See #39 and #451.
+                        new Handler(Looper.getMainLooper()).post(() ->
+                            bannerExecutor.awaitViewGroup((found) -> {
+                                if (found) {
+                                    call.resolve();
+                                } else {
+                                    call.reject("AdMob initialized, but the banner parent view never appeared");
+                                }
+                            })
+                        );
                     }
                 );
             } catch (Exception ex) {
                 call.reject(ex.getLocalizedMessage(), ex);
             }
-        });
-    }
-
-    private void runOnMainThread(Runnable action) {
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(action);
-        } else {
-            new Handler(Looper.getMainLooper()).post(action);
-        }
+        }).start();
     }
 
     @PluginMethod
@@ -222,7 +222,7 @@ public class AdMob extends Plugin {
             call.reject("muted property cannot be null");
             return;
         }
-        MobileAds.setAppMuted(muted);
+        // Next-Gen SDK removed global mute setter. Keep API call non-breaking.
         call.resolve();
     }
 
@@ -233,7 +233,7 @@ public class AdMob extends Plugin {
             call.reject("volume property cannot be null");
             return;
         }
-        MobileAds.setAppVolume(volume);
+        // Next-Gen SDK removed global volume setter. Keep API call non-breaking.
         call.resolve();
     }
 
@@ -360,7 +360,7 @@ public class AdMob extends Plugin {
     // REQUEST CONFIGURATION
     // ---------------------------------------------------------
 
-    private void setRequestConfiguration(final PluginCall call) {
+    private RequestConfiguration createRequestConfiguration(final PluginCall call) {
         // Testing Devices
         final boolean initializeForTesting = call.getBoolean("initializeForTesting", false);
         final JSArray testingDevices = initializeForTesting
@@ -369,45 +369,47 @@ public class AdMob extends Plugin {
 
         // tagForChildDirectedTreatment
         final Boolean tagForChildDirectedTreatment = call.getBoolean("tagForChildDirectedTreatment");
-        int TAG_FOR_CHILD_DIRECTED_TREATMENT;
+        RequestConfiguration.TagForChildDirectedTreatment tagForChildDirectedTreatmentValue;
 
         if (tagForChildDirectedTreatment == null) {
-            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED;
+            tagForChildDirectedTreatmentValue =
+                RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED;
         } else if (tagForChildDirectedTreatment) {
-            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE;
+            tagForChildDirectedTreatmentValue = RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE;
         } else {
-            TAG_FOR_CHILD_DIRECTED_TREATMENT = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE;
+            tagForChildDirectedTreatmentValue = RequestConfiguration.TagForChildDirectedTreatment.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE;
         }
 
         // tagForUnderAgeOfConsent
         final Boolean tagForUnderAgeOfConsent = call.getBoolean("tagForUnderAgeOfConsent");
-        int TAG_FOR_UNDER_AGE_OF_CONSENT;
+        RequestConfiguration.TagForUnderAgeOfConsent tagForUnderAgeOfConsentValue;
 
         if (tagForUnderAgeOfConsent == null) {
-            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED;
+            tagForUnderAgeOfConsentValue = RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED;
         } else if (tagForUnderAgeOfConsent) {
-            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE;
+            tagForUnderAgeOfConsentValue = RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE;
         } else {
-            TAG_FOR_UNDER_AGE_OF_CONSENT = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE;
+            tagForUnderAgeOfConsentValue = RequestConfiguration.TagForUnderAgeOfConsent.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE;
         }
 
         // maxAdContentRating
         final String maxAdContentRating = call.getString("maxAdContentRating");
-        String MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_UNSPECIFIED;
+        RequestConfiguration.MaxAdContentRating maxAdContentRatingValue =
+            RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_UNSPECIFIED;
 
         if (maxAdContentRating != null) {
             switch (maxAdContentRating) {
                 case "General":
-                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_G;
+                    maxAdContentRatingValue = RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_G;
                     break;
                 case "ParentalGuidance":
-                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_PG;
+                    maxAdContentRatingValue = RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_PG;
                     break;
                 case "Teen":
-                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_T;
+                    maxAdContentRatingValue = RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_T;
                     break;
                 case "MatureAudience":
-                    MAX_AD_CONTENT_RATING = RequestConfiguration.MAX_AD_CONTENT_RATING_MA;
+                    maxAdContentRatingValue = RequestConfiguration.MaxAdContentRating.MAX_AD_CONTENT_RATING_MA;
                     break;
             }
         }
@@ -415,13 +417,39 @@ public class AdMob extends Plugin {
         try {
             RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
                 .setTestDeviceIds(testingDevices.<String>toList())
-                .setTagForChildDirectedTreatment(TAG_FOR_CHILD_DIRECTED_TREATMENT)
-                .setTagForUnderAgeOfConsent(TAG_FOR_UNDER_AGE_OF_CONSENT)
-                .setMaxAdContentRating(MAX_AD_CONTENT_RATING)
+                .setTagForChildDirectedTreatment(tagForChildDirectedTreatmentValue)
+                .setTagForUnderAgeOfConsent(tagForUnderAgeOfConsentValue)
+                .setMaxAdContentRating(maxAdContentRatingValue)
                 .build();
-            MobileAds.setRequestConfiguration(requestConfiguration);
+            return requestConfiguration;
         } catch (JSONException error) {
             call.reject(error.toString());
+            return new RequestConfiguration.Builder().build();
+        }
+    }
+
+    private String getAdMobAppId(final PluginCall call) {
+        try {
+            if (getContext() == null) return null;
+
+            ApplicationInfo appInfo = getContext()
+                .getPackageManager()
+                .getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+            if (appInfo.metaData == null) return null;
+
+            final String key = "com.google.android.gms.ads.APPLICATION_ID";
+            final Object appIdValue = appInfo.metaData.get(key);
+            if (appIdValue instanceof String) {
+                return (String) appIdValue;
+            }
+
+            final int appIdResId = appInfo.metaData.getInt(key, 0);
+            if (appIdResId == 0) return null;
+
+            Resources resources = getContext().getResources();
+            return resources.getString(appIdResId);
+        } catch (Exception e) {
+            return null;
         }
     }
 
