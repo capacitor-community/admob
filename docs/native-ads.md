@@ -193,7 +193,10 @@ const feed = await NativeAdFeed.create({
   adId: 'YOUR_NATIVE_AD_UNIT_ID',
   visibleArea: () => {
     const top = document.querySelector('ion-header')?.getBoundingClientRect().bottom ?? 0;
-    const bottom = document.querySelector('ion-tab-bar')?.getBoundingClientRect().top ?? window.innerHeight;
+    // Only a bar along the bottom edge limits the area; side or top tab bars do not.
+    const bar = document.querySelector('ion-tab-bar')?.getBoundingClientRect();
+    const alongBottom = bar && bar.width > bar.height && bar.top > window.innerHeight / 2;
+    const bottom = alongBottom ? bar.top : window.innerHeight;
     return { x: 0, y: top, width: window.innerWidth, height: bottom - top };
   },
 });
