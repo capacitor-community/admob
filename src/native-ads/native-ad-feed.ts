@@ -330,6 +330,26 @@ export class NativeAdFeed {
     });
   }
 
+  /**
+   * Destroys the native ad of a slot that is no longer attached to an element
+   * and forgets the slot, instead of keeping the ad loaded until its capacity
+   * is needed. Does nothing for a slot that is attached or not registered.
+   */
+  async release(slotKey: string): Promise<void> {
+    this.assertActive();
+    const normalizedKey = slotKey.trim();
+    await this.runOperation(async () => {
+      const state = this.slots.get(normalizedKey);
+      if (!state || state.element) {
+        return;
+      }
+      await this.removeStateAd(state);
+      if (!state.element && this.slots.get(normalizedKey) === state) {
+        this.slots.delete(normalizedKey);
+      }
+    });
+  }
+
   /** Immediately hides this feed's overlays until {@link resume} is called. */
   async pause(): Promise<void> {
     this.assertActive();
