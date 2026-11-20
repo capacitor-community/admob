@@ -132,7 +132,7 @@ Call `destroy()` when leaving a screen. Await `pause()` before presenting an ove
 | `invalidateLayout(): Promise<void>`            | Hides and remeasures after an application-driven reflow.       |
 | `destroy()`                                    | Removes listeners and all native resources for the session.    |
 
-`NativeAdFeedOptions` contains `feedId`, `adId`, `template`, `style`, `isTesting`, `npa`, the optional iOS `scrollElement`, and Android `androidScrollSnapshot`. Set `isTesting: true` to use Google's platform test ad unit. For production ads, set your platform-specific native ad unit ID in `adId` and omit `isTesting` or set it to `false`. `adId` is required unless `isTesting` is `true`. `feedId` and every `slotKey` must be non-empty and stable; reuse the same feed IDs across WebView reloads so stale native sessions can be replaced safely.
+`NativeAdFeedOptions` contains `feedId`, `adId`, `template`, `style`, `isTesting`, `npa`, the optional iOS `scrollElement`, Android `androidScrollSnapshot`, and `visibleArea`. Set `isTesting: true` to use Google's platform test ad unit. For production ads, set your platform-specific native ad unit ID in `adId` and omit `isTesting` or set it to `false`. `adId` is required unless `isTesting` is `true`. `feedId` and every `slotKey` must be non-empty and stable; reuse the same feed IDs across WebView reloads so stale native sessions can be replaced safely.
 
 ## Rendering and policy boundary
 
@@ -177,6 +177,30 @@ const feed = await NativeAdFeed.create({
 Use `isTesting: true` during development to request Google's test ads. For production,
 provide your native ad unit ID in `adId` and omit `isTesting` or set it to `false`.
 Snapshots are available in either mode. The option is supported only on Android.
+
+### Keeping ads clear of app bars
+
+Native ads are drawn above the WebView, so content that the page scrolls under,
+such as a translucent header or a floating tab bar, does not cover them. Pass
+`visibleArea` to clip every ad in the feed to the part of the viewport between
+those bars. It is read on every placement update, in CSS pixels, and an ad with
+no part inside it is hidden. It works with both JavaScript placement and iOS
+`scrollElement` tracking.
+
+```ts
+const feed = await NativeAdFeed.create({
+  feedId: 'home',
+  adId: 'YOUR_NATIVE_AD_UNIT_ID',
+  visibleArea: () => {
+    const top = document.querySelector('ion-header')?.getBoundingClientRect().bottom ?? 0;
+    // Only a bar along the bottom edge limits the area; side or top tab bars do not.
+    const bar = document.querySelector('ion-tab-bar')?.getBoundingClientRect();
+    const alongBottom = bar && bar.width > bar.height && bar.top > window.innerHeight / 2;
+    const bottom = alongBottom ? bar.top : window.innerHeight;
+    return { x: 0, y: top, width: window.innerWidth, height: bottom - top };
+  },
+});
+```
 
 WebView Native UI Engine manages snapshot capture and switching between the image
 and native view. Each ad slot has its own projection. Images are refreshed when the
