@@ -26,6 +26,23 @@ final class BannerDisplayTests: XCTestCase {
         XCTAssertTrue(current.delegate === executor)
     }
 
+    @MainActor
+    func testRefreshKeepsBannerInFrontWithoutAddingConstraints() throws {
+        let plugin = BannerDisplayTestPlugin()
+        let root = try XCTUnwrap(plugin.getRootVC()?.view)
+        let executor = BannerExecutor()
+        executor.plugin = plugin
+        let banner = BannerView(adSize: AdSizeBanner)
+        banner.translatesAutoresizingMaskIntoConstraints = false
+
+        executor.bannerViewDidReceiveAd(banner)
+        root.addSubview(UIView())
+        executor.bannerViewDidReceiveAd(banner)
+
+        XCTAssertTrue(root.subviews.last === banner)
+        XCTAssertEqual(root.constraints.filter { $0.firstItem === banner }.count, 2)
+    }
+
     private let testAdUnitID = "ca-app-pub-3940256099942544/2934735716"
 
     private func showBannerCall() throws -> CAPPluginCall {

@@ -262,23 +262,29 @@ class BannerExecutor: NSObject, BannerViewDelegate {
 
     private func displayBannerView(_ bannerView: BannerView, previousSize: CGSize? = nil) -> Bool {
         if let rootViewController = plugin?.getRootVC() {
-            rootViewController.view.addSubview(bannerView)
-            rootViewController.view.addConstraints(
-                [NSLayoutConstraint(item: bannerView,
-                                    attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
-                                    relatedBy: .equal,
-                                    toItem: rootViewController.view.safeAreaLayoutGuide,
-                                    attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
-                                    multiplier: 1,
-                                    constant: CGFloat(Int(self.margin) * -1)),
-                 NSLayoutConstraint(item: bannerView,
-                                    attribute: .centerX,
-                                    relatedBy: .equal,
-                                    toItem: rootViewController.view,
-                                    attribute: .centerX,
-                                    multiplier: 1,
-                                    constant: 0)
-                ])
+            // Each successful auto-refresh calls this again for the banner on screen. Keep
+            // bringing it to the front, but add its constraints only once.
+            if bannerView.superview === rootViewController.view {
+                rootViewController.view.bringSubviewToFront(bannerView)
+            } else {
+                rootViewController.view.addSubview(bannerView)
+                rootViewController.view.addConstraints(
+                    [NSLayoutConstraint(item: bannerView,
+                                        attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
+                                        relatedBy: .equal,
+                                        toItem: rootViewController.view.safeAreaLayoutGuide,
+                                        attribute: self.adPosition == "TOP_CENTER" ? .top : .bottom,
+                                        multiplier: 1,
+                                        constant: CGFloat(Int(self.margin) * -1)),
+                     NSLayoutConstraint(item: bannerView,
+                                        attribute: .centerX,
+                                        relatedBy: .equal,
+                                        toItem: rootViewController.view,
+                                        attribute: .centerX,
+                                        multiplier: 1,
+                                        constant: 0)
+                    ])
+            }
             if previousSize != bannerView.frame.size {
                 self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
                     "width": bannerView.frame.width,
