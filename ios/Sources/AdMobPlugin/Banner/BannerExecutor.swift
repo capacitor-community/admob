@@ -129,10 +129,12 @@ class BannerExecutor: NSObject, BannerViewDelegate {
                 if let banner = self.bannerView, banner.superview != nil, !banner.isHidden {
                     previousSize = banner.bounds.size
                 }
-                self.bannerView?.delegate = nil
-                self.bannerView?.paidEventHandler = nil
-                self.bannerView?.removeFromSuperview()
             }
+            // A replaced banner that is still loading would otherwise add itself when
+            // its ad arrives, or remove the new banner when its request fails.
+            self.bannerView?.delegate = nil
+            self.bannerView?.paidEventHandler = nil
+            self.bannerView?.removeFromSuperview()
             self.bannerView = prepared ?? BannerView(adSize: bannerSize)
             self.addBannerViewToView(self.bannerView, adPosition, adMargin)
             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
