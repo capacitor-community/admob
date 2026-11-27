@@ -2,8 +2,9 @@ package com.getcapacitor.community.admob.helpers;
 
 import android.os.Bundle;
 import com.getcapacitor.community.admob.models.AdOptions;
-import com.google.ads.mediation.admob.AdMobAdapter;
-import com.google.android.gms.ads.AdRequest;
+import com.google.android.libraries.ads.mobile.sdk.banner.AdSize;
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest;
+import com.google.android.libraries.ads.mobile.sdk.common.AdRequest;
 
 public final class RequestHelper {
 
@@ -14,36 +15,28 @@ public final class RequestHelper {
      * @param adOptions
      * @return
      */
-    public static AdRequest createRequest(AdOptions adOptions) {
-        AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
+    public static AdRequest createRequest(AdOptions adOptions, String adUnitId) {
+        AdRequest.Builder adRequestBuilder = new AdRequest.Builder(adUnitId);
 
         // TODO: Allow more key/value extras?
         if (adOptions.npa) {
             Bundle extras = new Bundle();
-            extras.putString("npa", "1");
-            adRequestBuilder.addNetworkExtrasBundle(AdMobAdapter.class, extras);
+            extras.putInt("npa", 1);
+            adRequestBuilder.setGoogleExtrasBundle(extras);
         }
 
         return adRequestBuilder.build();
     }
 
-    /**
-     * Gets a string error reason from an error code.
-     */
-    public static String getRequestErrorReason(int errorCode) {
-        switch (errorCode) {
-            case AdRequest.ERROR_CODE_INTERNAL_ERROR:
-                return "Internal error";
-            case AdRequest.ERROR_CODE_INVALID_REQUEST:
-                return "Invalid request";
-            case AdRequest.ERROR_CODE_NETWORK_ERROR:
-                return "Network Error";
-            case AdRequest.ERROR_CODE_NO_FILL:
-                return "No fill";
-            case AdRequest.ERROR_CODE_APP_ID_MISSING:
-                return "App Id Missing";
-            default:
-                return "Unknown error";
+    public static BannerAdRequest createBannerRequest(AdOptions adOptions, String adUnitId, AdSize adSize) {
+        BannerAdRequest.Builder adRequestBuilder = new BannerAdRequest.Builder(adUnitId, adSize);
+
+        if (adOptions.npa) {
+            Bundle extras = new Bundle();
+            extras.putInt("npa", 1);
+            adRequestBuilder.setGoogleExtrasBundle(extras);
         }
+
+        return adRequestBuilder.build();
     }
 }

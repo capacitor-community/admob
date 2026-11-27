@@ -12,13 +12,13 @@ import com.getcapacitor.community.admob.rewarded.AdRewardExecutor;
 import com.getcapacitor.community.admob.rewarded.RewardAdPluginEvents;
 import com.getcapacitor.community.admob.rewardedinterstitial.AdRewardInterstitialExecutor;
 import com.getcapacitor.community.admob.rewardedinterstitial.RewardInterstitialAdPluginEvents;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
-import com.google.android.gms.ads.rewarded.RewardItem;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
-import com.google.android.gms.common.util.BiConsumer;
+import com.google.android.libraries.ads.mobile.sdk.common.AdEventCallback;
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd;
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAd;
+import java.util.function.BiConsumer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
@@ -67,12 +67,12 @@ class RewardedAdShowCallbackTest {
     void presentationFailureRejectsWithSdkCode(boolean interstitial) {
         Harness h = new Harness(interstitial);
         h.show();
-        AdError error = mock(AdError.class);
-        when(error.getCode()).thenReturn(9);
+        FullScreenContentError error = mock(FullScreenContentError.class);
+        when(error.getCode()).thenReturn(FullScreenContentError.ErrorCode.MEDIATION_SHOW_ERROR);
         when(error.getMessage()).thenReturn("presentation failed");
         h.callback.onAdFailedToShowFullScreenContent(error);
         h.callback.onAdDismissedFullScreenContent();
-        verify(h.call).reject("presentation failed", "9");
+        verify(h.call).reject("presentation failed", Integer.toString(FullScreenContentError.ErrorCode.MEDIATION_SHOW_ERROR.getValue()));
         verify(h.events).accept(eq(h.failed), any());
         verify(h.call, never()).resolve(any());
         assertFalse(h.prepared());
@@ -116,6 +116,21 @@ class RewardedAdShowCallbackTest {
         assertTrue(h.prepared());
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void paidEventsSurviveInstallingTheShowCallback(boolean interstitial) {
+        Harness h = new Harness(interstitial);
+        var previous = mock(com.google.android.libraries.ads.mobile.sdk.common.AdEventCallback.class);
+        var value = mock(com.google.android.libraries.ads.mobile.sdk.common.AdValue.class);
+        h.show();
+        ((RewardedAdShowCallback) h.callback).setPaidCallback(previous);
+        h.callback.onAdPaid(value);
+        verify(previous).onAdPaid(value);
+        h.callback.onAdDismissedFullScreenContent();
+        h.callback.onAdPaid(value);
+        verifyNoMoreInteractions(previous);
+    }
+
     private static class Harness {
 
         final Activity activity = mock(Activity.class);
@@ -128,7 +143,7 @@ class RewardedAdShowCallbackTest {
         final AdRewardExecutor executor;
         final AdRewardInterstitialExecutor interstitialExecutor;
         final String dismissed, rewarded, failed;
-        FullScreenContentCallback callback;
+        AdEventCallback callback;
         OnUserEarnedRewardListener reward;
 
         Harness(boolean interstitial) {
@@ -156,7 +171,7 @@ class RewardedAdShowCallbackTest {
                     return null;
                 })
                     .when(interstitialAd)
-                    .setFullScreenContentCallback(any());
+                    .setAdEventCallback(any());
                 doAnswer((invocation) -> {
                     reward = invocation.getArgument(1);
 
@@ -170,7 +185,7 @@ class RewardedAdShowCallbackTest {
                     return null;
                 })
                     .when(ad)
-                    .setFullScreenContentCallback(any());
+                    .setAdEventCallback(any());
                 doAnswer((invocation) -> {
                     reward = invocation.getArgument(1);
                     return null;

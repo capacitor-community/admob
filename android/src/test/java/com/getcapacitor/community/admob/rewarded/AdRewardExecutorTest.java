@@ -13,8 +13,8 @@ import android.app.Activity;
 import android.content.Context;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.common.util.BiConsumer;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd;
+import java.util.function.BiConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -127,18 +127,19 @@ class AdRewardExecutorTest {
             verify(mockedActivity).runOnUiThread(runnableArgumentCaptor.capture());
             runnableArgumentCaptor.getValue().run();
 
-            ArgumentCaptor<com.google.android.gms.ads.FullScreenContentCallback> callback = ArgumentCaptor.forClass(
-                com.google.android.gms.ads.FullScreenContentCallback.class
+            ArgumentCaptor<com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback> callback = ArgumentCaptor.forClass(
+                com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback.class
             );
-            ArgumentCaptor<com.google.android.gms.ads.OnUserEarnedRewardListener> rewardListener = ArgumentCaptor.forClass(
-                com.google.android.gms.ads.OnUserEarnedRewardListener.class
-            );
-            verify(ad).setFullScreenContentCallback(callback.capture());
+            ArgumentCaptor<com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener> rewardListener =
+                ArgumentCaptor.forClass(com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener.class);
+            verify(ad).setAdEventCallback(callback.capture());
             verify(ad).show(any(), rewardListener.capture());
 
             callback.getValue().onAdClicked();
             verify(pluginCallMock, times(0)).resolve(any());
-            com.google.android.gms.ads.rewarded.RewardItem reward = mock(com.google.android.gms.ads.rewarded.RewardItem.class);
+            com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem reward = mock(
+                com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem.class
+            );
             when(reward.getType()).thenReturn("coin");
             when(reward.getAmount()).thenReturn(1);
             rewardListener.getValue().onUserEarnedReward(reward);

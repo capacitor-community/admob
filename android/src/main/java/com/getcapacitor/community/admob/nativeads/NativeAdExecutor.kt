@@ -25,13 +25,16 @@ import com.getcapacitor.community.admob.helpers.RequestHelper
 import com.getcapacitor.community.admob.models.AdMobRevenueData
 import com.getcapacitor.community.admob.models.AdOptions
 import com.getcapacitor.community.admob.models.Executor
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdLoader
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.google.android.gms.ads.nativead.NativeAdView
-import com.google.android.gms.common.util.BiConsumer
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoaderCallback
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.AdChoicesPlacement
+import com.google.android.libraries.ads.mobile.sdk.common.AdValue
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoader
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView
+import java.util.function.BiConsumer
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicBoolean
@@ -124,30 +127,30 @@ class NativeAdExecutor(
                 return@runOnUiThread
             }
             pendingLoads[stateKey] = pendingLoad
-            val adLoader = AdLoader.Builder(contextSupplier.get(), adId)
-                .forNativeAd { nativeAd ->
-                    handleLoadedAd(
-                        nativeAd = nativeAd,
-                        adId = adId,
-                        stateKey = stateKey,
-                        pendingLoad = pendingLoad,
-                        finished = finished,
-                        feedId = feedId,
-                        sessionId = sessionId,
-                        slotKey = slotKey,
-                        template = template,
-                        style = style,
-                    )
+            val request = NativeAdRequest.Builder(adId, listOf(NativeAd.NativeAdType.NATIVE))
+                .setAdChoicesPlacement(AdChoicesPlacement.TOP_RIGHT)
+            if (options.npa) request.setGoogleExtrasBundle(android.os.Bundle().apply { putInt("npa", 1) })
+            NativeAdLoader.load(request.build(), object : NativeAdLoaderCallback {
+                override fun onNativeAdLoaded(nativeAd: NativeAd) {
+                    activitySupplier.get().runOnUiThread {
+                        handleLoadedAd(
+                            nativeAd = nativeAd,
+                            adId = adId,
+                            stateKey = stateKey,
+                            pendingLoad = pendingLoad,
+                            finished = finished,
+                            feedId = feedId,
+                            sessionId = sessionId,
+                            slotKey = slotKey,
+                            template = template,
+                            style = style,
+                        )
+                    }
                 }
-                .withNativeAdOptions(
-                    NativeAdOptions.Builder()
-                        .setAdChoicesPlacement(NativeAdOptions.ADCHOICES_TOP_RIGHT)
-                        .build(),
-                )
-                .withAdListener(adListener(stateKey, pendingLoad, finished, feedId, sessionId, slotKey))
-                .build()
-
-            adLoader.loadAd(RequestHelper.createRequest(options))
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    activitySupplier.get().runOnUiThread { failNativeLoad(adError, stateKey, pendingLoad, finished, feedId, sessionId, slotKey) }
+                }
+            })
         }
     }
 
@@ -259,7 +262,7 @@ class NativeAdExecutor(
             return
         }
         pendingLoads.remove(stateKey)
-        if (template == "small" && nativeAd.mediaContent?.hasVideoContent() == true) {
+        if (template == "small" && nativeAd.mediaContent?.hasVideoContent == true) {
             nativeAd.destroy()
             val message = "Small native ad template does not support video ads; use Medium"
             val event = identity(feedId, sessionId, slotKey).apply {
@@ -336,67 +339,50 @@ class NativeAdExecutor(
                             if (states[stateKey] === state && placement != null) applyPlacement(feedId, placement, defer = false)
                         },
                         canCapture = { states[stateKey] === state && state.opaqueBackground &&
-                            nativeAd.mediaContent?.hasVideoContent() != true && isSnapshotSizeSupported(adView.width, adView.height) },
+                            nativeAd.mediaContent?.hasVideoContent != true && isSnapshotSizeSupported(adView.width, adView.height) },
                         view = { if (states[stateKey] === state) adView else null }
                     )
                 }.onFailure { android.util.Log.w("AdMob", "Native ad projection unavailable; retaining native tracking", it) }.getOrNull()
             }
         }
-        nativeAd.setOnPaidEventListener { adValue ->
-            if (states[stateKey] !== state) return@setOnPaidEventListener
-            val responseInfo = nativeAd.responseInfo
-            val data = AdMobRevenueData(
-                adValue,
-                adId,
-                responseInfo?.mediationAdapterClassName ?: "",
-                responseInfo?.responseId ?: "",
-            ).apply {
-                put("feedId", feedId)
-                put("slotKey", slotKey)
-                put("sessionId", sessionId)
+        nativeAd.adEventCallback = object : NativeAdEventCallback {
+            private fun notifyCurrent(event: String) {
+                if (isCurrent(stateKey, pendingLoad.token)) notifyListeners(event, identity(feedId, sessionId, slotKey))
             }
-            notifyListeners(NativeAdPluginEvents.AD_PAID, data)
+            override fun onAdClicked() = notifyCurrent(NativeAdPluginEvents.CLICKED)
+            override fun onAdImpression() = notifyCurrent(NativeAdPluginEvents.IMPRESSION)
+            override fun onAdShowedFullScreenContent() = notifyCurrent(NativeAdPluginEvents.OPENED)
+            override fun onAdDismissedFullScreenContent() = notifyCurrent(NativeAdPluginEvents.CLOSED)
+            override fun onAdPaid(value: AdValue) {
+                if (states[stateKey] !== state) return
+                val info = nativeAd.getResponseInfo()
+                val data = AdMobRevenueData(value, adId, info.adapterClassName ?: "", info.responseId ?: "").apply {
+                    put("feedId", feedId)
+                    put("slotKey", slotKey)
+                    put("sessionId", sessionId)
+                }
+                notifyListeners(NativeAdPluginEvents.AD_PAID, data)
+            }
         }
 
         notifyListeners(NativeAdPluginEvents.LOADED, identity(feedId, sessionId, slotKey))
         pendingLoad.call.resolve()
     }
 
-    private fun adListener(
-        stateKey: String,
-        pendingLoad: PendingLoad,
-        finished: AtomicBoolean,
-        feedId: String,
-        sessionId: String,
-        slotKey: String,
-    ): AdListener = object : AdListener() {
-        override fun onAdFailedToLoad(error: LoadAdError) {
+    private fun failNativeLoad(error: LoadAdError, stateKey: String, pendingLoad: PendingLoad, finished: AtomicBoolean,
+        feedId: String, sessionId: String, slotKey: String) {
+
             if (pendingLoads[stateKey] !== pendingLoad) return
             pendingLoads.remove(stateKey)
             val event = identity(feedId, sessionId, slotKey).apply {
-                put("code", error.code)
+                put("code", error.code.value)
                 put("message", error.message)
             }
             notifyListeners(NativeAdPluginEvents.FAILED_TO_LOAD, event)
             if (finished.compareAndSet(false, true)) {
-                pendingLoad.call.reject(error.message, error.code.toString(), event)
+                pendingLoad.call.reject(error.message, error.code.value.toString(), event)
             }
-        }
-
-        override fun onAdClicked() = notifyIfCurrent(NativeAdPluginEvents.CLICKED)
-
-        override fun onAdImpression() = notifyIfCurrent(NativeAdPluginEvents.IMPRESSION)
-
-        override fun onAdOpened() = notifyIfCurrent(NativeAdPluginEvents.OPENED)
-
-        override fun onAdClosed() = notifyIfCurrent(NativeAdPluginEvents.CLOSED)
-
-        private fun notifyIfCurrent(eventName: String) {
-            if (isCurrent(stateKey, pendingLoad.token)) {
-                notifyListeners(eventName, identity(feedId, sessionId, slotKey))
             }
-        }
-    }
 
     private fun applyPlacement(expectedFeedId: String, placement: JSONObject, defer: Boolean = true): String? {
         val density = contextSupplier.get().resources.displayMetrics.density
@@ -475,7 +461,7 @@ class NativeAdExecutor(
                 call.reject("Snapshot underlays require an opaque native ad background")
                 return@runOnUiThread
             }
-            if (state.nativeAd.mediaContent?.hasVideoContent() == true) {
+            if (state.nativeAd.mediaContent?.hasVideoContent == true) {
                 call.reject("Video ads retain native tracking while scrolling")
                 return@runOnUiThread
             }

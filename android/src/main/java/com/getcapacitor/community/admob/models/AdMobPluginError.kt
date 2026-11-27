@@ -1,7 +1,8 @@
 package com.getcapacitor.community.admob.models
 
 import com.getcapacitor.JSObject
-import com.google.android.gms.ads.AdError
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 
 data class AdMobPluginError(val code: Int, val message: String) : JSObject() {
     override fun put(key: String, value: Int): JSObject {
@@ -11,5 +12,12 @@ data class AdMobPluginError(val code: Int, val message: String) : JSObject() {
         super.put("code", this.code)
         super.put("message", this.message)
     }
-    constructor(adError: AdError): this(adError.code, adError.message)
+
+    constructor(adError: LoadAdError) : this(adError.code.value, adError.message)
+
+    constructor(fullScreenContentError: FullScreenContentError) : this(
+        fullScreenContentError.code.value,
+        fullScreenContentError.message
+    )
+
 }

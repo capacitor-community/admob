@@ -4,14 +4,17 @@ import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.community.admob.models.AdMobPluginError;
 import com.getcapacitor.community.admob.models.LoadPluginEventNames;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
-import com.google.android.gms.ads.rewarded.RewardItem;
-import com.google.android.gms.common.util.BiConsumer;
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.OnUserEarnedRewardListener;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem;
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback;
+import com.google.android.libraries.ads.mobile.sdk.rewardedinterstitial.RewardedInterstitialAdEventCallback;
+import java.util.function.BiConsumer;
 
 /** Owns a single show call until reward, cancellation, or presentation failure. SDK callbacks run on the UI thread. */
-public final class RewardedAdShowCallback extends FullScreenContentCallback implements OnUserEarnedRewardListener {
+public final class RewardedAdShowCallback
+    implements RewardedAdEventCallback, RewardedInterstitialAdEventCallback, OnUserEarnedRewardListener
+{
 
     private PluginCall pendingCall;
     private final LoadPluginEventNames events;
@@ -19,6 +22,16 @@ public final class RewardedAdShowCallback extends FullScreenContentCallback impl
     private final BiConsumer<String, JSObject> notifyListeners;
     private final Runnable onCompleted;
     private boolean completed;
+    private com.google.android.libraries.ads.mobile.sdk.common.AdEventCallback paidCallback;
+
+    public void setPaidCallback(com.google.android.libraries.ads.mobile.sdk.common.AdEventCallback callback) {
+        paidCallback = callback;
+    }
+
+    @Override
+    public void onAdPaid(com.google.android.libraries.ads.mobile.sdk.common.AdValue value) {
+        if (!completed && paidCallback != null) paidCallback.onAdPaid(value);
+    }
 
     public RewardedAdShowCallback(
         PluginCall call,
@@ -62,9 +75,9 @@ public final class RewardedAdShowCallback extends FullScreenContentCallback impl
     }
 
     @Override
-    public void onAdFailedToShowFullScreenContent(AdError error) {
+    public void onAdFailedToShowFullScreenContent(FullScreenContentError error) {
         if (!complete()) return;
-        reject(error.getMessage(), Integer.toString(error.getCode()));
+        reject(error.getMessage(), Integer.toString(error.getCode().getValue()));
         notifyListeners.accept(events.getFailedToShow(), new AdMobPluginError(error));
     }
 

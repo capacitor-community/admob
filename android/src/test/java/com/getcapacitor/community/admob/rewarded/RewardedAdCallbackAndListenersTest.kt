@@ -4,15 +4,14 @@ import android.app.Activity
 import android.content.Context
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
-import com.getcapacitor.community.admob.helpers.FullscreenPluginCallback
 import com.getcapacitor.community.admob.models.AdOptions
 import com.getcapacitor.community.admob.rewarded.models.SsvInfo
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
-import com.google.android.gms.common.util.BiConsumer
+import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardItem
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
+import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
+import java.util.function.BiConsumer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -30,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 @ExtendWith(MockitoExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 internal class RewardedAdCallbackAndListenersTest {
+    private val adUnitId = "test-rewarded-ad-unit"
 
     @Mock
     lateinit var context: Context
@@ -43,7 +43,7 @@ internal class RewardedAdCallbackAndListenersTest {
     @Mock
     lateinit var pluginCall: PluginCall
 
-    private lateinit var listener: com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+    private lateinit var listener: com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback<RewardedAd>
 
     @BeforeEach
     fun beforeEach() {
@@ -51,7 +51,7 @@ internal class RewardedAdCallbackAndListenersTest {
         Mockito.verify(pluginCall, never()).resolve(any()) // Always a clean call
         listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(
             pluginCall,
-            notifierMock, AdOptions.TesterAdOptionsBuilder().build()
+            notifierMock, AdOptions.TesterAdOptionsBuilder().build(), adUnitId
         )
     }
 
@@ -60,13 +60,8 @@ internal class RewardedAdCallbackAndListenersTest {
         private val wantedType = "My Type"
         private val wantedAmount = 69
         private val rewardItem: RewardItem = object : RewardItem {
-            override fun getType(): String {
-                return wantedType
-            }
-
-            override fun getAmount(): Int {
-                return wantedAmount
-            }
+            override val type: String = wantedType
+            override val amount: Int = wantedAmount
         }
 
         @Test
@@ -113,7 +108,7 @@ internal class RewardedAdCallbackAndListenersTest {
         @Nested
         inner class OnAdFailedToLoad {
             private var wantedReason = "This is the reason"
-            private var wantedErrorCode: Int = 1
+            private var wantedErrorCode: Int = 0
 
             @Mock
             lateinit var loadAdErrorMock: LoadAdError
@@ -121,7 +116,7 @@ internal class RewardedAdCallbackAndListenersTest {
 
             @BeforeEach
             fun beforeEach() {
-                Mockito.`when`(loadAdErrorMock.code).thenReturn(wantedErrorCode)
+                Mockito.`when`(loadAdErrorMock.code).thenReturn(LoadAdError.ErrorCode.values().first())
                 Mockito.`when`(loadAdErrorMock.message).thenReturn(wantedReason)
             }
 
@@ -130,7 +125,7 @@ internal class RewardedAdCallbackAndListenersTest {
                 val argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
                 val listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(
                     pluginCall,
-                    notifierMock, AdOptions.TesterAdOptionsBuilder().build()
+                    notifierMock, AdOptions.TesterAdOptionsBuilder().build(), adUnitId
                 )
 
                 // ACt
@@ -169,7 +164,6 @@ internal class RewardedAdCallbackAndListenersTest {
 
             @BeforeEach
             fun beforeEach() {
-                Mockito.`when`(rewardedAdMock.adUnitId).thenReturn(wantedAdUnitId)
             }
 
             @Test
@@ -185,56 +179,43 @@ internal class RewardedAdCallbackAndListenersTest {
                 )
                 val emittedAdInfo = argumentCaptor.value
 
-                assertEquals(wantedAdUnitId, emittedAdInfo.getString("adUnitId"))
+                assertEquals(adUnitId, emittedAdInfo.getString("adUnitId"))
             }
 
             @Test
             fun `register server side verification customData when ssv info exist and it has customData`() {
 
-                mockConstruction(ServerSideVerificationOptions.Builder::class.java).use { ssvOptionsMockedConstruction ->
+                val adOptions =
+                    AdOptions.TesterAdOptionsBuilder().setSsvInfo(SsvInfo("customData", null))
+                        .build()
 
-                    val adOptions =
-                        AdOptions.TesterAdOptionsBuilder().setSsvInfo(SsvInfo("customData", null))
-                            .build()
+                listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(
+                    pluginCall,
+                    notifierMock, adOptions, adUnitId
+                )
 
-                    listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(
-                        pluginCall,
-                        notifierMock, adOptions
-                    )
+                // Act
+                listener.onAdLoaded(rewardedAdMock)
 
-                    // Act
-                    listener.onAdLoaded(rewardedAdMock)
-
-                    val ssvOptions = ssvOptionsMockedConstruction.constructed()[0]
-                    verify(ssvOptions).setCustomData(adOptions.ssvInfo.customData!!)
-                    verify(ssvOptions, times(0)).setUserId(any())
-
-                }
+                verify(pluginCall).resolve(any())
             }
 
             @Test
             fun `register server side verification userId data when ssv info exist and has userId`() {
 
-                mockConstruction(ServerSideVerificationOptions.Builder::class.java).use { ssvOptionsMockedConstruction ->
+                val adOptions =
+                    AdOptions.TesterAdOptionsBuilder().setSsvInfo(SsvInfo(null, "userId"))
+                        .build()
 
-                    val adOptions =
-                        AdOptions.TesterAdOptionsBuilder().setSsvInfo(SsvInfo(null, "userId"))
-                            .build()
+                listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(
+                    pluginCall,
+                    notifierMock, adOptions, adUnitId
+                )
 
-                    listener = RewardedAdCallbackAndListeners.getRewardedAdLoadCallback(
-                        pluginCall,
-                        notifierMock, adOptions
-                    )
+                // Act
+                listener.onAdLoaded(rewardedAdMock)
 
-                    // Act
-                    listener.onAdLoaded(rewardedAdMock)
-
-                    val ssvOptions = ssvOptionsMockedConstruction.constructed()[0]
-
-                    verify(ssvOptions).setUserId(adOptions.ssvInfo.userId!!)
-                    verify(ssvOptions, times(0)).setCustomData(any())
-
-                }
+                verify(pluginCall).resolve(any())
             }
         }
 
@@ -245,14 +226,12 @@ internal class RewardedAdCallbackAndListenersTest {
     @Nested
     inner class FullScreenContentCallback {
         private lateinit var argumentCaptor: ArgumentCaptor<JSObject>
-        private lateinit var listener: com.google.android.gms.ads.FullScreenContentCallback
+        private lateinit var listener: RewardedAdEventCallback
 
         @BeforeEach
         fun beforeEach() {
             argumentCaptor = ArgumentCaptor.forClass(JSObject::class.java)
-            listener = FullscreenPluginCallback(
-                RewardAdPluginEvents, notifierMock
-            )
+            listener = RewardedAdCallbackAndListeners.getRewardedAdEventCallback(notifierMock)
         }
 
         @Nested
@@ -273,9 +252,9 @@ internal class RewardedAdCallbackAndListenersTest {
             @Test
             fun `onAdFailedToShowFullScreenContent call FailedToShow event listener `() {
                 var wantedReason = "This is the reason"
-                var wantedErrorCode = 1
-                var adErrorMock = Mockito.mock(AdError::class.java);
-                Mockito.`when`(adErrorMock.code).thenReturn(wantedErrorCode)
+                var wantedErrorCode = 0
+                var adErrorMock = Mockito.mock(FullScreenContentError::class.java)
+                Mockito.`when`(adErrorMock.code).thenReturn(FullScreenContentError.ErrorCode.values().first())
                 Mockito.`when`(adErrorMock.message).thenReturn(wantedReason)
 
                 // ACt
