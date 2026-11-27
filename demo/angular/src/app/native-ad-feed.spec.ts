@@ -30,6 +30,7 @@ const bridge = {
 };
 
 import { configureNativeAdBridge, NativeAdFeed } from '../../../../src/native-ads/native-ad-feed';
+import type { NativeAdFeedOptions } from '../../../../src/native-ads/native-ad-options.interface';
 import { NativeAdTemplate } from '../../../../src/native-ads/native-ad-template.enum';
 import { AdMobWeb } from '../../../../src/web';
 
@@ -691,9 +692,14 @@ describe('NativeAdFeed', () => {
     await expect(web.startNativeAdFeed()).rejects.toThrow('only available on iOS and Android');
   });
   describe('Android Engine projection', () => {
-    const setup = async () => {
+    const setup = async (visibleArea?: NativeAdFeedOptions['visibleArea']) => {
       vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
-      const feed = await NativeAdFeed.create({ feedId: 'engine-test', isTesting: true, androidScrollSnapshot: true });
+      const feed = await NativeAdFeed.create({
+        feedId: 'engine-test',
+        isTesting: true,
+        androidScrollSnapshot: true,
+        visibleArea,
+      });
       createdFeeds.push(feed);
       const element = document.createElement('div');
       document.body.append(element);
@@ -885,6 +891,21 @@ describe('NativeAdFeed', () => {
         }),
       );
       expect(placementBindings.has(element)).toBe(true);
+    });
+
+    it('uses live clipping when visibleArea and Android snapshots are both configured', async () => {
+      const { element } = await setup(() => ({ x: 0, y: 100, width: 400, height: 200 }));
+      expect(placementBindings.has(element)).toBe(false);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].clipRect).toEqual({
+        x: 10,
+        y: 100,
+        width: 300,
+        height: 200,
+      });
+      element.getBoundingClientRect = () => new DOMRect(10, 310, 300, 320);
+      document.dispatchEvent(new Event('scroll'));
+      await vi.advanceTimersByTimeAsync(20);
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
     });
 
     it('still rejects snapshots on iOS', async () => {
