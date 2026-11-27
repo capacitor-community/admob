@@ -185,7 +185,7 @@ such as a translucent header or a floating tab bar, does not cover them. Pass
 `visibleArea` to clip every ad in the feed to the part of the viewport between
 those bars. It is read on every placement update, in CSS pixels, and an ad with
 no part inside it is hidden. It works with both JavaScript placement and iOS
-`scrollElement` tracking.
+`scrollElement` tracking. On Android, setting `visibleArea` disables scroll snapshots so the clip stays current.
 
 ```ts
 const feed = await NativeAdFeed.create({

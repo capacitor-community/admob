@@ -116,7 +116,11 @@ export class NativeAdFeed {
     if (options.androidScrollSnapshot && Capacitor.getPlatform() !== 'android') {
       throw new Error('androidScrollSnapshot requires Android');
     }
-    this.options = { ...options, feedId: id };
+    this.options = {
+      ...options,
+      feedId: id,
+      androidScrollSnapshot: options.androidScrollSnapshot && !options.visibleArea,
+    };
     this.nativeScrollElement = Capacitor.getPlatform() === 'ios' ? options.scrollElement : undefined;
 
     if (typeof IntersectionObserver !== 'undefined') {
