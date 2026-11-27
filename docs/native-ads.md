@@ -102,7 +102,7 @@ vue({
 
 Use a normal HTML `overflow: auto` container or Ionic `ion-content`; Android requires no scroll-specific option. Ads follow the slot and its clipping bounds, but can lag behind fast scrolling. New ads load after scrolling settles.
 
-A feed keeps at most three native ads, including attached offscreen slots; additional visible slots wait for capacity. At most two feed managers may be active. Ads are not automatically refreshed, and failed loads are not silently retried. Call `reload(slotKey)` only at an explicit product-defined retry or refresh point.
+A feed keeps at most three native ads, including attached offscreen slots; additional visible slots wait for capacity. At most two feed managers may be active. Ads are not automatically refreshed, and failed loads are not silently retried. Call `reload(slotKey)` only at an explicit product-defined retry or refresh point. A detached slot keeps its loaded ad until the capacity is needed; call `release(slotKey)` to destroy it at once, for example after moving an element to a freshly loaded slot.
 
 ## Layout and overlay lifecycle
 
@@ -128,6 +128,7 @@ Call `destroy()` when leaving a screen. Await `pause()` before presenting an ove
 | `addListener(event, listener)`                 | Adds a listener filtered to this feed session.                 |
 | `attach(slotKey, element)` / `detach(element)` | Advanced lifecycle for an ordinary element.                    |
 | `reload(slotKey)`                              | Explicitly removes and reloads one registered slot.            |
+| `release(slotKey)`                             | Destroys a detached slot's ad and forgets the slot.            |
 | `pause(): Promise<void>` / `resume(): void`    | Hides placements during Web overlays or inactive page states.  |
 | `invalidateLayout(): Promise<void>`            | Hides and remeasures after an application-driven reflow.       |
 | `destroy()`                                    | Removes listeners and all native resources for the session.    |
