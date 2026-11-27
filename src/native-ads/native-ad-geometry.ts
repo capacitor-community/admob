@@ -7,7 +7,7 @@ export interface MeasuredNativeAdSlot {
   clipRect: NativeAdRect;
 }
 
-const intersectRects = (left: NativeAdRect, right: NativeAdRect): NativeAdRect => {
+export const intersectRects = (left: NativeAdRect, right: NativeAdRect): NativeAdRect => {
   const x = Math.max(left.x, right.x);
   const y = Math.max(left.y, right.y);
   const maxX = Math.min(left.x + left.width, right.x + right.width);

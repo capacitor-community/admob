@@ -1,5 +1,6 @@
 import type { AdOptions } from '../shared';
 
+import type { NativeAdRect } from './native-ad-placement.interface';
 import type { NativeAdStyle } from './native-ad-style.interface';
 import type { NativeAdTemplate } from './native-ad-template.enum';
 
@@ -17,6 +18,15 @@ export interface NativeAdFeedOptions extends Pick<AdOptions, 'npa' | 'isTesting'
 
   /** Android: use a cached DOM image while scrolling. */
   androidScrollSnapshot?: boolean;
+
+  /**
+   * The part of the viewport, in CSS pixels, that native ads may be drawn in.
+   * Use it to keep ads clear of app chrome that the page scrolls under, such
+   * as a translucent header or a floating tab bar. Called on every placement
+   * update; return `undefined` to use the whole viewport. An ad with no part
+   * inside the area is hidden.
+   */
+  visibleArea?: () => NativeAdRect | undefined;
 
   /** Plugin-owned layout used for every native ad in this feed. */
   template?: NativeAdTemplate;

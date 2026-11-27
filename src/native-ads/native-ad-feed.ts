@@ -5,10 +5,15 @@ import { bindProjectionPlacement, type ProjectionPlacementBinding } from '@webvi
 import type { NativeAdDefinitions } from './native-ad-definitions.interface';
 import { connectNativeAdElements, defineNativeAdElement } from './native-ad-element';
 import type { NativeAdEvent, NativeAdErrorEvent, NativeAdRevenueEvent } from './native-ad-event.interface';
-import { measureNativeAdSlot, measureNativeAdScrollContainer, nativeAdAncestors } from './native-ad-geometry';
+import {
+  intersectRects,
+  measureNativeAdSlot,
+  measureNativeAdScrollContainer,
+  nativeAdAncestors,
+} from './native-ad-geometry';
 import type { MeasuredNativeAdSlot } from './native-ad-geometry';
 import type { NativeAdFeedOptions } from './native-ad-options.interface';
-import type { NativeAdPlacement } from './native-ad-placement.interface';
+import type { NativeAdPlacement, NativeAdRect } from './native-ad-placement.interface';
 import type { NativeAdPluginEvents } from './native-ad-plugin-events.enum';
 import { NativeAdTemplate } from './native-ad-template.enum';
 
@@ -111,7 +116,11 @@ export class NativeAdFeed {
     if (options.androidScrollSnapshot && Capacitor.getPlatform() !== 'android') {
       throw new Error('androidScrollSnapshot requires Android');
     }
-    this.options = { ...options, feedId: id };
+    this.options = {
+      ...options,
+      feedId: id,
+      androidScrollSnapshot: options.androidScrollSnapshot && !options.visibleArea,
+    };
     this.nativeScrollElement = Capacitor.getPlatform() === 'ios' ? options.scrollElement : undefined;
 
     if (typeof IntersectionObserver !== 'undefined') {
@@ -629,8 +638,22 @@ export class NativeAdFeed {
     );
   }
 
+  /** The app's visible area for ads, when it gives a usable one. */
+  private visibleArea(): NativeAdRect | undefined {
+    const area = this.options.visibleArea?.();
+    return area && [area.x, area.y, area.width, area.height].every(Number.isFinite) ? area : undefined;
+  }
+
   private measurePlacement(state: SlotState): NativeAdPlacement {
-    const measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
+    let measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
+    // With JavaScript placement the clip is in viewport coordinates; with iOS
+    // native scroll tracking it is in content coordinates, and the scroll
+    // container's clip is cut to the visible area instead.
+    const area = this.nativeScrollElement ? undefined : this.visibleArea();
+    if (measured && area) {
+      const clipRect = intersectRects(measured.clipRect, area);
+      measured = clipRect.width > 0 && clipRect.height > 0 ? { ...measured, clipRect } : undefined;
+    }
     return {
       feedId: this.options.feedId,
       slotKey: state.slotKey,
@@ -680,6 +703,10 @@ export class NativeAdFeed {
         const scrollContainer = this.nativeScrollElement
           ? measureNativeAdScrollContainer(this.nativeScrollElement)
           : undefined;
+        const area = scrollContainer ? this.visibleArea() : undefined;
+        if (scrollContainer && area) {
+          scrollContainer.clipRect = intersectRects(scrollContainer.clipRect, area);
+        }
         const serializedPlacements = JSON.stringify({ placements, scrollContainer });
         if (serializedPlacements === this.lastPlacements && (allowDirect || !this.lastPlacementWasDirect)) {
           continue;
