@@ -16,7 +16,6 @@ import android.util.Base64
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
-import android.widget.FrameLayout
 import androidx.core.util.Supplier
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
@@ -41,7 +40,7 @@ import kotlin.math.roundToInt
 class NativeAdExecutor(
     contextSupplier: Supplier<Context>,
     activitySupplier: Supplier<Activity>,
-    private val webViewSupplier: Supplier<View>,
+    private val webViewSupplier: Supplier<out View?>,
     notifyListenersFunction: BiConsumer<String, JSObject>,
     pluginLogTag: String,
 ) : Executor(contextSupplier, activitySupplier, notifyListenersFunction, pluginLogTag, "NativeAdExecutor") {
@@ -51,7 +50,7 @@ class NativeAdExecutor(
         val loadToken: Any,
         val nativeAd: NativeAd,
         val adView: NativeAdView,
-        val clippingContainer: FrameLayout,
+        val clippingContainer: NativeUIScrollHosting,
         val opaqueBackground: Boolean,
         var generation: Int = -1,
         var projection: NativeUIProjection? = null,
@@ -405,49 +404,34 @@ class NativeAdExecutor(
         if (value.generation < state.generation) return null
         val minimumWidth = (if (state.isSmall) 120 else 144) * density
         val minimumHeight = (if (state.isSmall) 120 else 300) * density
-        if (value.rectWidth < minimumWidth.roundToInt() || value.rectHeight < minimumHeight.roundToInt()) return null
+        if (value.rect.width < minimumWidth.roundToInt() || value.rect.height < minimumHeight.roundToInt()) return null
 
         if (defer && state.projection?.isProjecting == true &&
-            state.adView.width == value.rectWidth && state.adView.height == value.rectHeight) {
+            state.adView.width == value.rect.width && state.adView.height == value.rect.height) {
             state.deferredPlacement = JSONObject(placement.toString())
             state.generation = value.generation
             return stateKey(value.feedId, value.slotKey)
         }
         state.deferredPlacement = null
-        val resized = state.adView.width != value.rectWidth || state.adView.height != value.rectHeight
+        val resized = state.adView.width != value.rect.width || state.adView.height != value.rect.height
 
         if (!state.isSmall) {
             val adView = state.adView
-            if (adView.isLayoutRequested || adView.measuredWidth != value.rectWidth || adView.measuredHeight != value.rectHeight) {
+            if (adView.isLayoutRequested || adView.measuredWidth != value.rect.width || adView.measuredHeight != value.rect.height) {
                 adView.measure(
-                    View.MeasureSpec.makeMeasureSpec(value.rectWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(value.rectHeight, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(value.rect.width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(value.rect.height, View.MeasureSpec.EXACTLY),
                 )
-                adView.layout(0, 0, value.rectWidth, value.rectHeight)
+                adView.layout(0, 0, value.rect.width, value.rect.height)
             }
             val media = adView.mediaView ?: return null
             if (media.measuredWidth < 120 * density || media.measuredHeight < 120 * density) return null
         }
 
-        val webView = webViewSupplier.get() ?: return null
+        if (webViewSupplier.get() == null) return null
         val wasVisible = state.clippingContainer.visibility == View.VISIBLE
-        val clipParams = state.clippingContainer.layoutParams
-        if (clipParams.width != value.clipWidth || clipParams.height != value.clipHeight) {
-            state.clippingContainer.layoutParams = clipParams.apply {
-                width = value.clipWidth
-                height = value.clipHeight
-            }
-        }
-        state.clippingContainer.x = webView.x + value.clipX
-        state.clippingContainer.y = webView.y + value.clipY
-        val adParams = state.adView.layoutParams
-        if (adParams.width != value.rectWidth || adParams.height != value.rectHeight) {
-            state.adView.layoutParams = FrameLayout.LayoutParams(value.rectWidth, value.rectHeight)
-        }
-        state.adView.x = (value.rectX - value.clipX).toFloat()
-        state.adView.y = (value.rectY - value.clipY).toFloat()
+        if (!state.clippingContainer.place(value.rect, value.clip)) return null
         state.generation = value.generation
-        state.clippingContainer.visibility = View.VISIBLE
         if (!wasVisible) state.clippingContainer.bringToFront()
         if (!state.projectionVisible) {
             state.projection?.show()
