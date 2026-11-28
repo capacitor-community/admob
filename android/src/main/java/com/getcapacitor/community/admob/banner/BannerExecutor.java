@@ -253,6 +253,10 @@ public class BannerExecutor extends Executor {
             synchronized (BannerExecutor.this) {
                 if (preparedBanner != prepared) return;
             }
+            if (liveActivity() == null) {
+                if (detachPreparedBanner(prepared)) call.reject("Activity unavailable");
+                return;
+            }
             try {
                 AdSize size = requestedBannerSize(prepared.options);
                 if (size == null || size.equals(AdSize.INVALID)) throw new IllegalArgumentException("Invalid banner size");
@@ -377,14 +381,14 @@ public class BannerExecutor extends Executor {
             return;
         }
 
-        final AdView previousAdView = mAdView;
-        final RelativeLayout previousLayout = mAdViewLayout;
-        final boolean previousLoaded = bannerLoaded;
         // Why a try catch block?
         try {
+            final AdView adView = usePrepared ? prepared.view : new AdView(contextSupplier.get());
+            if (!usePrepared) adView.setAdSize(requestedBannerSize(adOptions));
+            final AdView previousAdView = replaceCurrentBanner(adView);
+            final RelativeLayout previousLayout = mAdViewLayout;
+            final boolean previousLoaded = previousAdView != null && bannerLoaded;
             bannerLoaded = false;
-            mAdView = usePrepared ? prepared.view : new AdView(contextSupplier.get());
-            if (!usePrepared) mAdView.setAdSize(requestedBannerSize(adOptions));
 
             // Setup AdView Layout
             mAdViewLayout = new RelativeLayout(contextSupplier.get());
@@ -463,7 +467,7 @@ public class BannerExecutor extends Executor {
             });
 
             mAdOptions = adOptions;
-            createNewAdView(adOptions, usePrepared, previousAdView, previousLayout, previousLoaded);
+            createNewAdView(adView, adOptions, usePrepared, previousAdView, previousLayout, previousLoaded);
 
             call.resolve();
         } catch (Exception ex) {
@@ -517,16 +521,21 @@ public class BannerExecutor extends Executor {
         }
     }
 
+    // Only the caller that takes the previous view is responsible for destroying it.
+    private synchronized AdView replaceCurrentBanner(AdView next) {
+        AdView previous = mAdView;
+        mAdView = next;
+        return previous;
+    }
+
     /**
      * Destroys the banner and any prepared banner with the plugin's activity. Called on the
      * main thread. A banner that is never destroyed keeps the destroyed activity alive.
      */
     public void destroy() {
         discardPreparedBanner(takePreparedBanner(), "Banner preparation was cancelled because the activity was destroyed", null);
-        if (mAdView != null) {
-            mAdView.destroy();
-            mAdView = null;
-        }
+        AdView shown = replaceCurrentBanner(null);
+        if (shown != null) shown.destroy();
     }
 
     public void removeBanner(final PluginCall call) {
@@ -607,19 +616,13 @@ public class BannerExecutor extends Executor {
      * https://developers.google.com/admob/ios/banner?hl=ja
      */
     private void createNewAdView(
+        AdView adView,
         AdOptions adOptions,
         boolean usePrepared,
         AdView previousAdView,
         RelativeLayout previousLayout,
         boolean previousLoaded
     ) {
-        // Bind to the AdView instance created for this call. `mAdView` is a
-        // shared field that removeBanner/hideBanner or a stale ad-listener
-        // callback can null from the UI thread before this posted task runs;
-        // reading the field inside the task would then throw a
-        // NullPointerException (e.g. in AdViewIdHelper.assignIdToAdView).
-        final AdView adView = mAdView;
-
         // Run AdMob In Main UI Thread
         activitySupplier.get().runOnUiThread(() -> {
             BannerAdSizeInfo previousSize =

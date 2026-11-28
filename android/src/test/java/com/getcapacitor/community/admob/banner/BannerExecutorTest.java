@@ -2,6 +2,7 @@ package com.getcapacitor.community.admob.banner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.atLeast;
@@ -37,6 +38,9 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.util.BiConsumer;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -460,6 +464,61 @@ class BannerExecutorTest {
             AdView ad = adViewMockedConstruction.constructed().get(0);
             if (hide) verify(ad).pause();
             else verify(ad).destroy();
+        }
+
+        @Test
+        void preparationRegisteredAfterDestroyRejectsWithoutCreatingAView() {
+            PluginCall call = mock(PluginCall.class);
+            when(adOptionsFactoryMock.createBannerOptions(call)).thenAnswer((invocation) -> {
+                when(activityMock.isDestroyed()).thenReturn(true);
+                sut.destroy();
+                return adOptionsMockForTesting;
+            });
+            sut.prepareBanner(call);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(call).reject("Activity unavailable");
+            assertEquals(0, adViewMockedConstruction.constructed().size());
+        }
+
+        @Test
+        void destroyDuringPreparedBannerSwapReleasesBothViewsOnce() throws Exception {
+            AdView shown = displayCurrentBanner();
+            prepare(mock(PluginCall.class)).onAdLoaded();
+            AdView replacement = adViewMockedConstruction.constructed().get(1);
+
+            CountDownLatch destroyingShown = new CountDownLatch(1);
+            CountDownLatch swapFinished = new CountDownLatch(1);
+            Mockito.doAnswer((invocation) -> {
+                destroyingShown.countDown();
+                assertTrue(swapFinished.await(5, TimeUnit.SECONDS));
+                return null;
+            })
+                .when(shown)
+                .destroy();
+            FutureTask<Void> teardown = new FutureTask<>(sut::destroy, null);
+            // Start teardown after show has claimed the prepared view, and finish the swap
+            // while the SDK is still destroying the displayed view on the other thread.
+            adViewIdHelperMockedStatic
+                .when(() -> AdViewIdHelper.getFinalAdId(any(), any(), any(), any()))
+                .thenAnswer((invocation) -> {
+                    when(activityMock.isDestroyed()).thenReturn(true);
+                    new Thread(teardown).start();
+                    assertTrue(destroyingShown.await(5, TimeUnit.SECONDS));
+                    return null;
+                });
+            try {
+                sut.showBanner(mock(PluginCall.class), true);
+            } finally {
+                swapFinished.countDown();
+            }
+            teardown.get(5, TimeUnit.SECONDS);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            runnableArgumentCaptor.getValue().run();
+
+            verify(shown).destroy();
+            verify(replacement).destroy();
         }
 
         @Test
