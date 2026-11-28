@@ -432,6 +432,7 @@ public class AdMob extends Plugin {
             nativeAdPlacementChannelRegistered = false;
         }
         nativeAdExecutor.destroyAll();
+        bannerExecutor.destroy();
         super.handleOnDestroy();
     }
 }

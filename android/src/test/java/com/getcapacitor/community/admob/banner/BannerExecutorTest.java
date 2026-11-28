@@ -463,6 +463,56 @@ class BannerExecutorTest {
         }
 
         @Test
+        void destroyDestroysShownAndPreparedBanners() {
+            AdView shown = displayCurrentBanner();
+            PluginCall call = mock(PluginCall.class);
+            prepare(call);
+            try (
+                MockedStatic<android.os.Looper> looper = Mockito.mockStatic(android.os.Looper.class);
+                MockedConstruction<android.os.Handler> handlers = Mockito.mockConstruction(android.os.Handler.class, (handler, context) ->
+                    when(handler.post(any())).thenAnswer((invocation) -> {
+                        invocation.<Runnable>getArgument(0).run();
+                        return true;
+                    })
+                )
+            ) {
+                sut.destroy();
+            }
+            verify(shown).destroy();
+            verify(adViewMockedConstruction.constructed().get(1)).destroy();
+            verify(call).reject(any(), Mockito.<String>isNull());
+            assertBannerSize(0, 0);
+        }
+
+        @Test
+        void callsThatArriveAroundDestroyAreRejected() {
+            displayCurrentBanner();
+            PluginCall hide = mock(PluginCall.class);
+            sut.hideBanner(hide);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            sut.destroy();
+            runnableArgumentCaptor.getValue().run();
+            verify(hide).reject("Banner was removed before it could be hidden");
+
+            when(activityMock.isDestroyed()).thenReturn(true);
+            PluginCall show = mock(PluginCall.class);
+            sut.showBanner(show, true);
+            verify(show).reject("Activity unavailable");
+            assertEquals(1, adViewMockedConstruction.constructed().size());
+        }
+
+        @Test
+        void showBannerDestroysItsBannerWhenTheActivityIsGoneBeforeLoading() {
+            sut.showBanner(mock(PluginCall.class), true);
+            verify(activityMock).runOnUiThread(runnableArgumentCaptor.capture());
+            when(activityMock.isDestroyed()).thenReturn(true);
+            runnableArgumentCaptor.getValue().run();
+            AdView ad = adViewMockedConstruction.constructed().get(0);
+            verify(ad, never()).loadAd(any());
+            verify(ad).destroy();
+        }
+
+        @Test
         @DisplayName("Banner constructs the request using the RequestHelper")
         void showBannerUsesRequestHelper() {
             PluginCall pluginCallMock = mock(PluginCall.class);

@@ -342,6 +342,10 @@ public class BannerExecutor extends Executor {
     }
 
     public void showBanner(final PluginCall call, boolean systemBarsHandlesInsets) {
+        if (liveActivity() == null) {
+            call.reject("Activity unavailable");
+            return;
+        }
         final AdOptions adOptions = AdOptions.getFactory().createBannerOptions(call);
         float density = contextSupplier.get().getResources().getDisplayMetrics().density;
 
@@ -475,7 +479,7 @@ public class BannerExecutor extends Executor {
 
         try {
             activitySupplier.get().runOnUiThread(() -> {
-                if (mAdViewLayout != null) {
+                if (mAdViewLayout != null && mAdView != null) {
                     mAdViewLayout.setVisibility(View.GONE);
                     mAdView.pause();
 
@@ -484,6 +488,8 @@ public class BannerExecutor extends Executor {
                     notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
 
                     call.resolve();
+                } else {
+                    call.reject("Banner was removed before it could be hidden");
                 }
             });
         } catch (Exception ex) {
@@ -508,6 +514,18 @@ public class BannerExecutor extends Executor {
             call.resolve();
         } catch (Exception ex) {
             call.reject(ex.getLocalizedMessage(), ex);
+        }
+    }
+
+    /**
+     * Destroys the banner and any prepared banner with the plugin's activity. Called on the
+     * main thread. A banner that is never destroyed keeps the destroyed activity alive.
+     */
+    public void destroy() {
+        discardPreparedBanner(takePreparedBanner(), "Banner preparation was cancelled because the activity was destroyed", null);
+        if (mAdView != null) {
+            mAdView.destroy();
+            mAdView = null;
         }
     }
 
@@ -619,6 +637,11 @@ public class BannerExecutor extends Executor {
             }
             if (adView != mAdView) {
                 // Banner was removed or replaced before this task ran.
+                return;
+            }
+            if (liveActivity() == null) {
+                // The activity was destroyed after showBanner() checked it.
+                destroy();
                 return;
             }
             final AdRequest adRequest = usePrepared ? null : RequestHelper.createRequest(adOptions);
