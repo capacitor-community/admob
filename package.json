@@ -8,11 +8,12 @@
   "types": "dist/esm/index.d.ts",
   "unpkg": "dist/plugin.js",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=24.0.0"
   },
   "files": [
     "android/src/main/",
     "android/build.gradle",
+    "android/proguard-rules.pro",
     "dist/",
     "docs/",
     "ios/Sources",
@@ -50,10 +51,10 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@capacitor/android": "^8.0.0",
-    "@capacitor/cli": "^8.0.0",
-    "@capacitor/core": "^8.0.0",
-    "@capacitor/ios": "^8.0.0",
+    "@capacitor/android": "9.0.0-rc.1",
+    "@capacitor/cli": "9.0.0-rc.1",
+    "@capacitor/core": "9.0.0-rc.1",
+    "@capacitor/ios": "9.0.0-rc.1",
     "@ionic/eslint-config": "^0.4.0",
     "@ionic/prettier-config": "^4.0.0",
     "@ionic/swiftlint-config": "^2.0.0",
@@ -72,7 +73,6 @@
     "@rollup/plugin-node-resolve": "^16.0.3"
   },
   "dependencies": {
-    "@capacitor/core": "^8.0.0",
     "@rdlabo/capacitor-docgen": "^0.4.1",
     "@webview-native-ui/engine": "^1.0.10"
   },
@@ -102,5 +102,8 @@
     "android": {
       "src": "android"
     }
+  },
+  "peerDependencies": {
+    "@capacitor/core": ">=9.0.0-rc.1"
   }
 }

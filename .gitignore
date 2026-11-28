@@ -62,3 +62,5 @@ captures/
 
 # vscode generates some debug.log files on some machines
 debug.log
+
+.kotlin/

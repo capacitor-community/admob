@@ -67,7 +67,7 @@ Capacitor community plugin for native AdMob. This plugin wraps the Google Mobile
 
 This plugin already ships Google Mobile Ads SDK. Install the package, then add your AdMob **application** ID in AndroidManifest / Info.plist. Google's Get started guides for [Android](https://developers.google.com/admob/android/quick-start) and [iOS](https://developers.google.com/admob/ios/quick-start) explain app IDs and SKAdNetwork identifiers (Apple's ad conversion IDs); do not add a second Mobile Ads dependency.
 
-This plugin targets `@capacitor-community/admob` **v8.2.0** and Capacitor 8.5 or later (within v8). It supports iOS 15 or later and Android API 24 or later.
+This branch targets Capacitor 9 (9.0.0-rc.1 or later), iOS 16 or later and Android API 26 or later.
 
 ```bash
 npm install @capacitor-community/admob

@@ -28,9 +28,9 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.graphics.Insets;
-import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.community.admob.banner.BannerExecutor.BannerInsets;
 import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
 import com.getcapacitor.community.admob.helpers.RequestHelper;
 import com.getcapacitor.community.admob.models.AdOptions;
@@ -638,12 +638,10 @@ class BannerExecutorTest {
             ArgumentCaptor<View.OnApplyWindowInsetsListener> listener = ArgumentCaptor.forClass(View.OnApplyWindowInsetsListener.class);
             verify(banner).setOnApplyWindowInsetsListener(listener.capture());
             WindowInsets platformInsets = mock(WindowInsets.class);
-            WindowInsetsCompat compat = mock(WindowInsetsCompat.class);
-            when(compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout())).thenReturn(
-                Insets.of(0, 32, 0, 24)
-            );
-            try (MockedStatic<WindowInsetsCompat> conversion = Mockito.mockStatic(WindowInsetsCompat.class)) {
-                conversion.when(() -> WindowInsetsCompat.toWindowInsetsCompat(platformInsets, banner)).thenReturn(compat);
+            try (MockedStatic<BannerInsets> conversion = Mockito.mockStatic(BannerInsets.class)) {
+                conversion
+                    .when(() -> BannerInsets.read(banner, platformInsets))
+                    .thenReturn(new BannerInsets(Insets.of(0, 32, 0, 24), false, 0));
                 clearInvocations(params);
                 listener.getValue().onApplyWindowInsets(banner, platformInsets);
                 listener.getValue().onApplyWindowInsets(banner, platformInsets);
@@ -739,16 +737,10 @@ class BannerExecutorTest {
             verify(banner).setOnApplyWindowInsetsListener(listener.capture());
             verify(viewGroupMock, never()).setOnApplyWindowInsetsListener(any());
             WindowInsets platformInsets = mock(WindowInsets.class);
-            WindowInsetsCompat compat = mock(WindowInsetsCompat.class);
-            when(compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout())).thenReturn(
-                Insets.of(0, 32, 0, safeBottom)
-            );
-            when(compat.isVisible(WindowInsetsCompat.Type.ime())).thenReturn(keyboardVisible);
-            if (keyboardVisible) {
-                when(compat.getInsets(WindowInsetsCompat.Type.ime())).thenReturn(Insets.of(0, 0, 0, imeBottom));
-            }
-            try (MockedStatic<WindowInsetsCompat> conversion = Mockito.mockStatic(WindowInsetsCompat.class)) {
-                conversion.when(() -> WindowInsetsCompat.toWindowInsetsCompat(platformInsets, banner)).thenReturn(compat);
+            try (MockedStatic<BannerInsets> conversion = Mockito.mockStatic(BannerInsets.class)) {
+                conversion
+                    .when(() -> BannerInsets.read(banner, platformInsets))
+                    .thenReturn(new BannerInsets(Insets.of(0, 32, 0, safeBottom), keyboardVisible, imeBottom));
                 clearInvocations(params);
                 assertSame(platformInsets, listener.getValue().onApplyWindowInsets(banner, platformInsets));
                 verify(params).setMargins(0, expectedTop, 0, expectedBottom);
@@ -775,14 +767,10 @@ class BannerExecutorTest {
             ArgumentCaptor<View.OnApplyWindowInsetsListener> listener = ArgumentCaptor.forClass(View.OnApplyWindowInsetsListener.class);
             verify(banner).setOnApplyWindowInsetsListener(listener.capture());
             WindowInsets platformInsets = mock(WindowInsets.class);
-            WindowInsetsCompat compat = mock(WindowInsetsCompat.class);
-            when(compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout())).thenReturn(
-                Insets.of(0, 32, 0, 24)
-            );
-            when(compat.isVisible(WindowInsetsCompat.Type.ime())).thenReturn(false, true, false, false);
-            when(compat.getInsets(WindowInsetsCompat.Type.ime())).thenReturn(Insets.of(0, 0, 0, 300));
-            try (MockedStatic<WindowInsetsCompat> conversion = Mockito.mockStatic(WindowInsetsCompat.class)) {
-                conversion.when(() -> WindowInsetsCompat.toWindowInsetsCompat(platformInsets, banner)).thenReturn(compat);
+            var hidden = new BannerInsets(Insets.of(0, 32, 0, 24), false, 0);
+            var visible = new BannerInsets(Insets.of(0, 32, 0, 24), true, 300);
+            try (MockedStatic<BannerInsets> conversion = Mockito.mockStatic(BannerInsets.class)) {
+                conversion.when(() -> BannerInsets.read(banner, platformInsets)).thenReturn(hidden, visible, hidden, hidden);
                 clearInvocations(params);
                 for (int i = 0; i < 4; i++) {
                     listener.getValue().onApplyWindowInsets(banner, platformInsets);
