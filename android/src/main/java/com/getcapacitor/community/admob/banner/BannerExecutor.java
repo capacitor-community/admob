@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
@@ -45,6 +46,16 @@ public class BannerExecutor extends Executor {
     private int[] mBannerMargins;
     private ViewGroup mViewGroup;
     private PreparedBanner preparedBanner;
+
+    record BannerInsets(Insets safeArea, boolean imeVisible, int imeBottom) {
+        static BannerInsets read(View view, WindowInsets insets) {
+            WindowInsetsCompat compat = WindowInsetsCompat.toWindowInsetsCompat(insets, view);
+            Insets safeArea = compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            boolean imeVisible = compat.isVisible(WindowInsetsCompat.Type.ime());
+            int imeBottom = imeVisible ? compat.getInsets(WindowInsetsCompat.Type.ime()).bottom : 0;
+            return new BannerInsets(safeArea, imeVisible, imeBottom);
+        }
+    }
 
     private static final class PreparedBanner {
 
@@ -447,10 +458,9 @@ public class BannerExecutor extends Executor {
             // Use the insets remaining after Capacitor's parent layout has handled them.
             // Replacing the decor-view listener would override SystemBars' safe-area handling.
             mAdViewLayout.setOnApplyWindowInsetsListener((v, insets) -> {
-                WindowInsetsCompat compat = WindowInsetsCompat.toWindowInsetsCompat(insets, v);
-                Insets safeArea = compat.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-                boolean keyboardVisible =
-                    compat.isVisible(WindowInsetsCompat.Type.ime()) && compat.getInsets(WindowInsetsCompat.Type.ime()).bottom > 0;
+                BannerInsets remaining = BannerInsets.read(v, insets);
+                Insets safeArea = remaining.safeArea();
+                boolean keyboardVisible = remaining.imeVisible() && remaining.imeBottom() > 0;
                 // SystemBars already pads the parent for the keyboard. Neither the IME
                 // height nor the navigation bar belongs in the banner's margin then.
                 // With insetsHandling=disable, the host app owns keyboard avoidance.
