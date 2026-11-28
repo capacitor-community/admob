@@ -132,6 +132,23 @@ describe('NativeAdFeed', () => {
     );
   });
 
+  it('updates the native clip when the visual viewport pans without a DOM scroll', async () => {
+    const viewport = Object.assign(new EventTarget(), { offsetLeft: 0, offsetTop: 0, width: 400, height: 600 });
+    vi.stubGlobal('visualViewport', viewport);
+    const feed = await NativeAdFeed.create({ feedId: 'viewport', isTesting: true });
+    createdFeeds.push(feed);
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+    feed.attach('ad', element);
+    await settle();
+    viewport.offsetLeft = 50;
+    viewport.dispatchEvent(new Event('scroll'));
+    await settle();
+    expect(bridge.updateNativeAdPlacements).toHaveBeenLastCalledWith(expect.objectContaining({
+      placements: [expect.objectContaining({ clipRect: { x: 50, y: 20, width: 260, height: 320 }, visible: true })],
+    }));
+  });
+
   it('follows scrolling once per frame, clips the ad, and skips unchanged placements', async () => {
     const feed = await NativeAdFeed.create({ feedId: 'feed-scroll', isTesting: true });
     createdFeeds.push(feed);
@@ -222,6 +239,8 @@ describe('NativeAdFeed', () => {
     scroller.style.overflow = 'auto';
     scroller.getBoundingClientRect = () => new DOMRect(0, 100, 300, 500);
     Object.defineProperties(scroller, {
+      clientWidth: { value: 300 },
+      clientHeight: { value: 500 },
       scrollWidth: { value: 300 },
       scrollHeight: { value: 1200 },
     });
@@ -230,7 +249,12 @@ describe('NativeAdFeed', () => {
     document.body.appendChild(scroller);
     scroller.scrollTop = 400;
     element.getBoundingClientRect = () => new DOMRect(10, 80, 280, 320);
-    const feed = await NativeAdFeed.create({ feedId: 'ios-scroll', isTesting: true, scrollElement: scroller });
+    const feed = await NativeAdFeed.create({
+      feedId: 'ios-scroll',
+      isTesting: true,
+      scrollElement: scroller,
+      visibleArea: () => ({ x: 0, y: 120, width: 300, height: 400 }),
+    });
     createdFeeds.push(feed);
     feed.attach('tracked', element);
     await settle();
@@ -239,7 +263,7 @@ describe('NativeAdFeed', () => {
       expect.objectContaining({
         scrollContainer: {
           rect: { x: 0, y: 100, width: 300, height: 500 },
-          clipRect: { x: 0, y: 100, width: 300, height: 500 },
+          clipRect: { x: 0, y: 120, width: 300, height: 400 },
           contentWidth: 300,
           contentHeight: 1200,
         },
@@ -305,6 +329,7 @@ describe('NativeAdFeed', () => {
     scroller.style.overflow = 'auto';
     scroller.appendChild(document.createElement('slot'));
     root.appendChild(scroller);
+    Object.defineProperties(scroller, { clientWidth: { value: 400 }, clientHeight: { value: 200 } });
     scroller.getBoundingClientRect = () => ({
       x: 0,
       y: 100,
@@ -413,6 +438,27 @@ describe('NativeAdFeed', () => {
         placements: [expect.objectContaining({ visible: true })],
       }),
     );
+  });
+
+  it('releases a detached slot once and loads it again on reattachment', async () => {
+    const feed = await NativeAdFeed.create({ feedId: 'release', isTesting: true });
+    createdFeeds.push(feed);
+    const element = document.createElement('div');
+    document.body.append(element);
+    feed.attach('ad', element);
+    await settle();
+
+    await feed.release('ad');
+    expect(bridge.removeNativeAd).not.toHaveBeenCalled();
+    feed.detach(element);
+    await feed.release('ad');
+    await feed.release('ad');
+    expect(bridge.removeNativeAd).toHaveBeenCalledOnce();
+    expect(bridge.removeNativeAd).toHaveBeenCalledWith(expect.objectContaining({ feedId: feed.feedId, slotKey: 'ad' }));
+    await expect(feed.reload('ad')).rejects.toThrow('not registered');
+    feed.attach('ad', element);
+    await settle();
+    expect(bridge.loadNativeAd).toHaveBeenCalledTimes(2);
   });
 
   it('bounds detached slot state and loads an evicted logical slot again', async () => {
@@ -894,7 +940,7 @@ describe('NativeAdFeed', () => {
     });
 
     it('uses live clipping when visibleArea and Android snapshots are both configured', async () => {
-      const { element } = await setup(() => ({ x: 0, y: 100, width: 400, height: 200 }));
+      const { feed, element } = await setup(() => ({ x: 0, y: 100, width: 400, height: 200 }));
       expect(placementBindings.has(element)).toBe(false);
       expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].clipRect).toEqual({
         x: 10,
@@ -902,6 +948,10 @@ describe('NativeAdFeed', () => {
         width: 300,
         height: 200,
       });
+      await feed.invalidateLayout();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(false);
+      await settle();
+      expect(bridge.updateNativeAdPlacements.mock.lastCall?.[0].placements[0].visible).toBe(true);
       element.getBoundingClientRect = () => new DOMRect(10, 310, 300, 320);
       document.dispatchEvent(new Event('scroll'));
       await vi.advanceTimersByTimeAsync(20);

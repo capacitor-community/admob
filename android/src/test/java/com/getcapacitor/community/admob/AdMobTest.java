@@ -77,6 +77,12 @@ public class AdMobTest {
         bannerExecutorMockedConstruction.close();
     }
 
+    @Test
+    void destroyingThePluginReleasesItsBanner() {
+        sut.handleOnDestroy();
+        verify(bannerExecutorMockedConstruction.constructed().get(0)).destroy();
+    }
+
     @Nested
     @DisplayName("Initialize()")
     class Initialize {

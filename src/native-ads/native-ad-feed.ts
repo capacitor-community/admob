@@ -1,19 +1,18 @@
 import { Capacitor } from '@capacitor/core';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { bindProjectionPlacement, type ProjectionPlacementBinding } from '@webview-native-ui/engine';
+import {
+  bindProjectionPlacement,
+  observeProjectionLayout,
+  type ProjectionPlacementBinding,
+} from '@webview-native-ui/engine';
 
 import type { NativeAdDefinitions } from './native-ad-definitions.interface';
 import { connectNativeAdElements, defineNativeAdElement } from './native-ad-element';
 import type { NativeAdEvent, NativeAdErrorEvent, NativeAdRevenueEvent } from './native-ad-event.interface';
-import {
-  intersectRects,
-  measureNativeAdSlot,
-  measureNativeAdScrollContainer,
-  nativeAdAncestors,
-} from './native-ad-geometry';
+import { measureNativeAdSlot, measureNativeAdScrollContainer } from './native-ad-geometry';
 import type { MeasuredNativeAdSlot } from './native-ad-geometry';
 import type { NativeAdFeedOptions } from './native-ad-options.interface';
-import type { NativeAdPlacement, NativeAdRect } from './native-ad-placement.interface';
+import type { NativeAdPlacement } from './native-ad-placement.interface';
 import type { NativeAdPluginEvents } from './native-ad-plugin-events.enum';
 import { NativeAdTemplate } from './native-ad-template.enum';
 
@@ -83,7 +82,7 @@ export class NativeAdFeed {
   private readonly sessionId = createSessionId();
   private readonly slots = new Map<string, SlotState>();
   private readonly elementSlots = new Map<HTMLElement, string>();
-  private readonly scrollRoots = new Set<ShadowRoot>();
+  private stopObservingLayout: () => void;
   private readonly intersectionObserver?: IntersectionObserver;
   private readonly resizeObserver?: ResizeObserver;
   private destroyed = false;
@@ -141,11 +140,9 @@ export class NativeAdFeed {
       if (this.nativeScrollElement) this.resizeObserver.observe(this.nativeScrollElement);
     }
 
-    document.addEventListener('scroll', this.handleViewportMotion, true);
     document.addEventListener('touchmove', this.handleViewportMotion, { capture: true, passive: true });
     document.addEventListener('wheel', this.handleViewportMotion, { capture: true, passive: true });
-    window.addEventListener('resize', this.handleViewportMotion, { passive: true });
-    window.visualViewport?.addEventListener('resize', this.handleViewportMotion, { passive: true });
+    this.stopObservingLayout = observeProjectionLayout(window, this.elementSlots.keys(), this.handleViewportMotion);
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
     document.addEventListener('load', this.handleViewportMotion, true);
     feeds.set(id, this);
@@ -289,7 +286,7 @@ export class NativeAdFeed {
     state.lastUsed = Date.now();
     this.slots.set(normalizedKey, state);
     this.elementSlots.set(element, normalizedKey);
-    this.updateScrollRoots();
+    this.observeSlotLayout();
     this.intersectionObserver?.observe(element);
     this.resizeObserver?.observe(element);
     this.scheduleEvaluation();
@@ -314,7 +311,7 @@ export class NativeAdFeed {
     this.intersectionObserver?.unobserve(element);
     this.resizeObserver?.unobserve(element);
     this.elementSlots.delete(element);
-    this.updateScrollRoots();
+    this.observeSlotLayout();
     void this.requestPlacementUpdate();
     this.scheduleEvaluation();
   }
@@ -391,15 +388,9 @@ export class NativeAdFeed {
     if (!this.destroyed) {
       this.destroyed = true;
       feeds.delete(this.options.feedId);
-      document.removeEventListener('scroll', this.handleViewportMotion, true);
-      for (const root of this.scrollRoots) {
-        root.removeEventListener('scroll', this.handleViewportMotion, true);
-      }
-      this.scrollRoots.clear();
       document.removeEventListener('touchmove', this.handleViewportMotion, true);
       document.removeEventListener('wheel', this.handleViewportMotion, true);
-      window.removeEventListener('resize', this.handleViewportMotion);
-      window.visualViewport?.removeEventListener('resize', this.handleViewportMotion);
+      this.stopObservingLayout();
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
       document.removeEventListener('load', this.handleViewportMotion, true);
       if (this.settleTimer) {
@@ -434,14 +425,11 @@ export class NativeAdFeed {
       event.target.dataset['admobSnapshot'] !== undefined
     )
       return;
-    if (!(event instanceof Event) || !['scroll', 'touchmove', 'wheel'].includes(event.type)) {
+    const scrolling = event instanceof Event && ['scroll', 'touchmove', 'wheel'].includes(event.type);
+    if (!scrolling) {
       for (const state of this.slots.values()) state.lastPlacement = undefined;
     }
-    if (!(
-      this.nativeScrollElement &&
-      event instanceof Event &&
-      ['scroll', 'touchmove', 'wheel'].includes(event.type)
-    )) {
+    if (!this.nativeScrollElement || !scrolling) {
       this.schedulePlacementUpdate();
     }
     this.scheduleEvaluation();
@@ -457,27 +445,10 @@ export class NativeAdFeed {
     });
   }
 
-  private updateScrollRoots(): void {
-    const roots = new Set<ShadowRoot>();
-    for (const element of this.elementSlots.keys()) {
-      for (const ancestor of [element, ...nativeAdAncestors(element)]) {
-        const root = ancestor.getRootNode();
-        if (root instanceof ShadowRoot) roots.add(root);
-      }
-    }
-    for (const root of this.scrollRoots) {
-      if (!roots.has(root)) {
-        root.removeEventListener('scroll', this.handleViewportMotion, true);
-        this.scrollRoots.delete(root);
-      }
-    }
-    for (const root of roots) {
-      if (!this.scrollRoots.has(root)) {
-        // Element scroll events do not cross a shadow boundary.
-        root.addEventListener('scroll', this.handleViewportMotion, true);
-        this.scrollRoots.add(root);
-      }
-    }
+  private observeSlotLayout(): void {
+    if (this.destroyed) return;
+    this.stopObservingLayout();
+    this.stopObservingLayout = observeProjectionLayout(window, this.elementSlots.keys(), this.handleViewportMotion);
   }
 
   private readonly handleVisibilityChange = (): void => {
@@ -579,7 +550,7 @@ export class NativeAdFeed {
 
   private getVisibleStates(): SlotState[] {
     return [...this.slots.values()].filter((state) => {
-      if (this.reuseProjectedPlacement(state)) return state.intersecting && !!state.lastPlacement?.visible;
+      if (this.projectedPlacement(state)) return state.intersecting;
       const measured = state.element && state.intersecting ? measureNativeAdSlot(state.element) : undefined;
       return Boolean(measured && this.isSupportedSize(measured));
     });
@@ -645,35 +616,30 @@ export class NativeAdFeed {
     this.elementSlots.clear();
   }
 
-  private reuseProjectedPlacement(state: SlotState): boolean {
-    return Boolean(
+  private projectedPlacement(state: SlotState): NativeAdPlacement | undefined {
+    const placement = state.lastPlacement;
+    if (
       state.placementBinding?.projected &&
-      state.lastPlacement?.visible &&
+      placement?.visible &&
       state.element?.isConnected &&
       !this.paused &&
       !this.destroyed &&
       !document.hidden &&
       state.status === 'loaded' &&
-      state.lastPlacement.generation === state.generation,
-    );
-  }
-
-  /** The app's visible area for ads, when it gives a usable one. */
-  private visibleArea(): NativeAdRect | undefined {
-    const area = this.options.visibleArea?.();
-    return area && [area.x, area.y, area.width, area.height].every(Number.isFinite) ? area : undefined;
+      placement.generation === state.generation
+    ) return placement;
+    return undefined;
   }
 
   private measurePlacement(state: SlotState): NativeAdPlacement {
-    let measured = state.element ? measureNativeAdSlot(state.element, this.nativeScrollElement) : undefined;
-    // With JavaScript placement the clip is in viewport coordinates; with iOS
-    // native scroll tracking it is in content coordinates, and the scroll
-    // container's clip is cut to the visible area instead.
-    const area = this.nativeScrollElement ? undefined : this.visibleArea();
-    if (measured && area) {
-      const clipRect = intersectRects(measured.clipRect, area);
-      measured = clipRect.width > 0 && clipRect.height > 0 ? { ...measured, clipRect } : undefined;
-    }
+    // Native scrolling applies the viewport clip to the scroll container.
+    const measured = state.element
+      ? measureNativeAdSlot(
+          state.element,
+          this.nativeScrollElement,
+          this.nativeScrollElement ? undefined : this.options.visibleArea?.(),
+        )
+      : undefined;
     return {
       feedId: this.options.feedId,
       slotKey: state.slotKey,
@@ -714,19 +680,16 @@ export class NativeAdFeed {
         const placements = [...this.slots.values()]
           .filter((state) => state.status === 'loaded')
           .map((state): NativeAdPlacement => {
-            if (this.reuseProjectedPlacement(state)) {
+            const cached = this.projectedPlacement(state);
+            if (cached) {
               retainedSlots.add(state.slotKey);
-              return state.lastPlacement!;
+              return cached;
             }
             return (state.lastPlacement = this.measurePlacement(state));
           });
         const scrollContainer = this.nativeScrollElement
-          ? measureNativeAdScrollContainer(this.nativeScrollElement)
+          ? measureNativeAdScrollContainer(this.nativeScrollElement, this.options.visibleArea?.())
           : undefined;
-        const area = scrollContainer ? this.visibleArea() : undefined;
-        if (scrollContainer && area) {
-          scrollContainer.clipRect = intersectRects(scrollContainer.clipRect, area);
-        }
         const serializedPlacements = JSON.stringify({ placements, scrollContainer });
         if (serializedPlacements === this.lastPlacements && (allowDirect || !this.lastPlacementWasDirect)) {
           continue;

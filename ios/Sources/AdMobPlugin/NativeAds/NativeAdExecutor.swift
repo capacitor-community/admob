@@ -2,6 +2,7 @@ import Capacitor
 import Foundation
 import GoogleMobileAds
 import UIKit
+import WebViewNativeUIEngine
 
 final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate {
     static let testAdUnitID = "ca-app-pub-3940256099942544/3986624511"
@@ -16,7 +17,7 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
         let slotKey: String
         let nativeAd: NativeAd
         let adView: PluginNativeAdView
-        let clippingView: UIView
+        let clippingView: NativeUIClippedView
         var generation = -1
 
         init(
@@ -26,7 +27,7 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
             slotKey: String,
             nativeAd: NativeAd,
             adView: PluginNativeAdView,
-            clippingView: UIView
+            clippingView: NativeUIClippedView
         ) {
             self.feedId = feedId
             self.isSmall = isSmall
@@ -159,9 +160,11 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
         call.resolve()
     }
 
-    func destroyAll() {
+    func destroyAll(documentReplaced: Bool = false) {
         scrollTrackers.removeAll()
-        for request in pending.values { request.call.reject("Native ad load was cancelled") }
+        if !documentReplaced {
+            for request in pending.values { request.call.reject("Native ad load was cancelled") }
+        }
         for stateKey in Array(states.keys) { destroyState(stateKey) }
         pending.removeAll()
         feedSessions.removeAll()
@@ -182,10 +185,8 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
         }
         nativeAd.delegate = self
         let adView = PluginNativeAdView(nativeAd: nativeAd, template: request.template, style: request.style)
-        let clippingView = UIView(frame: .zero)
-        clippingView.clipsToBounds = true
+        let clippingView = NativeUIClippedView(content: adView)
         clippingView.isHidden = true
-        clippingView.addSubview(adView)
 
         guard let webView = plugin?.bridge?.webView, let parent = webView.superview else {
             nativeAd.delegate = nil
@@ -248,17 +249,11 @@ final class NativeAdExecutor: NSObject, NativeAdLoaderDelegate, NativeAdDelegate
         if scrollTrackers[placement.feedId]?.host(state.clippingView, frame: placement.clip) != true {
             guard let parent = webView.superview else { return }
             if state.clippingView.superview !== parent { parent.addSubview(state.clippingView) }
-            state.clippingView.frame = parent.convert(placement.clip, from: webView)
         }
-        state.adView.frame = CGRect(
-            x: placement.rect.minX - placement.clip.minX,
-            y: placement.rect.minY - placement.clip.minY,
-            width: placement.rect.width,
-            height: placement.rect.height
-        )
+        guard let parent = state.clippingView.superview else { return }
+        state.clippingView.place(parent.convert(placement.rect, from: webView), clip: parent.convert(placement.clip, from: webView))
         state.generation = placement.generation
-        state.clippingView.isHidden = false
-        state.clippingView.superview?.bringSubviewToFront(state.clippingView)
+        parent.bringSubviewToFront(state.clippingView)
     }
 
     private func notify(_ event: NativeAdPluginEvents, nativeAd: NativeAd) {

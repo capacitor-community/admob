@@ -1,6 +1,7 @@
 import Foundation
 import Capacitor
 import GoogleMobileAds
+import WebViewNativeUIEngine
 #if canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 #endif
@@ -73,6 +74,7 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     private let adRewardInterstitialExecutor = AdRewardInterstitialExecutor()
     private let consentExecutor = ConsentExecutor()
     private let nativeAdExecutor = NativeAdExecutor()
+    private var nativeAdDocument: NativeUIDocumentObservation?
 
     public override func load() {
         self.consentExecutor.plugin = self
@@ -407,7 +409,14 @@ extension AdMobPlugin {
     // MARK: Native ads research preview
 
     @objc func startNativeAdFeed(_ call: CAPPluginCall) {
-        DispatchQueue.main.async { self.nativeAdExecutor.startFeed(call) }
+        DispatchQueue.main.async {
+            if self.nativeAdDocument == nil, let webView = self.webView {
+                self.nativeAdDocument = NativeUIDocumentObservation(webView: webView) { [weak self] in
+                    self?.nativeAdExecutor.destroyAll(documentReplaced: true)
+                }
+            }
+            self.nativeAdExecutor.startFeed(call)
+        }
     }
 
     @objc func destroyNativeAdFeed(_ call: CAPPluginCall) {

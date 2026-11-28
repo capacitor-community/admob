@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.util.DisplayMetrics
-import android.view.ViewGroup
-import android.widget.FrameLayout
+import io.github.webview_native_ui.engine.NativeUIScrollHosting
+import io.github.webview_native_ui.engine.NativeUIPixelFrame
 import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
@@ -29,12 +29,12 @@ class NativeAdExecutorTest {
             { mock(View::class.java) }, { _, _ -> }, "test")
         executor.startFeed(PluginCall(mock(MessageHandler::class.java), "AdMob", "1", "startNativeAdFeed",
             JSObject("""{"feedId":"feed","sessionId":"session"}""")))
-        val first = mock(FrameLayout::class.java)
-        val second = mock(FrameLayout::class.java)
+        val first = mock(NativeUIScrollHosting::class.java)
+        val second = mock(NativeUIScrollHosting::class.java)
         val stateClass = NativeAdExecutor::class.java.declaredClasses.single { it.simpleName == "NativeAdState" }
         val constructor = stateClass.declaredConstructors.single { it.parameterCount == 12 }.apply { isAccessible = true }
         val sequence = stateClass.getDeclaredField("placementSequence").apply { isAccessible = true }
-        fun state(container: FrameLayout, handoffSequence: Long): Any = constructor
+        fun state(container: NativeUIScrollHosting, handoffSequence: Long): Any = constructor
             .newInstance("feed", true, Any(), mock(NativeAd::class.java), mock(NativeAdView::class.java), container,
                 true, 1, null, null, true, null).also { sequence.setLong(it, handoffSequence) }
         @Suppress("UNCHECKED_CAST")
@@ -70,14 +70,18 @@ class NativeAdExecutorTest {
         val executor = NativeAdExecutor({ context }, { activity }, { mock(View::class.java) }, { _, _ -> }, "test")
         executor.startFeed(PluginCall(mock(MessageHandler::class.java), "AdMob", "1", "startNativeAdFeed",
             JSObject("""{"feedId":"feed","sessionId":"session"}""")))
-        val imageContainer = mock(FrameLayout::class.java)
-        val nativeContainer = mock(FrameLayout::class.java)
+        val imageContainer = mock(NativeUIScrollHosting::class.java)
+        val placed = mutableListOf<NativeUIPixelFrame>()
+        val nativeContainer = mock(NativeUIScrollHosting::class.java) { call ->
+            if (call.method.name == "place") {
+                placed.add(call.getArgument(1))
+                true
+            } else RETURNS_DEFAULTS.answer(call)
+        }
         val imageView = mock(NativeAdView::class.java)
         val nativeView = mock(NativeAdView::class.java)
         `when`(imageContainer.visibility).thenReturn(View.VISIBLE)
         `when`(nativeContainer.visibility).thenReturn(View.VISIBLE)
-        `when`(nativeContainer.layoutParams).thenReturn(mock(ViewGroup.LayoutParams::class.java).apply { width=200; height=200 })
-        `when`(nativeView.layoutParams).thenReturn(mock(ViewGroup.LayoutParams::class.java).apply { width=200; height=200 })
         `when`(nativeView.width).thenReturn(200)
         `when`(nativeView.height).thenReturn(200)
         val stateClass = NativeAdExecutor::class.java.declaredClasses.single { it.simpleName == "NativeAdState" }
@@ -100,18 +104,15 @@ class NativeAdExecutorTest {
             "rect":{"x":10,"y":40,"width":200,"height":200},
             "clipRect":{"x":10,"y":40,"width":200,"height":200}}"""
         executor.updateDirectPlacements("""{"feedId":"feed","sessionId":"session","sequence":20,"placements":[$retain,$placement]}""")
-        verify(nativeContainer).y = 40f
-        verify(nativeContainer).visibility = View.VISIBLE
+        assertEquals(listOf(40), placed.map { it.y })
+        org.junit.Assert.assertFalse(mockingDetails(imageContainer).invocations.any { it.method.name == "place" })
         verify(imageContainer, never()).visibility = anyInt()
-        verify(imageContainer, never()).x = anyFloat()
-        verify(imageContainer, never()).y = anyFloat()
         verifyNoInteractions(imageView)
         org.junit.Assert.assertSame(pending, deferred.get(imageState))
         assertEquals(10L, sequence.getLong(imageState))
         assertEquals(20L, sequence.getLong(nativeState))
         // The final image placement was measured at 19 but arrives after retain batch 20.
         // This is the same per-slot freshness predicate used by updatePlacement.
-        org.junit.Assert.assertTrue(19L > sequence.getLong(imageState))
         sequence.setLong(imageState, 19L)
         executor.updateDirectPlacements("""{"feedId":"feed","sessionId":"session","sequence":21,"placements":[$retain,$placement]}""")
         assertEquals(19L, sequence.getLong(imageState))
@@ -140,10 +141,9 @@ class NativeAdExecutorTest {
         )
         val adView = mock(NativeAdView::class.java)
         val media = mock(MediaView::class.java)
-        val container = mock(FrameLayout::class.java)
-        val params = mock(ViewGroup.LayoutParams::class.java).apply { width = 320; height = 400 }
-        `when`(adView.layoutParams).thenReturn(params)
-        `when`(container.layoutParams).thenReturn(params)
+        val container = mock(NativeUIScrollHosting::class.java) { call ->
+            if (call.method.name == "place") true else RETURNS_DEFAULTS.answer(call)
+        }
         `when`(container.visibility).thenReturn(View.VISIBLE)
         `when`(adView.mediaView).thenReturn(media)
         `when`(media.measuredWidth).thenReturn(200)
